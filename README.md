@@ -217,22 +217,28 @@ one command.
 firebase apps:sdkconfig android 1:522013714152:android:66c18f123b33d8de53cb5d   --project clickclack-002827 --out app/google-services.json
 ```
 
-### The one step left, and it is manual
+Google **is** enabled as a sign-in provider, so the config carries two OAuth
+clients — an Android one bound to the SHA-1 above, and the web one that becomes
+`default_web_client_id`. Enabling it is console-only; there is no `firebase`
+command, and until it was done the config had an empty `oauth_client` array and
+no web client id was generated.
 
-**Google is not yet enabled as a sign-in provider.** Until it is, the generated
-config has an empty `oauth_client` array, no `default_web_client_id` resource is
-produced, and tapping *Continue with Google* fails with a message saying so.
+To go back to the fake auth path while designing a screen, **delete
+`app/google-services.json`**. Detection is automatic, so removing the file is
+the whole of it.
 
-There is no `firebase` command for this. In the
-[console](https://console.firebase.google.com/project/clickclack-002827/authentication/providers):
-Authentication → Sign-in method → Google → Enable → Save. That creates the OAuth
-web client the flow needs.
+### Verified on device
 
-Then regenerate the config with the command above and rebuild.
+Up to the account picker: the app opens Google's sheet, correctly branded
+("to continue to Click Clack", with the launcher icon), and dismissing it logs
+`Sign-in dismissed` and returns to the sign-in screen with no error shown —
+which is the intended handling of `GetCredentialCancellationException`.
 
-Until then, **delete `app/google-services.json`** to go back to the fake auth
-path and keep working — the detection is automatic, so removing the file is the
-whole of it.
+The final hop is unverified: the emulator has no Google account attached, so
+the picker only offers "Add another account". Completing sign-in needs real
+credentials and therefore a person. What that will exercise for the first time
+is `signInToFirebase` — the ID-token-for-session exchange — and the first write
+of a user to Firebase Auth.
 
 ### Still to do
 
