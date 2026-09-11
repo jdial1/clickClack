@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * in and rebuilding is the entire setup step -- nothing to remember to flip.
  */
 fun createAuthRepository(context: Context): AuthRepository =
-    if (hasFirebaseConfig(context)) GoogleAuthRepository(context) else FakeAuthRepository()
+    if (hasFirebaseConfigFor(context)) GoogleAuthRepository(context) else FakeAuthRepository()
 
-private fun hasFirebaseConfig(context: Context): Boolean {
+internal fun hasFirebaseConfigFor(context: Context): Boolean {
     @Suppress("DiscouragedApi")
     val id = context.resources.getIdentifier("google_app_id", "string", context.packageName)
     return id != 0 && context.getString(id).isNotBlank()
@@ -100,16 +100,21 @@ interface AuthRepository {
  * a Firebase project exists.
  */
 class FakeAuthRepository(
-    uid: String = "u_justin",
-    displayName: String = "Justin",
+    private val uid: String = "u_justin",
+    private val displayName: String = "Justin",
 ) : AuthRepository {
 
-    private val _state = MutableStateFlow<AuthState>(
-        AuthState.SignedIn(uid = uid, displayName = displayName, email = null, photoUrl = null),
-    )
+    private val signedIn =
+        AuthState.SignedIn(uid = uid, displayName = displayName, email = null, photoUrl = null)
+
+    private val _state = MutableStateFlow<AuthState>(signedIn)
     override val state: StateFlow<AuthState> = _state.asStateFlow()
 
-    override suspend fun signInWithGoogle(activity: Activity): Result<Unit> = Result.success(Unit)
+    /** Signs straight back in, so sign-out is a loop rather than a dead end. */
+    override suspend fun signInWithGoogle(activity: Activity): Result<Unit> {
+        _state.value = signedIn
+        return Result.success(Unit)
+    }
 
     override fun signOut() {
         _state.value = AuthState.SignedOut

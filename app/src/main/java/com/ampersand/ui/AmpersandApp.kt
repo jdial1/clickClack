@@ -27,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,9 +52,13 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.launch
 import com.ampersand.auth.AuthRepository
 import com.ampersand.auth.AuthState
+import com.ampersand.auth.PairState
+import com.ampersand.auth.PairingRepository
 import com.ampersand.auth.createAuthRepository
+import com.ampersand.auth.createPairingRepository
 import com.ampersand.auth.findActivity
 import com.ampersand.model.CoupleState
+import com.ampersand.ui.auth.PairingScreen
 import com.ampersand.ui.auth.SignInScreen
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
@@ -100,6 +105,21 @@ class AuthViewModel(val auth: AuthRepository) : ViewModel() {
     }
 }
 
+/**
+ * Pairing, keyed to the signed-in account.
+ *
+ * Separate from [AuthViewModel] because it cannot be built until there *is* an
+ * account: the Firestore implementation watches `users/{uid}`, and there is no
+ * uid to watch before sign-in.
+ */
+class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
+    companion object {
+        fun factory(context: Context, uid: String, name: String) = viewModelFactory {
+            initializer { PairingViewModel(createPairingRepository(context, uid, name)) }
+        }
+    }
+}
+
 /** The pack has no "black" in [BrickColor]; it is structure, not a choice. */
 private const val JoinerSlug = "black"
 
@@ -138,7 +158,15 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
 
             AuthState.SignedOut -> SignedOutScreen(authVm.auth)
 
-            is AuthState.SignedIn -> SignedInApp(vm, state)
+            is AuthState.SignedIn -> {
+                val account = auth as AuthState.SignedIn
+                PairedGate(
+                    vm = vm,
+                    state = state,
+                    account = account,
+                    onSignOut = authVm.auth::signOut,
+                )
+            }
         }
       }
     }
@@ -178,9 +206,89 @@ private fun SignedOutScreen(auth: AuthRepository) {
     }
 }
 
+/**
+ * Signed in, but the product needs two people.
+ *
+ * Keyed on the uid so switching accounts builds a new pairing repository rather
+ * than leaving the previous account's listener attached.
+ */
+@Composable
+private fun PairedGate(
+    vm: AmpersandViewModel,
+    state: CoupleState,
+    account: AuthState.SignedIn,
+    onSignOut: () -> Unit,
+) {
+    val context = LocalContext.current
+    val pairVm: PairingViewModel = viewModel(
+        key = "pairing_${account.uid}",
+        factory = PairingViewModel.factory(context, account.uid, account.displayName),
+    )
+    val pair by pairVm.pairing.state.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    when (val p = pair) {
+        PairState.Loading -> Surface(color = MaterialTheme.colorScheme.background) {
+            Box(Modifier.fillMaxSize())
+        }
+
+        is PairState.Paired -> SignedInApp(
+            vm = vm,
+            state = state,
+            account = account,
+            partner = p,
+            onSignOut = onSignOut,
+            onUnpair = { scope.launch { pairVm.pairing.unpair() } },
+        )
+
+        else -> Surface(color = MaterialTheme.colorScheme.background) {
+            PairingScreen(
+                name = account.displayName,
+                code = (p as? PairState.Inviting)?.code,
+                busy = busy,
+                error = error,
+                onCreateInvite = {
+                    busy = true; error = null
+                    scope.launch {
+                        val r = pairVm.pairing.createInvite()
+                        busy = false
+                        error = r.exceptionOrNull()?.message
+                    }
+                },
+                onRedeem = { code ->
+                    busy = true; error = null
+                    scope.launch {
+                        val r = pairVm.pairing.redeem(code)
+                        busy = false
+                        error = r.exceptionOrNull()?.message
+                    }
+                },
+            )
+        }
+    }
+}
+
 /** The whole product, once we know who is using it. */
 @Composable
-private fun SignedInApp(vm: AmpersandViewModel, state: CoupleState) {
+private fun SignedInApp(
+    vm: AmpersandViewModel,
+    state: CoupleState,
+    account: AuthState.SignedIn,
+    partner: PairState.Paired,
+    onSignOut: () -> Unit,
+    onUnpair: () -> Unit,
+) {
+        // Point both halves of the couple at the real accounts. Keyed on the
+        // uids so this runs once per pairing rather than every recomposition.
+        LaunchedEffect(account.uid, account.displayName) {
+            vm.repo.bindLocalUser(account.uid, account.displayName)
+        }
+        LaunchedEffect(partner.partnerUid, partner.partnerName) {
+            vm.repo.bindPartner(partner.partnerUid, partner.partnerName)
+        }
+
         var tab by remember { mutableStateOf(Tab.TODAY) }
         // The *date* of the open day, not the day itself. Holding the entry
         // would freeze it at the moment it was opened, so a reaction added on
@@ -201,6 +309,7 @@ private fun SignedInApp(vm: AmpersandViewModel, state: CoupleState) {
                                 today = state.today.date,
                                 kitOpen = showKit,
                                 onToggleKit = { showKit = !showKit },
+                                onUnpair = onUnpair,
                             )
                         }
                         BottomBar(
@@ -266,6 +375,8 @@ private fun SignedInApp(vm: AmpersandViewModel, state: CoupleState) {
                         else -> UsScreen(
                             state = state,
                             onPickColor = vm.repo::setColor,
+                            account = account.email ?: account.displayName,
+                            onSignOut = onSignOut,
                         )
                     }
 
@@ -393,6 +504,7 @@ private fun ScaffoldControls(
     today: LocalDate,
     kitOpen: Boolean,
     onToggleKit: () -> Unit,
+    onUnpair: () -> Unit,
 ) {
     Column(
         Modifier
@@ -413,6 +525,7 @@ private fun ScaffoldControls(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Chip("Seal the week") { repo.sealPlate() }
             Chip(if (kitOpen) "Close kit" else "Form kit", onClick = onToggleKit)
+            Chip("Unpair", onClick = onUnpair)
         }
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

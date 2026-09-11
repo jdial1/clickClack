@@ -34,6 +34,7 @@ import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.ColorChip
+import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.sound.LocalSounds
@@ -48,6 +49,8 @@ fun UsScreen(
     state: CoupleState,
     onPickColor: (uid: String, colorArgb: Long) -> Unit,
     modifier: Modifier = Modifier,
+    account: String? = null,
+    onSignOut: (() -> Unit)? = null,
 ) {
     Column(
         modifier
@@ -113,6 +116,23 @@ fun UsScreen(
         Upcoming("Wildcard", "One day a week, one of you writes the question.")
         Upcoming("Time capsule", "Some questions come back in six months, then vs. now.")
         Upcoming("Daily nudge", "One gentle reminder, at a time you choose.")
+
+        if (onSignOut != null) {
+            Spacer(Modifier.height(32.dp))
+            SectionLabel("Account")
+            Spacer(Modifier.height(10.dp))
+            if (account != null) {
+                Text(
+                    text = account,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+            // Black, not the user's colour. Leaving is structure, not a choice
+            // -- the same reason the nav joiners are black.
+            AmpButton(label = "Sign out", slug = "black", onClick = onSignOut)
+        }
 
         Spacer(Modifier.height(48.dp))
     }

@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// Click Clack.
+//
+// The seal is enforced here, not in the app. The UI hiding your partner's
+// answer would be a convention; this makes it unreadable.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+
+    function isMember(cid) {
+      return signedIn() &&
+        me() in get(/databases/$(database)/documents/couples/$(cid)).data.members;
+    }
+
+    // Name and colour. Readable by anyone signed in, because your partner has
+    // to be able to render you and there is nothing private here.
+    match /users/{uid} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update: if signedIn() && uid == me();
+      allow delete: if false;
+    }
+
+    // Pairing codes.
+    //
+    // `get` but never `list`. The code *is* the secret, so being able to
+    // enumerate the collection would hand over every outstanding invite in the
+    // app. Anyone holding a code may delete it, because redeeming one consumes
+    // it and the redeemer is by definition not the person who made it.
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.fromUid == me();
+      allow delete: if signedIn();
+      allow update: if false;
+    }
+
+    match /couples/{cid} {
+      allow get: if signedIn() && me() in resource.data.members;
+      allow list: if false;
+      // You may only create a couple you are in, and only of exactly two.
+      allow create: if signedIn()
+        && me() in request.resource.data.members
+        && request.resource.data.members.size() == 2;
+      allow update, delete: if false;
+
+      match /days/{day} {
+        allow read: if isMember(cid);
+        allow create, update: if isMember(cid);
+        allow delete: if false;
+
+        // The sealed part, and the reason answers are one document per person:
+        // rules are per-document and cannot hide a field inside a shared one.
+        // A single day document holding both answers would be readable by both
+        // from the moment the first person writes.
+        match /answers/{uid} {
+          allow read: if isMember(cid) && (
+            uid == me() ||
+            get(/databases/$(database)/documents/couples/$(cid)/days/$(day)).data.revealed == true
+          );
+          allow create: if isMember(cid) && uid == me();
+          // No edits after submit. That is the point.
+          allow update, delete: if false;
+        }
+      }
+
+      // Sealed sculptures. completedOn != null means finished, and a finished
+      // plate must not gain bricks from a late listener.
+      match /plates/{pid} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid);
+        allow update: if isMember(cid) && resource.data.completedOn == null;
+        allow delete: if false;
+      }
+    }
+  }
+}

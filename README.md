@@ -240,14 +240,57 @@ credentials and therefore a person. What that will exercise for the first time
 is `signInToFirebase` — the ID-token-for-session exchange — and the first write
 of a user to Firebase Auth.
 
+## Pairing
+
+Two signed-in people become a couple by one of them making a code and the other
+typing it.
+
+```
+users/{uid}      displayName, coupleId, inviteCode
+invites/{code}   fromUid, fromName, createdAt
+couples/{cid}    members[2], createdAt
+```
+
+Codes are **8 characters from a 32-symbol alphabet with no I, O, 0 or 1** —
+the pairs that get misheard and mistyped, and a code is worthless if it cannot
+survive being read down a phone. That is 2^40, which matters because the rules
+deliberately let any signed-in user `get` an invite by id: the code is the
+secret, so it has to be one. `get` is allowed and `list` never is, or the whole
+collection of outstanding invites would be readable.
+
+Redeeming is **one transaction**: read the invite, create the couple, point both
+user documents at it, delete the invite. Two people tapping at the same moment
+outside a transaction is how you get two couples each holding one person.
+
+The local user document is **watched**, not fetched. That is what makes pairing
+land on both phones — the person who made the code never touches their own
+document again, so without a listener their app would sit on the invite screen
+until it was restarted.
+
+`FakePairingRepository` starts **paired**, matching the mock couple, so the fake
+path is still the whole product. The scaffold panel has an **Unpair** chip for
+reaching the pairing screen deliberately.
+
+### Binding the accounts to the couple
+
+`bindLocalUser` / `bindPartner` rewrite a member *and every reference to them*:
+uids are map keys on every answer and reaction, `ownerUid` on every brick, and
+embedded in block ids of the form `date_uid`. Renaming the member alone is the
+obvious version and it silently guts ten weeks of history — the answers end up
+belonging to a user who no longer exists and the plate shows your bricks as
+your partner's.
+
+None of this is needed once Firestore owns the couple; it exists because the
+sample couple was invented before anyone had signed in.
+
 ### Still to do
 
-- `CoupleState` is still seeded from `MockCouple`; the signed-in uid is not
-  threaded into it yet, so you are Justin regardless of who signs in.
-- No sign-out control. `AuthRepository.signOut()` exists and nothing calls it;
-  the Us screen is the obvious home.
-- No pairing. Two signed-in people do not become a couple by themselves, and
-  the invite-code flow is not built.
+- `CoupleRepository` is still `FakeCoupleRepository`. Pairing and auth are real;
+  the questions, answers, bricks and shelf are not yet.
+- `unpair()` only clears your own user document. The rules let you write only
+  your own, so a one-sided unpair is the honest outcome — the partner keeps a
+  `coupleId` pointing at a couple you have left.
+- No expiry on invites. A code is valid until it is used.
 
 ## The build
 

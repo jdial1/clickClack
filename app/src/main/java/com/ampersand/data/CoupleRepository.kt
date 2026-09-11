@@ -27,6 +27,17 @@ interface CoupleRepository {
 
     val state: StateFlow<CoupleState>
 
+    /**
+     * Point the local half of the couple at the signed-in account.
+     *
+     * Idempotent, because it is called from a composition that can re-run for
+     * reasons that have nothing to do with the account changing.
+     */
+    fun bindLocalUser(uid: String, displayName: String)
+
+    /** Same, for the person you are paired with. */
+    fun bindPartner(uid: String, displayName: String)
+
     /** Submit your own answer for today. Irreversible, by design. */
     fun submitToday(values: List<String>, guess: List<String>?)
 
@@ -78,6 +89,69 @@ class FakeCoupleRepository(
 
     private val _state = MutableStateFlow(initial)
     override val state: StateFlow<CoupleState> = _state.asStateFlow()
+
+    /**
+     * Rewrite the local member, and every reference to them, to the real uid.
+     *
+     * The rewrite is the whole job. `you.uid` appears as a map key on every
+     * answer, as `ownerUid` on every brick, and inside block ids of the form
+     * `date_uid` -- so changing the member alone would leave ten weeks of
+     * history belonging to a user who no longer exists, and the plate would
+     * show your bricks as your partner's. Renaming without remapping is the
+     * obvious version of this and it silently guts the mock data.
+     *
+     * Firestore will not need any of this: there the uid is the uid from the
+     * first write. It exists because the sample couple was invented before
+     * anyone had signed in.
+     */
+    override fun bindLocalUser(uid: String, displayName: String) = mutate { current ->
+        if (current.you.uid == uid && current.you.name == displayName) return@mutate current
+        current.rebind(current.you.uid, uid) { copy(you = you.copy(uid = uid, name = displayName)) }
+    }
+
+    override fun bindPartner(uid: String, displayName: String) = mutate { current ->
+        if (current.them.uid == uid && current.them.name == displayName) return@mutate current
+        current.rebind(current.them.uid, uid) {
+            copy(them = them.copy(uid = uid, name = displayName))
+        }
+    }
+
+    private fun CoupleState.rebind(
+        old: String,
+        uid: String,
+        setMember: CoupleState.() -> CoupleState,
+    ): CoupleState {
+        fun remap(id: String) = if (id == old) uid else id
+
+        fun DayEntry.rebind() = copy(
+            answers = answers.mapKeys { remap(it.key) }
+                .mapValues { (_, a) -> a.copy(uid = remap(a.uid)) },
+            reactions = reactions.mapKeys { remap(it.key) },
+        )
+
+        fun BuildPlate.rebind() = copy(
+            blocks = blocks.map { b ->
+                b.copy(
+                    // Block ids are `date_uid` and are the idempotency key for
+                    // awarding, so they have to move with the owner.
+                    id = b.id.removeSuffix("_$old").let { if (it == b.id) b.id else "${it}_$uid" },
+                    ownerUid = remap(b.ownerUid),
+                )
+            },
+            placed = placed.map { p ->
+                p.copy(blockId = p.blockId.removeSuffix("_$old").let {
+                    if (it == p.blockId) p.blockId else "${it}_$uid"
+                })
+            },
+        )
+
+        return setMember().copy(
+            today = today.rebind(),
+            history = history.map { it.rebind() },
+            plate = plate.rebind(),
+            shelf = shelf.map { it.rebind() },
+        )
+    }
 
     override fun submitToday(values: List<String>, guess: List<String>?) = mutate { current ->
         val you = current.you
