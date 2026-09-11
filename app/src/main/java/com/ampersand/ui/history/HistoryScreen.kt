@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +50,7 @@ import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.Sculpture
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
@@ -128,6 +130,8 @@ fun HistoryScreen(
 private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
+    // The card is a wall of both colours and the text crosses it.
+    val ink = inkOnBricks(you.slug, them.slug)
 
     BrickSlab(
         slugs = listOf(you.slug, them.slug),
@@ -143,18 +147,18 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
             Text(
                 text = ago(entry.date, state.today.date),
                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
-                color = inkOnBrick(you.slug).copy(alpha = 0.75f),
+                color = ink.copy(alpha = 0.75f),
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = entry.question.text,
                 style = MaterialTheme.typography.titleMedium,
-                color = inkOnBrick(you.slug),
+                color = ink,
             )
             Spacer(Modifier.height(14.dp))
-            Said(state.you.name, entry.answerFor(state.you.uid)?.response, you.slug)
+            Said(state.you.name, entry.answerFor(state.you.uid)?.response, ink)
             Spacer(Modifier.height(8.dp))
-            Said(state.them.name, entry.answerFor(state.them.uid)?.response, you.slug)
+            Said(state.them.name, entry.answerFor(state.them.uid)?.response, ink)
 
             val marks = entry.reactions.values.toList()
             if (marks.isNotEmpty()) {
@@ -169,12 +173,12 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
 }
 
 @Composable
-private fun Said(name: String, what: String?, onSlug: String?) {
+private fun Said(name: String, what: String?, ink: Color) {
     if (what == null) return
     Text(
         text = "$name: $what",
         style = MaterialTheme.typography.bodyMedium,
-        color = inkOnBrick(onSlug).copy(alpha = 0.9f),
+        color = ink.copy(alpha = 0.9f),
     )
 }
 

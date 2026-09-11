@@ -61,6 +61,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.sound.Sfx
@@ -129,6 +130,9 @@ fun TodayScreen(
  */
 @Composable
 private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) {
+    // One line of text crosses both halves of the wall, so the ink has to suit
+    // the paler of the two. White over pack yellow is unreadable.
+    val ink = inkOnBricks(you.slug, them.slug)
 
     // The hero is a wall built from both of you, not a gradient panel. The
     // blend idea survives -- it is just said in brick rather than in colour
@@ -152,16 +156,16 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
             Text(
                 text = question.category.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.85f),
+                color = ink.copy(alpha = 0.85f),
             )
-            DepthDots(question.depth, tint = Color.White)
+            DepthDots(question.depth, tint = ink)
         }
         Spacer(Modifier.height(14.dp))
         SelectionContainer {
             Text(
                 text = question.text,
                 style = MaterialTheme.typography.displaySmall,
-                color = Color.White,
+                color = ink,
             )
         }
     }

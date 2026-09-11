@@ -13,9 +13,23 @@ import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import kotlin.math.ceil
 
+private val DarkInk = Color(0xFF15121F)
+
 /** Readable text colour for a brick of [slug]. The pale bricks need dark ink. */
 fun inkOnBrick(slug: String?): Color =
-    if (slug == null || slug == "yellow") Color(0xFF15121F) else Color.White
+    if (slug == null || slug == "yellow") DarkInk else Color.White
+
+/**
+ * Ink for a surface built from **two** colours, where one line of text has to
+ * cross both.
+ *
+ * Dark unless both halves want white. White on pack yellow is about 1.8:1,
+ * which fails even the large-text bar, so a single yellow brick anywhere in the
+ * surface decides it for the whole thing. Dark ink is the safer default anyway:
+ * on pack red it measures about 5.5:1 against white's 3.2:1.
+ */
+fun inkOnBricks(a: String?, b: String?): Color =
+    if (inkOnBrick(a) == Color.White && inkOnBrick(b) == Color.White) Color.White else DarkInk
 
 /**
  * A wide surface built out of real bricks.

@@ -92,7 +92,12 @@ fun AmpReactionRow(
                             left = 0f,
                             bottom = size.height,
                             studPx = size.width / Tile.w,
-                            alpha = 0.3f + 0.7f * lift,
+                            // Not 0.3: six bricks of the same colour sit edge
+                            // to edge here, and that far back they stop having
+                            // visible edges and read as one smear rather than
+                            // as six things you can press. The nav bar gets
+                            // away with 0.34 because black joiners separate it.
+                            alpha = 0.55f + 0.45f * lift,
                         )
                     }
                     Text(
@@ -125,10 +130,7 @@ fun PartnerReaction(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        Box(contentAlignment = Alignment.Center) {
-            BrickBadge(color)
-            Text(reaction.emoji, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
-        }
+        BrickBadge(color, reaction.emoji)
         Spacer(Modifier.size(10.dp))
         Text(
             text = "$name: ${reaction.label}",
@@ -138,28 +140,42 @@ fun PartnerReaction(
     }
 }
 
-/** A single 2-stud brick, sized to hold one emoji. */
+/**
+ * A single 2-stud brick with one emoji sitting on it.
+ *
+ * Sized from the brick rather than from the glyph. At a 15dp stud the body is
+ * only 13dp tall and a 15sp emoji hangs off the top and both sides, which looks
+ * like a rendering bug rather than a badge -- so the stud is set first and the
+ * glyph is sized to the body it has to fit inside.
+ */
 @Composable
-private fun BrickBadge(color: BrickColor) {
+private fun BrickBadge(color: BrickColor, emoji: String) {
     val shape = BrickShape(2, BrickHeight.MEDIUM)
     val asset = color.asset(shape)
     val atlas = rememberBricks(listOf(asset))
-    val stud = 15.dp
+    val stud = 21.dp
+    val body = stud * shape.h * BrickArt.ROW_RATIO
+    val nub = stud * BrickArt.NUB_RATIO
 
-    Canvas(
-        Modifier.size(
-            stud * shape.w,
-            stud * (shape.h * BrickArt.ROW_RATIO + BrickArt.NUB_RATIO),
-        ),
+    Box(
+        Modifier.size(stud * shape.w, body + nub),
+        contentAlignment = Alignment.Center,
     ) {
-        drawBrickArt(
-            atlas = atlas,
-            asset = asset,
-            studs = shape.w,
-            rows = shape.h,
-            left = 0f,
-            bottom = size.height,
-            studPx = size.width / shape.w,
+        Canvas(Modifier.fillMaxSize()) {
+            drawBrickArt(
+                atlas = atlas,
+                asset = asset,
+                studs = shape.w,
+                rows = shape.h,
+                left = 0f,
+                bottom = size.height,
+                studPx = size.width / shape.w,
+            )
+        }
+        Text(
+            text = emoji,
+            fontSize = (body.value * 0.72f).sp,
+            modifier = Modifier.padding(top = nub),
         )
     }
 }
