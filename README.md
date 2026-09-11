@@ -1,4 +1,4 @@
-# Ampersand
+# Click Clack
 
 A daily question for two people. You each answer privately; neither answer is
 readable until both are in. Then it unseals, and you talk.
@@ -12,6 +12,14 @@ There is no backend yet.
 See [DESIGN.md](DESIGN.md) for what the app is *for* — the name, the voice, the
 rules that settle arguments. This file is how it is built.
 
+> **The code still says Ampersand.** That was the name until the rename, and the
+> package is `com.ampersand`, the theme composable is `AmpersandTheme` and every
+> control carries an `Amp` prefix. Renaming those touches every file in the
+> project and changes the `applicationId`, which makes the new build refuse to
+> install over the old one — so it has deliberately not been done. Only the
+> things a person actually sees were renamed: the launcher label, the app theme,
+> and the waiting state.
+
 ## Running it
 
 Open the folder in Android Studio and run the `app` configuration, or:
@@ -23,16 +31,24 @@ Open the folder in Android Studio and run the `app` configuration, or:
 Every screen also has `@Preview` composables, so the whole UI renders in the
 Studio preview pane without an emulator.
 
-**Prefer the previews to the emulator.** The `Pixel_9` AVD on this machine runs
-under `-gpu swiftshader_indirect`, because hardware GL corrupts the framebuffer.
-That costs roughly 30s cold starts, near-constant SystemUI ANRs, and twice in
-one session `system_server` died outright and took the installed APK with it. If
-a screenshot comes back black or `dumpsys window | grep mCurrentFocus` reports
-`null`, it is wedged; kill it and cold-boot rather than retrying the install.
+### The emulator
 
-Untried and worth a go before writing it off: `-gpu angle_indirect` (D3D11
-rather than software), and letting it reuse a snapshot instead of passing
-`-no-snapshot-load`.
+Start the `Pixel_9` AVD with **ANGLE**, not software rendering:
+
+```bash
+emulator -avd Pixel_9 -gpu angle_indirect -no-boot-anim -memory 4096
+```
+
+`-gpu swiftshader_indirect` was the previous advice, on the grounds that
+hardware GL corrupted the framebuffer. It is far worse: roughly 30s cold starts,
+near-constant SystemUI ANRs, and `system_server` dying outright twice in one
+session, each time taking the installed APK with it. ANGLE goes through D3D11
+and is usable.
+
+Expect one "System UI isn't responding" dialog about a minute after a cold boot.
+Give it 45 seconds and tap **Wait**; it settles and does not come back. If a
+screenshot comes back black, or `dumpsys window | grep mCurrentFocus` reports
+`null`, it is wedged — kill it and cold-boot rather than retrying the install.
 
 ### Screenshot testing does not work here yet
 

@@ -406,7 +406,7 @@ private fun SealedPanel(
     Spacer(Modifier.height(20.dp))
 
     AnimatedVisibility(visible = !bothIn, enter = fadeIn(), exit = fadeOut()) {
-        WaitingLine(state.you.name, state.them.name)
+        WaitingLine(state.them.name)
     }
 
     AnimatedVisibility(visible = bothIn, enter = fadeIn(), exit = fadeOut()) {
@@ -422,24 +422,25 @@ private fun SealedPanel(
 /**
  * The waiting state, said with the app's own name.
  *
- * Half of an ampersand construction is on screen -- your name, the conjunction,
- * and nothing yet -- and the sentence completes itself when they answer. It is
- * the one place the title of the app is also the state the app is in, which is
- * the entire reason it is called this.
+ * Half the name is on screen and the other half has not happened yet: your
+ * answer made the click, and the clack is theirs to make. It is the one place
+ * where the title of the app is also the state the app is in, which is the
+ * entire reason it is called this.
  *
- * The name is deliberately not replaced by a spinner or a countdown. Nothing is
- * loading; someone is thinking.
+ * "Clack" breathes rather than spinning. Nothing is loading -- someone is
+ * thinking -- and a spinner would promise that waiting is a technical problem
+ * about to resolve itself.
  */
 @Composable
-private fun WaitingLine(yourName: String, theirName: String) {
-    val amp by rememberInfiniteTransition(label = "amp").animateFloat(
-        initialValue = 0.35f,
+private fun WaitingLine(theirName: String) {
+    val pending by rememberInfiniteTransition(label = "clack").animateFloat(
+        initialValue = 0.3f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1800, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "ampFade",
+        label = "clackFade",
     )
 
     Column(
@@ -452,15 +453,15 @@ private fun WaitingLine(yourName: String, theirName: String) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = yourName,
+                text = "Click.",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.size(10.dp))
             Text(
-                text = "&",
+                text = "Clack.",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = amp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = pending),
             )
         }
         Spacer(Modifier.height(10.dp))

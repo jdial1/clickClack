@@ -1,4 +1,4 @@
-# Ampersand — design ideals
+# Click Clack — design ideals
 
 What the app is for, what it sounds like, and the rules that decide arguments.
 The README says how it is built. This says why it is built that way, so a future
@@ -8,25 +8,34 @@ change can be judged against something.
 
 ## The name
 
-**&** is the only character in common use whose entire job is to hold two things
-together. It is never used alone, it is never the subject, and it does not work
-unless there is something on both sides of it.
+**Click Clack** is the sound of two bricks going down.
 
-That is the product. Two people, one thing between them, useless with one.
+It is two halves that only mean something as a pair. A click on its own is a
+switch, a pen, a bad speaker. It becomes the name of this app only when the
+clack follows it. Nobody says clack first.
+
+That is the product: two people, one thing between them, useless with one.
 
 So the name is not decoration and it is not a logo waiting to happen:
 
 - The **launcher icon** is two bricks in running bond, one in each person's
   colour. Not a heart, not a speech bubble, not a letter. Two separate pieces
-  that only make a shape because they are stacked.
-- The **waiting state** is the name doing its job. You have answered, they have
-  not, and the screen says `Justin &` with the ampersand breathing and the
-  sentence unfinished. It is the one place where the title of the app is also
-  the state the app is in.
+  that only make a shape because they are stacked — the click and the clack.
+- The **waiting state** is the name doing its job. You have answered and they
+  have not, so the screen says **Click.** in full and **Clack.** breathing and
+  unmade. It is the one place where the title of the app is also the state the
+  app is in.
 - The **shelf** captions a finished sculpture "built together", never "by you".
 
-The one thing never to do is put the ampersand in a corner as a mark. It means
-something when it is holding two names apart, and nothing at all on its own.
+Two things never to do. Do not split the name across the UI as decoration —
+"click" and "clack" appear as a pair, in that order, or not at all. And do not
+let it become onomatopoeia for its own sake: the sound is the moment two people
+land in the same place, not a noise the app makes at you.
+
+> The app was called **Ampersand** until the rename. The `&` carried the same
+> idea — a character whose only job is to join two things — and the code still
+> uses `com.ampersand` and an `Amp` prefix throughout. That is a leftover, not a
+> second identity.
 
 ---
 
