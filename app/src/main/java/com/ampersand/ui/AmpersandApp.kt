@@ -72,7 +72,9 @@ import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.gallery.GalleryScreen
 import com.ampersand.ui.history.HistoryScreen
+import com.ampersand.ui.quiz.QuizKitScreen
 import com.ampersand.ui.reveal.RevealScreen
+import com.ampersand.ui.splash.SplashScreen
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
@@ -148,6 +150,20 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
         them = Color(state.them.colorArgb),
     ) {
       CompositionLocalProvider(LocalSounds provides sounds) {
+        // The splash is gated on its own animation finishing, not on auth, so
+        // the click-clack always plays in full. It is under a second, and
+        // cutting it short the moment a cached session resolves would mean the
+        // animation is only ever seen by people who are signed out.
+        var splashDone by remember { mutableStateOf(false) }
+        if (!splashDone) {
+            SplashScreen(
+                you = BrickColor.of(state.you.colorArgb),
+                them = BrickColor.of(state.them.colorArgb),
+                onDone = { splashDone = true },
+            )
+            return@CompositionLocalProvider
+        }
+
         when (auth) {
             // Nothing on screen rather than a spinner. This resolves from the
             // cached session in a frame or two, and a spinner that fast is just
@@ -297,6 +313,7 @@ private fun SignedInApp(
         var showScaffoldControls by remember { mutableStateOf(false) }
         // Scaffold only, and off the tab bar: five pills do not fit a phone.
         var showKit by remember { mutableStateOf(false) }
+        var showQuizKit by remember { mutableStateOf(false) }
 
         Surface(color = MaterialTheme.colorScheme.background) {
             Scaffold(
@@ -308,15 +325,19 @@ private fun SignedInApp(
                                 repo = vm.repo,
                                 today = state.today.date,
                                 kitOpen = showKit,
-                                onToggleKit = { showKit = !showKit },
+                                onToggleKit = { showKit = !showKit; showQuizKit = false },
+                                quizKitOpen = showQuizKit,
+                                onToggleQuizKit = { showQuizKit = !showQuizKit; showKit = false },
                                 onUnpair = onUnpair,
                             )
                         }
                         BottomBar(
                             current = tab,
                             color = BrickColor.of(state.you.colorArgb),
-                            enabled = openDate == null && !showKit,
-                            onSelect = { tab = it; openDate = null; showKit = false },
+                            enabled = openDate == null && !showKit && !showQuizKit,
+                            onSelect = {
+                                tab = it; openDate = null; showKit = false; showQuizKit = false
+                            },
                         )
                     }
                 },
@@ -347,6 +368,8 @@ private fun SignedInApp(
 
                     when {
                         showKit -> GalleryScreen(state = state)
+
+                        showQuizKit -> QuizKitScreen(state = state)
 
                         day != null -> RevealScreen(
                             state = state,
@@ -504,6 +527,8 @@ private fun ScaffoldControls(
     today: LocalDate,
     kitOpen: Boolean,
     onToggleKit: () -> Unit,
+    quizKitOpen: Boolean,
+    onToggleQuizKit: () -> Unit,
     onUnpair: () -> Unit,
 ) {
     Column(
@@ -525,6 +550,12 @@ private fun ScaffoldControls(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Chip("Seal the week") { repo.sealPlate() }
             Chip(if (kitOpen) "Close kit" else "Form kit", onClick = onToggleKit)
+            Chip(if (quizKitOpen) "Close decks" else "Quiz kit", onClick = onToggleQuizKit)
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Its own row: four chips overflow the width and the last one wraps
+            // one character per line.
             Chip("Unpair", onClick = onUnpair)
         }
         Spacer(Modifier.height(8.dp))

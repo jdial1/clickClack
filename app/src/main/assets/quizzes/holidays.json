@@ -1,0 +1,41 @@
+{
+  "id": "holidays",
+  "title": "Where we'd go",
+  "blurb": "Holidays, from the one you'd book tomorrow to the one you'd dread.",
+  "theme": "TRAVEL",
+  "questions": [
+    {
+      "id": "hol_rank",
+      "text": "Order these from the trip you'd book tomorrow to the one you'd dread.",
+      "type": "RANK",
+      "depth": 2,
+      "options": ["Two weeks doing nothing by the sea", "A city, walked end to end", "Somewhere cold with big views", "A house full of family"]
+    },
+    {
+      "id": "hol_pace",
+      "text": "The right pace is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": ["Plan every day", "Decide at breakfast"]
+    },
+    {
+      "id": "hol_money",
+      "text": "Where should the money go?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": ["The flights, go further", "The room, stay somewhere lovely", "The food, eat properly", "The doing, book everything"]
+    },
+    {
+      "id": "hol_dream",
+      "text": "If we left tomorrow, money no object, where are we going?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "hol_home",
+      "text": "What is the bit you look forward to about coming home?",
+      "type": "REFLECT",
+      "depth": 2
+    }
+  ]
+}

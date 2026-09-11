@@ -1,0 +1,44 @@
+{
+  "id": "meals",
+  "title": "What's for dinner",
+  "blurb": "Ranking the food you argue about.",
+  "theme": "FOOD",
+  "questions": [
+    {
+      "id": "meal_rank",
+      "text": "Put these in order, favourite first.",
+      "type": "RANK",
+      "depth": 1,
+      "options": ["A proper roast", "Curry night", "Pasta, any pasta", "Something on toast"]
+    },
+    {
+      "id": "meal_friday",
+      "text": "Friday night is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": ["Takeaway on the sofa", "Cook it together"]
+    },
+    {
+      "id": "meal_forever",
+      "text": "Which could you eat every day for a month?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "meal_out",
+      "text": "Pick the three that make a good night out.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "maxChoices": 3,
+      "options": ["Somewhere new", "The usual place", "Too much bread", "A long pudding", "Nowhere, stay in"]
+    },
+    {
+      "id": "meal_cook",
+      "text": "How much do you actually enjoy cooking?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "It is a chore",
+      "highLabel": "It is the best bit"
+    }
+  ]
+}

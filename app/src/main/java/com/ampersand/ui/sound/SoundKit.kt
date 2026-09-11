@@ -45,6 +45,20 @@ enum class Sfx(val res: Int, val volume: Float) {
 
     /** Sealing the day, and the seal lifting. The two big moments. */
     SEAL(R.raw.sfx_switch33, 0.9f),
+
+    /**
+     * The two halves of the app's name, and the only sounds picked by ear
+     * rather than by filename.
+     *
+     * Chosen by measuring the pack instead of guessing: every clip's duration
+     * and bytes-per-second was read out of its Ogg pages, and these two are the
+     * shortest and the most and least dense of the short ones -- 28ms bright
+     * for the click, 37ms duller for the clack. Short means percussive; the
+     * density gap is what makes them audibly a pair rather than the same sound
+     * twice.
+     */
+    CLICK(R.raw.sfx_brick_click, 0.75f),
+    CLACK(R.raw.sfx_brick_clack, 0.8f),
 }
 
 /**
@@ -89,6 +103,19 @@ class SoundKit(context: Context) {
         pool.play(id, sfx.volume, sfx.volume, 1, 0, 1f)
     }
 
+    /**
+     * Click, then clack: two bricks meeting.
+     *
+     * [gapMs] is the beat between them. Below about 50ms the pair fuses into
+     * one thud and the name stops being audible in it; much above 140ms they
+     * read as two separate events rather than one join.
+     */
+    suspend fun clickClack(gapMs: Long = 90) {
+        play(Sfx.CLICK)
+        kotlinx.coroutines.delay(gapMs)
+        play(Sfx.CLACK)
+    }
+
     fun release() {
         pool.release()
         loaded.clear()
@@ -113,4 +140,8 @@ fun rememberSoundKit(): SoundKit {
 /** Convenience so call sites read as `sounds.play(Sfx.TAP)` even when absent. */
 fun SoundKit?.play(sfx: Sfx) {
     this?.play(sfx)
+}
+
+suspend fun SoundKit?.clickClack(gapMs: Long = 90) {
+    this?.clickClack(gapMs)
 }
