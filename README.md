@@ -193,37 +193,46 @@ It is read by name at runtime rather than through `R.string`, because the
 resource only exists once the plugin has run — the one place `getIdentifier`
 earns its keep.
 
-### Setting it up
+### The project
 
-Everything below needs a Firebase project, which does not exist yet.
+| | |
+|---|---|
+| Project | `clickclack-002827` ("Click Clack") |
+| Android app | `1:522013714152:android:66c18f123b33d8de53cb5d` |
+| Package | `com.ampersand` |
+| Debug SHA-1 | `6A:8C:7C:40:98:31:DC:8C:76:2F:72:65:C3:9E:53:58:E3:C3:5B:AC` |
+
+`clickclack` alone was taken — project ids are global across all of Google
+Cloud — hence the suffix, which is the same convention as the other projects on
+this account.
+
+The SHA-1 is this machine's `~/.android/debug.keystore`, valid to 2056, and is
+already registered. A release build is signed with a different key and will
+need its own added.
+
+`google-services.json` is **gitignored**: it is per-project and regenerated in
+one command.
 
 ```bash
-# 1. Create the project (or reuse one from `firebase projects:list`)
-firebase projects:create clickclack --display-name "Click Clack"
-
-# 2. Register the Android app. applicationId is still com.ampersand.
-firebase apps:create android com.ampersand --project clickclack
-
-# 3. Write the config the plugin needs
-firebase apps:sdkconfig android --project clickclack --out app/google-services.json
+firebase apps:sdkconfig android 1:522013714152:android:66c18f123b33d8de53cb5d   --project clickclack-002827 --out app/google-services.json
 ```
 
-Then two things the CLI **cannot** do, both in the Firebase console:
+### The one step left, and it is manual
 
-- **Enable Google as a sign-in provider** (Authentication → Sign-in method).
-  There is no `firebase` command for this.
-- **Add the debug signing SHA-1** to the Android app (Project settings → Your
-  apps), or Credential Manager rejects the token on debug builds:
+**Google is not yet enabled as a sign-in provider.** Until it is, the generated
+config has an empty `oauth_client` array, no `default_web_client_id` resource is
+produced, and tapping *Continue with Google* fails with a message saying so.
 
-```
-6A:8C:7C:40:98:31:DC:8C:76:2F:72:65:C3:9E:53:58:E3:C3:5B:AC
-```
+There is no `firebase` command for this. In the
+[console](https://console.firebase.google.com/project/clickclack-002827/authentication/providers):
+Authentication → Sign-in method → Google → Enable → Save. That creates the OAuth
+web client the flow needs.
 
-That fingerprint is this machine's `~/.android/debug.keystore`, valid to 2056.
-A release build is signed with a different key and needs its own SHA-1 added.
+Then regenerate the config with the command above and rebuild.
 
-Re-run `apps:sdkconfig` after adding the SHA-1 — the fingerprint changes the
-generated file.
+Until then, **delete `app/google-services.json`** to go back to the fake auth
+path and keep working — the detection is automatic, so removing the file is the
+whole of it.
 
 ### Still to do
 

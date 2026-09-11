@@ -1,6 +1,5 @@
 package com.ampersand.ui.brick
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.layout.Layout
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 private val DarkInk = Color(0xFF15121F)
 
@@ -44,10 +46,12 @@ fun inkOnBricks(a: String?, b: String?): Color =
  * that run in reverse so seams stagger like real bond rather than stacking into
  * a visible column.
  *
- * Height comes from the **content**, not from a course count. The first version
- * took a `courses` parameter and clipped whatever did not fit; here the box
- * wraps its content and the canvas lays however many courses are needed to back
- * it, which is also what a wall does.
+ * Height comes from the **content**, rounded up to a whole number of courses.
+ * That rounding is why this is a custom [Layout] rather than a Box: a plain
+ * content-sized box gives a short slab a course count that does not divide its
+ * height, and the top course is then drawn *above* the slab, over whatever is
+ * laid out there. On the sign-in screen that was the button covering the line
+ * of copy above it.
  *
  * [slugs] cycles, so passing two colours gives a surface built from both of you.
  */
@@ -68,43 +72,71 @@ fun BrickSlab(
     }
     val atlas = rememberBricks(assets)
 
-    Box(modifier.fillMaxWidth()) {
-        Canvas(Modifier.matchParentSize()) {
-            val studPx = size.width / studs
-            val coursePx = studPx * height.rows * BrickArt.ROW_RATIO
-            val nubPx = studPx * BrickArt.NUB_RATIO
-            if (coursePx <= 0f) return@Canvas
-            // Subtract the nub: the topmost course's studs sit *above* its body,
-            // and without this they are drawn outside the slab and overlap
-            // whatever is laid out above it.
-            val courses = ceil((size.height - nubPx) / coursePx).toInt().coerceAtLeast(1)
-            var n = 0
+    Layout(
+        modifier = modifier
+            .fillMaxWidth()
+            .drawBehind {
+                val studPx = size.width / studs
+                val coursePx = studPx * height.rows * BrickArt.ROW_RATIO
+                val nubPx = studPx * BrickArt.NUB_RATIO
+                if (coursePx <= 0f) return@drawBehind
 
-            for (course in 0 until courses) {
-                // Reverse alternate courses: [6,4,2] then [2,4,6]. Without this
-                // every seam lines up and the slab reads as tiles.
-                val widths = if (course % 2 == 0) run else run.reversed()
-                var x = 0f
-                widths.forEach { w ->
-                    drawBrickArt(
-                        atlas = atlas,
-                        asset = BrickArt.assetFor(
-                            slugs[n++ % slugs.size],
-                            BrickShape(w, height),
-                        ),
-                        studs = w,
-                        rows = height.rows,
-                        left = x,
-                        // Course 0 is the bottom one.
-                        bottom = size.height - course * coursePx,
-                        studPx = studPx,
-                        alpha = alpha,
-                    )
-                    x += w * studPx
+                // Exact, because the measure pass made the height a whole
+                // number of courses. Rounding rather than ceiling so a float
+                // hair over the boundary does not add a course that overflows.
+                val courses = ((size.height - nubPx) / coursePx).roundToInt().coerceAtLeast(1)
+                var n = 0
+
+                for (course in 0 until courses) {
+                    // Reverse alternate courses: [6,4,2] then [2,4,6]. Without
+                    // this every seam lines up and the slab reads as tiles.
+                    val widths = if (course % 2 == 0) run else run.reversed()
+                    var x = 0f
+                    widths.forEach { w ->
+                        drawBrickArt(
+                            atlas = atlas,
+                            asset = BrickArt.assetFor(
+                                slugs[n++ % slugs.size],
+                                BrickShape(w, height),
+                            ),
+                            studs = w,
+                            rows = height.rows,
+                            left = x,
+                            // Course 0 is the bottom one.
+                            bottom = size.height - course * coursePx,
+                            studPx = studPx,
+                            alpha = alpha,
+                        )
+                        x += w * studPx
+                    }
                 }
-            }
-        }
+            },
+        content = { Box(Modifier.fillMaxWidth(), content = content) },
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val studPx = width / studs.toFloat()
+        val coursePx = studPx * height.rows * BrickArt.ROW_RATIO
+        val nubPx = studPx * BrickArt.NUB_RATIO
 
-        Box(Modifier.fillMaxWidth(), content = content)
+        val placeable = measurables.first().measure(constraints.copy(minHeight = 0))
+
+        // Round the height UP to a whole number of courses, plus the nub the
+        // top course sticks above its body.
+        //
+        // This is the whole point of the custom layout. With a content-sized
+        // box, a short slab -- a button, say -- gets a course count that does
+        // not divide its height, and the top course is simply drawn above the
+        // slab, over whatever is laid out there. On the sign-in screen that was
+        // the button eating the line of copy above it.
+        val needed = max(placeable.height.toFloat(), coursePx + nubPx)
+        val courses = ceil((needed - nubPx) / coursePx).toInt().coerceAtLeast(1)
+        val slabHeight = (courses * coursePx + nubPx).roundToInt()
+
+        layout(width, slabHeight) {
+            // Centred in the slack the rounding created. Placed at the top, a
+            // button whose label needs a course and a half sits against the
+            // nubs with an empty course under it.
+            placeable.place(0, ((slabHeight - placeable.height) / 2).coerceAtLeast(0))
+        }
     }
 }

@@ -7,3 +7,6 @@ local.properties
 
 # Build output, not source.
 *.apk
+
+# Firebase config: per-project, regenerate with firebase apps:sdkconfig.
+google-services.json
