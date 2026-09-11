@@ -42,7 +42,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
-import com.ampersand.data.FakeCoupleRepository
+import com.ampersand.data.FirestoreCoupleRepository
+import com.ampersand.data.createCoupleRepository
 import com.ampersand.data.MockQuestions
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
@@ -56,6 +57,7 @@ import com.ampersand.auth.PairState
 import com.ampersand.auth.PairingRepository
 import com.ampersand.auth.createAuthRepository
 import com.ampersand.auth.createPairingRepository
+import com.ampersand.auth.hasFirebaseConfigFor
 import com.ampersand.auth.findActivity
 import com.ampersand.model.CoupleState
 import com.ampersand.ui.auth.PairingScreen
@@ -87,10 +89,32 @@ import com.ampersand.ui.today.TodayScreen
 import com.ampersand.ui.us.UsScreen
 import java.time.LocalDate
 
-/** Swapped for a Firestore-backed repository later; nothing above it changes. */
-class AmpersandViewModel(
-    val repo: CoupleRepository = FakeCoupleRepository(),
-) : ViewModel()
+/**
+ * Holds the couple repository for one pairing.
+ *
+ * Built per couple rather than once, because the Firestore implementation
+ * attaches its listeners to a specific couple id and a specific pair of uids.
+ */
+class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
+    override fun onCleared() {
+        (repo as? FirestoreCoupleRepository)?.close()
+    }
+
+    companion object {
+        fun factory(
+            hasFirebase: Boolean,
+            coupleId: String,
+            myUid: String,
+            partnerUid: String,
+        ) = viewModelFactory {
+            initializer {
+                AmpersandViewModel(
+                    createCoupleRepository(hasFirebase, coupleId, myUid, partnerUid),
+                )
+            }
+        }
+    }
+}
 
 /**
  * Holds the auth repository across configuration changes.
@@ -136,19 +160,14 @@ private enum class Tab(val label: String) {
 }
 
 @Composable
-fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
+fun AmpersandApp() {
     val context = LocalContext.current
     val authVm: AuthViewModel = viewModel(factory = AuthViewModel.factory(context))
     val auth by authVm.auth.state.collectAsStateWithLifecycle()
 
-    val state by vm.repo.state.collectAsStateWithLifecycle()
-
     val sounds = rememberSoundKit()
 
-    AmpersandTheme(
-        you = Color(state.you.colorArgb),
-        them = Color(state.them.colorArgb),
-    ) {
+    AmpersandTheme {
       CompositionLocalProvider(LocalSounds provides sounds) {
         // The splash is gated on its own animation finishing, not on auth, so
         // the click-clack always plays in full. It is under a second, and
@@ -156,9 +175,11 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
         // animation is only ever seen by people who are signed out.
         var splashDone by remember { mutableStateOf(false) }
         if (!splashDone) {
+            // Fixed colours: this plays before anyone is signed in, so there is
+            // no profile to take them from yet.
             SplashScreen(
-                you = BrickColor.of(state.you.colorArgb),
-                them = BrickColor.of(state.them.colorArgb),
+                you = BrickColor.RED,
+                them = BrickColor.BLUE,
                 onDone = { splashDone = true },
             )
             return@CompositionLocalProvider
@@ -177,8 +198,6 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
             is AuthState.SignedIn -> {
                 val account = auth as AuthState.SignedIn
                 PairedGate(
-                    vm = vm,
-                    state = state,
                     account = account,
                     onSignOut = authVm.auth::signOut,
                 )
@@ -230,12 +249,11 @@ private fun SignedOutScreen(auth: AuthRepository) {
  */
 @Composable
 private fun PairedGate(
-    vm: AmpersandViewModel,
-    state: CoupleState,
     account: AuthState.SignedIn,
     onSignOut: () -> Unit,
 ) {
     val context = LocalContext.current
+    val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
     val pairVm: PairingViewModel = viewModel(
         key = "pairing_${account.uid}",
         factory = PairingViewModel.factory(context, account.uid, account.displayName),
@@ -250,14 +268,33 @@ private fun PairedGate(
             Box(Modifier.fillMaxSize())
         }
 
-        is PairState.Paired -> SignedInApp(
-            vm = vm,
-            state = state,
-            account = account,
-            partner = p,
-            onSignOut = onSignOut,
-            onUnpair = { scope.launch { pairVm.pairing.unpair() } },
-        )
+        is PairState.Paired -> {
+            // Keyed on the couple: a new pairing gets a new repository and a
+            // new set of listeners rather than the previous couple's.
+            val vm: AmpersandViewModel = viewModel(
+                key = "couple_${p.coupleId}",
+                factory = AmpersandViewModel.factory(
+                    hasFirebase = hasFirebase,
+                    coupleId = p.coupleId,
+                    myUid = account.uid,
+                    partnerUid = p.partnerUid,
+                ),
+            )
+            val state by vm.repo.state.collectAsStateWithLifecycle()
+            AmpersandTheme(
+                you = Color(state.you.colorArgb),
+                them = Color(state.them.colorArgb),
+            ) {
+                SignedInApp(
+                    vm = vm,
+                    state = state,
+                    account = account,
+                    partner = p,
+                    onSignOut = onSignOut,
+                    onUnpair = { scope.launch { pairVm.pairing.unpair() } },
+                )
+            }
+        }
 
         else -> Surface(color = MaterialTheme.colorScheme.background) {
             PairingScreen(

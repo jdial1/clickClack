@@ -21,7 +21,8 @@ sealed interface PairState {
     /** Signed in, no partner, no outstanding invite. */
     data object Solo : PairState
 
-    data class Inviting(val code: String) : PairState
+    /** [expiresAtMillis] is null only in the fake, which does not time out. */
+    data class Inviting(val code: String, val expiresAtMillis: Long? = null) : PairState
 
     data class Paired(
         val coupleId: String,
@@ -33,10 +34,24 @@ sealed interface PairState {
 /** Why a code did not work, in terms a person can act on. */
 enum class RedeemError(val message: String) {
     UNKNOWN_CODE("No invite with that code. Check it and try again."),
+    EXPIRED("That code has expired. Ask them for a fresh one."),
     OWN_CODE("That is your own code. Send it to them instead."),
     ALREADY_PAIRED("You are already paired with someone."),
     FAILED("Could not join. Try again in a moment."),
 }
+
+/**
+ * How long a code lives.
+ *
+ * An hour, because the realistic use is reading it out to the person next to
+ * you or sending it while you are both looking at your phones. A code with no
+ * expiry is a code that leaks: it sits in a message thread and still works
+ * months later, and anyone who scrolls back can pair with you.
+ *
+ * The ceiling is enforced in the security rules as well, so a client cannot
+ * mint a long-lived one.
+ */
+const val INVITE_TTL_MINUTES = 60L
 
 class RedeemException(val reason: RedeemError) : Exception(reason.message)
 

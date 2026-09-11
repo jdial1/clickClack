@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 fun createAuthRepository(context: Context): AuthRepository =
     if (hasFirebaseConfigFor(context)) GoogleAuthRepository(context) else FakeAuthRepository()
 
-internal fun hasFirebaseConfigFor(context: Context): Boolean {
+fun hasFirebaseConfigFor(context: Context): Boolean {
     @Suppress("DiscouragedApi")
     val id = context.resources.getIdentifier("google_app_id", "string", context.packageName)
     return id != 0 && context.getString(id).isNotBlank()

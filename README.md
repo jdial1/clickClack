@@ -283,14 +283,62 @@ your partner's.
 None of this is needed once Firestore owns the couple; it exists because the
 sample couple was invented before anyone had signed in.
 
+Codes **expire after an hour**, and are consumed on a valid match. An hour is
+the window for "read this out to the person next to you"; a code with no expiry
+sits in a message thread and still works months later. The ceiling is enforced
+in the rules too (`expiresAt` must be a timestamp inside two hours), so a client
+cannot mint a long-lived one. Redeeming an expired code deletes it — the only
+thing a dead invite can do is confuse whoever types it next.
+
+**Unpairing ends it for both of you.** `endedAt` is written on the *couple*,
+which both members may update, rather than clearing your own `coupleId`, which
+only you may write. That is the whole fix: the partner's listener sees the
+shared document change and their app leaves too. The couple document is kept
+rather than deleted — it is the parent of every answer and sculpture you made,
+and deleting a parent in Firestore orphans subcollections rather than removing
+them.
+
+## The real repository
+
+`FirestoreCoupleRepository` backs everything a person creates: answers,
+reactions, colours, bricks and sealed sculptures, all keyed to their account.
+Two phones on two profiles see each other's contributions, which is what makes
+any of this testable.
+
+**Questions are still mock.** The pool arrives as JSON, so today's question is
+picked out of `MockQuestions` *by date*. Picking rather than storing matters
+more than it looks: both phones must land on the same question before either
+has written anything, or whoever opens the app second gets a different one.
+
+Four listeners — both user documents, today, the last ten weeks, the plates —
+all feeding one `recompose()`. A `CoupleState` is a whole picture, and updating
+it field by field from four callbacks arriving in any order is how you get a
+screen that is briefly wrong.
+
+Two details worth keeping:
+
+- **The answers listener fails before the reveal, on purpose.** The rules deny
+  the collection query rather than filtering it, so the error path falls back to
+  reading only your own answer. The seal is enforced by the database; the app
+  never has to hide anything.
+- **`revealed` can only become true once both answer documents exist.** The rule
+  checks with `exists()` on both, so a client cannot flip it early to peek.
+  Properly this belongs in a Cloud Function — the rule is what makes the client
+  version honest.
+
+The scaffold controls that fake your partner are **no-ops against Firestore**.
+There is no honest way to answer as someone else once the rules only let you
+write your own documents; use a second account.
+
 ### Still to do
 
-- `CoupleRepository` is still `FakeCoupleRepository`. Pairing and auth are real;
-  the questions, answers, bricks and shelf are not yet.
-- `unpair()` only clears your own user document. The rules let you write only
-  your own, so a one-sided unpair is the honest outcome — the partner keeps a
-  `coupleId` pointing at a couple you have left.
-- No expiry on invites. A code is valid until it is used.
+- No Cloud Function. Sealing a plate at the end of a week, and lifting the seal,
+  both depend on a client being open.
+- History rows carry no answers — they live in a subcollection that would need a
+  read each. The Shelf shows questions, dates and reactions; the Reveal screen
+  loads a single day in full.
+- Streaks are computed on the client from the last ten weeks, so a couple older
+  than that undercounts.
 
 ## The build
 

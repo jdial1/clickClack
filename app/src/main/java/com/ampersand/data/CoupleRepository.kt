@@ -82,6 +82,25 @@ interface CoupleRepository {
     fun resetToday()
 }
 
+/**
+ * Firestore when there is a project and a real couple behind it, the mock
+ * otherwise.
+ *
+ * The same test as the auth and pairing factories, so the three never disagree
+ * about which world the app is running in.
+ */
+fun createCoupleRepository(
+    hasFirebase: Boolean,
+    coupleId: String,
+    myUid: String,
+    partnerUid: String,
+): CoupleRepository =
+    if (hasFirebase && !coupleId.startsWith("c_fake")) {
+        FirestoreCoupleRepository(coupleId, myUid, partnerUid)
+    } else {
+        FakeCoupleRepository()
+    }
+
 /** In-memory, deterministic, and seeded from [MockCouple]. */
 class FakeCoupleRepository(
     initial: CoupleState = MockCouple.state(),

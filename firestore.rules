@@ -10,13 +10,17 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function me() { return request.auth.uid; }
 
+    function couple(cid) {
+      return get(/databases/$(database)/documents/couples/$(cid)).data;
+    }
     function isMember(cid) {
-      return signedIn() &&
-        me() in get(/databases/$(database)/documents/couples/$(cid)).data.members;
+      return signedIn() && me() in couple(cid).members;
+    }
+    // A couple with an endedAt is over. Nobody writes to it again.
+    function isLive(cid) {
+      return isMember(cid) && couple(cid).endedAt == null;
     }
 
-    // Name and colour. Readable by anyone signed in, because your partner has
-    // to be able to render you and there is nothing private here.
     match /users/{uid} {
       allow get: if signedIn();
       allow list: if false;
@@ -26,14 +30,25 @@ service cloud.firestore {
 
     // Pairing codes.
     //
-    // `get` but never `list`. The code *is* the secret, so being able to
-    // enumerate the collection would hand over every outstanding invite in the
-    // app. Anyone holding a code may delete it, because redeeming one consumes
-    // it and the redeemer is by definition not the person who made it.
+    // `get` but never `list`. The code *is* the secret, so enumerating the
+    // collection would hand over every outstanding invite. Anyone holding a
+    // code may delete it, because redeeming one consumes it and the redeemer
+    // is by definition not the person who made it.
     match /invites/{code} {
       allow get: if signedIn();
       allow list: if false;
-      allow create: if signedIn() && request.resource.data.fromUid == me();
+
+      // The lifetime is bounded here, not just in the client. A code that
+      // never expires is a code that leaks: it sits in a message thread and
+      // still works months later. An hour is the window for "read this out to
+      // the person next to you", and the two-hour ceiling stops a client
+      // minting one that lasts a year.
+      allow create: if signedIn()
+        && request.resource.data.fromUid == me()
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt < request.time + duration.value(2, 'h');
+
       allow delete: if signedIn();
       allow update: if false;
     }
@@ -41,27 +56,45 @@ service cloud.firestore {
     match /couples/{cid} {
       allow get: if signedIn() && me() in resource.data.members;
       allow list: if false;
+
       // You may only create a couple you are in, and only of exactly two.
       allow create: if signedIn()
         && me() in request.resource.data.members
-        && request.resource.data.members.size() == 2;
-      allow update, delete: if false;
+        && request.resource.data.members.size() == 2
+        && request.resource.data.endedAt == null;
+
+      // Members may update, but never rewrite who is in it. Ending the couple
+      // lives here rather than on each user document precisely so that one
+      // person can end it for both -- a user document is writable only by its
+      // owner, which is what made unpairing one-sided.
+      allow update: if isMember(cid)
+        && request.resource.data.members == resource.data.members;
+      allow delete: if false;
 
       match /days/{day} {
         allow read: if isMember(cid);
-        allow create, update: if isMember(cid);
+        allow create: if isLive(cid);
+
+        // `revealed` is the seal, so a client must not be able to flip it
+        // early and read the other answer. It may only become true once both
+        // answer documents actually exist.
+        allow update: if isLive(cid) && (
+          request.resource.data.revealed == false ||
+          (
+            exists(/databases/$(database)/documents/couples/$(cid)/days/$(day)/answers/$(couple(cid).members[0])) &&
+            exists(/databases/$(database)/documents/couples/$(cid)/days/$(day)/answers/$(couple(cid).members[1]))
+          )
+        );
         allow delete: if false;
 
         // The sealed part, and the reason answers are one document per person:
         // rules are per-document and cannot hide a field inside a shared one.
-        // A single day document holding both answers would be readable by both
-        // from the moment the first person writes.
         match /answers/{uid} {
           allow read: if isMember(cid) && (
             uid == me() ||
             get(/databases/$(database)/documents/couples/$(cid)/days/$(day)).data.revealed == true
           );
-          allow create: if isMember(cid) && uid == me();
+          allow create: if isLive(cid) && uid == me();
           // No edits after submit. That is the point.
           allow update, delete: if false;
         }
@@ -71,8 +104,8 @@ service cloud.firestore {
       // plate must not gain bricks from a late listener.
       match /plates/{pid} {
         allow read: if isMember(cid);
-        allow create: if isMember(cid);
-        allow update: if isMember(cid) && resource.data.completedOn == null;
+        allow create: if isLive(cid);
+        allow update: if isLive(cid) && resource.data.completedOn == null;
         allow delete: if false;
       }
     }
