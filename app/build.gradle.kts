@@ -2,6 +2,20 @@ plugins {
     alias(libs.plugins.android.application)
     // No kotlin.android plugin: AGP 9 has built-in Kotlin support and rejects it.
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services) apply false
+}
+
+/**
+ * Applied only when the Firebase config is actually present.
+ *
+ * The google-services plugin hard-fails the build if google-services.json is
+ * missing, and this project is checked in without one -- it is per-project and
+ * carries a real OAuth client id. Guarding it here means the app builds, runs
+ * and is developed against FakeAuthRepository with no Firebase account at all,
+ * and starts using the real thing the moment the file is dropped in.
+ */
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
@@ -49,6 +63,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.google.identity)
 
     // Renders the @Preview composables in Android Studio.
     debugImplementation(libs.compose.ui.tooling)

@@ -43,6 +43,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
 import com.ampersand.data.FakeCoupleRepository
 import com.ampersand.data.MockQuestions
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.launch
+import com.ampersand.auth.AuthRepository
+import com.ampersand.auth.AuthState
+import com.ampersand.auth.createAuthRepository
+import com.ampersand.auth.findActivity
+import com.ampersand.model.CoupleState
+import com.ampersand.ui.auth.SignInScreen
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
@@ -73,6 +85,21 @@ class AmpersandViewModel(
     val repo: CoupleRepository = FakeCoupleRepository(),
 ) : ViewModel()
 
+/**
+ * Holds the auth repository across configuration changes.
+ *
+ * Separate from [AmpersandViewModel] because it needs a Context to build and
+ * that one deliberately does not take any -- and because signing out has to
+ * survive without tearing down the couple state with it.
+ */
+class AuthViewModel(val auth: AuthRepository) : ViewModel() {
+    companion object {
+        fun factory(context: Context) = viewModelFactory {
+            initializer { AuthViewModel(createAuthRepository(context)) }
+        }
+    }
+}
+
 /** The pack has no "black" in [BrickColor]; it is structure, not a choice. */
 private const val JoinerSlug = "black"
 
@@ -88,6 +115,10 @@ private enum class Tab(val label: String) {
 
 @Composable
 fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
+    val context = LocalContext.current
+    val authVm: AuthViewModel = viewModel(factory = AuthViewModel.factory(context))
+    val auth by authVm.auth.state.collectAsStateWithLifecycle()
+
     val state by vm.repo.state.collectAsStateWithLifecycle()
 
     val sounds = rememberSoundKit()
@@ -97,6 +128,59 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
         them = Color(state.them.colorArgb),
     ) {
       CompositionLocalProvider(LocalSounds provides sounds) {
+        when (auth) {
+            // Nothing on screen rather than a spinner. This resolves from the
+            // cached session in a frame or two, and a spinner that fast is just
+            // a flicker.
+            AuthState.Loading -> Surface(color = MaterialTheme.colorScheme.background) {
+                Box(Modifier.fillMaxSize())
+            }
+
+            AuthState.SignedOut -> SignedOutScreen(authVm.auth)
+
+            is AuthState.SignedIn -> SignedInApp(vm, state)
+        }
+      }
+    }
+}
+
+/** Sign-in, and the one place the app talks to Credential Manager. */
+@Composable
+private fun SignedOutScreen(auth: AuthRepository) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    Surface(color = MaterialTheme.colorScheme.background) {
+        SignInScreen(
+            busy = busy,
+            error = error,
+            onSignIn = {
+                val activity = context.findActivity()
+                if (activity == null) {
+                    error = "Could not open the Google sheet."
+                    return@SignInScreen
+                }
+                busy = true
+                error = null
+                scope.launch {
+                    val result = auth.signInWithGoogle(activity)
+                    busy = false
+                    // A dismissed sheet comes back as success with no session,
+                    // so only a real failure is worth saying anything about.
+                    error = result.exceptionOrNull()?.let {
+                        it.message ?: "Sign-in failed."
+                    }
+                }
+            },
+        )
+    }
+}
+
+/** The whole product, once we know who is using it. */
+@Composable
+private fun SignedInApp(vm: AmpersandViewModel, state: CoupleState) {
         var tab by remember { mutableStateOf(Tab.TODAY) }
         // The *date* of the open day, not the day itself. Holding the entry
         // would freeze it at the moment it was opened, so a reaction added on
@@ -197,8 +281,6 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
                 }
             }
         }
-      }
-    }
 }
 
 /**

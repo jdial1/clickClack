@@ -7,6 +7,10 @@ composeBom = "2026.08.00"
 activity = "1.13.0"
 lifecycle = "2.11.0"
 coreKtx = "1.18.0"
+googleServices = "4.5.0"
+firebaseBom = "34.19.0"
+credentials = "1.6.0"
+googleid = "1.2.0"
 
 [libraries]
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -23,7 +27,18 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
+# Auth. Versionless firebase-auth: the BOM above pins it.
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+# Credential Manager, not the old GoogleSignIn API -- that one is deprecated and
+# its Activity-result flow does not fit Compose.
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+# Reads google-services.json and generates the Firebase config resources.
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 # Kotlin 2.x moves the Compose compiler out of composeOptions into its own plugin.
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

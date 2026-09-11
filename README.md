@@ -157,6 +157,83 @@ current one clears it.
 The reveal ends with the only instruction the app ever gives: *Now go and ask
 them about it.*
 
+## Google sign-in
+
+The code is in and compiles; the Firebase project does not exist yet.
+
+`AuthRepository` is the seam, shaped like `CoupleRepository` and for the same
+reason. `createAuthRepository()` returns `GoogleAuthRepository` when a Firebase
+config is present and `FakeAuthRepository` when it is not, detected by the
+presence of the generated `google_app_id` string. So the app builds, runs and
+is designed with no Firebase account in existence, and starts doing real auth
+the moment `google-services.json` lands in `app/`.
+
+The google-services plugin is applied **conditionally** in `app/build.gradle.kts`
+for the same reason: it hard-fails a build that has no config file, and this
+repo deliberately does not check one in.
+
+Without the file, `FirebaseInitProvider` logs one warning at startup and skips
+initialisation. That is expected and harmless — nothing touches `FirebaseAuth`
+on the fake path.
+
+### The flow, and the hop people miss
+
+Credential Manager, not the deprecated `GoogleSignIn` API. Two hops:
+
+1. Credential Manager returns a **Google ID token** — proof of who they are to
+   Google.
+2. That is exchanged with Firebase for a **Firebase session** — which is what
+   Firestore security rules actually check.
+
+Skip the second and you have a signed-in user the database has never heard of.
+
+`webClientId` is the OAuth **web** client id, not the Android one. Using the
+Android client here fails with a token-audience error that says nothing useful.
+It is read by name at runtime rather than through `R.string`, because the
+resource only exists once the plugin has run — the one place `getIdentifier`
+earns its keep.
+
+### Setting it up
+
+Everything below needs a Firebase project, which does not exist yet.
+
+```bash
+# 1. Create the project (or reuse one from `firebase projects:list`)
+firebase projects:create clickclack --display-name "Click Clack"
+
+# 2. Register the Android app. applicationId is still com.ampersand.
+firebase apps:create android com.ampersand --project clickclack
+
+# 3. Write the config the plugin needs
+firebase apps:sdkconfig android --project clickclack --out app/google-services.json
+```
+
+Then two things the CLI **cannot** do, both in the Firebase console:
+
+- **Enable Google as a sign-in provider** (Authentication → Sign-in method).
+  There is no `firebase` command for this.
+- **Add the debug signing SHA-1** to the Android app (Project settings → Your
+  apps), or Credential Manager rejects the token on debug builds:
+
+```
+6A:8C:7C:40:98:31:DC:8C:76:2F:72:65:C3:9E:53:58:E3:C3:5B:AC
+```
+
+That fingerprint is this machine's `~/.android/debug.keystore`, valid to 2056.
+A release build is signed with a different key and needs its own SHA-1 added.
+
+Re-run `apps:sdkconfig` after adding the SHA-1 — the fingerprint changes the
+generated file.
+
+### Still to do
+
+- `CoupleState` is still seeded from `MockCouple`; the signed-in uid is not
+  threaded into it yet, so you are Justin regardless of who signs in.
+- No sign-out control. `AuthRepository.signOut()` exists and nothing calls it;
+  the Us screen is the obvious home.
+- No pairing. Two signed-in people do not become a couple by themselves, and
+  the invite-code flow is not built.
+
 ## The build
 
 Bricks are earned by answering and placed by hand on a shared plate. Bricks keep
