@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
 import com.ampersand.model.CoupleState
 import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.AmpReactionRow
+import com.ampersand.ui.components.PartnerReaction
 import com.ampersand.ui.components.AmpCheckboxGroup
 import com.ampersand.ui.components.AmpDragRank
 import com.ampersand.ui.components.AmpDropdown
@@ -36,6 +38,7 @@ import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.model.BrickColor
+import com.ampersand.model.Reaction
 
 /**
  * Every control in one place, live and interactive.
@@ -168,6 +171,21 @@ fun GalleryScreen(state: CoupleState, modifier: Modifier = Modifier) {
             )
             Spacer(Modifier.height(10.dp))
             AmpDragRank(items = order, accent = you, onReorder = { order = it })
+        }
+
+        Section("Reactions") {
+            var reaction by remember { mutableStateOf<Reaction?>(Reaction.MELT) }
+            AmpReactionRow(
+                selected = reaction,
+                color = BrickColor.of(state.you.colorArgb),
+                onSelect = { reaction = it },
+            )
+            Spacer(Modifier.height(16.dp))
+            PartnerReaction(
+                name = state.them.name,
+                reaction = Reaction.LAUGH,
+                color = BrickColor.of(state.them.colorArgb),
+            )
         }
 
         Section("Buttons") {

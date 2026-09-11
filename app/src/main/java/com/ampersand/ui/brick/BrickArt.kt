@@ -37,6 +37,15 @@ object BrickArt {
     /** Plate aspect ratio for a grid of [w] studs by [h] rows. */
     fun aspect(w: Int, h: Int): Float = (w * STUD_PX) / (h * ROW_PX)
 
+    /**
+     * As [aspect], but counting the nub the top course sticks up above its body.
+     *
+     * A plate has room above the highest brick and does not need this; anything
+     * cropped tight to its own content does, or the top row of studs is drawn
+     * outside the bounds.
+     */
+    fun aspectWithNub(w: Int, rows: Int): Float = w / (rows * ROW_RATIO + NUB_RATIO)
+
     /** Full drawn height of a brick [rows] tall, including the nub. */
     fun heightFor(rows: Int, studPx: Float): Float = rows * studPx * ROW_RATIO + studPx * NUB_RATIO
 

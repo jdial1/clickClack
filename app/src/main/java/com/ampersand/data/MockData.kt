@@ -15,7 +15,9 @@ import com.ampersand.model.Member
 import com.ampersand.model.Placement
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
+import com.ampersand.model.Reaction
 import java.time.LocalDate
+import kotlin.random.Random
 
 /**
  * Stand-in for the real question pool, which will be ingested into Firestore.
@@ -238,6 +240,20 @@ object MockCouple {
     val you = Member(uid = "u_justin", name = "Justin", colorArgb = 0xFFF54E4F)
     val them = Member(uid = "u_maya", name = "Maya", colorArgb = 0xFF108BE2)
 
+    /** A sculpture is a week. Short enough that you finish one and start again. */
+    const val PeriodDays = 7
+    private const val GridW = 12
+    private const val GridH = 14
+
+    /** No slopes and no characters: those are earned, not filler. */
+    private val ShelfShapes = listOf(
+        BrickShape(2, BrickHeight.LOW),
+        BrickShape(4, BrickHeight.LOW),
+        BrickShape(6, BrickHeight.LOW),
+        BrickShape(2, BrickHeight.MEDIUM),
+        BrickShape(4, BrickHeight.MEDIUM),
+    )
+
     /** Today starts unanswered, so the app opens on the state worth designing. */
     fun freshToday(today: LocalDate = LocalDate.now()): DayEntry =
         DayEntry(date = today, question = MockQuestions.byId("g1"))
@@ -301,6 +317,23 @@ object MockCouple {
             youGuess = "You reorganise my desk",
             themGuess = "You talk to the cat",
         ),
+
+        // --- Older, and deliberately on today's date --------------------------
+        // These exist so "on this day" has something to find. Six months and a
+        // year back, because the whole point of that block is to show the app
+        // holding on to something long after you would have forgotten it.
+        day(
+            today.minusMonths(6), "r4",
+            yourResponse = "For you to tell me it was fine. I did not want it fixed.",
+            theirResponse = "An hour where nobody needed anything from me.",
+            reactions = mapOf(you.uid to Reaction.MELT),
+        ),
+        day(
+            today.minusYears(1), "r5",
+            yourResponse = "The kitchen with the bad light, and us not minding.",
+            theirResponse = "A dog. Somehow there is always a dog.",
+            reactions = mapOf(you.uid to Reaction.LAUGH, them.uid to Reaction.LOVE),
+        ),
     )
 
     /** A both-answered day. Omitted guesses simply count as a miss. */
@@ -311,6 +344,7 @@ object MockCouple {
         theirResponse: String,
         youGuess: String? = null,
         themGuess: String? = null,
+        reactions: Map<String, Reaction> = emptyMap(),
     ): DayEntry = DayEntry(
         date = date,
         question = MockQuestions.byId(questionId),
@@ -318,6 +352,7 @@ object MockCouple {
             you.uid to Answer.of(you.uid, yourResponse, youGuess),
             them.uid to Answer.of(them.uid, theirResponse, themGuess),
         ),
+        reactions = reactions,
     )
 
     /**
@@ -329,7 +364,7 @@ object MockCouple {
      * for [BuildPlate.canPlace].
      */
     fun plate(today: LocalDate = LocalDate.now()): BuildPlate {
-        val start = today.minusDays(9)
+        val start = today.minusDays(4)
         var n = 0
         val blocks = mutableListOf<Block>()
         val placed = mutableListOf<Placement>()
@@ -381,12 +416,99 @@ object MockCouple {
         return BuildPlate(
             id = "plate_1",
             startedOn = start,
-            periodDays = 14,
-            gridW = 12,
-            gridH = 14,
+            periodDays = PeriodDays,
+            gridW = GridW,
+            gridH = GridH,
             blocks = blocks,
             placed = placed,
         )
+    }
+
+    /**
+     * Sealed sculptures for the shelf.
+     *
+     * Generated rather than hand-placed, and generated *through*
+     * [BuildPlate.dropRow] rather than by writing coordinates -- so every one of
+     * these is a plate that the real placement rules would have accepted, and
+     * the shelf doubles as a fixture for them. A fixed seed per week keeps each
+     * sculpture the same between runs, which matters: a shelf that reshuffles
+     * itself is not a memory of anything.
+     */
+    fun shelf(today: LocalDate = LocalDate.now()): List<BuildPlate> =
+        listOf(
+            sculpture("plate_w1", today.minusDays(11), seed = 4021),
+            sculpture("plate_w2", today.minusDays(18), seed = 1177),
+            sculpture("plate_w3", today.minusDays(25), seed = 8830),
+        )
+
+    private fun sculpture(id: String, startedOn: LocalDate, seed: Int): BuildPlate {
+        val random = Random(seed)
+        val blocks = mutableListOf<Block>()
+        val placed = mutableListOf<Placement>()
+
+        fun current() = BuildPlate(id, startedOn, PeriodDays, GridW, GridH, blocks, placed)
+
+        // Two bricks a day for a week: one each, which is exactly what a
+        // completed week pays out.
+        repeat(PeriodDays * 2) { i ->
+            val owner = if (i % 2 == 0) you else them
+            val shape = ShelfShapes[random.nextInt(ShelfShapes.size)]
+            val plate = current()
+            val occupied = plate.occupied()
+            val (x, y) = bestSpot(plate, shape, occupied, random) ?: return@repeat
+
+            val block = Block(
+                id = "${id}_$i",
+                shape = shape,
+                colorArgb = owner.colorArgb,
+                ownerUid = owner.uid,
+                earnedOn = startedOn.plusDays((i / 2).toLong()),
+            )
+            blocks += block
+            placed += Placement(block.id, x, y)
+        }
+
+        return current().copy(completedOn = startedOn.plusDays(PeriodDays - 1L))
+    }
+
+    /**
+     * Where a person would actually put this brick.
+     *
+     * [BuildPlate.canPlace] only asks for **one** stud of support, which is the
+     * right rule for a human placing a brick on purpose -- overhangs are half of
+     * what makes a sculpture look built. Dropped at random, though, that rule
+     * produces an inverted pyramid: a 6-stud brick balanced on a single stud,
+     * over and over, until the whole week looks like it is about to fall over.
+     *
+     * So this scores every legal column by how much of the brick is actually
+     * supported and how low it sits, and takes the best. Ties are broken by the
+     * seeded [random] so the three shelf pieces do not come out identical.
+     */
+    private fun bestSpot(
+        plate: BuildPlate,
+        shape: BrickShape,
+        occupied: Set<Pair<Int, Int>>,
+        random: Random,
+    ): Pair<Int, Int>? {
+        var best: Pair<Int, Int>? = null
+        var bestScore = Int.MIN_VALUE
+
+        for (x in 0..(GridW - shape.w)) {
+            val y = plate.dropRow(shape, x, occupied) ?: continue
+            val under = if (y == 0) {
+                shape.w
+            } else {
+                (0 until shape.w).count { dx -> (x + dx to y - 1) in occupied }
+            }
+            // Support dominates; height breaks near-ties towards the baseplate;
+            // the jitter keeps the silhouette from being perfectly symmetrical.
+            val score = under * 10 - y * 3 + random.nextInt(4)
+            if (score > bestScore) {
+                bestScore = score
+                best = x to y
+            }
+        }
+        return best
     }
 
     fun state(today: LocalDate = LocalDate.now()) = CoupleState(
@@ -394,6 +516,7 @@ object MockCouple {
         them = them,
         today = freshToday(today),
         plate = plate(today),
+        shelf = shelf(today),
         history = history(today),
         streak = 7,
         freezesLeft = 0,

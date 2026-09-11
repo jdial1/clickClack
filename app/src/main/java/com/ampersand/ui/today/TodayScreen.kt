@@ -1,6 +1,12 @@
 package com.ampersand.ui.today
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -396,28 +402,7 @@ private fun SealedPanel(
     Spacer(Modifier.height(20.dp))
 
     AnimatedVisibility(visible = !bothIn, enter = fadeIn(), exit = fadeOut()) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .clip(Radius.control)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BrickDot(slug = BrickColor.of(themColor.toArgbLong()).slug, studSize = 16.dp)
-            Spacer(Modifier.size(12.dp))
-            Column {
-                Text(
-                    "Waiting on ${state.them.name}",
-                    style = MaterialTheme.typography.titleSmall,
-                )
-                Text(
-                    "You will both be told the moment it unseals.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
+        WaitingLine(state.you.name, state.them.name)
     }
 
     AnimatedVisibility(visible = bothIn, enter = fadeIn(), exit = fadeOut()) {
@@ -426,6 +411,59 @@ private fun SealedPanel(
             slug = BrickColor.of(state.you.colorArgb).slug,
             sfx = Sfx.SEAL,
             onClick = onOpenReveal,
+        )
+    }
+}
+
+/**
+ * The waiting state, said with the app's own name.
+ *
+ * Half of an ampersand construction is on screen -- your name, the conjunction,
+ * and nothing yet -- and the sentence completes itself when they answer. It is
+ * the one place the title of the app is also the state the app is in, which is
+ * the entire reason it is called this.
+ *
+ * The name is deliberately not replaced by a spinner or a countdown. Nothing is
+ * loading; someone is thinking.
+ */
+@Composable
+private fun WaitingLine(yourName: String, theirName: String) {
+    val amp by rememberInfiniteTransition(label = "amp").animateFloat(
+        initialValue = 0.35f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "ampFade",
+    )
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(Radius.control)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(vertical = 26.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = yourName,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "&",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = amp),
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = "$theirName has not answered yet.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

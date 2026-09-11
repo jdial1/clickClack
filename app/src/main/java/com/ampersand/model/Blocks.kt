@@ -96,10 +96,28 @@ data class BuildPlate(
     val gridH: Int,
     val blocks: List<Block> = emptyList(),
     val placed: List<Placement> = emptyList(),
+    /**
+     * The day this sculpture was sealed, or null while it is still being built.
+     *
+     * The date belongs to the **finished thing**, not to the bricks in it. A
+     * brick that remembered its own day would turn the sculpture into a
+     * scrollable diary and the plate into an index; what you actually want to
+     * be able to say is "that is the one we made the week of the ninth". So
+     * individual blocks stay anonymous and the plate carries the date.
+     */
+    val completedOn: LocalDate? = null,
 ) {
     private val byId: Map<String, Block> get() = blocks.associateBy { it.id }
 
     fun block(id: String): Block? = byId[id]
+
+    /** Sealed sculptures are read-only: no tray, no placing, no awarding. */
+    val isSealed: Boolean get() = completedOn != null
+
+    /** The last row with anything standing on it. Sizes a thumbnail honestly. */
+    fun builtHeight(): Int = placed.maxOfOrNull { p ->
+        p.y + (byId[p.blockId]?.shape?.h ?: 0)
+    } ?: 0
 
     /** Bricks earned but not yet on the plate, for [uid]. */
     fun tray(uid: String): List<Block> {

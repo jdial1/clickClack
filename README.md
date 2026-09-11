@@ -3,8 +3,14 @@
 A daily question for two people. You each answer privately; neither answer is
 readable until both are in. Then it unseals, and you talk.
 
+Answering earns bricks. You both drop them on one shared plate, and at the end
+of the week the sculpture is sealed with a date and a fresh plate starts.
+
 Scaffold stage: the UI is complete and driven by an in-memory mock repository.
 There is no backend yet.
+
+See [DESIGN.md](DESIGN.md) for what the app is *for* — the name, the voice, the
+rules that settle arguments. This file is how it is built.
 
 ## Running it
 
@@ -17,27 +23,36 @@ Open the folder in Android Studio and run the `app` configuration, or:
 Every screen also has `@Preview` composables, so the whole UI renders in the
 Studio preview pane without an emulator.
 
-To check it on a device instead — the `Pixel_9` AVD works:
+**Prefer the previews to the emulator.** The `Pixel_9` AVD on this machine runs
+under `-gpu swiftshader_indirect`, because hardware GL corrupts the framebuffer.
+That costs roughly 30s cold starts, near-constant SystemUI ANRs, and twice in
+one session `system_server` died outright and took the installed APK with it. If
+a screenshot comes back black or `dumpsys window | grep mCurrentFocus` reports
+`null`, it is wedged; kill it and cold-boot rather than retrying the install.
+
+Untried and worth a go before writing it off: `-gpu angle_indirect` (D3D11
+rather than software), and letting it reuse a snapshot instead of passing
+`-no-snapshot-load`.
+
+If you do want it on a device:
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk && adb shell am start -n com.ampersand/.MainActivity
 ```
 
-On a cold-booted emulator, SystemUI can throw an "isn't responding" dialog for
-the first half-minute and swallow input. Dismiss it and give it twenty seconds
-before driving the UI.
-
 ### Scaffold controls
 
 There is an unlabelled 28dp tap target in the **top-right corner** of any screen.
 Tapping it opens a panel that fakes the things that normally need a second
-person and a second phone:
+person, a second phone, or a week of waiting:
 
-- **Partner answers** — fakes Maya submitting, so the seal lifts and the reveal
-  becomes reachable.
-- **Reset day** — back to an unanswered question.
-- **Reflect / Guess Me / This or That** — swaps today's question so all three
-  input styles can be designed quickly.
+- **Partner answers** — fakes Maya submitting, so the seal lifts.
+- **Partner reacts** — toggles a reaction from her on today, so both halves of
+  the reveal can be seen.
+- **Seal the week** — archives the current plate onto the shelf and starts a
+  fresh one. Otherwise this is a thing that happens once every seven days and is
+  impossible to design.
+- **Reset day**, **Form kit**, and a question-type switcher.
 
 This panel and `FakeCoupleRepository` both come out when Firestore lands.
 
@@ -60,7 +75,7 @@ rules allow it.
 | `PICK_ONE` | Radio, 3+ options | The pick |
 | `MULTI_SELECT` | Checkboxes, optional cap | Set equality |
 | `RANK` | Drag to order | The top choice only |
-| `SCALE` | Five pips, 1–5 | The number |
+| `SCALE` | Draggable, 1–6 studs | The number |
 | `DROPDOWN` | Menu, long option lists | The pick |
 
 Every scoreable type asks for two things: your own answer, and a prediction of
@@ -75,53 +90,49 @@ anyway.
 Every question carries a `Depth` of 1–3 so the pool can keep Monday light and
 avoid landing a heavy one at the wrong moment.
 
-## The form kit
+## Reactions
 
-The app is mostly forms, so the controls are the product. They live in
-`ui/components/` and are drawn rather than taken from Material defaults.
-Indicators animate on a spring; nothing snaps.
+Once a day unseals, you each get **one** reaction — six to choose from, mapped
+meaning-first in `Reaction`:
 
-| Composable | Notes |
-|---|---|
-| `AmpField` | Filled, borderless at rest, accent ring arriving on focus. No floating label. |
-| `AmpSegmented` | Pill tab strip: a tray, with the selected tab filled solid inside it. |
-| `AmpRadioGroup` | Whole row is the target and fills with the accent when picked. Dot drawn on a `Canvas`. |
-| `AmpCheckboxGroup` | Same row anatomy as the radio, so they read as one family. Optional `max`, which disables the unpicked rows rather than hiding them. The tick is drawn in two strokes in proportion, so it appears to be written. |
-| `AmpDropdown` | Plain `DropdownMenu` with our own anchor, not `ExposedDropdownMenuBox` — the anchor then matches the other controls exactly. |
-| `AmpScale` | Five tappable pips. A slider would imply precision the answer does not have, and is fiddly one-handed. |
-| `AmpButton` | Filled primary action carrying its own glow. |
-| `ColorChip` | The rounded-square colour tile the reference designs put on every list row. |
-| `CurveBackdrop` | Bezier curves sweeping from off the bottom-left up and off the right, in the couple's own colours. Geometry is in fractions of the canvas so it fits any screen, strokes start and end outside the bounds so none has a visible end, and weights are mixed — equal-weight lines read as a graph, mixed weights read as movement. |
-| `AmpDragRank` | Drag to reorder. See below. |
+```kotlin
+LOVE, LAUGH, MELT, SURPRISE, CURIOUS, KNEW_IT
+```
 
-Open the **Kit** tab in the running app to see all of them live, or the
-`Gallery` previews in Android Studio.
+The enum stores the glyph *and* the sentence it stands in for, the same way
+`Sfx` maps meaning to file. Changing an emoji later does not change what a
+stored reaction meant, and the partner's reaction is displayed with its label
+rather than the glyph alone — an emoji on its own is ambiguous in exactly the
+way this app is trying not to be.
 
-### AmpDragRank
+Reactions live on the day document, not in the sealed per-person subcollection:
+there is nothing left to spoil after the reveal, so no rule has to hide them.
+They are also the one thing in the app you *can* change your mind about — an
+answer is a statement made under seal, a reaction is a gesture. Tapping your
+current one clears it.
 
-Compose has no built-in reorderable list outside lazy lists, so this is
-hand-rolled. Three things it gets right that the obvious version does not:
-
-- Rows are wrapped in `key(item)`, so a row keeps its identity across a
-  reorder. Without it Compose reuses slots positionally and every row visually
-  teleports.
-- The gesture is keyed on the **item**, not the list. Keying `pointerInput` on
-  the list restarts it the instant the order changes, cancelling the drag on the
-  first swap. This is the single most common bug in hand-rolled reorderables.
-- The live list is read through `rememberUpdatedState`, so the gesture resolves
-  the item's *current* index rather than the one captured at drag start.
-
-Everything except the row under the finger animates its placement via a small
-`animatePlacement` modifier, so the list reflows instead of snapping.
+The reveal ends with the only instruction the app ever gives: *Now go and ask
+them about it.*
 
 ## The build
 
-Answering earns bricks. Both of you drop them on one shared baseplate, and at
-the end of the period the sculpture is archived and a fresh plate starts. The
-streak stops being a number and becomes a thing you made together.
+Bricks are earned by answering and placed by hand on a shared plate. Bricks keep
+their owner's colour, so the finished piece shows who built which bit. That is
+most of the charm, and the reason this beats a progress bar.
 
-Bricks keep their owner's colour, so the finished piece shows who built which
-bit. That is most of the charm, and the reason this beats a progress bar.
+### Sculptures are dated; bricks are not
+
+A `BuildPlate` carries `completedOn`. Null means still building; a date means
+sealed, and a sealed plate is read-only — no tray, no placing, no awarding.
+
+The date belongs to the finished thing, not to the bricks in it. A brick that
+remembered its own day would turn the sculpture into a scrollable diary and the
+plate into an index; what you actually want to be able to say is *"that is the
+one we made the week of the ninth"*.
+
+When a plate seals, **unplaced bricks carry over** to the next one. They were
+earned by answering, and confiscating them would punish you for not having
+tidied the tray before a deadline you did not choose.
 
 ### Geometry follows the art
 
@@ -135,13 +146,11 @@ Slopes exist at medium and high, 2 and 4 studs wide.
 Picking a square grid and stretching the art onto it would have been the obvious
 move, and it would look wrong.
 
-Bricks are drawn from the **greyscale** (`White`) set and tinted with
-`BlendMode.Modulate`, which multiplies: the `#FFFFFF` highlight becomes the
-owner's colour and the `#BFBFBF` shadow becomes a darker version of it. That
-keeps the pack's shading while letting every couple build in their own two
-colours. A flat `SrcIn` tint would flatten the bricks; shipping the pack's six
-fixed colours would throw the personal palette away. Character bricks carry
-their own art and are drawn untinted.
+The art ships in the pack's own six colours, so bricks are drawn **untinted**.
+An earlier version multiplied a greyscale source with `BlendMode.Modulate`,
+which cannot reach the pack's saturated reds without clipping and left the
+bricks slightly off from the rest of the UI. Character bricks carry their own
+art and ignore the owner's colour entirely.
 
 **Earning** is deliberately modest — one brick each per completed day, sized by
 the question's depth (2-stud low / 4-stud low / 4-stud medium), with a character
@@ -170,14 +179,92 @@ per brick is the obvious build and the slow one.
 `BrickAtlas.kt` maps asset name → drawable id explicitly rather than via
 `getIdentifier()`, so a missing or renamed asset is a compile error instead of a
 blank brick at runtime. It is generated from the pack file list — regenerate it
-if the pack changes.
+if the pack changes. Bitmaps are decoded **lazily, per name**: all 173 at once is
+roughly 14MB of bitmap.
+
+## The Shelf
+
+The memory screen, ordered by feeling rather than chronology:
+
+1. **On this day** — an entry from six months or a year back, with both answers
+   shown in full. `CoupleState.onThisDay` matches on day-of-month rather than on
+   exact anniversaries, so there is something to find more than once a year, and
+   excludes anything inside the last month: "three weeks ago today" is not a
+   memory, it is just recent.
+2. **The shelf** — sealed sculptures, the selected one large, the rest as a
+   strip. `Sculpture` crops to `BuildPlate.builtHeight()` rather than to the
+   grid; drawn to the full 14 rows every week's work would be two thirds empty
+   sky and they would all look identical.
+3. **The last ten weeks** — 70 one-stud bricks, one per day, in one `Canvas`
+   with hit-testing in the same coordinates rather than seventy clickable boxes.
+4. **Every day** — the index, which is the least interesting part and is
+   therefore last.
+
+It is the **Shelf** tab, not History. A shelf is where finished things live; a
+history is a log, and a log is what that screen used to be. It is also the only
+label that fits a 2-stud nav tile without shrinking the type.
+
+## The form kit
+
+The app is mostly forms, so the controls are the product. They live in
+`ui/components/` and are drawn rather than taken from Material defaults.
+
+| Composable | Notes |
+|---|---|
+| `AmpField` | A recessed socket. The one control that is deliberately *not* a brick. |
+| `AmpSegmented` | Pill tab strip: a tray, with the selected tab filled solid inside it. |
+| `AmpRadioGroup` | A 1-stud brick in each colour, one per option. |
+| `AmpCheckboxGroup` | Same row anatomy as the radio, so they read as one family. Optional `max`, which disables the unpicked rows rather than hiding them. |
+| `AmpDropdown` | Plain `DropdownMenu` with our own anchor, not `ExposedDropdownMenuBox` — the anchor then matches the other controls exactly. |
+| `AmpScale` | Drag a run of studs from 1 to 6. A slider would imply precision the answer does not have. |
+| `AmpButton` | A 12-stud `BrickSlab` in a colour slug. Disabled is a black brick at full opacity, not a 35%-alpha ghost. |
+| `AmpDragRank` | Six-stud bricks that reorder and snap. See below. |
+| `AmpReactionRow` | Six 2-stud bricks, one per `Reaction`, twelve studs in total. |
+| `ColorChip` | A real 2-stud brick from the pack. |
+| `BrickWall` | The background: a running-bond wall in both your colours, with gaps. |
+
+Open the **Form kit** from the scaffold panel to see them live, or the `Gallery`
+previews in Android Studio.
+
+### AmpDragRank
+
+Compose has no built-in reorderable list outside lazy lists, so this is
+hand-rolled. Three things it gets right that the obvious version does not:
+
+- Rows are wrapped in `key(item)`, so a row keeps its identity across a
+  reorder. Without it Compose reuses slots positionally and every row visually
+  teleports.
+- The gesture is keyed on the **item**, not the list. Keying `pointerInput` on
+  the list restarts it the instant the order changes, cancelling the drag on the
+  first swap. This is the single most common bug in hand-rolled reorderables.
+- The live list is read through `rememberUpdatedState`, so the gesture resolves
+  the item's *current* index rather than the one captured at drag start.
+
+The same class of bug bit twice more: once in the build tray (fixed with
+`key(block.id)`) and once in navigation, where holding the open `DayEntry`
+instead of its date meant a reaction added on the reveal screen never appeared
+on the reveal screen. If something captured at the start of an interaction is
+read at the end of it, check it.
 
 ## Brick styling for UI chrome
 
-The sculpture uses the real pack art, but that art only comes in 1, 2, 4 and 6
-stud widths — it cannot stretch to a text field or a nav bar without looking
-mangled. So UI chrome is **drawn** in the same language instead, via
-`Modifier.brickFace(...)`: a body, a row of studs along the top, and a darker lip
+Pack art only comes in 1, 2, 4 and 6 stud widths, so a full-width surface cannot
+be a single image. It is laid as a **course of real bricks** instead:
+`BrickSlab` decomposes the width via `BrickArt.runOf` (12 studs → a 6, a 4 and a
+2) and reverses alternate courses so seams stagger like real bond rather than
+stacking into a visible column.
+
+Height comes from the **content**, not from a course count, and the course count
+is computed against `height − nub`: a course's studs sit *above* its body, so
+without that subtraction the top row draws outside the slab and overlaps
+whatever is laid out above it.
+
+`inkOnBrick(slug)` picks the text colour. The neutral brick is `#DBDBDB` and
+yellow is `#FFB733`; white text on either is unreadable, which is exactly how
+the first version of the stat cards shipped.
+
+Anything too small or too odd-shaped for real art is drawn in the same language
+via `Modifier.brickFace(...)`: a body, studs along the top, and a darker lip
 underneath that shortens when pressed, the way a key goes down.
 
 One rule keeps it coherent:
@@ -187,10 +274,9 @@ One rule keeps it coherent:
 > **Things you type into are sockets.** Recessed, studless — studs behind a
 > cursor is just clutter.
 
-Studs sit *inside* the bounds rather than overhanging. Overhang is what real
-bricks do, but `drawBehind` clips to bounds and a clipped stud reads as a bug.
-Stud count is derived from the element's width, so a nav tab gets one and the
-hero gets nine, with no per-call configuration.
+Still drawn rather than real art, and fair game for conversion: the segmented
+tray, the dropdown anchor and its chevron, `PersonDot`, and the ten-week plate
+backing.
 
 ## Sound
 
@@ -208,6 +294,23 @@ arrives late is worse than one that never arrives.
 system, and a `SoundKit?.play()` extension means call sites need no null checks.
 The toggle lives on the **Us** screen.
 
+## The icon
+
+An adaptive icon, hand-written as two vectors rather than exported: two 2-stud
+medium bricks in running bond, blue under red, on the app's own night ground.
+
+The geometry is the pack's, scaled — a stud is 18 units, a body row is 28/64 of
+that, the nub is 16/64 and sits above the body — and the bottom brick's right
+nub is covered by the top brick's body, because the paths are ordered exactly
+the way `drawBrickArt` orders a plate. The whole mark is 54 × 36 units, inside
+the 66-unit circle every launcher mask is guaranteed to show.
+
+There is a `monochrome` layer for themed icons, where the colours are gone and
+the join has to survive as a shape.
+
+Note for future edits: `--` is illegal inside an XML comment, so the em-dash
+convention used throughout the Kotlin will fail `mergeDebugResources`.
+
 ## Credits
 
 Brick art and UI audio: [Kenney](https://kenney.nl) — Brick Pack 2.0 and the
@@ -217,14 +320,17 @@ here because the packs are good.
 ## Layout
 
 ```
-model/Models.kt          Question, Answer, DayEntry, CoupleState. No Android imports.
-data/MockData.kt         16 sample questions + a couple with ten days of history.
-data/CoupleRepository.kt The seam Firebase slots into. Fake implementation lives here.
+model/Models.kt          Question, Answer, Reaction, DayEntry, CoupleState.
+model/Blocks.kt          Brick geometry, BuildPlate, placement rules, Rewards.
+model/BrickColor.kt      The four pickable colours, lifted from the pack SVGs.
+data/MockData.kt         16 questions, a couple with history, three sculptures.
+data/CoupleRepository.kt The seam Firebase slots into. Fake implementation here.
 ui/theme/Theme.kt        The blended two-person palette.
+ui/brick/                Atlas, geometry, drawBrickArt, BrickSlab, Sculpture.
 ui/today/                Question, input, seal, waiting.
-ui/reveal/               Both answers, each in its owner's colour, with hit/miss.
-ui/history/              Ten weeks as dots, plus the answered list.
-ui/us/                   Streak, sync score, live colour pickers.
+ui/reveal/               Both answers, the score, and the reaction row.
+ui/history/              The Shelf: on this day, sculptures, ten weeks, index.
+ui/us/                   Streak, sync score, live colour pickers, sound toggle.
 ```
 
 `model/` is plain Kotlin on purpose — when the Firestore layer arrives it maps
@@ -232,53 +338,39 @@ documents to these types and nothing in `ui/` changes.
 
 ## Visual language
 
-Deep navy ground, filled surfaces, big radii, one vivid accent, and depth from a
-soft **coloured** glow rather than outlines or grey drop shadows.
+Deep navy ground, filled surfaces, and depth from real brick shading rather than
+outlines or grey drop shadows. Shared surfaces are built from **both** people's
+bricks: the hero question is a wall of yours and theirs, alternating.
 
-| Token | Value |
-|---|---|
-| Corner | chip 14 · control 20 · card 28 · hero 32 · pill ∞ |
-| Depth | `Modifier.glow(color, shape)` — a wide shadow tinted with the element's own hue |
-| Surfaces | filled and layered; **no** hairline borders at rest |
-| Selection | the accent takes the whole control, not a 12% tint of it |
-| Type | geometric sans, heavy where it matters; size and weight carry hierarchy |
+The `ColorScheme` is built by hand rather than seeded from a tonal palette. The
+blend of two chosen colours is computed in **HSL along the shorter hue arc**
+with a saturation floor and a clamped lightness — averaging two complementary
+colours in RGB gives grey, which is how the first version of this painted the
+app's signature surface mud, and an unclamped blend put white text on magenta at
+about 3:1.
 
 Coloured shadows need API 28. Below that `glow` degrades to a standard black
 shadow, which still reads fine.
-
-### The blend
-
-Each person picks a colour. Their surfaces lean their hue, and the **hero
-question card is painted in the gradient between the two** — your colour on one
-edge, theirs on the other, the question sitting in the blend. That one surface
-says what the app is about without words, and no two couples get the same one.
-
-The `ColorScheme` is built by hand rather than seeded from a tonal palette, so
-the blend stays the literal average of the two chosen colours. Change them on
-the **Us** screen and the whole app repaints live, hero gradient included.
-
-Default seeds are coral `#FF6B5B` and indigo `#6C63FF`; their blend is an
-orchid. The swatches are saturated on purpose — the entire palette derives from
-them, and muted seeds make a muted app.
 
 ## What is not built yet
 
 - Firebase Auth, Firestore, FCM (see below)
 - Pairing by invite code
 - Notifications
+- Automatic weekly sealing — the rule exists, the clock does not
+- Undo on a placed brick, and brick rotation
 - Wildcard (one of you writes the question) and time capsule (questions return
   in six months, then vs. now)
-- Post-reveal notes and reactions — the Reveal screen has the slot, not the
-  behaviour
+- `Rewards` never awards slopes, only flats plus a character at 7-day streaks
 
 ## Planned Firestore model
 
 ```
 users/{uid}                      displayName, colorArgb, coupleId, tz, fcmToken
 couples/{cid}                    members[2], homeTz, streak, freezes, queue[], lastDay
-couples/{cid}/days/{yyyy-mm-dd}  questionId, type, submitted[], revealed, score
+couples/{cid}/days/{yyyy-mm-dd}  questionId, type, submitted[], revealed, score, reactions
   .../answers/{uid}              response, guess, submittedAt      <- the sealed part
-  .../notes/{noteId}             uid, text, createdAt              <- post-reveal only
+couples/{cid}/plates/{pid}       startedOn, completedOn, blocks[], placed[]
 questions/{qid}                  text, type, options[], category, depth, source
 ```
 
@@ -296,6 +388,13 @@ match /couples/{cid}/days/{d}/answers/{uid} {
 }
 ```
 
+Reactions are a map on the day document, writable by either member only once
+`revealed` is true, and each member may only write their own key.
+
+A sealed plate — `completedOn != null` — should reject writes in rules as well
+as in the repository. Otherwise a late listener could append a brick to last
+week's sculpture.
+
 Day boundaries follow the couple's `homeTz`, never device time. That is the
 difference between working and not working if you are ever in different
 timezones, and it is far cheaper to decide now than to migrate later.
@@ -306,8 +405,15 @@ Gradle 9.7.1, AGP 9.4.0, Kotlin 2.4.10, Compose BOM 2026.08.00, compileSdk 37,
 minSdk 26 (`java.time` without desugaring). Bytecode targets 17; the build JVM
 is Temurin 25.
 
+AGP 9 has Kotlin built in and **rejects** the `org.jetbrains.kotlin.android`
+plugin. Do not add it back.
+
 This host needs `-Djdk.net.unixdomain.tmpdir` pointed away from `%LOCALAPPDATA%\Temp`
 or the Gradle daemon cannot accept a connection. It is set in
 `~/.gradle/gradle.properties`, which is why this project deliberately does **not**
 define `org.gradle.jvmargs` — a project-level value would override it and break
 the build on this machine. Command-line builds also want it in `GRADLE_OPTS`.
+
+When scripting a build, redirect to a log and echo `$?`. Piping Gradle through
+`tail` reports the exit code of `tail`, which cheerfully returns 0 on a failed
+build.

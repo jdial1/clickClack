@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Themed-icon version, tinted by the launcher's own palette.
+
+  Same two bricks, but the colours are gone and so is the only thing telling
+  them apart &#8212; so the lips do that work instead: the join between the two
+  pieces has to survive as a *shape* or the icon collapses into one rectangle.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108"
+    android:tint="#FFFFFF">
+
+    <path android:fillColor="#FFFFFF" android:pathData="M31.5,51.75h9v4.5h-9z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M49.5,51.75h9v4.5h-9z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M27,56.25h36v15.75h-36z" />
+
+    <!-- The gap that keeps the two bricks legible without colour. -->
+    <path android:fillColor="#FFFFFF" android:pathData="M49.5,36h9v4.5h-9z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M67.5,36h9v4.5h-9z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M45,40.5h36v14.25h-36z" />
+</vector>

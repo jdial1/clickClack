@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Two bricks in running bond: yours on theirs.
+
+  The whole app in the smallest possible number of parts. Not a heart, not a
+  chat bubble, not a letter A &#8212; two separate pieces that only make a shape
+  because they are stacked, and in two different colours so you can see whose is
+  whose. The offset is a full stud, so the join is visible at 48dp: aligned
+  bricks read as one rectangle, staggered ones read as built.
+
+  Geometry is the pack's, scaled: a stud is 18 units, a brick body row is 28/64
+  of that, and the nub is 16/64 of it and sits above the body. Two 2-stud medium
+  bricks come to 54 x 36 units, which fits inside the 66-unit circle every
+  launcher mask is guaranteed to show.
+
+  Drawn bottom-brick-first so the top brick's body covers the nub it is sitting
+  on, exactly as drawBrickArt orders the plate.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Theirs: blue, underneath. -->
+    <path android:fillColor="#108BE2" android:pathData="M31.5,51.75h9v4.5h-9z" />
+    <path android:fillColor="#108BE2" android:pathData="M49.5,51.75h9v4.5h-9z" />
+    <path android:fillColor="#108BE2" android:pathData="M27,56.25h36v15.75h-36z" />
+    <path android:fillColor="#0C6DB2" android:pathData="M27,69.5h36v2.5h-36z" />
+
+    <!-- Yours: red, on top and offset by one stud. -->
+    <path android:fillColor="#F54E4F" android:pathData="M49.5,36h9v4.5h-9z" />
+    <path android:fillColor="#F54E4F" android:pathData="M67.5,36h9v4.5h-9z" />
+    <path android:fillColor="#F54E4F" android:pathData="M45,40.5h36v15.75h-36z" />
+    <path android:fillColor="#C93E3F" android:pathData="M45,53.75h36v2.5h-36z" />
+</vector>

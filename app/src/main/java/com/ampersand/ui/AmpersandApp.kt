@@ -46,7 +46,6 @@ import com.ampersand.data.MockQuestions
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
-import com.ampersand.model.DayEntry
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
@@ -67,6 +66,7 @@ import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
 import com.ampersand.ui.today.TodayScreen
 import com.ampersand.ui.us.UsScreen
+import java.time.LocalDate
 
 /** Swapped for a Firestore-backed repository later; nothing above it changes. */
 class AmpersandViewModel(
@@ -79,7 +79,10 @@ private const val JoinerSlug = "black"
 private enum class Tab(val label: String) {
     TODAY("Today"),
     BUILD("Build"),
-    HISTORY("History"),
+    // "Shelf", not "History": it is where the finished sculptures live, and a
+    // log is not what that screen is for. It is also the only label that fits a
+    // 2-stud tile without shrinking the type.
+    SHELF("Shelf"),
     US("Us"),
 }
 
@@ -95,7 +98,10 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
     ) {
       CompositionLocalProvider(LocalSounds provides sounds) {
         var tab by remember { mutableStateOf(Tab.TODAY) }
-        var openDay by remember { mutableStateOf<DayEntry?>(null) }
+        // The *date* of the open day, not the day itself. Holding the entry
+        // would freeze it at the moment it was opened, so a reaction added on
+        // the reveal screen would never appear on the reveal screen.
+        var openDate by remember { mutableStateOf<LocalDate?>(null) }
         var showScaffoldControls by remember { mutableStateOf(false) }
         // Scaffold only, and off the tab bar: five pills do not fit a phone.
         var showKit by remember { mutableStateOf(false) }
@@ -108,6 +114,7 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
                         AnimatedVisibility(visible = showScaffoldControls) {
                             ScaffoldControls(
                                 repo = vm.repo,
+                                today = state.today.date,
                                 kitOpen = showKit,
                                 onToggleKit = { showKit = !showKit },
                             )
@@ -115,8 +122,8 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
                         BottomBar(
                             current = tab,
                             color = BrickColor.of(state.you.colorArgb),
-                            enabled = openDay == null && !showKit,
-                            onSelect = { tab = it; openDay = null; showKit = false },
+                            enabled = openDate == null && !showKit,
+                            onSelect = { tab = it; openDate = null; showKit = false },
                         )
                     }
                 },
@@ -135,20 +142,30 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
                         .fillMaxSize()
                         .padding(padding),
                 ) {
-                    val day = openDay
+                    // Re-resolved every composition, so the screen sees the live
+                    // day rather than the one that was open when it was tapped.
+                    val day = openDate?.let { date ->
+                        if (state.today.date == date) {
+                            state.today
+                        } else {
+                            state.history.firstOrNull { it.date == date }
+                        }
+                    }
+
                     when {
                         showKit -> GalleryScreen(state = state)
 
                         day != null -> RevealScreen(
                             state = state,
                             day = day,
-                            onBack = { openDay = null },
+                            onBack = { openDate = null },
+                            onReact = { vm.repo.react(day.date, it) },
                         )
 
                         tab == Tab.TODAY -> TodayScreen(
                             state = state,
                             onSubmit = vm.repo::submitToday,
-                            onOpenReveal = { openDay = state.today },
+                            onOpenReveal = { openDate = state.today.date },
                         )
 
                         tab == Tab.BUILD -> BuildScreen(
@@ -157,9 +174,9 @@ fun AmpersandApp(vm: AmpersandViewModel = viewModel()) {
                             onPlace = vm.repo::placeBlock,
                         )
 
-                        tab == Tab.HISTORY -> HistoryScreen(
+                        tab == Tab.SHELF -> HistoryScreen(
                             state = state,
-                            onOpenDay = { openDay = it },
+                            onOpenDay = { openDate = it.date },
                         )
 
                         else -> UsScreen(
@@ -291,6 +308,7 @@ private fun BottomBar(
 @Composable
 private fun ScaffoldControls(
     repo: CoupleRepository,
+    today: LocalDate,
     kitOpen: Boolean,
     onToggleKit: () -> Unit,
 ) {
@@ -306,7 +324,12 @@ private fun ScaffoldControls(
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Chip("Partner answers") { repo.simulatePartnerAnswer() }
+            Chip("Partner reacts") { repo.simulatePartnerReaction(today) }
             Chip("Reset day") { repo.resetToday() }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Chip("Seal the week") { repo.sealPlate() }
             Chip(if (kitOpen) "Close kit" else "Form kit", onClick = onToggleKit)
         }
         Spacer(Modifier.height(8.dp))

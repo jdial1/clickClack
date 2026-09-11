@@ -26,14 +26,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import com.ampersand.data.MockCouple
 import com.ampersand.model.Answer
+import com.ampersand.model.BrickColor
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Member
 import com.ampersand.model.Question
+import com.ampersand.model.Reaction
+import com.ampersand.ui.components.AmpReactionRow
 import com.ampersand.ui.components.DepthDots
+import com.ampersand.ui.components.PartnerReaction
 import com.ampersand.ui.components.PersonDot
+import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
@@ -55,6 +61,7 @@ fun RevealScreen(
     day: DayEntry,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onReact: (Reaction?) -> Unit = {},
 ) {
     val youColor = Color(state.you.colorArgb)
     val themColor = Color(state.them.colorArgb)
@@ -118,28 +125,37 @@ fun RevealScreen(
             guessLabelPrefix = "You",
         )
 
-        Spacer(Modifier.height(24.dp))
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(18.dp),
-        ) {
-            Column {
-                Text(
-                    "Talk about this tonight",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Bookmarks the question so it shows up on the Us screen.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            }
+        Spacer(Modifier.height(30.dp))
+        SectionLabel("Say something back")
+        Spacer(Modifier.height(10.dp))
+        AmpReactionRow(
+            selected = day.reactionFor(state.you.uid),
+            color = BrickColor.of(state.you.colorArgb),
+            onSelect = onReact,
+        )
+
+        Spacer(Modifier.height(16.dp))
+        val theirs = day.reactionFor(state.them.uid)
+        if (theirs != null) {
+            PartnerReaction(
+                name = state.them.name,
+                reaction = theirs,
+                color = BrickColor.of(state.them.colorArgb),
+            )
+        } else {
+            QuietNote("${state.them.name} has not said anything back yet.")
         }
+
+        Spacer(Modifier.height(30.dp))
+        // The last word on the screen, and the only instruction the app ever
+        // gives: the reaction is a receipt, not the conversation.
+        Text(
+            text = "Now go and ask them about it.",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Spacer(Modifier.height(40.dp))
     }
 }
