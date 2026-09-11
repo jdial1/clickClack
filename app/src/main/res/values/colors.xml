@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Kept in step with NightBase in Theme.kt. -->
+    <color name="night_base">#0E1226</color>
+</resources>

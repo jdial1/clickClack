@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose paints everything; this only needs to get out of the way.
+         Parenting on the platform theme avoids pulling in appcompat.
+         windowBackground matches NightBase so the starting window is the app's
+         own colour rather than a black flash before the first frame. -->
+    <style name="Theme.Ampersand" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/night_base</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
