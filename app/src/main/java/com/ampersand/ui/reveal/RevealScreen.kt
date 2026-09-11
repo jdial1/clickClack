@@ -262,6 +262,26 @@ private fun PreviewRevealReflect() = AmpersandTheme {
     }
 }
 
+/** Both of you have reacted: the row lit on your side, their label underneath. */
+@Preview(name = "Reveal - reacted", showBackground = true, heightDp = 1100)
+@Composable
+private fun PreviewRevealReacted() = AmpersandTheme {
+    val s = MockCouple.state()
+    val day = s.history.first { it.question.id == "g4" }
+    Surface(color = MaterialTheme.colorScheme.background) {
+        RevealScreen(
+            state = s,
+            day = day.copy(
+                reactions = mapOf(
+                    s.you.uid to Reaction.KNEW_IT,
+                    s.them.uid to Reaction.LAUGH,
+                ),
+            ),
+            onBack = {},
+        )
+    }
+}
+
 @Preview(name = "Reveal - dark, split", showBackground = true, heightDp = 820)
 @Composable
 private fun PreviewRevealDark() = AmpersandTheme(darkTheme = true) {

@@ -34,6 +34,33 @@ Untried and worth a go before writing it off: `-gpu angle_indirect` (D3D11
 rather than software), and letting it reuse a snapshot instead of passing
 `-no-snapshot-load`.
 
+### Screenshot testing does not work here yet
+
+AGP's `com.android.compose.screenshot` plugin renders `@Preview` composables to
+PNG on the JVM, which would replace the emulator entirely. It does not work
+against this toolchain, and the failure is silent, so here is how far it gets
+before you waste an afternoon on it:
+
+- The plugin is **not** versioned with AGP. Only `0.0.1-alphaNN` is published;
+  `version.ref = "agp"` fails to resolve.
+- `android.experimental.enableScreenshotTest=true` is needed in **both**
+  `gradle.properties` (so the plugin can apply) and the module's `android` block
+  as `experimentalProperties[...]` (so the source set is created). Each error
+  message names only the other one.
+- The plugin does not add its own JUnit engine under AGP 9 —
+  `debugScreenshotTestRuntimeClasspath` comes back completely empty. Adding
+  `com.android.tools.screenshot:screenshot-validation-junit-engine` manually
+  fixes the classpath.
+- After all of that the engine loads and discovers **zero** previews, whether
+  they are top-level functions or members of a class, and reports nothing at
+  all. Alpha16 predates AGP 9's built-in Kotlin compiler, which writes classes
+  to `intermediates/built_in_kotlinc/...`; the discovery step appears not to
+  cope.
+
+Until that plugin catches up, the Studio preview pane is the verification tool.
+Every screen has `@Preview`s, including the sealed-and-waiting state and the
+reveal with both reactions set.
+
 If you do want it on a device:
 
 ```bash
