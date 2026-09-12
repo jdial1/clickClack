@@ -1,0 +1,765 @@
+{
+  "id": "daily-ipip-extraversion",
+  "title": "Out and about",
+  "theme": "PLAYFUL",
+  "blurb": "Daily only. Adapted from the International Personality Item Pool.",
+  "source": "International Personality Item Pool (ipip.ori.org), public domain. Goldberg et al. (2006), Journal of Research in Personality, 40, 84-96.",
+  "questions": [
+    {
+      "id": "ipe1t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I make friends easily",
+        "I am hard to get to know"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1s",
+      "text": "How much does this sound like me? “I warm up quickly to others.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I feel comfortable around people",
+        "I involve others in what I am doing",
+        "I take control of things",
+        "I am always busy"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I act comfortably with others",
+        "I love surprise parties",
+        "I take charge",
+        "I am always on the go",
+        "I seek danger"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I cheer people up",
+        "I love large parties",
+        "I try to lead others",
+        "I do a lot in my spare time"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I warm up quickly to others",
+        "I enjoy being part of a group",
+        "I seek to influence others",
+        "I react quickly",
+        "I act wild and crazy",
+        "I laugh aloud"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1g",
+      "text": "How long does it take me to feel comfortable with someone new?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe1f",
+      "text": "Who is the easiest person you have ever gotten to know, and why?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-NEO Friendliness (E1)"
+    },
+    {
+      "id": "ipe2t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "options": [
+        "I love large parties",
+        "I prefer to be alone"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2s",
+      "text": "How true is this of me? “I talk to a lot of different people at parties.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "options": [
+        "I enjoy being part of a group",
+        "I seek to influence others",
+        "I react quickly",
+        "I act wild and crazy"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "options": [
+        "I involve others in what I am doing",
+        "I take control of things",
+        "I am always busy",
+        "I am willing to try anything once",
+        "I amuse my friends"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "options": [
+        "I love surprise parties",
+        "I take charge",
+        "I am always on the go",
+        "I seek danger"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "options": [
+        "I talk to a lot of different people at parties",
+        "I can talk others into doing things",
+        "I can manage many things at the same time",
+        "I enjoy being reckless",
+        "I look at the bright side of life",
+        "I warm up quickly to others"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2g",
+      "text": "What is my ideal number of people at a party, not counting us?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe2f",
+      "text": "What is the best gathering you have ever been part of?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "fun"
+      ],
+      "source": "IPIP-NEO Gregariousness (E2)"
+    },
+    {
+      "id": "ipe3t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "options": [
+        "I take charge",
+        "I wait for others to lead the way"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3s",
+      "text": "Would I say this about myself? “I try to lead others.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "options": [
+        "I can talk others into doing things",
+        "I can manage many things at the same time",
+        "I enjoy being reckless",
+        "I look at the bright side of life"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "options": [
+        "I seek to influence others",
+        "I react quickly",
+        "I act wild and crazy",
+        "I laugh aloud",
+        "I feel comfortable around people"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "options": [
+        "I take control of things",
+        "I am always busy",
+        "I am willing to try anything once",
+        "I amuse my friends"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "options": [
+        "I try to lead others",
+        "I do a lot in my spare time",
+        "I enjoy being part of a loud crowd",
+        "I love life",
+        "I make friends easily",
+        "I talk to a lot of different people at parties"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3g",
+      "text": "In a group trying to decide where to eat, what role do I end up playing?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe3f",
+      "text": "When do you wish you had spoken up sooner?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "work",
+        "words"
+      ],
+      "source": "IPIP-NEO Assertiveness (E3)"
+    },
+    {
+      "id": "ipe4t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am always busy",
+        "I like to take it easy"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4s",
+      "text": "How much does this sound like me? “I am always on the go.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I do a lot in my spare time",
+        "I enjoy being part of a loud crowd",
+        "I love life",
+        "I make friends easily"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I can manage many things at the same time",
+        "I enjoy being reckless",
+        "I look at the bright side of life",
+        "I warm up quickly to others",
+        "I enjoy being part of a group"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I react quickly",
+        "I act wild and crazy",
+        "I laugh aloud",
+        "I feel comfortable around people"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am always on the go",
+        "I love action",
+        "I laugh my way through life",
+        "I cheer people up",
+        "I love large parties",
+        "I try to lead others"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4g",
+      "text": "What does my perfect lazy day look like, hour by hour?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe4f",
+      "text": "Does your week feel too full, too empty, or about right, and why?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 2,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-NEO Activity Level (E4)"
+    },
+    {
+      "id": "ipe5t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I love excitement",
+        "I would never go hang gliding or bungee jumping"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5s",
+      "text": "How true is this of me? “I seek adventure.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I love action",
+        "I laugh my way through life",
+        "I cheer people up",
+        "I love large parties"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I enjoy being part of a loud crowd",
+        "I love life",
+        "I make friends easily",
+        "I talk to a lot of different people at parties",
+        "I can talk others into doing things"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I enjoy being reckless",
+        "I look at the bright side of life",
+        "I warm up quickly to others",
+        "I enjoy being part of a group"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I seek adventure",
+        "I express childlike joy",
+        "I act comfortably with others",
+        "I love surprise parties",
+        "I take charge",
+        "I am always on the go"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5g",
+      "text": "What is the most daring thing I would actually do if you dared me?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe5f",
+      "text": "What is the most adventurous thing you have ever done, and would you do it again?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "source": "IPIP-NEO Excitement-Seeking (E5)"
+    },
+    {
+      "id": "ipe6t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I radiate joy",
+        "I am not easily amused"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6s",
+      "text": "Would I say this about myself? “I have a lot of fun.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I express childlike joy",
+        "I act comfortably with others",
+        "I love surprise parties",
+        "I take charge"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I laugh my way through life",
+        "I cheer people up",
+        "I love large parties",
+        "I try to lead others",
+        "I do a lot in my spare time"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I love life",
+        "I make friends easily",
+        "I talk to a lot of different people at parties",
+        "I can talk others into doing things"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I have a lot of fun",
+        "I feel comfortable around people",
+        "I involve others in what I am doing",
+        "I take control of things",
+        "I am always busy",
+        "I am willing to try anything once"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6g",
+      "text": "What never fails to make me laugh?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    },
+    {
+      "id": "ipe6f",
+      "text": "When did you last laugh until it hurt?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-NEO Cheerfulness (E6)"
+    }
+  ]
+}

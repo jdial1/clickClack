@@ -90,7 +90,26 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
-    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT)
+    /**
+     * The one source whose item text is free for any use.
+     *
+     * The daily-ipip decks turn 216 of the IPIP-NEO facet statements into
+     * questions: first person, spread across every question type, with the
+     * accusatory, clinical and political items left out. Public domain needs no
+     * credit; it gets one anyway.
+     */
+    val IPIP = Source(
+        id = "ipip",
+        authors = "Goldberg, Johnson, Eber, Hogan, Ashton, Cloninger & Gough",
+        year = 2006,
+        title = "The International Personality Item Pool and the future of public-domain personality measures",
+        venue = "Journal of Research in Personality, 40(1), 84-96",
+        url = "https://ipip.ori.org/",
+        licence = "Public domain. Items from the IPIP-NEO facet scales, reworded.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }

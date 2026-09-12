@@ -1,0 +1,635 @@
+{
+  "id": "daily-ipip-openness",
+  "title": "Curious",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only. Adapted from the International Personality Item Pool.",
+  "source": "International Personality Item Pool (ipip.ori.org), public domain. Goldberg et al. (2006), Journal of Research in Personality, 40, 84-96.",
+  "questions": [
+    {
+      "id": "ipo1t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I have a vivid imagination",
+        "I seldom daydream"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1s",
+      "text": "How much does this sound like me? “I enjoy wild flights of fantasy.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I love to daydream",
+        "I love flowers",
+        "I try to understand myself",
+        "I like to visit new places"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I like to get lost in thought",
+        "I enjoy the beauty of nature",
+        "I experience my emotions intensely",
+        "I am interested in many things",
+        "I have a rich vocabulary"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I indulge in my fantasies",
+        "I believe in the importance of art",
+        "I feel others' emotions",
+        "I like to begin new things"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I enjoy wild flights of fantasy",
+        "I see beauty in things that others might not notice",
+        "I enjoy examining myself and my life",
+        "I prefer variety to routine",
+        "I like to solve complex problems",
+        "I seldom get lost in thought"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1g",
+      "text": "What do I daydream about when I am staring out the window?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo1f",
+      "text": "What is something you imagined as a kid that you still think about?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Imagination (O1)"
+    },
+    {
+      "id": "ipo2t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "options": [
+        "I believe in the importance of art",
+        "I do not like art"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2s",
+      "text": "How true is this of me? “I like music.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "options": [
+        "I see beauty in things that others might not notice",
+        "I enjoy examining myself and my life",
+        "I prefer variety to routine",
+        "I like to solve complex problems"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "options": [
+        "I love flowers",
+        "I try to understand myself",
+        "I like to visit new places",
+        "I love to read challenging material",
+        "I enjoy wild flights of fantasy"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "options": [
+        "I enjoy the beauty of nature",
+        "I experience my emotions intensely",
+        "I am interested in many things",
+        "I have a rich vocabulary"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "options": [
+        "I like music",
+        "I am passionate about causes",
+        "I like to begin new things",
+        "I enjoy thinking about things",
+        "I spend time reflecting on things",
+        "I do not like poetry"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2g",
+      "text": "What song, painting, or place would I call beautiful?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo2f",
+      "text": "What is something beautiful you noticed this week that nobody else seemed to?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "source": "IPIP-NEO Artistic Interests (O2)"
+    },
+    {
+      "id": "ipo3t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I experience my emotions intensely",
+        "I seldom get emotional"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3s",
+      "text": "Would I say this about myself? “I feel others' emotions.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am passionate about causes",
+        "I like to begin new things",
+        "I enjoy thinking about things",
+        "I spend time reflecting on things"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I enjoy examining myself and my life",
+        "I prefer variety to routine",
+        "I like to solve complex problems",
+        "I have a vivid imagination",
+        "I see beauty in things that others might not notice"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I try to understand myself",
+        "I like to visit new places",
+        "I love to read challenging material",
+        "I enjoy wild flights of fantasy"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I feel others' emotions",
+        "I am interested in many things",
+        "I can handle a lot of information",
+        "I indulge in my fantasies",
+        "I believe in the importance of art",
+        "I am not easily affected by my emotions"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3g",
+      "text": "What is something that moves me more than I let on?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo3f",
+      "text": "When did you last cry at something, and what was it?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Emotionality (O3)"
+    },
+    {
+      "id": "ipo4t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "options": [
+        "I prefer variety to routine",
+        "I prefer to stick with things that I know"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4s",
+      "text": "How much does this sound like me? “I like to visit new places.”",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "options": [
+        "I am interested in many things",
+        "I can handle a lot of information",
+        "I indulge in my fantasies",
+        "I believe in the importance of art"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "options": [
+        "I like to begin new things",
+        "I enjoy thinking about things",
+        "I spend time reflecting on things",
+        "I like music",
+        "I am passionate about causes"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "options": [
+        "I prefer variety to routine",
+        "I like to solve complex problems",
+        "I have a vivid imagination",
+        "I see beauty in things that others might not notice"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "options": [
+        "I like to visit new places",
+        "I have a rich vocabulary",
+        "I like to get lost in thought",
+        "I enjoy the beauty of nature",
+        "I experience my emotions intensely",
+        "I prefer to stick with things that I know"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4g",
+      "text": "What is one routine I would never give up, even on vacation?",
+      "type": "GUESS_ME",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo4f",
+      "text": "What is something new you want us to try together this year?",
+      "type": "REFLECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "source": "IPIP-NEO Adventurousness (O4)"
+    },
+    {
+      "id": "ipo5t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I like to solve complex problems",
+        "I am not interested in abstract ideas"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5s",
+      "text": "How true is this of me? “I love to read challenging material.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I have a rich vocabulary",
+        "I like to get lost in thought",
+        "I enjoy the beauty of nature",
+        "I experience my emotions intensely"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I can handle a lot of information",
+        "I indulge in my fantasies",
+        "I believe in the importance of art",
+        "I feel others' emotions",
+        "I like to begin new things"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I enjoy thinking about things",
+        "I spend time reflecting on things",
+        "I like music",
+        "I am passionate about causes"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I love to read challenging material",
+        "I love to daydream",
+        "I love flowers",
+        "I try to understand myself",
+        "I like to visit new places",
+        "I avoid philosophical discussions"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5g",
+      "text": "What topic could I talk about for an hour without noticing the time?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    },
+    {
+      "id": "ipo5f",
+      "text": "What is an idea that changed how you see things?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Intellect (O5)"
+    }
+  ]
+}

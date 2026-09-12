@@ -1,0 +1,773 @@
+{
+  "id": "daily-ipip-neuroticism",
+  "title": "Steady and not",
+  "theme": "DEEP",
+  "blurb": "Daily only. Adapted from the International Personality Item Pool.",
+  "source": "International Personality Item Pool (ipip.ori.org), public domain. Goldberg et al. (2006), Journal of Research in Personality, 40, 84-96.",
+  "questions": [
+    {
+      "id": "ipn1t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I worry about things",
+        "I am not easily bothered by things"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1s",
+      "text": "How much does this sound like me? “I fear for the worst.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am afraid of many things",
+        "I am often in a bad mood",
+        "I am often down in the dumps",
+        "I stumble over my words"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get stressed out easily",
+        "I lose my temper",
+        "I have frequent mood swings",
+        "I am easily intimidated",
+        "I love to eat"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get caught up in my problems",
+        "I get angry easily",
+        "I often feel blue",
+        "I am afraid that I will do the wrong thing"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I fear for the worst",
+        "I get upset easily",
+        "I often feel blue",
+        "I only feel comfortable with friends",
+        "I don't know why I do some of the things I do",
+        "I can't make up my mind"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1g",
+      "text": "What is the thing I worry about most often, even when I do not bring it up?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn1f",
+      "text": "What helps you stop worrying once you have started?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Anxiety (N1)"
+    },
+    {
+      "id": "ipn2t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get angry easily",
+        "I rarely get irritated"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2s",
+      "text": "How true is this of me? “I get irritated easily.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get upset easily",
+        "I often feel blue",
+        "I only feel comfortable with friends",
+        "I don't know why I do some of the things I do"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am often in a bad mood",
+        "I am often down in the dumps",
+        "I stumble over my words",
+        "I do things I later regret",
+        "I get overwhelmed by emotions"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I lose my temper",
+        "I have frequent mood swings",
+        "I am easily intimidated",
+        "I love to eat"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get irritated easily",
+        "I have frequent mood swings",
+        "I am afraid to draw attention to myself",
+        "I often eat too much",
+        "I become overwhelmed by events",
+        "I fear for the worst"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2g",
+      "text": "What is the small, everyday thing most likely to get under my skin?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn2f",
+      "text": "When you are irritated, what do you want the other person to do?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Anger (N2)"
+    },
+    {
+      "id": "ipn3t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I often feel blue",
+        "I seldom feel blue"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3s",
+      "text": "Would I say this about myself? “I am often down in the dumps.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I have frequent mood swings",
+        "I am afraid to draw attention to myself",
+        "I often eat too much",
+        "I become overwhelmed by events"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I often feel blue",
+        "I only feel comfortable with friends",
+        "I don't know why I do some of the things I do",
+        "I can't make up my mind",
+        "I am afraid of many things"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I am often down in the dumps",
+        "I stumble over my words",
+        "I do things I later regret",
+        "I get overwhelmed by emotions"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I am often down in the dumps",
+        "I find it difficult to approach others",
+        "I love to eat",
+        "I panic easily",
+        "I worry about things",
+        "I get irritated easily"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3g",
+      "text": "What do I do when I am feeling low and do not want to say so?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn3f",
+      "text": "What is something that reliably lifts you out of a gray mood?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "source": "IPIP-NEO Depression (N3)"
+    },
+    {
+      "id": "ipn4t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I am easily intimidated",
+        "I am not embarrassed easily"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4s",
+      "text": "How much does this sound like me? “I am afraid that I will do the wrong thing.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I find it difficult to approach others",
+        "I love to eat",
+        "I panic easily",
+        "I worry about things"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I am afraid to draw attention to myself",
+        "I often eat too much",
+        "I become overwhelmed by events",
+        "I fear for the worst",
+        "I get upset easily"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I only feel comfortable with friends",
+        "I don't know why I do some of the things I do",
+        "I can't make up my mind",
+        "I am afraid of many things"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I am afraid that I will do the wrong thing",
+        "I do things I later regret",
+        "I get overwhelmed by emotions",
+        "I get caught up in my problems",
+        "I get angry easily",
+        "I often feel blue"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4g",
+      "text": "What kind of situation makes me feel most out of place?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn4f",
+      "text": "When did you last feel shy, and what got you past it?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "source": "IPIP-NEO Self-Consciousness (N4)"
+    },
+    {
+      "id": "ipn5t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "options": [
+        "I often eat too much",
+        "I rarely overindulge"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5s",
+      "text": "How true is this of me? “I don't know why I do some of the things I do.”",
+      "type": "SCALE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "options": [
+        "I do things I later regret",
+        "I get overwhelmed by emotions",
+        "I get caught up in my problems",
+        "I get angry easily"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "options": [
+        "I love to eat",
+        "I panic easily",
+        "I worry about things",
+        "I get irritated easily",
+        "I am often down in the dumps"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "options": [
+        "I often eat too much",
+        "I become overwhelmed by events",
+        "I fear for the worst",
+        "I get upset easily"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "options": [
+        "I don't know why I do some of the things I do",
+        "I can't make up my mind",
+        "I get stressed out easily",
+        "I lose my temper",
+        "I have frequent mood swings",
+        "I am easily intimidated"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5g",
+      "text": "What is the one thing I can never resist, however full I am?",
+      "type": "GUESS_ME",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn5f",
+      "text": "What is a small indulgence you would never give up?",
+      "type": "REFLECT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "money"
+      ],
+      "source": "IPIP-NEO Immoderation (N5)"
+    },
+    {
+      "id": "ipn6t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "options": [
+        "I panic easily",
+        "I remain calm under pressure"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6s",
+      "text": "Would I say this about myself? “I become overwhelmed by events.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "options": [
+        "I can't make up my mind",
+        "I get stressed out easily",
+        "I lose my temper",
+        "I have frequent mood swings"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "options": [
+        "I get overwhelmed by emotions",
+        "I get caught up in my problems",
+        "I get angry easily",
+        "I often feel blue",
+        "I am afraid that I will do the wrong thing"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "options": [
+        "I panic easily",
+        "I worry about things",
+        "I get irritated easily",
+        "I am often down in the dumps"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "options": [
+        "I become overwhelmed by events",
+        "I am afraid of many things",
+        "I am often in a bad mood",
+        "I am often down in the dumps",
+        "I stumble over my words",
+        "I do things I later regret"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6g",
+      "text": "When everything goes wrong at once, what is the first thing I do?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    },
+    {
+      "id": "ipn6f",
+      "text": "What is the hardest thing you have gotten through, and what got you through it?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "source": "IPIP-NEO Vulnerability (N6)"
+    }
+  ]
+}

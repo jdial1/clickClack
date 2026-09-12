@@ -1,0 +1,505 @@
+{
+  "id": "daily-ipip-agreeableness",
+  "title": "Getting along",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only. Adapted from the International Personality Item Pool.",
+  "source": "International Personality Item Pool (ipip.ori.org), public domain. Goldberg et al. (2006), Journal of Research in Personality, 40, 84-96.",
+  "questions": [
+    {
+      "id": "ipa1t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I trust others",
+        "I distrust people"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1s",
+      "text": "Would I say this about myself? “I believe that others have good intentions.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I trust what people say",
+        "I am concerned about others",
+        "I can't stand confrontations",
+        "I dislike talking about myself"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I believe that people are basically moral",
+        "I have a good word for everyone",
+        "I hate to seem pushy",
+        "I consider myself an average person",
+        "I believe that people are essentially evil"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I believe in human goodness",
+        "I feel sympathy for those who are worse off than myself",
+        "I am easy to satisfy",
+        "I seldom toot my own horn"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "options": [
+        "I believe that others have good intentions",
+        "I love to help others",
+        "I am easy to satisfy",
+        "I dislike being the center of attention",
+        "I suspect hidden motives in others",
+        "I take no time for others"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1g",
+      "text": "How long does it take me to really trust someone?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa1f",
+      "text": "Who taught you the most about trusting people, for better or worse?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "friends",
+        "words"
+      ],
+      "source": "IPIP-NEO Trust (A1)"
+    },
+    {
+      "id": "ipa3t",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "options": [
+        "I make people feel welcome",
+        "I take no time for others"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3s",
+      "text": "How much does this sound like me? “I anticipate the needs of others.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "options": [
+        "I love to help others",
+        "I am easy to satisfy",
+        "I dislike being the center of attention",
+        "I think that all will be well"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "options": [
+        "I am concerned about others",
+        "I can't stand confrontations",
+        "I dislike talking about myself",
+        "I trust others",
+        "I am not interested in other people's problems"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "options": [
+        "I have a good word for everyone",
+        "I hate to seem pushy",
+        "I consider myself an average person",
+        "I believe that others have good intentions"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "options": [
+        "I anticipate the needs of others",
+        "I hate to seem pushy",
+        "I seldom toot my own horn",
+        "I believe in human goodness",
+        "I am not interested in other people's problems",
+        "I love a good fight"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3g",
+      "text": "What is the kindest thing I do that nobody asks me to?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "acts"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa3f",
+      "text": "When did someone help you in a way you still think about?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "acts"
+      ],
+      "source": "IPIP-NEO Altruism + Sympathy (A3, A6)"
+    },
+    {
+      "id": "ipa4t",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am easy to satisfy",
+        "I have a sharp tongue"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4s",
+      "text": "How true is this of me? “I can't stand confrontations.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4p",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I hate to seem pushy",
+        "I seldom toot my own horn",
+        "I believe in human goodness",
+        "I feel sympathy for those who are worse off than myself"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4m",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am easy to satisfy",
+        "I dislike being the center of attention",
+        "I think that all will be well",
+        "I value cooperation over competition",
+        "I hold a grudge"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4r",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I can't stand confrontations",
+        "I dislike talking about myself",
+        "I trust others",
+        "I suffer from others' sorrows"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4d",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I can't stand confrontations",
+        "I consider myself an average person",
+        "I believe that people are basically moral",
+        "I have a good word for everyone",
+        "I contradict others",
+        "I know the answers to many questions"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4g",
+      "text": "When we disagree, what do I do first: argue, go quiet, or give in?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa4f",
+      "text": "What is one thing that would make our disagreements easier?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Cooperation (A4)"
+    },
+    {
+      "id": "ipa5t",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I dislike being the center of attention",
+        "I think highly of myself"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5s",
+      "text": "Would I say this about myself? “I dislike talking about myself.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5p",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I consider myself an average person",
+        "I believe that people are basically moral",
+        "I have a good word for everyone",
+        "I hate to seem pushy"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5m",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I seldom toot my own horn",
+        "I believe in human goodness",
+        "I feel sympathy for those who are worse off than myself",
+        "I am easy to satisfy",
+        "I make myself the center of attention"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5r",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I dislike being the center of attention",
+        "I think that all will be well",
+        "I value cooperation over competition",
+        "I can't stand confrontations"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5d",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I dislike talking about myself",
+        "I trust what people say",
+        "I am concerned about others",
+        "I can't stand confrontations",
+        "I have a high opinion of myself",
+        "I am wary of others"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5g",
+      "text": "What am I secretly proud of that I rarely mention?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    },
+    {
+      "id": "ipa5f",
+      "text": "What is something you are good at that you do not get credit for?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-NEO Modesty (A5)"
+    }
+  ]
+}
