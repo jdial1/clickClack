@@ -1,6 +1,7 @@
 package com.ampersand.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -96,6 +97,8 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.sound.rememberSoundKit
 import com.ampersand.ui.theme.AmpersandTheme
+import com.ampersand.ui.theme.LocalAppearance
+import com.ampersand.ui.theme.rememberAppearance
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
@@ -180,9 +183,14 @@ fun AmpersandApp() {
 
     val sounds = rememberSoundKit()
     val feel = rememberFeelKit()
+    val appearance = rememberAppearance(context)
 
-    AmpersandTheme {
-      CompositionLocalProvider(LocalSounds provides sounds, LocalFeel provides feel) {
+    AmpersandTheme(darkTheme = appearance.isDark()) {
+      CompositionLocalProvider(
+          LocalSounds provides sounds,
+          LocalFeel provides feel,
+          LocalAppearance provides appearance,
+      ) {
         // The splash is gated on its own animation finishing, not on auth, so
         // the click-clack always plays in full. It is under a second, and
         // cutting it short the moment a cached session resolves would mean the
@@ -316,6 +324,10 @@ private fun PairedGate(
             AmpersandTheme(
                 you = Color(state.you.colorArgb),
                 them = Color(state.them.colorArgb),
+                // The inner theme rebuilds the whole scheme from the couple's
+                // colours, so it has to be told the mode again or it falls back
+                // to the phone and the setting only holds until you pair.
+                darkTheme = LocalAppearance.current?.isDark() ?: isSystemInDarkTheme(),
             ) {
                 SignedInApp(
                     vm = vm,

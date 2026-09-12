@@ -3,6 +3,7 @@ package com.ampersand.ui.us
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +40,14 @@ import androidx.compose.runtime.setValue
 import com.ampersand.model.CoupleState
 import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
+import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
@@ -55,6 +59,9 @@ import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
+import com.ampersand.ui.theme.LocalAppearance
+import com.ampersand.ui.theme.Motion
+import com.ampersand.ui.theme.ThemeMode
 import com.ampersand.ui.theme.ColorChoices
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.toArgbLong
@@ -128,6 +135,11 @@ fun UsScreen(
 
         Spacer(Modifier.height(32.dp))
         FeedbackToggles(you = BrickColor.of(state.you.colorArgb))
+
+        Spacer(Modifier.height(32.dp))
+        SectionLabel("Appearance")
+        Spacer(Modifier.height(10.dp))
+        ThemeBricks(you = BrickColor.of(state.you.colorArgb))
 
 
         if (onSignOut != null) {
@@ -271,6 +283,53 @@ private fun FeedbackToggles(you: BrickColor) {
         sounds.play(if (nowOn) Sfx.SELECT else Sfx.DESELECT)
         // Only the *on* direction can confirm itself here, the mirror of sound.
         if (nowOn) feel.play(Feel.SELECT)
+    }
+}
+
+/**
+ * Light, dark, or the phone's own mind.
+ *
+ * Three bricks rather than a switch, because there are genuinely three answers
+ * and a two-way toggle has to swallow one of them. "Automatic" is not a
+ * fallback here -- a phone that goes dark at sunset is a preference, and an app
+ * that overrides it on the first tap is one you set back the next evening.
+ */
+@Composable
+private fun ThemeBricks(you: BrickColor) {
+    val appearance = LocalAppearance.current
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val current = appearance?.mode ?: ThemeMode.SYSTEM
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ThemeMode.entries.forEach { mode ->
+            val on = mode == current
+            val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "themeLift")
+
+            BrickPill(
+                slug = if (on) you.slug else structureSlug(),
+                studSize = 30.dp,
+                height = BrickHeight.MEDIUM,
+                alpha = 0.55f + 0.45f * lift,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    if (!on) {
+                        sounds.play(Sfx.SELECT)
+                        feel.play(Feel.SELECT)
+                        appearance?.set(mode)
+                    }
+                },
+            ) {
+                Text(
+                    text = mode.label,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = inkOnBrick(if (on) you.slug else structureSlug()),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                )
+            }
+        }
     }
 }
 

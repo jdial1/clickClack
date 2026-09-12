@@ -24,11 +24,13 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
+import com.ampersand.R
 
 /**
  * The two personal colours, and the colour they make together.
@@ -145,6 +147,21 @@ private fun lightSchemeFrom(duo: DuoColors): ColorScheme {
         outlineVariant = DayCard.mixWith(blend, 0.10f),
     )
 }
+
+/**
+ * The wordmark face, and only the wordmark.
+ *
+ * Lilita One: heavy, rounded, and slightly squashed, which is as close to the
+ * feel of moulded plastic as a free face gets. Deliberately *not* the typeface
+ * the obvious toy company uses -- that one is theirs, and an app built entirely
+ * on CC0 art specifically to stay clear of them should not put their letters on
+ * its front door. This is SIL Open Font Licensed, so it can simply ship.
+ *
+ * Scoped to the splash on purpose. A display face reads as a logo for two
+ * words and as a novelty for a paragraph, and the rest of the app is
+ * paragraphs.
+ */
+val Wordmark = FontFamily(Font(R.font.lilita_one, FontWeight.Normal))
 
 // --- Shape and elevation -----------------------------------------------------
 

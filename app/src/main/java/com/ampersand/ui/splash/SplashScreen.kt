@@ -5,6 +5,7 @@ import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -18,13 +19,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
@@ -40,7 +46,9 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.awaitReady
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
+import com.ampersand.ui.theme.Wordmark
 import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 private val Tile = BrickShape(2, BrickHeight.MEDIUM)
 private const val StudSize = 46
@@ -109,13 +117,16 @@ fun SplashScreen(
         upperY.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh))
 
         fade.animateTo(1f, tween(300, easing = FastOutSlowInEasing))
-        delay(380)
+        // Longer than it needs to be for the wordmark, and on purpose: the
+        // wall behind is still going up, and cutting away mid-course is the
+        // one thing that would make it look like a loading bar.
+        delay(900)
         finish()
     }
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier.fillMaxSize()) {
-            BrickWall(you = you, them = them, alpha = 0.10f)
+            BuildingWall(you = you, them = them)
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -155,11 +166,131 @@ fun SplashScreen(
                     Spacer(Modifier.height(28.dp))
                     Text(
                         text = "Click Clack",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontFamily = Wordmark,
+                            // The face is already heavy; letting the letters
+                            // touch is what makes it read as one moulded object
+                            // rather than as a word.
+                            letterSpacing = (-0.5).sp,
+                        ),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = fade.value),
                     )
                 }
             }
+        }
+    }
+}
+
+
+/** One piece of the wall: which colour, and which cell it ended up in. */
+private data class Piece(val slug: String?, val col: Int, val row: Int)
+
+/** Grid of the wall, in 4-stud pieces across a 12-stud screen. */
+private const val WallCols = 3
+private const val WallRows = 32
+
+/** Courses already down when the splash opens. */
+private const val WallBase = 7
+private val WallPiece = BrickShape(4, BrickHeight.MEDIUM)
+
+/**
+ * The wall behind the splash, being built while you watch.
+ *
+ * Everywhere else in the app the wall is a still background generated once from
+ * a fixed seed -- it is the ground, and ground does not move. Here it is the
+ * only screen with nothing to do, so it does the thing the whole app is about:
+ * a piece arrives, hovers while it decides, and settles into place. By the time
+ * the wordmark has faded up there is a wall under it that was not there when
+ * you opened the app.
+ *
+ * Bottom row first. A wall built top-down reads as tetris; built from the floor
+ * up it reads as a wall.
+ *
+ * The ghost is the same idea as the landing hint on the build plate: a piece
+ * that is not committed yet, drawn brighter than the placed ones so the eye
+ * follows it. It wanders before it lands because a piece that flew straight to
+ * its slot would look placed rather than considered -- and because two people
+ * deciding where something goes is the app.
+ */
+@Composable
+private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier = Modifier) {
+    val slugs = remember(you, them) { listOf(you.slug, them.slug, null) }
+    val atlas = rememberBricks(slugs.map { BrickArt.assetFor(it, WallPiece) })
+
+    val placed = remember { mutableStateListOf<Piece>() }
+    val ghost = remember { Animatable(Offset(1f, 0f), Offset.VectorConverter) }
+    var ghostSlug by remember { mutableStateOf<String?>(null) }
+    var ghostShowing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val rng = Random(11)
+        // Shuffled within each row, so it fills unevenly rather than sweeping
+        // left to right like a progress bar.
+        val cells = (0 until WallRows).flatMap { row ->
+            (0 until WallCols).map { col -> col to row }.shuffled(rng)
+        }
+
+        // The bottom courses are already down when you arrive. A splash that
+        // starts on bare ground and places six pieces reads as an empty screen
+        // with something loading on it; starting part-built reads as a wall
+        // that is going up, which is the thing worth showing.
+        val seeded = WallBase * WallCols
+        cells.take(seeded).forEach { (col, row) ->
+            placed += Piece(slugs[rng.nextInt(slugs.size)], col, row)
+        }
+
+        ghostShowing = true
+        cells.drop(seeded).forEach { (col, row) ->
+            ghostSlug = slugs[rng.nextInt(slugs.size)]
+            // One hesitation, not three. Any longer and the splash becomes a
+            // screensaver with a logo on it.
+            ghost.animateTo(
+                targetValue = Offset(
+                    rng.nextFloat() * (WallCols - 1),
+                    (row + rng.nextFloat() * 2f).coerceAtMost(WallRows - 1f),
+                ),
+                animationSpec = tween(70, easing = FastOutSlowInEasing),
+            )
+            // A tween rather than a spring for the landing: a spring settles
+            // over a couple of hundred milliseconds, and at three pieces a
+            // second that is the difference between a wall going up and five
+            // bricks arriving before the splash ends.
+            ghost.animateTo(
+                targetValue = Offset(col.toFloat(), row.toFloat()),
+                animationSpec = tween(80, easing = FastOutSlowInEasing),
+            )
+            placed += Piece(ghostSlug, col, row)
+        }
+        ghostShowing = false
+    }
+
+    Canvas(modifier.fillMaxSize()) {
+        val studPx = size.width / (WallCols * WallPiece.w).toFloat()
+        val coursePx = studPx * WallPiece.h * BrickArt.ROW_RATIO
+        val span = studPx * WallPiece.w
+
+        fun piece(slug: String?, col: Float, row: Float, alpha: Float) {
+            drawBrickArt(
+                atlas = atlas,
+                asset = BrickArt.assetFor(slug, WallPiece),
+                studs = WallPiece.w,
+                rows = WallPiece.h,
+                left = col * span,
+                bottom = size.height - row * coursePx,
+                studPx = studPx,
+                alpha = alpha,
+            )
+        }
+
+        // Read inside the draw lambda, so a piece landing invalidates the draw
+        // and nothing else -- this runs under a screen that is already
+        // animating three other things.
+        placed.forEach { piece(it.slug, it.col.toFloat(), it.row.toFloat(), 0.13f) }
+
+        if (ghostShowing) {
+            // Brighter than the wall, dimmer than anything in front of it: it
+            // is a decision, not an object.
+            piece(ghostSlug, ghost.value.x, ghost.value.y, 0.40f)
         }
     }
 }
