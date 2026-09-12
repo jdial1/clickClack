@@ -2,15 +2,15 @@
   "id": "everyday-who",
   "title": "Who does what",
   "theme": "EVERYDAY",
-  "blurb": "The washing up, the bins, and the split nobody writes down.",
+  "blurb": "The dishes, the trash, and the split nobody writes down.",
   "questions": [
     {
       "id": "ev1",
-      "text": "The washing up gets done:",
+      "text": "The dishes get done:",
       "type": "THIS_OR_THAT",
       "depth": 1,
       "options": [
-        "Straight away",
+        "Right away",
         "In the morning"
       ]
     },
@@ -26,7 +26,7 @@
       "type": "PICK_ONE",
       "depth": 2,
       "options": [
-        "The bins",
+        "The trash",
         "Being late",
         "Money",
         "The thermostat"

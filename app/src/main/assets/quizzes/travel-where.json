@@ -34,7 +34,7 @@
       "options": [
         "The flights, go further",
         "The room, stay somewhere lovely",
-        "The food, eat properly",
+        "The food, eat well",
         "The doing, book everything"
       ]
     },
@@ -46,7 +46,7 @@
     },
     {
       "id": "tr6",
-      "text": "Pick what actually makes a holiday work for you.",
+      "text": "Pick what actually makes a vacation work for you.",
       "type": "MULTI_SELECT",
       "depth": 2,
       "options": [

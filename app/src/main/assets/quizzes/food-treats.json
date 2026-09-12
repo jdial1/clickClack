@@ -2,7 +2,7 @@
   "id": "food-treats",
   "title": "Treats and childhood things",
   "theme": "FOOD",
-  "blurb": "Pudding, good coffee, and the thing your mum used to make.",
+  "blurb": "Dessert, good coffee, and the thing your mom used to make.",
   "questions": [
     {
       "id": "fd6",
@@ -38,7 +38,7 @@
     },
     {
       "id": "fd9",
-      "text": "Pudding is:",
+      "text": "Dessert is:",
       "type": "THIS_OR_THAT",
       "depth": 1,
       "options": [

@@ -91,7 +91,7 @@ fun UsScreen(
         }
 
         Spacer(Modifier.height(32.dp))
-        SectionLabel("Your colours")
+        SectionLabel("Your colors")
         Spacer(Modifier.height(6.dp))
         Text(
             "Everything you share is painted in the blend of the two.",

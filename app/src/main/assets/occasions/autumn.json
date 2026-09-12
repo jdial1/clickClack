@@ -1,12 +1,12 @@
 {
   "id": "autumn",
-  "title": "First day of autumn",
+  "title": "First day of fall",
   "blurb": "Darker, and not unwelcome.",
   "theme": "EVERYDAY",
   "questions": [
     {
       "id": "autumn-au1",
-      "text": "Autumn is:",
+      "text": "Fall is:",
       "type": "THIS_OR_THAT",
       "depth": 1,
       "options": [
@@ -21,8 +21,8 @@
       "depth": 1,
       "options": [
         "Dark evenings",
-        "Proper food",
-        "Jumpers",
+        "Heavy food",
+        "Sweaters",
         "Being indoors together"
       ]
     },

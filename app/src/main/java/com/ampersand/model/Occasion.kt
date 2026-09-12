@@ -47,7 +47,7 @@ enum class Occasion(val id: String, val label: String) {
     // Astronomical markers last: they lose every collision.
     SPRING("spring", "First day of spring"),
     SUMMER("summer", "Summer solstice"),
-    AUTUMN("autumn", "First day of autumn"),
+    AUTUMN("autumn", "First day of fall"),
     WINTER("winter", "Winter solstice"),
 
     /**

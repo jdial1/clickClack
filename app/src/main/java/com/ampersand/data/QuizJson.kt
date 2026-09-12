@@ -24,7 +24,7 @@ import org.json.JSONObject
  *   "questions": [
  *     {
  *       "id": "m1",
- *       "text": "Put these in order, favourite first.",
+ *       "text": "Put these in order, favorite first.",
  *       "type": "RANK",
  *       "category": "Food",
  *       "depth": 1,

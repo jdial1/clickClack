@@ -286,8 +286,8 @@ object MockCouple {
         day(
             today.minusDays(6), "g4",
             yourResponse = "Lisbon",
-            theirResponse = "Japan, in autumn",
-            youGuess = "Japan, in autumn",
+            theirResponse = "Japan, in the fall",
+            youGuess = "Japan, in the fall",
             themGuess = "Lisbon",
         ),
         day(
@@ -540,7 +540,7 @@ object MockCouple {
         QuizRun(
             quizId = "food-dinner",
             uid = them.uid,
-            answers = mapOf("fd2" to listOf("Takeaway on the sofa"), "fd3" to listOf("Ramen")),
+            answers = mapOf("fd2" to listOf("Takeout on the couch"), "fd3" to listOf("Ramen")),
             guesses = mapOf("fd2" to listOf("Cook it together"), "fd3" to listOf("Ramen")),
         ),
         // You have played this one; nothing opens until she does.

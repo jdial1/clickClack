@@ -6,11 +6,11 @@
   "questions": [
     {
       "id": "fd1",
-      "text": "Put these in order, favourite first.",
+      "text": "Put these in order, favorite first.",
       "type": "RANK",
       "depth": 1,
       "options": [
-        "A proper roast",
+        "A big roast dinner",
         "Curry night",
         "Pasta, any pasta",
         "Something on toast"
@@ -22,7 +22,7 @@
       "type": "THIS_OR_THAT",
       "depth": 1,
       "options": [
-        "Takeaway on the sofa",
+        "Takeout on the couch",
         "Cook it together"
       ]
     },
@@ -41,7 +41,7 @@
         "Somewhere new",
         "The usual place",
         "Too much bread",
-        "A long pudding",
+        "A long dessert",
         "Nowhere, stay in"
       ],
       "maxChoices": 3

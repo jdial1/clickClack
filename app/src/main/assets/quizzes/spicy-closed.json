@@ -2,7 +2,7 @@
   "id": "spicy-closed",
   "title": "Behind closed doors",
   "theme": "SPICY",
-  "blurb": "Warmer. Still daft.",
+  "blurb": "Warmer. Still silly.",
   "questions": [
     {
       "id": "sx1",
@@ -13,7 +13,7 @@
         "A long kiss in a kitchen",
         "Being told exactly what to do",
         "A whole afternoon, no phones",
-        "Getting properly dressed up first"
+        "Getting all dressed up first"
       ]
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "id": "sx4",
-      "text": "How good am I at telling you I fancy you?",
+      "text": "How good am I at telling you I am into you?",
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "You never say it",
