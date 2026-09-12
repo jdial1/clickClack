@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.Layout
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalDensity
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import kotlin.math.ceil
@@ -207,6 +209,95 @@ fun BrickSlab(
             // button whose label needs a course and a half sits against the
             // nubs with an empty course under it.
             placeable.place(0, ((slabHeight - placeable.height) / 2).coerceAtLeast(0))
+        }
+    }
+}
+
+/**
+ * [BrickSlab]'s content-width sibling: a real brick that hugs what is on it.
+ *
+ * The slab takes the width it is given and divides it into studs. A chip cannot
+ * do that -- "Reflect" and "This or that" are not the same width and neither is
+ * a whole number of anything -- so this works the other way round: the stud is
+ * a fixed size, the content is measured, and the brick is however many studs it
+ * takes to cover it. Labels therefore snap to 1, 2, 4 and 6 stud widths, which
+ * is not a compromise: it is what a box of bricks actually contains.
+ *
+ * The stud count is recovered in the draw pass by dividing the final width by
+ * the stud, rather than hoisted into state. The measure pass set that width to
+ * exactly `studs * studPx`, so the division is exact and there is no frame
+ * where the art and the layout disagree.
+ */
+@Composable
+fun BrickPill(
+    slug: String?,
+    modifier: Modifier = Modifier,
+    studSize: Dp = 26.dp,
+    height: BrickHeight = BrickHeight.LOW,
+    alpha: Float = 1f,
+    content: @Composable BoxScope.() -> Unit = {},
+) {
+    val studPx = with(LocalDensity.current) { studSize.toPx() }
+    // Every stock width, because which ones are needed is not known until the
+    // content has been measured.
+    val atlas = rememberBricks(
+        remember(slug, height) {
+            BrickArt.WIDTHS.map { BrickArt.assetFor(slug, BrickShape(it, height)) }
+        },
+    )
+
+    Layout(
+        modifier = modifier.drawBehind {
+            val studs = (size.width / studPx).roundToInt().coerceAtLeast(1)
+            val coursePx = studPx * height.rows * BrickArt.ROW_RATIO
+            val nubPx = studPx * BrickArt.NUB_RATIO
+            if (coursePx <= 0f) return@drawBehind
+
+            val courses = ((size.height - nubPx) / coursePx).roundToInt().coerceAtLeast(1)
+            val run = BrickArt.runOf(studs)
+            for (course in 0 until courses) {
+                val widths = if (course % 2 == 0) run else run.reversed()
+                var x = 0f
+                widths.forEach { w ->
+                    drawBrickArt(
+                        atlas = atlas,
+                        asset = BrickArt.assetFor(slug, BrickShape(w, height)),
+                        studs = w,
+                        rows = height.rows,
+                        left = x,
+                        bottom = size.height - course * coursePx,
+                        studPx = studPx,
+                        alpha = alpha,
+                    )
+                    x += w * studPx
+                }
+            }
+        },
+        // The nub is reserved as padding on the content rather than fixed up
+        // afterwards in the placement, so it is part of what gets measured. Done
+        // the other way round, a label taller than one course centres through
+        // the nub and sits on the studs.
+        content = {
+            Box(Modifier.padding(top = studSize * BrickArt.NUB_RATIO), content = content)
+        },
+    ) { measurables, constraints ->
+        val placeable = measurables.first().measure(
+            constraints.copy(minWidth = 0, minHeight = 0),
+        )
+        val coursePx = studPx * height.rows * BrickArt.ROW_RATIO
+        val nubPx = studPx * BrickArt.NUB_RATIO
+
+        val studs = ceil(placeable.width / studPx).toInt().coerceAtLeast(1)
+        val width = (studs * studPx).roundToInt()
+        val needed: Float = max(placeable.height - nubPx, coursePx)
+        val courses = ceil(needed / coursePx).toInt().coerceAtLeast(1)
+        val pillHeight = (courses * coursePx + nubPx).roundToInt()
+
+        layout(width, pillHeight) {
+            placeable.place(
+                (width - placeable.width) / 2,
+                ((pillHeight - placeable.height) / 2).coerceAtLeast(0),
+            )
         }
     }
 }

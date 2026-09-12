@@ -146,56 +146,6 @@ fun AmpField(
     }
 }
 
-// --- Segmented (pill tabs) ---------------------------------------------------
-
-/** A tray with one brick pressed into it. */
-@Composable
-fun AmpSegmented(
-    options: List<String>,
-    selected: String,
-    accent: Color,
-    modifier: Modifier = Modifier,
-    onSelect: (String) -> Unit,
-) {
-    val sounds = LocalSounds.current
-    val feel = LocalFeel.current
-    Row(
-        modifier
-            .clip(RoundedCornerShape(Corner))
-            .background(lerp(MaterialTheme.colorScheme.surfaceVariant, Color.Black, 0.14f))
-            .padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        options.forEach { option ->
-            val on = option == selected
-            val fg by animateColorAsState(
-                if (on) Duo.inkOn(accent) else MaterialTheme.colorScheme.onSurfaceVariant,
-                label = "segFg",
-            )
-            Box(
-                Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(14.dp))
-                    .then(
-                        if (on) {
-                            Modifier.brickFace(accent, corner = 14.dp, lip = 4.dp)
-                        } else {
-                            Modifier
-                        },
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); onSelect(option) }
-                    .padding(vertical = 11.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(option, style = MaterialTheme.typography.labelLarge, color = fg)
-            }
-        }
-    }
-}
-
 // --- Radio -------------------------------------------------------------------
 
 /**
@@ -228,22 +178,13 @@ fun AmpRadioGroup(
             val on = option == selected
             val brick = colors[index]
             val alpha by animateFloatAsState(if (on) 1f else 0.3f, label = "radioBrick")
-            val down by animateFloatAsState(if (on) 1f else 0f, Motion.settle, label = "radioPress")
 
-            Row(
-                Modifier
+            BrickSlab(
+                slugs = listOf(if (on) brick.slug else structureSlug()),
+                studs = 12,
+                height = BrickHeight.MEDIUM,
+                modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(Corner))
-                    .brickFace(
-                        if (on) {
-                            Color(brick.argb)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        },
-                        corner = Corner,
-                        studded = false,
-                        pressed = down,
-                    )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -252,8 +193,12 @@ fun AmpRadioGroup(
                         sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
                         feel.play(if (on) Feel.DESELECT else Feel.SELECT)
                         onSelect(option)
-                    }
-                    .padding(start = 14.dp, end = Pad, top = 12.dp, bottom = 14.dp),
+                    },
+            ) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 14.dp, end = Pad, top = 24.dp, bottom = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BrickTile(
@@ -267,12 +212,9 @@ fun AmpRadioGroup(
                 Text(
                     text = option,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (on) {
-                        Duo.inkOn(Color(brick.argb))
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                    color = inkOnBrick(if (on) brick.slug else structureSlug()),
                 )
+            }
             }
         }
     }
@@ -382,23 +324,19 @@ private fun ChoiceRow(
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
-    val bg by animateColorAsState(
-        if (selected) accent else MaterialTheme.colorScheme.surfaceVariant,
-        label = "rowBg",
-    )
-    val ink by animateColorAsState(
-        if (selected) Duo.inkOn(accent) else MaterialTheme.colorScheme.onSurface,
-        label = "rowInk",
-    )
-    // The lip travels rather than jumping, so choosing reads as pressing a key
-    // down rather than as the row swapping for a different row.
-    val down by animateFloatAsState(if (selected) 1f else 0f, Motion.settle, label = "rowPress")
+    // A real brick in your colour when it is chosen, the neutral one when it is
+    // not. Both are pack art: the drawn stand-in this used to use painted stud
+    // shapes onto a rounded rectangle, and at every size it read as a card with
+    // dots on it rather than as a brick.
+    val slug = if (selected) BrickColor.of(accent.toArgbLong()).slug else structureSlug()
+    val ink = inkOnBrick(slug)
 
-    Row(
-        Modifier
+    BrickSlab(
+        slugs = listOf(slug),
+        studs = 12,
+        height = BrickHeight.MEDIUM,
+        modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(Corner))
-            .brickFace(bg, corner = Corner, pressed = down)
             // Blocked rows stay tappable and say no. Leaving them disabled meant
             // the tap was swallowed whole -- no ripple (suppressed), no sound,
             // no message -- which reads as the app having crashed quietly.
@@ -415,8 +353,12 @@ private fun ChoiceRow(
                     feel.play(Feel.REJECT)
                     onBlocked()
                 }
-            }
-            .padding(start = Pad, end = Pad, top = 26.dp, bottom = 18.dp),
+            },
+    ) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(start = Pad, end = Pad, top = 22.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         indicator(selected, ink)
@@ -426,6 +368,7 @@ private fun ChoiceRow(
             style = MaterialTheme.typography.bodyLarge,
             color = if (enabled) ink else ink.copy(alpha = 0.4f),
         )
+    }
     }
 }
 
@@ -451,39 +394,40 @@ fun AmpDropdown(
     val caret by animateFloatAsState(if (open) 180f else 0f, label = "ddCaret")
 
     Box(modifier.fillMaxWidth()) {
+        val anchorSlug = if (open) BrickColor.of(accent.toArgbLong()).slug else structureSlug()
+        BrickSlab(
+            slugs = listOf(anchorSlug),
+            studs = 12,
+            height = BrickHeight.MEDIUM,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    enabled = enabled,
+                ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); open = true },
+        ) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(Corner))
-                .brickFace(
-                    if (open) accent else MaterialTheme.colorScheme.surfaceVariant,
-                    corner = Corner,
-                    pressed = animateFloatAsState(
-                        if (open) 1f else 0f, Motion.settle, label = "ddPress",
-                    ).value,
-                )
-                .clickable(enabled = enabled) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); open = true }
-                .padding(start = Pad, end = Pad, top = 26.dp, bottom = 18.dp),
+                .padding(start = Pad, end = Pad, top = 22.dp, bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = selected ?: placeholder,
                 style = MaterialTheme.typography.bodyLarge,
                 color = when {
-                    open -> Duo.inkOn(accent)
-                    selected == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                    else -> MaterialTheme.colorScheme.onSurface
+                    open -> inkOnBrick(anchorSlug)
+                    selected == null -> inkOnBrick(anchorSlug).copy(alpha = 0.7f)
+                    else -> inkOnBrick(anchorSlug)
                 },
                 modifier = Modifier.weight(1f),
             )
             Caret(
-                color = if (open) {
-                    Duo.inkOn(accent)
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                color = inkOnBrick(anchorSlug),
                 modifier = Modifier.rotate(caret),
             )
+        }
         }
 
         DropdownMenu(

@@ -81,7 +81,6 @@ import com.ampersand.ui.build.BuildScreen
 import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.pressDepth
 import com.ampersand.ui.components.SectionLabel
-import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.history.HistoryScreen
 import com.ampersand.notify.Reminder
 import com.ampersand.ui.notify.ReminderSetupScreen

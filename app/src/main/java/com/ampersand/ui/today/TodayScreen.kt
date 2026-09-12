@@ -53,7 +53,6 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
 import com.ampersand.ui.components.AmpButton
-import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.components.AmpCheckboxGroup
 import com.ampersand.ui.components.AmpDragRank
 import com.ampersand.ui.components.AmpDropdown
@@ -65,6 +64,7 @@ import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
@@ -243,21 +243,12 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
 /** Small filled capsule, used for metadata that should not compete. */
 @Composable
 private fun Pill(text: String) {
-    Box(
-        Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .brickFace(
-                MaterialTheme.colorScheme.surfaceVariant,
-                corner = 12.dp,
-                studded = false,
-                lip = 4.dp,
-            )
-            .padding(start = 14.dp, end = 14.dp, top = 7.dp, bottom = 10.dp),
-    ) {
+    BrickPill(slug = null, studSize = 24.dp, height = BrickHeight.LOW) {
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = inkOnBrick(null),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
         )
     }
 }

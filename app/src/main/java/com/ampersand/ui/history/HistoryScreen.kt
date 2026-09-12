@@ -2,6 +2,7 @@ package com.ampersand.ui.history
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -70,7 +71,6 @@ import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
-import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.theme.AmpersandTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -400,7 +400,7 @@ private fun StudPlate(
                 .fillMaxWidth()
                 .height(cell * 0.72f * WeeksShown)
                 .clip(RoundedCornerShape(20.dp))
-                .brickFace(plate, corner = 20.dp, studded = false, lip = 7.dp)
+                .background(plate, RoundedCornerShape(20.dp))
                 .pointerInput(byDate, today) {
                     detectTapGestures { at ->
                         val col = (at.x / (size.width / DaysPerWeek)).toInt()

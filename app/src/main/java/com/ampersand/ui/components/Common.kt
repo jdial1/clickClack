@@ -23,9 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ampersand.model.Depth
+import com.ampersand.model.BrickColor
+import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.BrickPill
+import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.toArgbLong
 
 /** Small, letter-spaced, uppercase. Used for every section heading in the app. */
 @Composable
@@ -71,19 +76,19 @@ fun PersonDot(
     modifier: Modifier = Modifier,
     size: Int = 28,
 ) {
-    val corner = (size * 0.26f).dp
-    Box(
-        modifier
-            .size(size.dp)
-            .clip(RoundedCornerShape(corner))
-            .brickFace(color, corner = corner, lip = (size * 0.13f).dp),
-        contentAlignment = Alignment.BottomCenter,
+    // One real stud with an initial on it. Sized from [size] so every existing
+    // call site keeps the footprint it asked for, nub included.
+    val slug = BrickColor.of(color.toArgbLong()).slug
+    BrickPill(
+        slug = slug,
+        studSize = (size * 0.82f).dp,
+        height = BrickHeight.LOW,
+        modifier = modifier,
     ) {
         Text(
             text = name.take(1).uppercase(),
             style = MaterialTheme.typography.labelLarge,
-            color = Duo.inkOn(color),
-            modifier = Modifier.padding(bottom = (size * 0.12f).dp),
+            color = inkOnBrick(slug),
         )
     }
 }

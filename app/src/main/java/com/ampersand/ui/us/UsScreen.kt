@@ -48,7 +48,6 @@ import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.pressDepth
-import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
 import com.ampersand.ui.feel.play

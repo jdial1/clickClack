@@ -39,11 +39,11 @@ import com.ampersand.model.QuizResult
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.label
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
-import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
 import com.ampersand.ui.feel.play
@@ -261,37 +261,34 @@ private fun BrickChip(
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
-    val lit = color?.let { Color(it.argb) } ?: MaterialTheme.colorScheme.secondaryContainer
-    // Unpressed, a category still carries a third of its colour. Without it the
-    // two rows are sixteen identical grey bricks and the whole point -- that
-    // the brick you press is the brick you are looking for further down -- only
-    // arrives after you have already found it.
-    val off = if (color != null) {
-        lerp(MaterialTheme.colorScheme.surfaceVariant, lit, 0.32f)
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
-    val bg by animateColorAsState(if (on) lit else off, label = "chipBg")
-    val down by animateFloatAsState(if (on) 1f else 0f, Motion.settle, label = "chipPress")
 
-    Text(
-        text = label,
-        style = MaterialTheme.typography.labelLarge,
-        // Against whatever the brick currently is, pressed or not.
-        color = Duo.inkOn(bg),
-        modifier = Modifier
-            .clip(Radius.chip)
-            .brickFace(bg, corner = 14.dp, studded = false, pressed = down, lip = 5.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) {
-                sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
-                feel.play(if (on) Feel.DESELECT else Feel.SELECT)
-                onClick()
-            }
-            .padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 13.dp),
-    )
+    // A category keeps its colour whether or not it is pressed, so the row
+    // reads as the colours you are hunting for; on and off is brightness, the
+    // same as the nav bar and the reaction row. Real art has no third state
+    // between a colour and grey, and faking one was the drawn brick's job.
+    val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "chipLift")
+
+    BrickPill(
+        slug = color?.slug,
+        studSize = 30.dp,
+        height = BrickHeight.MEDIUM,
+        alpha = 0.45f + 0.55f * lift,
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+        ) {
+            sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+            feel.play(if (on) Feel.DESELECT else Feel.SELECT)
+            onClick()
+        },
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            color = inkOnBrick(color?.slug),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+        )
+    }
 }
 
 /**
