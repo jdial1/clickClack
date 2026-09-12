@@ -14,6 +14,11 @@
         "Being told exactly what to do",
         "A whole afternoon, no phones",
         "Getting all dressed up first"
+      ],
+      "tags": [
+        "romance",
+        "touch",
+        "time"
       ]
     },
     {
@@ -24,6 +29,10 @@
       "options": [
         "Planned and looked forward to",
         "Out of nowhere"
+      ],
+      "tags": [
+        "romance",
+        "planning"
       ]
     },
     {
@@ -38,7 +47,13 @@
         "Lazy mornings",
         "Being chased a bit"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "romance",
+        "touch",
+        "words",
+        "time"
+      ]
     },
     {
       "id": "sx4",
@@ -46,13 +61,20 @@
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "You never say it",
-      "highLabel": "Constantly"
+      "highLabel": "Constantly",
+      "tags": [
+        "romance",
+        "words"
+      ]
     },
     {
       "id": "sx5",
       "text": "Which of these do I find most attractive about you?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "romance"
+      ]
     },
     {
       "id": "sx6",
@@ -64,6 +86,9 @@
         "Being competent",
         "Being kind to someone else",
         "Being a bit mean to me"
+      ],
+      "tags": [
+        "romance"
       ]
     }
   ]

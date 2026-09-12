@@ -8,7 +8,10 @@
       "id": "pl1",
       "text": "If I had to win a competition tomorrow, what would I pick?",
       "type": "GUESS_ME",
-      "depth": 1
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
     },
     {
       "id": "pl2",
@@ -20,6 +23,9 @@
         "Coffee",
         "Music",
         "Sitting down"
+      ],
+      "tags": [
+        "fun"
       ]
     },
     {
@@ -30,6 +36,9 @@
       "options": [
         "Fly",
         "Be invisible"
+      ],
+      "tags": [
+        "fun"
       ]
     },
     {
@@ -44,7 +53,12 @@
         "Board games",
         "Doing absolutely nothing"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "fun",
+        "time",
+        "friends"
+      ]
     },
     {
       "id": "pl5",
@@ -56,13 +70,19 @@
         "Keeping a secret",
         "Parallel parking",
         "Small talk with strangers"
+      ],
+      "tags": [
+        "fun"
       ]
     },
     {
       "id": "pl10",
       "text": "What would you put on a t-shirt to embarrass me?",
       "type": "REFLECT",
-      "depth": 1
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
     }
   ]
 }

@@ -16,13 +16,21 @@
         "After dinner",
         "Late",
         "The middle of the night"
+      ],
+      "tags": [
+        "romance",
+        "time"
       ]
     },
     {
       "id": "sx8",
       "text": "What is something you have wanted to ask for and have not?",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "romance",
+        "words"
+      ]
     },
     {
       "id": "sx9",
@@ -32,6 +40,10 @@
       "options": [
         "Excellent",
         "Excruciating"
+      ],
+      "tags": [
+        "romance",
+        "words"
       ]
     },
     {
@@ -40,7 +52,10 @@
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "Happy as we are",
-      "highLabel": "Try me"
+      "highLabel": "Try me",
+      "tags": [
+        "romance"
+      ]
     },
     {
       "id": "sx11",
@@ -54,13 +69,21 @@
         "Nobody due home",
         "Being told to stop working"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "romance",
+        "home"
+      ]
     },
     {
       "id": "sx12",
       "text": "What did I find most attractive about you at the start?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ]
     }
   ]
 }

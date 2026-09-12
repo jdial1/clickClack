@@ -54,6 +54,15 @@ data class Question(
     /** SCALE only. */
     val lowLabel: String = "Not at all",
     val highLabel: String = "Completely",
+    /**
+     * What the question is actually about -- "planning", "touch", "money".
+     *
+     * Finer than [category], which is only ever the deck's theme. A lean toward
+     * planning used to mean "more of the Future deck", most of which is not
+     * about planning; with tags it reaches the questions that are, wherever
+     * they happen to sit.
+     */
+    val tags: Set<String> = emptySet(),
 ) {
     val isScored: Boolean get() = type != QuestionType.REFLECT
 

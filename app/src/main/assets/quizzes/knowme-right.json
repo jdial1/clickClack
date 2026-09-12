@@ -16,7 +16,11 @@
         "Letting things go",
         "Saying sorry"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "planning",
+        "words"
+      ]
     },
     {
       "id": "km6",
@@ -24,7 +28,10 @@
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "You always know",
-      "highLabel": "You never know"
+      "highLabel": "You never know",
+      "tags": [
+        "words"
+      ]
     },
     {
       "id": "km7",
@@ -39,19 +46,30 @@
         "Midnight",
         "One",
         "Later than that"
+      ],
+      "tags": [
+        "home",
+        "time"
       ]
     },
     {
       "id": "km8",
       "text": "What is something I believe that you think is nonsense?",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words"
+      ]
     },
     {
       "id": "km9",
       "text": "What would I take if the house were on fire and the people were already out?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "home",
+        "gifts"
+      ]
     }
   ]
 }

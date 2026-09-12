@@ -8,7 +8,10 @@
       "id": "dp2",
       "text": "What am I most afraid of, that I have never said out loud?",
       "type": "GUESS_ME",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words"
+      ]
     },
     {
       "id": "dp4",
@@ -22,7 +25,12 @@
         "Being told",
         "Being asked"
       ],
-      "maxChoices": 2
+      "maxChoices": 2,
+      "tags": [
+        "time",
+        "acts",
+        "words"
+      ]
     },
     {
       "id": "dp7",
@@ -32,6 +40,9 @@
       "options": [
         "Say it right away",
         "Wait until it is calm"
+      ],
+      "tags": [
+        "words"
       ]
     },
     {
@@ -46,19 +57,28 @@
         "The hour after work",
         "Dinner",
         "Last thing at night"
+      ],
+      "tags": [
+        "time"
       ]
     },
     {
       "id": "dp9",
       "text": "What do you forgive me for over and over?",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "past"
+      ]
     },
     {
       "id": "dp10",
       "text": "What compliment do you most want to hear, and never get?",
       "type": "GUESS_ME",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

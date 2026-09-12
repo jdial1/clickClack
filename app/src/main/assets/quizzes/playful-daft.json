@@ -10,7 +10,10 @@
       "type": "SCALE",
       "depth": 1,
       "lowLabel": "Not at all",
-      "highLabel": "Do not play me at anything"
+      "highLabel": "Do not play me at anything",
+      "tags": [
+        "fun"
+      ]
     },
     {
       "id": "pl7",
@@ -24,19 +27,30 @@
         "A heron",
         "Something in a burrow",
         "A goose"
+      ],
+      "tags": [
+        "fun"
       ]
     },
     {
       "id": "pl8",
       "text": "What is the most ridiculous thing you have ever seen me do?",
       "type": "REFLECT",
-      "depth": 1
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past"
+      ]
     },
     {
       "id": "pl9",
       "text": "What is my most annoying habit that you secretly find endearing?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "fun",
+        "home"
+      ]
     },
     {
       "id": "pl11",
@@ -50,7 +64,11 @@
         "Something of yours",
         "A list of complaints"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "past",
+        "gifts"
+      ]
     },
     {
       "id": "pl12",
@@ -62,6 +80,9 @@
         "Without sugar",
         "Without checking my phone",
         "Without complaining about the weather"
+      ],
+      "tags": [
+        "fun"
       ]
     }
   ]

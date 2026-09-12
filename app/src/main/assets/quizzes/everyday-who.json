@@ -12,13 +12,21 @@
       "options": [
         "Right away",
         "In the morning"
+      ],
+      "tags": [
+        "acts",
+        "home"
       ]
     },
     {
       "id": "ev2",
       "text": "Which chore do I secretly not mind?",
       "type": "GUESS_ME",
-      "depth": 1
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ]
     },
     {
       "id": "ev3",
@@ -30,6 +38,10 @@
         "Being late",
         "Money",
         "The thermostat"
+      ],
+      "tags": [
+        "home",
+        "money"
       ]
     },
     {
@@ -42,6 +54,11 @@
         "Cooking",
         "Laundry",
         "Admin and forms"
+      ],
+      "tags": [
+        "acts",
+        "money",
+        "home"
       ]
     },
     {
@@ -50,7 +67,11 @@
       "type": "SCALE",
       "depth": 3,
       "lowLabel": "Not at all",
-      "highLabel": "Down the middle"
+      "highLabel": "Down the middle",
+      "tags": [
+        "acts",
+        "home"
+      ]
     },
     {
       "id": "ev11",
@@ -65,6 +86,9 @@
         "Friday",
         "Saturday",
         "Sunday"
+      ],
+      "tags": [
+        "work"
       ]
     }
   ]

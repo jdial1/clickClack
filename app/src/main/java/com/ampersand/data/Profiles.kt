@@ -31,36 +31,41 @@ import kotlin.math.abs
 object Profiles {
 
     /**
-     * Which categories each love language sends you toward.
+     * Which tags each love language sends you toward.
      *
-     * Loose on purpose. There is no "acts of service" deck and there should not
-     * be -- the point is not to ask about the language, it is to spend more days
-     * in the part of life where the shortfall lives. Somebody going short on
-     * time needs questions about their evenings, not questions about time.
+     * Aimed at tags rather than decks. There is no "acts of service" deck and
+     * there should not be; with tags the lean reaches the questions about who
+     * does what around the house wherever they sit, instead of weighting an
+     * entire Everyday deck of which a third is about chores.
      */
-    private val languageThemes = mapOf(
-        "words" to listOf("Know me", "Deep"),
-        "time" to listOf("Everyday", "Travel"),
-        "gifts" to listOf("Playful", "Everyday"),
-        "acts" to listOf("Everyday", "Food"),
-        "touch" to listOf("Spicy"),
+    private val languageTags = mapOf(
+        "words" to listOf("words"),
+        "time" to listOf("time"),
+        "gifts" to listOf("gifts"),
+        "acts" to listOf("acts"),
+        "touch" to listOf("touch"),
     )
 
-    /** Which categories each love style leans toward. */
-    private val styleThemes = mapOf(
-        "eros" to listOf("Spicy"),
-        "storge" to listOf("Know me"),
-        "pragma" to listOf("Future"),
-        "agape" to listOf("Deep"),
+    /** Which tags each love style leans toward. */
+    private val styleTags = mapOf(
+        "eros" to listOf("romance", "touch"),
+        "storge" to listOf("friends", "past"),
+        "pragma" to listOf("planning", "money"),
+        "agape" to listOf("acts"),
     )
 
     fun of(state: CoupleState): Taste {
         val themes = mutableMapOf<String, Int>()
+        val tags = mutableMapOf<String, Int>()
         val types = mutableSetOf<QuestionType>()
         val reasons = mutableListOf<String>()
 
         fun favour(names: List<String>, by: Int = 1) {
             names.forEach { themes[it] = (themes[it] ?: 1) + by }
+        }
+
+        fun favourTags(names: List<String>, by: Int = 1) {
+            names.forEach { tags[it] = (tags[it] ?: 1) + by }
         }
 
         // The week first, then the questionnaires. These say what is alive
@@ -81,18 +86,18 @@ object Profiles {
         }
 
         shortfall(state)?.let { (language, who, label) ->
-            favour(languageThemes[language].orEmpty(), by = 2)
+            favourTags(languageTags[language].orEmpty(), by = 2)
             reasons += "$who wants ${label.lowercase()} more than the other of you tends to " +
                 "give it, so there is more about that in the pool."
         }
 
         leadingStyle(state)?.let { (id, label) ->
-            favour(styleThemes[id].orEmpty())
+            favourTags(styleTags[id].orEmpty())
             reasons += "You both lead with ${label.lowercase()}."
         }
 
         planningGap(state)?.let { reason ->
-            favour(listOf("Future"))
+            favourTags(listOf("planning"))
             reasons += reason
         }
 
@@ -118,7 +123,7 @@ object Profiles {
             }
         }
 
-        return Taste(themes = themes, types = types, reasons = reasons)
+        return Taste(themes = themes, tags = tags, types = types, reasons = reasons)
     }
 
     /**

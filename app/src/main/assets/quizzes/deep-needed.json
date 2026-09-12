@@ -8,7 +8,11 @@
       "id": "dp1",
       "text": "What did you need this week that you did not ask for?",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words",
+        "acts"
+      ]
     },
     {
       "id": "dp3",
@@ -20,6 +24,9 @@
         "I am tired",
         "I am upset with you",
         "Nothing at all"
+      ],
+      "tags": [
+        "words"
       ]
     },
     {
@@ -32,6 +39,11 @@
         "To be left alone",
         "To be helped",
         "To be told it is fine"
+      ],
+      "tags": [
+        "words",
+        "time",
+        "acts"
       ]
     },
     {
@@ -40,7 +52,11 @@
       "type": "SCALE",
       "depth": 3,
       "lowLabel": "Distant",
-      "highLabel": "Very close"
+      "highLabel": "Very close",
+      "tags": [
+        "time",
+        "touch"
+      ]
     },
     {
       "id": "dp11",
@@ -54,7 +70,11 @@
         "Be told it will pass",
         "Be taken out of the house"
       ],
-      "maxChoices": 2
+      "maxChoices": 2,
+      "tags": [
+        "acts",
+        "time"
+      ]
     }
   ]
 }

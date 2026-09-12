@@ -14,6 +14,9 @@
         "A trip",
         "Something you said once",
         "An old job"
+      ],
+      "tags": [
+        "past"
       ]
     },
     {
@@ -22,7 +25,10 @@
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "Never",
-      "highLabel": "Constantly"
+      "highLabel": "Constantly",
+      "tags": [
+        "past"
+      ]
     },
     {
       "id": "fs8",
@@ -36,19 +42,29 @@
         "A later one",
         "This one",
         "Still coming"
+      ],
+      "tags": [
+        "past"
       ]
     },
     {
       "id": "fs9",
       "text": "Which small ritual of ours would you miss most?",
       "type": "REFLECT",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "time",
+        "home"
+      ]
     },
     {
       "id": "fs10",
       "text": "What is the first thing you would tell someone about me?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

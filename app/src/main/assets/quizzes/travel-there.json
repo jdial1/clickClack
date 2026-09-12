@@ -8,7 +8,10 @@
       "id": "tr5",
       "text": "What is the bit you look forward to about coming home?",
       "type": "REFLECT",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "home"
+      ]
     },
     {
       "id": "tr7",
@@ -16,7 +19,10 @@
       "type": "SCALE",
       "depth": 1,
       "lowLabel": "Endure it",
-      "highLabel": "Half the fun"
+      "highLabel": "Half the fun",
+      "tags": [
+        "fun"
+      ]
     },
     {
       "id": "tr8",
@@ -36,6 +42,9 @@
         "October",
         "November",
         "December"
+      ],
+      "tags": [
+        "planning"
       ]
     },
     {
@@ -46,6 +55,9 @@
       "options": [
         "Days in advance",
         "The night before"
+      ],
+      "tags": [
+        "planning"
       ]
     },
     {
@@ -58,6 +70,9 @@
         "A long drive",
         "Camping",
         "A group tour"
+      ],
+      "tags": [
+        "fun"
       ]
     }
   ]

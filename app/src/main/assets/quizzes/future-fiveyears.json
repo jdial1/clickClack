@@ -14,6 +14,11 @@
         "Money put away",
         "More time off",
         "Something learned properly"
+      ],
+      "tags": [
+        "planning",
+        "money",
+        "home"
       ]
     },
     {
@@ -24,6 +29,11 @@
       "options": [
         "Where we live",
         "What we do all day"
+      ],
+      "tags": [
+        "planning",
+        "work",
+        "home"
       ]
     },
     {
@@ -36,6 +46,9 @@
         "Starting something of our own",
         "Taking a long break",
         "Getting really good at one thing"
+      ],
+      "tags": [
+        "planning"
       ]
     },
     {
@@ -44,13 +57,19 @@
       "type": "SCALE",
       "depth": 3,
       "lowLabel": "Not at all",
-      "highLabel": "Completely"
+      "highLabel": "Completely",
+      "tags": [
+        "planning"
+      ]
     },
     {
       "id": "fu6",
       "text": "When I picture us in ten years, what is the first thing I see?",
       "type": "GUESS_ME",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "planning"
+      ]
     },
     {
       "id": "fu8",
@@ -64,6 +83,10 @@
         "The countryside",
         "By the sea",
         "Another country"
+      ],
+      "tags": [
+        "planning",
+        "home"
       ]
     }
   ]

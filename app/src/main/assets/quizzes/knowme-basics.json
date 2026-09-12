@@ -8,7 +8,10 @@
       "id": "km1",
       "text": "What do I complain about most, that I would deny complaining about?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
     },
     {
       "id": "km2",
@@ -20,6 +23,9 @@
         "Being interrupted",
         "Being cold",
         "Being hungry"
+      ],
+      "tags": [
+        "fun"
       ]
     },
     {
@@ -30,6 +36,9 @@
       "options": [
         "Quiet",
         "Loud"
+      ],
+      "tags": [
+        "words"
       ]
     },
     {
@@ -42,13 +51,21 @@
         "Being told I did well",
         "Being left to do it my way",
         "Someone to talk it through with"
+      ],
+      "tags": [
+        "time",
+        "words",
+        "acts"
       ]
     },
     {
       "id": "km10",
       "text": "Describe me to someone who has never met me, in one sentence.",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

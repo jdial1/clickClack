@@ -14,6 +14,10 @@
         "A city, walked end to end",
         "Somewhere cold with big views",
         "A house full of family"
+      ],
+      "tags": [
+        "planning",
+        "fun"
       ]
     },
     {
@@ -24,6 +28,9 @@
       "options": [
         "Plan every day",
         "Decide at breakfast"
+      ],
+      "tags": [
+        "planning"
       ]
     },
     {
@@ -36,13 +43,20 @@
         "The room, stay somewhere lovely",
         "The food, eat well",
         "The doing, book everything"
+      ],
+      "tags": [
+        "money",
+        "planning"
       ]
     },
     {
       "id": "tr4",
       "text": "If we left tomorrow, money no object, where are we going?",
       "type": "GUESS_ME",
-      "depth": 1
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
     },
     {
       "id": "tr6",
@@ -56,7 +70,11 @@
         "Nothing booked",
         "Good coffee nearby"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "time",
+        "fun"
+      ]
     }
   ]
 }

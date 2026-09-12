@@ -24,12 +24,20 @@ data class Taste(
      * rather than enum names.
      */
     val themes: Map<String, Int> = emptyMap(),
+    /**
+     * Tag to how many times a question carrying it enters the draw.
+     *
+     * The finer of the two keys. A question gets the strongest of its category
+     * and any of its tags -- not the sum, so a question tagged three ways that
+     * all match does not crowd out the pool by itself.
+     */
+    val tags: Map<String, Int> = emptyMap(),
     /** Types that get one extra copy in the draw. */
     val types: Set<QuestionType> = emptySet(),
     /** Said out loud on the Us screen. One short sentence each. */
     val reasons: List<String> = emptyList(),
 ) {
-    val isEmpty: Boolean get() = themes.isEmpty() && types.isEmpty()
+    val isEmpty: Boolean get() = themes.isEmpty() && tags.isEmpty() && types.isEmpty()
 
     /**
      * How many copies of [question] go into the draw.
@@ -39,7 +47,9 @@ data class Taste(
      * quarter of the pool on its own.
      */
     fun weightOf(question: Question): Int {
-        val base = themes[question.category] ?: 1
+        val byTheme = themes[question.category] ?: 1
+        val byTag = question.tags.maxOfOrNull { tags[it] ?: 1 } ?: 1
+        val base = maxOf(byTheme, byTag)
         val bonus = if (question.type in types) 1 else 0
         return (base + bonus).coerceIn(1, MaxWeight)
     }

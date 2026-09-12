@@ -65,6 +65,31 @@ class TasteTest {
         assertEquals(1, taste.weightOf(q("x", "Spicy")))
     }
 
+    // ---- tags --------------------------------------------------------------
+
+    private fun tagged(id: String, category: String, vararg tags: String) =
+        Question(id = id, text = id, type = QuestionType.REFLECT, category = category, depth = Depth(1), tags = tags.toSet())
+
+    /** The point of tags: reach the planning question that sits in a food deck. */
+    @Test
+    fun `a tag reaches a question wherever it sits`() {
+        val taste = Taste(tags = mapOf("planning" to 3))
+        assertEquals(3, taste.weightOf(tagged("x", "Food", "planning")))
+        assertEquals(1, taste.weightOf(tagged("y", "Future", "fun")))
+    }
+
+    /** Strongest of category and tags, never the sum. */
+    @Test
+    fun `matching several ways takes the strongest, not the total`() {
+        val taste = Taste(themes = mapOf("Future" to 2), tags = mapOf("planning" to 3, "money" to 3))
+        assertEquals(3, taste.weightOf(tagged("x", "Future", "planning", "money")))
+    }
+
+    @Test
+    fun `a taste with only tags is not empty`() {
+        assertFalse(Taste(tags = mapOf("touch" to 2)).isEmpty)
+    }
+
     // ---- the draw ----------------------------------------------------------
 
     private fun draw(taste: Taste): List<Question> {

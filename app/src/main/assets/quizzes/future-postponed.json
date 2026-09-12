@@ -16,13 +16,22 @@
         "Getting fit",
         "Less work"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "planning",
+        "friends",
+        "time"
+      ]
     },
     {
       "id": "fu7",
       "text": "What would you want said about the two of us, later?",
       "type": "REFLECT",
-      "depth": 3
+      "depth": 3,
+      "tags": [
+        "words",
+        "past"
+      ]
     },
     {
       "id": "fu9",
@@ -32,6 +41,10 @@
       "options": [
         "Spend it now",
         "Put it away"
+      ],
+      "tags": [
+        "money",
+        "planning"
       ]
     },
     {
@@ -44,6 +57,11 @@
         "Work",
         "Family",
         "Nothing, we are fine"
+      ],
+      "tags": [
+        "planning",
+        "family",
+        "work"
       ]
     },
     {
@@ -58,6 +76,9 @@
         "This winter",
         "Next year",
         "When it happens"
+      ],
+      "tags": [
+        "planning"
       ]
     },
     {
@@ -66,7 +87,10 @@
       "type": "SCALE",
       "depth": 3,
       "lowLabel": "Change it all",
-      "highLabel": "Do not touch it"
+      "highLabel": "Do not touch it",
+      "tags": [
+        "planning"
+      ]
     }
   ]
 }

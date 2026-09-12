@@ -143,6 +143,11 @@ object QuizJson {
             maxChoices = max,
             lowLabel = o.optString("lowLabel").ifBlank { "Not at all" },
             highLabel = o.optString("highLabel").ifBlank { "Completely" },
+            tags = o.optJSONArray("tags")
+                ?.let { arr -> (0 until arr.length()).map { arr.getString(it).trim().lowercase() } }
+                .orEmpty()
+                .filter { it.isNotEmpty() }
+                .toSet(),
         )
     }
 

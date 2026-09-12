@@ -16,7 +16,11 @@
         "A movie neither of us has seen",
         "Both on our phones, quietly"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "time",
+        "home"
+      ]
     },
     {
       "id": "ev7",
@@ -30,13 +34,19 @@
         "Bathroom",
         "Outside",
         "Wherever you are"
+      ],
+      "tags": [
+        "home"
       ]
     },
     {
       "id": "ev8",
       "text": "What is one small thing I do that makes your day easier?",
       "type": "REFLECT",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "acts"
+      ]
     },
     {
       "id": "ev9",
@@ -46,6 +56,10 @@
       "options": [
         "Talk to me",
         "Do not talk to me"
+      ],
+      "tags": [
+        "words",
+        "home"
       ]
     },
     {
@@ -58,6 +72,10 @@
         "Subscriptions",
         "Getting things delivered",
         "Things for the house we never use"
+      ],
+      "tags": [
+        "money",
+        "home"
       ]
     },
     {
@@ -66,7 +84,10 @@
       "type": "SCALE",
       "depth": 2,
       "lowLabel": "Badly",
-      "highLabel": "Properly"
+      "highLabel": "Properly",
+      "tags": [
+        "home"
+      ]
     }
   ]
 }

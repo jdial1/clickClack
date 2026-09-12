@@ -8,13 +8,19 @@
       "id": "fs1",
       "text": "What did you actually think of me the first time we met?",
       "type": "REFLECT",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "past"
+      ]
     },
     {
       "id": "fs2",
       "text": "Which of our firsts do I remember best?",
       "type": "GUESS_ME",
-      "depth": 2
+      "depth": 2,
+      "tags": [
+        "past"
+      ]
     },
     {
       "id": "fs3",
@@ -24,6 +30,9 @@
       "options": [
         "How we met",
         "The first proper date"
+      ],
+      "tags": [
+        "past"
       ]
     },
     {
@@ -36,6 +45,9 @@
         "The first row",
         "The first time one of us was ill",
         "The first time we met the family"
+      ],
+      "tags": [
+        "past"
       ]
     },
     {
@@ -50,7 +62,10 @@
         "The first Christmas",
         "None of it, forwards only"
       ],
-      "maxChoices": 3
+      "maxChoices": 3,
+      "tags": [
+        "past"
+      ]
     }
   ]
 }
