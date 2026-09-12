@@ -11,19 +11,17 @@ import kotlinx.coroutines.flow.asStateFlow
  * Real auth when there is a Firebase project behind it, the fake when there is
  * not.
  *
- * Detection is the presence of `google_app_id`, which the google-services
- * plugin generates from google-services.json and which cannot exist without
- * it. Checking the resource rather than a build flag means dropping the file
- * in and rebuilding is the entire setup step -- nothing to remember to flip.
+ * Detection is whether the build found an OAuth web client in
+ * google-services.json. Dropping the file in and rebuilding is still the entire
+ * setup step -- nothing to remember to flip -- but the answer is now a compiled
+ * constant rather than a resource looked up by name, which the release build's
+ * resource shrinker was free to remove.
  */
 fun createAuthRepository(context: Context): AuthRepository =
     if (hasFirebaseConfigFor(context)) GoogleAuthRepository(context) else FakeAuthRepository()
 
-fun hasFirebaseConfigFor(context: Context): Boolean {
-    @Suppress("DiscouragedApi")
-    val id = context.resources.getIdentifier("google_app_id", "string", context.packageName)
-    return id != 0 && context.getString(id).isNotBlank()
-}
+fun hasFirebaseConfigFor(@Suppress("UNUSED_PARAMETER") context: Context): Boolean =
+    com.ampersand.BuildConfig.WEB_CLIENT_ID.isNotBlank()
 
 /**
  * The hosting Activity, which Credential Manager requires.

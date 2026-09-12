@@ -124,25 +124,19 @@ class GoogleAuthRepository(
 
     private companion object {
         /**
-         * The OAuth **web** client id, looked up by name at runtime.
+         * The OAuth **web** client id, baked in at build time.
          *
-         * Generated into resources by the google-services plugin, which only
-         * runs when google-services.json is present -- so `R.string` cannot be
-         * used here without making the whole project fail to compile until a
-         * Firebase project exists. This is the one place `getIdentifier` earns
-         * its keep: the resource is genuinely optional.
+         * Read straight out of google-services.json by the build script, so an
+         * absent config gives an empty string rather than a missing symbol.
          *
-         * It is the *web* client, not the Android one. Using the Android client
-         * id here fails with a token-audience error that says nothing useful.
+         * This used to be a `Resources.getIdentifier` lookup, for the same
+         * reason: the generated string only exists when a Firebase config does.
+         * But a reflective lookup is invisible to the resource shrinker, which
+         * duly removed the string from the release build -- and the app then
+         * reported "No default_web_client_id" on a build that had one. A
+         * constant cannot be shrunk away.
          */
-        fun webClientId(context: Context): String? {
-            @Suppress("DiscouragedApi")
-            val id = context.resources.getIdentifier(
-                "default_web_client_id",
-                "string",
-                context.packageName,
-            )
-            return if (id == 0) null else context.getString(id)
-        }
+        fun webClientId(context: Context): String? =
+            com.ampersand.BuildConfig.WEB_CLIENT_ID.takeIf { it.isNotBlank() }
     }
 }

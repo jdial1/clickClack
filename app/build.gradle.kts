@@ -18,6 +18,36 @@ if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
 }
 
+/**
+ * The OAuth **web** client id, read out of google-services.json at build time.
+ *
+ * It used to be fetched with Resources.getIdentifier, because the resource only
+ * exists once a Firebase config is present and R.string would not compile
+ * without one. That indirection is invisible to static analysis, so
+ * `shrinkResources` stripped the string and the release build failed sign-in
+ * with "No default_web_client_id" on a build that had one. A `keep.xml` did not
+ * rescue it.
+ *
+ * Baking it into BuildConfig removes the problem rather than working around it:
+ * the value is a constant the shrinker can see, and an absent config yields an
+ * empty string rather than a missing symbol.
+ */
+fun webClientId(): String {
+    val config = file("google-services.json")
+    if (!config.exists()) return ""
+    @Suppress("UNCHECKED_CAST")
+    val root = groovy.json.JsonSlurper().parse(config) as Map<String, Any?>
+    val client = (root["client"] as? List<*>)?.firstOrNull() as? Map<*, *> ?: return ""
+    val clients = client["oauth_client"] as? List<*> ?: return ""
+    return clients.filterIsInstance<Map<*, *>>()
+        // client_type 3 is the web client. The Android one (type 1) is bound to
+        // the signing certificate and fails here with a token-audience error
+        // that says nothing useful.
+        .firstOrNull { (it["client_type"] as? Number)?.toInt() == 3 }
+        ?.get("client_id") as? String
+        ?: ""
+}
+
 android {
     namespace = "com.ampersand"
     compileSdk = 37
@@ -52,6 +82,11 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    defaultConfig {
+        buildConfigField("String", "WEB_CLIENT_ID", "\"${webClientId()}\"")
     }
 
     compileOptions {
