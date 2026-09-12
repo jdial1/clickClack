@@ -1,0 +1,117 @@
+{
+  "id": "daily-future",
+  "title": "Future, daily",
+  "theme": "FUTURE",
+  "blurb": "Daily only. Where this is going, a small question at a time.",
+  "questions": [
+    {
+      "id": "dfu1",
+      "text": "A windfall goes to:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "Something we will remember",
+        "Something that lasts"
+      ],
+      "tags": [
+        "money",
+        "planning"
+      ]
+    },
+    {
+      "id": "dfu2",
+      "text": "What is one thing I want to learn while there is still time?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "planning"
+      ]
+    },
+    {
+      "id": "dfu3",
+      "text": "What should we be saving for first?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "A trip",
+        "A house",
+        "A cushion for bad months",
+        "Something for later"
+      ],
+      "tags": [
+        "money",
+        "planning"
+      ]
+    },
+    {
+      "id": "dfu4",
+      "text": "How much do you enjoy planning things months ahead?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "lowLabel": "Dread it",
+      "highLabel": "Love it"
+    },
+    {
+      "id": "dfu5",
+      "text": "What does a really good ordinary year look like for us?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "time",
+        "planning"
+      ]
+    },
+    {
+      "id": "dfu6",
+      "text": "Pick the ones you would like to be true a year from now.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "We travel more",
+        "We see our friends more",
+        "We have less stuff",
+        "We sleep better",
+        "We finally fix the house"
+      ],
+      "maxChoices": 2,
+      "tags": [
+        "planning",
+        "home",
+        "friends"
+      ]
+    },
+    {
+      "id": "dfu7",
+      "text": "Order these by how soon we should do them.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Take a real vacation",
+        "Get our money in order",
+        "Redo a room",
+        "Learn something together"
+      ],
+      "tags": [
+        "planning",
+        "money"
+      ]
+    },
+    {
+      "id": "dfu8",
+      "text": "Birthdays should be:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Planned for weeks",
+        "A surprise on the day"
+      ],
+      "tags": [
+        "planning",
+        "gifts"
+      ]
+    }
+  ]
+}

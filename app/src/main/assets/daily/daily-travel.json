@@ -1,0 +1,116 @@
+{
+  "id": "daily-travel",
+  "title": "Travel, daily",
+  "theme": "TRAVEL",
+  "blurb": "Daily only. Getting away, and getting back.",
+  "questions": [
+    {
+      "id": "dtr1",
+      "text": "On a road trip I want:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Snacks and a playlist",
+        "Podcasts and quiet"
+      ],
+      "tags": [
+        "time"
+      ]
+    },
+    {
+      "id": "dtr2",
+      "text": "What is the first thing I do in a hotel room?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dtr3",
+      "text": "What makes a trip feel like a success to you?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Seeing something new",
+        "Eating well",
+        "Actually resting",
+        "Coming back closer"
+      ],
+      "tags": [
+        "time"
+      ]
+    },
+    {
+      "id": "dtr4",
+      "text": "How much do I like having a plan when we are away?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "lowLabel": "Wing it",
+      "highLabel": "Itinerary, please"
+    },
+    {
+      "id": "dtr5",
+      "text": "Which trip would you take again, exactly the same?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past"
+      ]
+    },
+    {
+      "id": "dtr6",
+      "text": "Pick the souvenirs worth bringing home.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "Something to eat",
+        "A print or a postcard",
+        "A local mug",
+        "Nothing, just photos",
+        "Something for someone else"
+      ],
+      "maxChoices": 2,
+      "tags": [
+        "gifts"
+      ]
+    },
+    {
+      "id": "dtr7",
+      "text": "Order these by what I hate most about travel.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Airports",
+        "Packing",
+        "Jet lag",
+        "Coming home to laundry"
+      ],
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dtr8",
+      "text": "If we took three months off, where would we go?",
+      "type": "DROPDOWN",
+      "depth": 3,
+      "options": [
+        "One city, properly",
+        "A road trip across the country",
+        "Somewhere with a beach",
+        "Europe, a bit of everything",
+        "Back to where one of us grew up",
+        "Nowhere, we would stay home"
+      ],
+      "tags": [
+        "planning",
+        "time",
+        "family"
+      ]
+    }
+  ]
+}

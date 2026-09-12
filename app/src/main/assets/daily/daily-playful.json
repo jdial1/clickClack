@@ -1,0 +1,114 @@
+{
+  "id": "daily-playful",
+  "title": "Playful, daily",
+  "theme": "PLAYFUL",
+  "blurb": "Daily only. Low stakes, high opinions.",
+  "questions": [
+    {
+      "id": "dpl1",
+      "text": "What would I name a boat?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl2",
+      "text": "On a game night I am:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "In it to win",
+        "In it for the snacks"
+      ],
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl3",
+      "text": "Which reality show would I last longest on?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "A baking contest",
+        "A dating show",
+        "A survival show",
+        "A home renovation show"
+      ],
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl4",
+      "text": "How good am I at keeping a straight face?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl5",
+      "text": "What is the best inside joke we have, and where did it come from?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun",
+        "words"
+      ]
+    },
+    {
+      "id": "dpl6",
+      "text": "Pick the ones I would be secretly great at.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Karaoke",
+        "Mini golf",
+        "Charades",
+        "Trivia night",
+        "Bowling"
+      ],
+      "maxChoices": 2,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl7",
+      "text": "Order these by how fast I would lose it.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "A slow walker",
+        "A loud chewer",
+        "A spoiler",
+        "Someone who never uses a turn signal"
+      ],
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dpl8",
+      "text": "If I had a theme song, what kind would it be?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "Big movie score",
+        "Eighties power ballad",
+        "Country",
+        "Cartoon theme",
+        "Something with a lot of horns",
+        "Elevator music"
+      ],
+      "tags": [
+        "fun"
+      ]
+    }
+  ]
+}

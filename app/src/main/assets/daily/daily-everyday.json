@@ -1,0 +1,117 @@
+{
+  "id": "daily-everyday",
+  "title": "Everyday, daily",
+  "theme": "EVERYDAY",
+  "blurb": "Daily only. The week as it actually goes.",
+  "questions": [
+    {
+      "id": "dev1",
+      "text": "Saturday morning:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Out the door early",
+        "Nowhere until noon"
+      ],
+      "tags": [
+        "time"
+      ]
+    },
+    {
+      "id": "dev2",
+      "text": "What is the one thing I always forget to buy at the grocery store?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "dev3",
+      "text": "Whose turn is it to plan the next free evening?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "Mine",
+        "Yours",
+        "We have not had one in a while",
+        "Let's flip for it"
+      ],
+      "tags": [
+        "planning",
+        "time"
+      ]
+    },
+    {
+      "id": "dev4",
+      "text": "How much of your week has felt like your own?",
+      "type": "SCALE",
+      "depth": 2,
+      "tags": [
+        "time",
+        "work"
+      ]
+    },
+    {
+      "id": "dev5",
+      "text": "What is a chore I do that you have never thanked me for?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ]
+    },
+    {
+      "id": "dev6",
+      "text": "Pick what makes the house feel ready for the weekend.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Clean sheets",
+        "An empty sink",
+        "Groceries in",
+        "Laundry done",
+        "Nothing on the calendar"
+      ],
+      "maxChoices": 3,
+      "tags": [
+        "home",
+        "acts"
+      ]
+    },
+    {
+      "id": "dev7",
+      "text": "Order these by what drains you most on a workday.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "The commute",
+        "Meetings",
+        "Email",
+        "Getting dinner together"
+      ],
+      "tags": [
+        "work"
+      ]
+    },
+    {
+      "id": "dev8",
+      "text": "What time does the evening actually start around here?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "Five",
+        "Six",
+        "Seven",
+        "Eight",
+        "Nine",
+        "Whenever the dishes are done"
+      ],
+      "tags": [
+        "time",
+        "home"
+      ]
+    }
+  ]
+}

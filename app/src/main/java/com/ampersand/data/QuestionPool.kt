@@ -26,9 +26,18 @@ class QuestionPool(
      * eleventh of March is clutter.
      */
     val occasions: Map<String, Quiz> = emptyMap(),
+    /**
+     * Questions that only ever arrive as the daily question.
+     *
+     * The decks and the daily pool used to be one list, so an evening spent on
+     * a deck was an evening spent using up daily questions -- and five months in
+     * the pool had been round. These widen the daily pool and are never offered
+     * as a deck, so nothing can spend them but the day.
+     */
+    val dailyOnly: List<Quiz> = emptyList(),
 ) {
 
-    val all: List<Question> = decks.flatMap { it.questions }
+    val all: List<Question> = decks.flatMap { it.questions } + dailyOnly.flatMap { it.questions }
 
     private val byId: Map<String, Question> =
         (all + occasions.values.flatMap { it.questions }).associateBy { it.id }
@@ -55,6 +64,12 @@ class QuestionPool(
         date: LocalDate,
         anniversary: LocalDate? = null,
         taste: Taste = Taste.none,
+        /**
+         * Question ids to pass over: asked in the last few weeks, or played in a
+         * deck the two of you finished recently. Built from state both phones
+         * share, so skipping keeps the two landing on the same question.
+         */
+        recent: Set<String> = emptySet(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
 
@@ -69,12 +84,49 @@ class QuestionPool(
         val weekend = date.dayOfWeek in setOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         val candidates = all.filter { weekend || it.depth.level <= 2 }.ifEmpty { all }
 
-        // A prime stride walks the list rather than stepping through it in
-        // order, so consecutive days are not neighbours in the same deck.
         val draw = if (taste.isEmpty) candidates else tilted(candidates, taste)
-        val index = (date.toEpochDay() * 7).mod(draw.size)
-        return draw[index]
+        val start = (sameKindDay(date, weekend) * strideFor(draw.size)).mod(draw.size)
+
+        // Walk on from the day's own slot to the first question not asked
+        // lately. Every candidate is tried once; if all of them were recent the
+        // day's own slot stands rather than asking nothing.
+        return draw.indices.asSequence()
+            .map { draw[(start + it).mod(draw.size)] }
+            .firstOrNull { it.id !in recent }
+            ?: draw[start]
     }
+
+    /**
+     * A day number that counts only days of the same kind.
+     *
+     * Weekends and weekdays draw from different lists, and the calendar day
+     * number repeats its day of the week every seven. Stepping a weekend list by
+     * calendar days meant every weekend slot was the same distance apart each
+     * week, so a weekend list whose length was a multiple of seven only ever
+     * reached three sevenths of itself. Counting Fridays to Sundays as 0, 1, 2,
+     * 3, 4... and Mondays to Thursdays likewise makes consecutive days of a kind
+     * consecutive numbers, and the stride then reaches everything.
+     */
+    private fun sameKindDay(date: LocalDate, weekend: Boolean): Long {
+        val week = Math.floorDiv(date.with(DayOfWeek.MONDAY).toEpochDay(), 7L)
+        val dow = date.dayOfWeek.value // Monday 1 .. Sunday 7
+        return if (weekend) week * 3 + (dow - DayOfWeek.FRIDAY.value)
+        else week * 4 + (dow - DayOfWeek.MONDAY.value)
+    }
+
+    /**
+     * How far the daily slot moves each day.
+     *
+     * A prime stride walks the list rather than stepping through it in order,
+     * so consecutive days are not neighbours in the same deck. It has to share
+     * no factor with the list's length, or it only ever reaches a fraction of
+     * it: a stride of seven over a list of 140 visits twenty questions and never
+     * the other hundred and twenty. A fixed seven was safe while the pool was 76
+     * or 99; the weighting changes the length day to day, so the stride is chosen
+     * to fit.
+     */
+    private fun strideFor(size: Int): Long =
+        Strides.first { size % it != 0 }.toLong()
 
     /**
      * The pool, with what the tests found leaning on it.
@@ -99,6 +151,13 @@ class QuestionPool(
         fun load(context: Context): QuestionPool = QuestionPool(
             decks = QuizJson.loadBundled(context),
             occasions = QuizJson.loadFolder(context, "occasions").associateBy { it.id },
+            dailyOnly = QuizJson.loadFolder(context, "daily"),
         )
+
+        /** Primes to try as a stride, smallest first. One always fits: no list is that long. */
+        private val Strides = listOf(7, 11, 13, 17, 19, 23)
+
+        /** How far back "asked lately" reaches: six weeks. */
+        const val RecentDays = 42L
     }
 }

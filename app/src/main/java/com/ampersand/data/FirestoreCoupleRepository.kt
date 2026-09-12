@@ -283,14 +283,15 @@ class FirestoreCoupleRepository(
         // has not -- and it self-corrects, because the first answer pins the
         // question and the pin outranks everything below.
         val taste = Profiles.of(current)
+        val recent = recentlyAsked(current)
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent)
             // A question one of you wrote outranks one a stranger wrote.
             waiting.isNotEmpty() -> waiting.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste)
+            else -> pool.daily(today, anniversary, taste, recent)
         }
 
         val todayEntry = DayEntry(
@@ -355,6 +356,28 @@ class FirestoreCoupleRepository(
         }
         awardForQuizzes(next)
         awardForTalks(next)
+    }
+
+    /**
+     * Questions not to ask today: the last six weeks of days, and any deck the
+     * two of you both finished in that time.
+     *
+     * Both runs, not just yours. Your own run is readable the moment you finish,
+     * your partner's only once the deck opens -- so counting a deck as soon as
+     * one of you had played it would give the two phones different sets, and
+     * they would each land on a different question.
+     */
+    private fun recentlyAsked(s: CoupleState): Set<String> {
+        val since = today.minusDays(QuestionPool.RecentDays)
+        val fromDays = history.filter { it.date >= since }.map { it.question.id }
+        val cutoff = since.toEpochDay() * 86_400_000L
+        val fromDecks = pool.decks.filter { quiz ->
+            val mine = s.myRun(quiz.id)
+            val theirs = s.theirRun(quiz.id)
+            mine != null && theirs != null &&
+                maxOf(mine.completedAtMillis ?: Long.MAX_VALUE, theirs.completedAtMillis ?: Long.MAX_VALUE) >= cutoff
+        }.flatMap { quiz -> quiz.questions.map { it.id } }
+        return (fromDays + fromDecks).toSet()
     }
 
     /**

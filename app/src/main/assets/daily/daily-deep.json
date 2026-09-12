@@ -1,0 +1,115 @@
+{
+  "id": "daily-deep",
+  "title": "Deep, daily",
+  "theme": "DEEP",
+  "blurb": "Daily only. The ones worth a real evening.",
+  "questions": [
+    {
+      "id": "ddp1",
+      "text": "When did you last feel really looked after by me?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "acts",
+        "words",
+        "touch"
+      ]
+    },
+    {
+      "id": "ddp2",
+      "text": "What is something I worry about that I rarely say?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "ddp3",
+      "text": "After a hard day I want:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "To talk about it",
+        "To not talk about it"
+      ],
+      "tags": [
+        "words",
+        "time"
+      ]
+    },
+    {
+      "id": "ddp4",
+      "text": "What makes you feel most like a team?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Getting through something hard",
+        "Making plans",
+        "Laughing at the same thing",
+        "Taking care of the house"
+      ],
+      "tags": [
+        "acts",
+        "time"
+      ]
+    },
+    {
+      "id": "ddp5",
+      "text": "How easy is it to tell me when I have hurt you?",
+      "type": "SCALE",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Very hard",
+      "highLabel": "Very easy"
+    },
+    {
+      "id": "ddp6",
+      "text": "Pick what helps you feel close to me.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "A long talk",
+        "Time with no phones",
+        "A hug that lasts",
+        "Doing something for you",
+        "A note or a message"
+      ],
+      "maxChoices": 2,
+      "tags": [
+        "words",
+        "time",
+        "touch",
+        "acts"
+      ]
+    },
+    {
+      "id": "ddp7",
+      "text": "Order these by what you would most want from me in a crisis.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "Stay calm",
+        "Take over",
+        "Just be there",
+        "Tell me the truth"
+      ],
+      "tags": [
+        "acts",
+        "time"
+      ]
+    },
+    {
+      "id": "ddp8",
+      "text": "What is something from how your family did things that you want us to do differently?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "family",
+        "past"
+      ]
+    }
+  ]
+}

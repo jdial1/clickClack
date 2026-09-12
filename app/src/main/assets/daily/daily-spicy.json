@@ -1,0 +1,116 @@
+{
+  "id": "daily-spicy",
+  "title": "Spicy, daily",
+  "theme": "SPICY",
+  "blurb": "Daily only. Warm, not explicit.",
+  "questions": [
+    {
+      "id": "dsx1",
+      "text": "A date night is better:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Dressed up",
+        "In sweatpants"
+      ],
+      "tags": [
+        "romance"
+      ]
+    },
+    {
+      "id": "dsx2",
+      "text": "What is one small thing I do that you find attractive and I probably do not notice?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ]
+    },
+    {
+      "id": "dsx3",
+      "text": "Which is the most romantic?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "A handwritten note",
+        "A planned evening",
+        "Being pulled in for a slow dance",
+        "Breakfast brought to you"
+      ],
+      "tags": [
+        "romance",
+        "words",
+        "time",
+        "touch",
+        "acts"
+      ]
+    },
+    {
+      "id": "dsx4",
+      "text": "How often do you want to be touched just in passing?",
+      "type": "SCALE",
+      "depth": 2,
+      "tags": [
+        "touch"
+      ],
+      "lowLabel": "Rarely",
+      "highLabel": "Constantly"
+    },
+    {
+      "id": "dsx5",
+      "text": "When did you last feel really wanted by me?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ]
+    },
+    {
+      "id": "dsx6",
+      "text": "Pick the ones that count as flirting.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "A long look across a room",
+        "A text in the middle of the day",
+        "A hand on the back",
+        "An inside joke",
+        "Stealing a bite of your food"
+      ],
+      "maxChoices": 3,
+      "tags": [
+        "romance",
+        "touch"
+      ]
+    },
+    {
+      "id": "dsx7",
+      "text": "Order these by how much they make you feel close.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Holding hands",
+        "A long hug",
+        "Sitting pressed together on the couch",
+        "A kiss goodbye"
+      ],
+      "tags": [
+        "touch",
+        "romance"
+      ]
+    },
+    {
+      "id": "dsx8",
+      "text": "What would I most like more of from you, if I were brave enough to ask?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "words"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "id": "daily-food",
+  "title": "Food, daily",
+  "theme": "FOOD",
+  "blurb": "Daily only. What is for dinner, and who decides.",
+  "questions": [
+    {
+      "id": "dfd1",
+      "text": "Leftovers are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Better the next day",
+        "Never as good"
+      ],
+      "tags": [
+        "home"
+      ]
+    },
+    {
+      "id": "dfd2",
+      "text": "What pizza would I order if I could only have one for a year?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dfd3",
+      "text": "Who should be in charge of the grocery list?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "Me",
+        "You",
+        "Whoever is hungrier",
+        "The fridge"
+      ],
+      "tags": [
+        "acts",
+        "home"
+      ]
+    },
+    {
+      "id": "dfd4",
+      "text": "How adventurous am I when ordering somewhere new?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Same thing every time",
+      "highLabel": "Whatever I can't pronounce"
+    },
+    {
+      "id": "dfd5",
+      "text": "What is a meal that reminds you of a good day we had?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past"
+      ]
+    },
+    {
+      "id": "dfd6",
+      "text": "Pick what makes a perfect Sunday breakfast.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Pancakes",
+        "Eggs any way",
+        "A big pot of coffee",
+        "Eating in bed",
+        "Going out for it"
+      ],
+      "maxChoices": 3,
+      "tags": [
+        "home",
+        "time"
+      ]
+    },
+    {
+      "id": "dfd7",
+      "text": "Order these by how much I would miss them if they were gone for good.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Cheese",
+        "Bread",
+        "Coffee",
+        "Chocolate"
+      ],
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dfd8",
+      "text": "Which of these should we learn to cook together?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "Homemade pasta",
+        "Dumplings",
+        "A real curry",
+        "Barbecue",
+        "Bread from scratch",
+        "Something from one of our families"
+      ],
+      "tags": [
+        "time",
+        "family"
+      ]
+    }
+  ]
+}

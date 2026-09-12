@@ -1,0 +1,109 @@
+{
+  "id": "daily-knowme",
+  "title": "Know me, daily",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only. Small things you probably know and have never been asked.",
+  "questions": [
+    {
+      "id": "dkm1",
+      "text": "What is something you changed your mind about because of me?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past",
+        "words"
+      ]
+    },
+    {
+      "id": "dkm2",
+      "text": "What song would I put on to get myself out of a bad mood?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ]
+    },
+    {
+      "id": "dkm3",
+      "text": "When I have news, I:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Tell you first",
+        "Sit on it for a day"
+      ],
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dkm4",
+      "text": "What do I do when I am stressed and do not want to say so?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Clean something",
+        "Go very quiet",
+        "Get extremely busy",
+        "Snack"
+      ],
+      "tags": [
+        "acts"
+      ]
+    },
+    {
+      "id": "dkm5",
+      "text": "How much do I care what other people think of us?",
+      "type": "SCALE",
+      "depth": 2,
+      "tags": [
+        "friends",
+        "family"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "More than I admit"
+    },
+    {
+      "id": "dkm6",
+      "text": "Pick the compliments that would actually land with me.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "You are funny",
+        "You are good at your job",
+        "You look great",
+        "You were right",
+        "You handled that well"
+      ],
+      "maxChoices": 2,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dkm7",
+      "text": "Order these by how much I would miss them.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "My friends",
+        "My routine",
+        "My hometown",
+        "My own space"
+      ],
+      "tags": [
+        "friends",
+        "home"
+      ]
+    },
+    {
+      "id": "dkm8",
+      "text": "What part of me do you think I am still working on?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "past"
+      ]
+    }
+  ]
+}
