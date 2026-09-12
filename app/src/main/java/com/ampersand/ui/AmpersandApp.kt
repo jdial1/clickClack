@@ -354,6 +354,22 @@ private fun SignedInApp(
             vm.repo.bindLocalUser(account.uid, account.displayName)
         }
 
+        // Leave the receiver a note about what is actually outstanding. It
+        // fires with no app process and cannot go and ask Firestore, so the
+        // alternative is a reminder that says the same thing whether or not
+        // there is anything to do.
+        val context = LocalContext.current
+        val waiting = state.decksAwaitingYou(pool.decks.map { it.id })
+        val unanswered = state.today.answerFor(account.uid) == null
+        LaunchedEffect(waiting, unanswered, state.them.name) {
+            Reminder.cacheOutstanding(
+                context = context,
+                questionPending = unanswered,
+                decksWaiting = waiting,
+                partnerName = state.them.name,
+            )
+        }
+
         var tab by remember { mutableStateOf(Tab.TODAY) }
         // The *date* of the open day, not the day itself. Holding the entry
         // would freeze it at the moment it was opened, so a reaction added on

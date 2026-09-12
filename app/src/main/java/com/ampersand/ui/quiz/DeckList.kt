@@ -53,9 +53,11 @@ fun DeckList(
     onOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Grouped once per change rather than filtered four times in the layout.
+    // Grouped and ordered once per change rather than filtered four times in
+    // the layout.
     val grouped = remember(decks, state.quizRuns) {
         decks.groupBy { state.deckState(it.id) }
+            .mapValues { (group, inGroup) -> inGroup.sortedWith(order(group, state)) }
     }
 
     Column(modifier.fillMaxWidth()) {
@@ -82,6 +84,35 @@ fun DeckList(
             }
         }
     }
+}
+
+/**
+ * Newest first, by whichever run made the deck land in this group.
+ *
+ * "Waiting on you" sorts by *their* submission, because that is the thing that
+ * put it there and the one they are counting the days on. "Waiting on them"
+ * sorts by yours, for the mirror reason. Finished sorts by whichever of the two
+ * came last, which is the moment the result appeared.
+ *
+ * Not-started keeps pool order. Those runs do not exist, so there is nothing to
+ * sort by, and the order the decks are written in is a curated one worth
+ * keeping rather than replacing with alphabetical.
+ */
+private fun order(group: DeckState, state: CoupleState): Comparator<Quiz> = when (group) {
+    DeckState.WAITING_ON_YOU ->
+        compareByDescending { state.theirRun(it.id)?.completedAtMillis ?: 0L }
+
+    DeckState.WAITING_ON_THEM ->
+        compareByDescending { state.myRun(it.id)?.completedAtMillis ?: 0L }
+
+    DeckState.FINISHED -> compareByDescending {
+        maxOf(
+            state.myRun(it.id)?.completedAtMillis ?: 0L,
+            state.theirRun(it.id)?.completedAtMillis ?: 0L,
+        )
+    }
+
+    DeckState.NOT_STARTED -> Comparator { _, _ -> 0 }
 }
 
 @Composable

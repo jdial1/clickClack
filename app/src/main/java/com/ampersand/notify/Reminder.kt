@@ -18,6 +18,9 @@ private const val PREFS = "reminder"
 private const val KEY_HOUR = "hour"
 private const val KEY_MINUTE = "minute"
 private const val KEY_ASKED = "asked"
+private const val KEY_QUESTION = "questionPending"
+private const val KEY_DECKS = "decksWaiting"
+private const val KEY_PARTNER = "partnerName"
 
 /**
  * One reminder a day, at a time the user picked.
@@ -39,6 +42,37 @@ object Reminder {
 
     fun markAsked(context: Context) {
         prefs(context).edit().putBoolean(KEY_ASKED, true).apply()
+    }
+
+    /**
+     * What is actually outstanding, left where the receiver can read it.
+     *
+     * The alarm fires in a broadcast receiver with no app process, no signed-in
+     * Firebase session and a few milliseconds to live, so it cannot go and ask
+     * Firestore what is waiting. The app knows, every time its state changes, so
+     * it leaves a note instead. Stale by at most one app launch, which is the
+     * right trade for a nudge.
+     */
+    fun cacheOutstanding(
+        context: Context,
+        questionPending: Boolean,
+        decksWaiting: Int,
+        partnerName: String,
+    ) {
+        prefs(context).edit()
+            .putBoolean(KEY_QUESTION, questionPending)
+            .putInt(KEY_DECKS, decksWaiting)
+            .putString(KEY_PARTNER, partnerName)
+            .apply()
+    }
+
+    internal fun outstanding(context: Context): Triple<Boolean, Int, String> {
+        val p = prefs(context)
+        return Triple(
+            p.getBoolean(KEY_QUESTION, true),
+            p.getInt(KEY_DECKS, 0),
+            p.getString(KEY_PARTNER, null) ?: "your partner",
+        )
     }
 
     /** The chosen time, or null when reminders are off. */
@@ -120,6 +154,13 @@ class ReminderReceiver : BroadcastReceiver() {
             Reminder.restore(context)
             return
         }
+        val (questionPending, decksWaiting, partner) = Reminder.outstanding(context)
+
+        // Nothing outstanding, so nothing to say. An app that reminds you about
+        // a thing you have already done is an app you turn notifications off
+        // for, and the streak is not a reason to interrupt someone.
+        if (!questionPending && decksWaiting == 0) return
+
         Reminder.ensureChannel(context)
 
         val open = PendingIntent.getActivity(
@@ -129,11 +170,23 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
+        // Says the most useful true thing, and only one of them. No streak, no
+        // exclamation, no count of days missed.
+        val decks = if (decksWaiting == 1) "a deck" else "$decksWaiting decks"
+        val title = when {
+            questionPending && decksWaiting > 0 -> "Today's question, and $decks"
+            decksWaiting > 0 -> "$partner finished $decks"
+            else -> "Today's question is waiting"
+        }
+        val body = when {
+            decksWaiting > 0 -> "Waiting on you."
+            else -> "Answer it and it opens when they do."
+        }
+
         val note = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
-            .setContentTitle("Today's question is waiting")
-            // No streak, no count, no exclamation. It says the thing and stops.
-            .setContentText("Answer it and it opens when they do.")
+            .setContentTitle(title)
+            .setContentText(body)
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()

@@ -134,6 +134,15 @@ data class QuizRun(
     val answers: Map<String, List<String>>,
     /** questionId -> what they predicted their partner would say. */
     val guesses: Map<String, List<String>> = emptyMap(),
+    /**
+     * When it was submitted, epoch millis, or null when the server has not
+     * stamped it yet.
+     *
+     * Only used for ordering. A list of decks in filename order is fine at nine
+     * and useless at fifty: what you want at the top of "waiting on you" is the
+     * one they finished this morning, not the one whose file sorts first.
+     */
+    val completedAtMillis: Long? = null,
 ) {
     fun isComplete(quiz: Quiz): Boolean =
         quiz.questions.all { answers[it.id]?.isNotEmpty() == true }

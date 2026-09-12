@@ -274,7 +274,8 @@ class FakeCoupleRepository(
     ) = mutate { current ->
         if (current.myRun(quizId) != null) return@mutate current
         current.copy(
-            quizRuns = current.quizRuns + QuizRun(quizId, current.you.uid, answers, guesses),
+            quizRuns = current.quizRuns +
+                QuizRun(quizId, current.you.uid, answers, guesses, System.currentTimeMillis()),
         )
     }
 

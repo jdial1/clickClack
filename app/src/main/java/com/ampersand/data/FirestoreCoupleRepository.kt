@@ -500,6 +500,7 @@ private fun DocumentSnapshot.toQuizRun(quizId: String): QuizRun? {
         uid = id,
         answers = answers,
         guesses = (get("guesses") as? Map<String, List<String>>).orEmpty(),
+        completedAtMillis = getTimestamp("completedAt")?.toDate()?.time,
     )
 }
 
