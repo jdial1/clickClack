@@ -31,6 +31,7 @@ object BadgeWall {
     fun groups(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeGroup> {
         val jungian = runs.of(Instruments.JUNGIAN)
         val language = runs.of(Instruments.LOVE_LANGUAGES)
+        val style = runs.of(Instruments.LOVE_ATTITUDES)
         return listOf(
             BadgeGroup(
                 instrumentId = Instruments.JUNGIAN.id,
@@ -40,6 +41,13 @@ object BadgeWall {
                 // One course, so no sub-label: a heading above a single row
                 // that repeats the group's own name is noise.
                 rows = listOf(typeRow(jungian, you, them)),
+            ),
+            BadgeGroup(
+                instrumentId = Instruments.LOVE_ATTITUDES.id,
+                title = Instruments.LOVE_ATTITUDES.title,
+                about = Instruments.LOVE_ATTITUDES.blurb,
+                minutes = Instruments.LOVE_ATTITUDES.minutes,
+                rows = listOf(styleRow(style, you, them)),
             ),
             BadgeGroup(
                 instrumentId = Instruments.LOVE_LANGUAGES.id,
@@ -95,6 +103,55 @@ object BadgeWall {
                 if (it.margin > 0.12f) null
                 else "${it.subscale.label} was close to a coin toss. " +
                     "That letter would likely come out the other way on another day."
+            },
+            instrumentId = kit.id,
+            minutes = kit.minutes,
+            waitingOnThem = run != null && !open && run.has(of.uid),
+        )
+    }
+
+    // ---- love style --------------------------------------------------------
+
+    private fun styleRow(run: InstrumentRun?, you: Member, them: Member) = BadgeRow(
+        label = "",
+        badges = listOf(
+            styleBadge(run, you, Owner.YOU),
+            styleBadge(run, them, Owner.THEM),
+        ),
+    )
+
+    /**
+     * How somebody loves, rather than how much.
+     *
+     * The headline is the leading style and the note names the runner-up,
+     * because the whole claim the scale supports is that these are separate
+     * dimensions you can be high on two of at once -- reporting one word and
+     * stopping would be asserting the opposite of what the paper found.
+     */
+    private fun styleBadge(run: InstrumentRun?, of: Member, owner: Owner): Badge {
+        val kit = Instruments.LOVE_ATTITUDES
+        val open = run?.isOpen == true
+        val readings = if (open) run.responsesFor(of.uid)?.let { kit.readings(it) } else null
+        val ranked = readings?.sortedByDescending { it.value }
+
+        return Badge(
+            slotId = "style.${owner.name.lowercase()}",
+            owner = owner,
+            who = of.name,
+            result = ranked?.firstOrNull()?.subscale?.label,
+            detail = ranked.orEmpty().map { r ->
+                BadgeBar(r.subscale.label, r.fraction, "${r.value} of ${r.subscale.range.last}")
+            },
+            note = ranked?.let {
+                val top = it.getOrNull(0) ?: return@let null
+                val second = it.getOrNull(1) ?: return@let null
+                if (top.value == second.value) {
+                    "${top.subscale.label.lowercase()} and ${second.subscale.label.lowercase()}, " +
+                        "evenly. Nobody is only one of these."
+                } else {
+                    "Mostly ${top.subscale.label.lowercase()}, then " +
+                        "${second.subscale.label.lowercase()}. Nobody is only one of these."
+                }
             },
             instrumentId = kit.id,
             minutes = kit.minutes,

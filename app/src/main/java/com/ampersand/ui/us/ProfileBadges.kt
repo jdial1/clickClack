@@ -79,6 +79,10 @@ fun ProfileBadges(
         BadgeWall.groups(state.instrumentRuns, state.you, state.them)
     }
     var open by remember { mutableStateOf<String?>(null) }
+    // Collapsed to start. Three explanations at three lines each is most of a
+    // screen of prose above the only thing anybody came to look at, and the
+    // wall stops reading as a wall.
+    var explaining by remember { mutableStateOf<String?>(null) }
 
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
@@ -100,6 +104,11 @@ fun ProfileBadges(
                 you = you,
                 them = them,
                 openSlot = open,
+                explaining = explaining == group.instrumentId,
+                onExplain = {
+                    explaining =
+                        if (explaining == group.instrumentId) null else group.instrumentId
+                },
                 onTap = { badge ->
                     if (badge.isEarned) {
                         open = if (open == badge.slotId) null else badge.slotId
@@ -129,10 +138,25 @@ private fun WallGroup(
     you: BrickColor,
     them: BrickColor,
     openSlot: String?,
+    explaining: Boolean,
+    onExplain: () -> Unit,
     onTap: (Badge) -> Unit,
 ) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val interaction = remember { MutableInteractionSource() }
+
     Column(Modifier.fillMaxWidth()) {
-        Column(Modifier.fillMaxWidth().onWall(corner = 12.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .clickable(interactionSource = interaction, indication = null) {
+                    sounds.play(Sfx.NAV)
+                    feel.play(Feel.NAV)
+                    onExplain()
+                }
+                .onWall(corner = 12.dp),
+        ) {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -145,20 +169,26 @@ private fun WallGroup(
                 )
                 Text(
                     text = when {
-                        group.isEarned -> "Done"
+                        // Status earns the slot over "what is this": once a
+                        // test is done, how long it took stops being useful.
+                        group.isEarned -> if (explaining) "Done" else "Done · What is this?"
                         group.waitingOnThem -> "Waiting on them"
-                        else -> "${group.minutes} min"
+                        else -> "${group.minutes} min · What is this?"
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Spacer(Modifier.height(4.dp))
-            Text(
-                group.about,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            AnimatedVisibility(visible = explaining) {
+                Column {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        group.about,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
 
         group.rows.forEach { row ->

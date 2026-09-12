@@ -49,6 +49,25 @@ object Sources {
         fidelity = Fidelity.INSPIRED,
     )
 
+    /**
+     * Shortened by us, so the credit names the construct and not the text.
+     *
+     * The Fetzer Institute's freely distributed compendium reproduces all 42
+     * items and flags per-instrument where an author's permission is required;
+     * this entry carries no such flag. That is normal practice for private,
+     * non-commercial use with attribution, and it is not a licence.
+     */
+    val LOVE_ATTITUDES = Source(
+        id = "loveattitudes",
+        authors = "Hendrick & Hendrick",
+        year = 1986,
+        title = "A theory and method of love",
+        venue = "Journal of Personality and Social Psychology, 50(2), 392-402",
+        url = "https://doi.org/10.1037/0022-3514.50.2.392",
+        licence = "All rights reserved. Four subscales of six, reworded for couples.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
     val ARON = Source(
         id = "aron1997",
         authors = "Aron, Melinat, Aron, Vallone & Bator",
@@ -71,7 +90,7 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
-    private val all = listOf(OEJTS, LOVE_LANGUAGES, ARON, RCIT)
+    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }
@@ -258,8 +277,86 @@ object Instruments {
         ),
     )
 
+
+    /**
+     * Four of Hendrick and Hendrick's six love styles.
+     *
+     * [Fidelity.ADAPTED], not verbatim, and the reason is worth stating: the
+     * Ludus and Mania subscales are not shipped at all. Ludus asks you to rate
+     * "I have sometimes had to keep two of my lovers from finding out about
+     * each other"; Mania item 30 asks about suicidal thinking after a breakup.
+     * Those are legitimate research items and a daily couples app is the wrong
+     * room for both -- particularly the second, which this app has no way to
+     * respond to. Answering all six and hiding two in the result was the
+     * earlier plan and it was wrong: hiding a result does not unask a question.
+     *
+     * That leaves 28 items and a four-way profile, which is our shortened
+     * instrument and not the Hendricks', so it makes no claim on their
+     * psychometrics. "My lover" is "my partner" throughout for the same reason
+     * -- once it is adapted, it may as well read like the app it is in.
+     */
+    val LOVE_ATTITUDES = Instrument(
+        id = "loveattitudes",
+        sourceId = "loveattitudes",
+        title = "Love style",
+        blurb = "Twenty-eight statements about how you love rather than how " +
+            "much. Four styles: the immediate kind, the kind that grew out of " +
+            "friendship, the kind that thinks ahead, and the kind that gives way.",
+        cadence = Cadence.YEARLY,
+        minutes = 5,
+        items = listOf(
+            // Eros -- passionate, immediate, physical. Original items 1-7.
+            like("My partner and I were attracted to each other immediately after we first met."),
+            like("My partner and I have the right physical \"chemistry\" between us."),
+            like("Our lovemaking is very intense and satisfying."),
+            like("I feel that my partner and I were meant for each other."),
+            like("My partner and I became emotionally involved rather quickly."),
+            like("My partner and I really understand each other."),
+            like("My partner fits my ideal standards of physical beauty."),
+            // Storge -- friendship that became love. Original items 15-21.
+            like("It is hard to say exactly where friendship ends and love begins."),
+            like("Genuine love first requires caring for a while."),
+            like("I expect to always be friends with the one I love."),
+            like("The best kind of love grows out of a long friendship."),
+            like("Our friendship merged gradually into love over time."),
+            like("Love is really a deep friendship, not a mysterious, mystical emotion."),
+            like("My most satisfying love relationships have developed from good friendships."),
+            // Pragma -- compatibility, reasoned. Original items 22-28.
+            like("I consider what a person is going to become in life before I commit myself."),
+            like("I try to plan my life carefully before choosing a partner."),
+            like("It is best to love someone with a similar background."),
+            like("A main consideration in choosing a partner is how they reflect on my family."),
+            like("An important factor in choosing a partner is whether they will be a good parent."),
+            like("One consideration in choosing a partner is how they will reflect on my career."),
+            like("Before getting very involved with anyone, I try to figure out how compatible we would be as parents."),
+            // Agape -- selfless, giving way. Original items 36-42.
+            like("I try to always help my partner through difficult times."),
+            like("I would rather suffer myself than let my partner suffer."),
+            like("I cannot be happy unless I place my partner's happiness before my own."),
+            like("I am usually willing to sacrifice my own wishes to let my partner achieve theirs."),
+            like("Whatever I own is my partner's to use as they choose."),
+            like("When my partner gets angry with me, I still love them fully and unconditionally."),
+            like("I would endure all things for the sake of my partner."),
+        ),
+        // Plain positive sums, 7..35. The published coding runs the other way
+        // -- 1 is *strongly agree* -- so the anchors below are reversed and the
+        // stored number is `6 - published`. Summing that is arithmetically the
+        // same as subtracting the published sum from 42, and it means every
+        // scale in this app rises to the right, which a person switching
+        // between two tests in one sitting will thank us for.
+        subscales = listOf(
+            Subscale("eros", "Straight away", terms = (0..6).associateWith { 1 }),
+            Subscale("storge", "Friends first", terms = (7..13).associateWith { 1 }),
+            Subscale("pragma", "Thought through", terms = (14..20).associateWith { 1 }),
+            Subscale("agape", "Giving way", terms = (21..27).associateWith { 1 }),
+        ),
+    )
+
+    /** A statement rated for how true it is, rising to the right. */
+    private fun like(text: String) = InstrumentItem("Not like me", "Very like me", text)
+
     /** Shortest first: the four-minute one is the one people actually finish. */
-    val all = listOf(JUNGIAN, LOVE_LANGUAGES)
+    val all = listOf(JUNGIAN, LOVE_ATTITUDES, LOVE_LANGUAGES)
 
     operator fun get(id: String?): Instrument? = all.firstOrNull { it.id == id }
 

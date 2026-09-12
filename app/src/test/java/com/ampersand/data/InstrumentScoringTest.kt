@@ -126,6 +126,62 @@ class InstrumentScoringTest {
     private fun sn(readings: List<com.ampersand.model.Reading>) =
         readings.first { it.subscale.id == "SN" }
 
+    // ---- love styles ------------------------------------------------------
+
+    /**
+     * Four subscales of seven, and neither of the two that were cut.
+     *
+     * Ludus and Mania are not hidden here, they are absent. Hiding a subscale
+     * from the result still puts its items in front of somebody, and Mania's
+     * thirtieth item asks about suicidal thinking after a breakup -- which a
+     * daily couples game has no business asking and no way to answer.
+     */
+    @Test
+    fun `love styles ships four subscales and asks only those items`() {
+        val kit = Instruments.LOVE_ATTITUDES
+        assertEquals(28, kit.items.size)
+        assertEquals(4, kit.subscales.size)
+        assertEquals(1, kit.passCount)
+        assertTrue("nothing is merely hidden", kit.hidden.isEmpty())
+
+        kit.subscales.forEach {
+            assertEquals("${it.id} is seven items", 7, it.terms.size)
+            assertEquals("${it.id} spans 7..35", 7..35, it.range)
+        }
+        val used = kit.subscales.flatMap { it.terms.keys }
+        assertEquals("every item scored once", kit.items.indices.toSet(), used.toSet())
+        assertEquals("no item scored twice", used.size, used.toSet().size)
+
+        // Every statement carries its own text; a bare pole pair here would be
+        // an item with nothing to agree or disagree with.
+        assertTrue("all statements", kit.items.all { !it.isPolePair })
+    }
+
+    /** The leading style is the highest, and the note names the runner-up. */
+    @Test
+    fun `a love style badge leads with one and names two`() {
+        val kit = Instruments.LOVE_ATTITUDES
+        // Agape is the last seven. Max those, middle everything else.
+        val agape = kit.subscales.first { it.id == "agape" }.terms.keys
+        val responses = List(28) { i -> if (i in agape) 5 else 2 }
+
+        val run = InstrumentRun(
+            instrumentId = kit.id,
+            takenOn = LocalDate.of(2026, 9, 12),
+            answers = mapOf(you.uid to responses, them.uid to responses),
+        )
+        val badge = BadgeWall.groups(listOf(run), you, them)
+            .first { it.instrumentId == kit.id }
+            .rows.single()
+            .badges.first { it.owner == Owner.YOU }
+
+        assertEquals("Giving way", badge.result)
+        assertEquals(4, badge.detail.size)
+        val note = requireNotNull(badge.note)
+        assertTrue("names the runner-up too: $note", note.contains(","))
+        assertTrue("says a person is not one thing: $note", note.contains("only one"))
+    }
+
     // ---- love languages ---------------------------------------------------
 
     @Test
@@ -230,7 +286,7 @@ class InstrumentScoringTest {
     @Test
     fun `each test owns its own courses`() {
         val groups = BadgeWall.groups(emptyList(), you, them)
-        assertEquals(2, groups.size)
+        assertEquals(3, groups.size)
 
         val type = groups.first { it.instrumentId == Instruments.JUNGIAN.id }
         assertEquals(1, type.rows.size)
