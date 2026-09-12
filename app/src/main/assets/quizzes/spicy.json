@@ -1,0 +1,128 @@
+{
+  "id": "spicy",
+  "title": "Behind closed doors",
+  "blurb": "Warmer. Still daft.",
+  "theme": "SPICY",
+  "questions": [
+    {
+      "id": "sx1",
+      "text": "Order these from most to least your sort of thing.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "A long kiss in a kitchen",
+        "Being told exactly what to do",
+        "A whole afternoon, no phones",
+        "Getting properly dressed up first"
+      ]
+    },
+    {
+      "id": "sx2",
+      "text": "Better:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Planned and looked forward to",
+        "Out of nowhere"
+      ]
+    },
+    {
+      "id": "sx3",
+      "text": "Pick everything you would like more of.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "Being kissed hello",
+        "Compliments, out loud",
+        "Hands in public",
+        "Lazy mornings",
+        "Being chased a bit"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "sx4",
+      "text": "How good am I at telling you I fancy you?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "You never say it",
+      "highLabel": "Constantly"
+    },
+    {
+      "id": "sx5",
+      "text": "Which of these do I find most attractive about you?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "sx6",
+      "text": "Which is the bigger turn-on?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Being funny",
+        "Being competent",
+        "Being kind to someone else",
+        "Being a bit mean to me"
+      ]
+    },
+    {
+      "id": "sx7",
+      "text": "When is the right time?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "First thing",
+        "Mid-morning",
+        "Afternoon",
+        "After dinner",
+        "Late",
+        "The middle of the night"
+      ]
+    },
+    {
+      "id": "sx8",
+      "text": "What is something you have wanted to ask for and have not?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "sx9",
+      "text": "Flirting over text is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Excellent",
+        "Excruciating"
+      ]
+    },
+    {
+      "id": "sx10",
+      "text": "How adventurous are you feeling these days?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Happy as we are",
+      "highLabel": "Try me"
+    },
+    {
+      "id": "sx11",
+      "text": "Pick the ones that genuinely set the mood.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "A clean room",
+        "A drink",
+        "Music",
+        "Nobody due home",
+        "Being told to stop working"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "sx12",
+      "text": "What did I find most attractive about you at the start?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

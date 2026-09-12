@@ -1,0 +1,32 @@
+{
+  "id": "veterans-day",
+  "title": "Veterans Day",
+  "blurb": "Service, and what it costs.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "veterans-day-vd1",
+      "text": "Who in your family gave the most and said the least?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "veterans-day-vd2",
+      "text": "How comfortable are you asking for help?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Completely"
+    },
+    {
+      "id": "veterans-day-vd3",
+      "text": "Duty or happiness, if you had to choose?",
+      "type": "THIS_OR_THAT",
+      "depth": 3,
+      "options": [
+        "Duty",
+        "Happiness"
+      ]
+    }
+  ]
+}

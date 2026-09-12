@@ -27,6 +27,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
+import com.ampersand.model.Occasion
+import com.ampersand.model.timeTogether
+import com.ampersand.ui.components.AmpDropdown
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import com.ampersand.model.CoupleState
 import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
@@ -49,7 +56,8 @@ import com.ampersand.ui.theme.toArgbLong
 @Composable
 fun UsScreen(
     state: CoupleState,
-    onPickColor: (uid: String, colorArgb: Long) -> Unit,
+    onPickColor: (colorArgb: Long) -> Unit,
+    onSetAnniversary: ((java.time.LocalDate) -> Unit)? = null,
     modifier: Modifier = Modifier,
     account: String? = null,
     onSignOut: (() -> Unit)? = null,
@@ -95,20 +103,22 @@ fun UsScreen(
         ColorRow(
             name = state.you.name,
             current = Color(state.you.colorArgb),
-            onPick = { onPickColor(state.you.uid, it) },
+            onPick = onPickColor,
         )
         Spacer(Modifier.height(20.dp))
-        ColorRow(
-            name = state.them.name,
-            current = Color(state.them.colorArgb),
-            onPick = { onPickColor(state.them.uid, it) },
-        )
+        // Theirs is shown, not offered. A colour belongs to the person whose
+        // bricks it paints, and the rules refuse a write to their profile
+        // anyway -- so a picker here was a control that could only fail.
+        PartnerColor(name = state.them.name, current = Color(state.them.colorArgb))
 
         Spacer(Modifier.height(20.dp))
         BlendStrip(
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
         )
+
+        Spacer(Modifier.height(32.dp))
+        Anniversary(state, onSetAnniversary)
 
         Spacer(Modifier.height(32.dp))
         SoundToggle(you = BrickColor.of(state.you.colorArgb))
@@ -308,7 +318,7 @@ private fun Upcoming(title: String, detail: String) {
 @Composable
 private fun PreviewUs() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
-        UsScreen(MockCouple.state(), { _, _ -> })
+        UsScreen(MockCouple.state(), {}, {})
     }
 }
 
@@ -316,6 +326,139 @@ private fun PreviewUs() = AmpersandTheme {
 @Composable
 private fun PreviewUsDark() = AmpersandTheme(darkTheme = true) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        UsScreen(MockCouple.state(), { _, _ -> })
+        UsScreen(MockCouple.state(), {}, {})
+    }
+}
+
+
+/** Their colour, shown. Only they can change it. */
+@Composable
+private fun PartnerColor(name: String, current: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        PersonDot(name, current, size = 28)
+        Spacer(Modifier.size(10.dp))
+        Column {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = "Theirs to pick",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.weight(1f))
+        ColorChip(label = name.take(1).uppercase(), color = BrickColor.of(current.toArgbLong()))
+    }
+}
+
+/**
+ * The day the two of you started, and how long that has been.
+ *
+ * Built from three of our own dropdowns rather than a platform date picker.
+ * A Material dialog would be quicker and would look like a different app --
+ * and these are the same control the questions use, so there is one less thing
+ * to learn.
+ */
+@Composable
+private fun Anniversary(state: CoupleState, onSet: ((java.time.LocalDate) -> Unit)?) {
+    val since = state.anniversary
+
+    SectionLabel("Time together")
+    Spacer(Modifier.height(6.dp))
+
+    if (since != null) {
+        Text(
+            text = timeTogether(since, state.today.date),
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = "Since ${since.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Occasion.next(state.today.date.plusDays(1), since)?.let { (occasion, day) ->
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "${occasion.glyph}  Next up: ${occasion.label}, " +
+                    day.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM")),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        return
+    }
+
+    if (onSet == null) return
+
+    Text(
+        "Tell us when you started and this day gets its own questions every year.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(14.dp))
+
+    val months = java.time.Month.entries.map {
+        it.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault())
+    }
+    val thisYear = state.today.date.year
+    var day by remember { mutableStateOf<String?>(null) }
+    var month by remember { mutableStateOf<String?>(null) }
+    var year by remember { mutableStateOf<String?>(null) }
+    val accent = MaterialTheme.colorScheme.primary
+
+    AmpDropdown(
+        options = (1..31).map { it.toString() },
+        selected = day,
+        accent = accent,
+        placeholder = "Day",
+        onSelect = { day = it },
+    )
+    Spacer(Modifier.height(10.dp))
+    AmpDropdown(
+        options = months,
+        selected = month,
+        accent = accent,
+        placeholder = "Month",
+        onSelect = { month = it },
+    )
+    Spacer(Modifier.height(10.dp))
+    AmpDropdown(
+        options = (thisYear downTo thisYear - 60).map { it.toString() },
+        selected = year,
+        accent = accent,
+        placeholder = "Year",
+        onSelect = { year = it },
+    )
+
+    Spacer(Modifier.height(14.dp))
+    // Parsed rather than trusted: the thirty-first of February is selectable
+    // from three independent dropdowns and is not a date.
+    val parsed = runCatching {
+        java.time.LocalDate.of(
+            year!!.toInt(),
+            months.indexOf(month!!) + 1,
+            day!!.toInt(),
+        )
+    }.getOrNull()
+
+    AmpButton(
+        label = "Save",
+        slug = BrickColor.of(state.you.colorArgb).slug,
+        enabled = parsed != null && parsed <= state.today.date,
+    ) { parsed?.let(onSet) }
+
+    if (day != null && month != null && year != null && parsed == null) {
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "That is not a day.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+        )
     }
 }

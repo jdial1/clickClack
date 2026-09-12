@@ -1,0 +1,54 @@
+{
+  "id": "thanksgiving",
+  "title": "Thanksgiving",
+  "blurb": "Food, family, and holding your tongue.",
+  "theme": "FOOD",
+  "questions": [
+    {
+      "id": "thanksgiving-tg1",
+      "text": "Order these by how much you are looking forward to them.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "The food",
+        "The people",
+        "The leftovers",
+        "It being over"
+      ]
+    },
+    {
+      "id": "thanksgiving-tg2",
+      "text": "What are you actually grateful for this year?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "thanksgiving-tg3",
+      "text": "Pick the ones that make the day.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "A proper table",
+        "Nobody arguing",
+        "A walk after",
+        "Being in charge of the food",
+        "Leaving early"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "thanksgiving-tg4",
+      "text": "Which dish would I fight for?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "thanksgiving-tg5",
+      "text": "How much family is the right amount today?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Just us",
+      "highLabel": "All of them"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "mothers-day",
+  "title": "Mother's Day",
+  "blurb": "For the mothers, and about them.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "mothers-day-md1",
+      "text": "What did you get from your mother that you are glad of?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "mothers-day-md2",
+      "text": "What did you get from her that you are still working on?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "mothers-day-md3",
+      "text": "How much am I like my mother?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "mothers-day-md4",
+      "text": "What would my mother say about me that I would deny?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

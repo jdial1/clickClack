@@ -1,0 +1,56 @@
+{
+  "id": "valentines",
+  "title": "Valentine's Day",
+  "blurb": "Obligatory, and we are doing it anyway.",
+  "theme": "PLAYFUL",
+  "questions": [
+    {
+      "id": "valentines-v1",
+      "text": "Valentine's Day is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Worth the fuss",
+        "A racket"
+      ]
+    },
+    {
+      "id": "valentines-v2",
+      "text": "Order these from most to least romantic, honestly.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Flowers",
+        "A letter",
+        "Being cooked for",
+        "Being left alone all afternoon"
+      ]
+    },
+    {
+      "id": "valentines-v3",
+      "text": "Pick everything that would actually land with me.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "A long lunch",
+        "Something handmade",
+        "A night away",
+        "No plans at all",
+        "Being told why"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "valentines-v4",
+      "text": "What did I think of you the first time you kissed me?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "valentines-v5",
+      "text": "What is the most romantic thing I have ever done, in your view?",
+      "type": "REFLECT",
+      "depth": 2
+    }
+  ]
+}

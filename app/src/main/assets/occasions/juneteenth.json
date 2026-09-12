@@ -1,0 +1,34 @@
+{
+  "id": "juneteenth",
+  "title": "Juneteenth",
+  "blurb": "Freedom, and what it takes.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "juneteenth-jt1",
+      "text": "What does freedom actually look like in your ordinary week?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "juneteenth-jt2",
+      "text": "Order these by how free they make you feel.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Time",
+        "Money",
+        "Nobody needing anything",
+        "Knowing what happens next"
+      ]
+    },
+    {
+      "id": "juneteenth-jt3",
+      "text": "How free do you feel at the moment?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not very",
+      "highLabel": "Completely"
+    }
+  ]
+}

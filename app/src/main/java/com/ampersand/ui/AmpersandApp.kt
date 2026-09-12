@@ -428,6 +428,7 @@ private fun SignedInApp(
                         else -> UsScreen(
                             state = state,
                             onPickColor = vm.repo::setColor,
+                            onSetAnniversary = vm.repo::setAnniversary,
                             account = account.email ?: account.displayName,
                             onSignOut = onSignOut,
                             onUnpair = onUnpair,

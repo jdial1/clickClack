@@ -1,0 +1,55 @@
+{
+  "id": "christmas",
+  "title": "Christmas Day",
+  "blurb": "The big one.",
+  "theme": "EVERYDAY",
+  "questions": [
+    {
+      "id": "christmas-xm1",
+      "text": "Christmas should be:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Big and loud",
+        "Small and slow"
+      ]
+    },
+    {
+      "id": "christmas-xm2",
+      "text": "Order these by what actually makes the day.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "The food",
+        "The presents",
+        "The people",
+        "The quiet bit at the end"
+      ]
+    },
+    {
+      "id": "christmas-xm3",
+      "text": "What is the best present you have ever been given?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "christmas-xm4",
+      "text": "What did I want this year and not say?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "christmas-xm5",
+      "text": "When should presents happen?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "The night before",
+        "First thing",
+        "After breakfast",
+        "After lunch",
+        "Whenever"
+      ]
+    }
+  ]
+}

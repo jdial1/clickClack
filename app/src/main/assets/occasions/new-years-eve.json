@@ -1,0 +1,38 @@
+{
+  "id": "new-years-eve",
+  "title": "New Year's Eve",
+  "blurb": "The last night of it.",
+  "theme": "PLAYFUL",
+  "questions": [
+    {
+      "id": "new-years-eve-nye1",
+      "text": "Tonight should be:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Out with everyone",
+        "In, just us"
+      ]
+    },
+    {
+      "id": "new-years-eve-nye2",
+      "text": "What was the best day of this year?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "new-years-eve-nye3",
+      "text": "How was this year, out of ten?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Rough",
+      "highLabel": "One of the good ones"
+    },
+    {
+      "id": "new-years-eve-nye4",
+      "text": "What will I say was the highlight?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

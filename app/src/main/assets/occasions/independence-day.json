@@ -1,0 +1,46 @@
+{
+  "id": "independence-day",
+  "title": "Independence Day",
+  "blurb": "Hot, loud, and outdoors.",
+  "theme": "PLAYFUL",
+  "questions": [
+    {
+      "id": "independence-day-id1",
+      "text": "The right way to spend it:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Somewhere crowded",
+        "Somewhere quiet"
+      ]
+    },
+    {
+      "id": "independence-day-id2",
+      "text": "Pick everything that makes a good fourth.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Fireworks",
+        "Too much food",
+        "A lake",
+        "Other people's children",
+        "An early night"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "independence-day-id3",
+      "text": "Which do I secretly find a bit much?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "independence-day-id4",
+      "text": "How much do you enjoy a big group day?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "Endure it",
+      "highLabel": "Live for it"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "spring",
+  "title": "First day of spring",
+  "blurb": "Lighter evenings.",
+  "theme": "EVERYDAY",
+  "questions": [
+    {
+      "id": "spring-sp1",
+      "text": "Spring is for:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Starting something",
+        "Clearing something out"
+      ]
+    },
+    {
+      "id": "spring-sp2",
+      "text": "Pick what you want more of now the light is back.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Being outside",
+        "Seeing people",
+        "Growing something",
+        "Moving more",
+        "Nothing, I am fine"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "spring-sp3",
+      "text": "What do you want this spring to be about?",
+      "type": "REFLECT",
+      "depth": 2
+    }
+  ]
+}

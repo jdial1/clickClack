@@ -1,0 +1,38 @@
+{
+  "id": "summer",
+  "title": "Summer solstice",
+  "blurb": "The longest day.",
+  "theme": "TRAVEL",
+  "questions": [
+    {
+      "id": "summer-su1",
+      "text": "The best part of summer:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Long evenings",
+        "Nowhere to be"
+      ]
+    },
+    {
+      "id": "summer-su2",
+      "text": "How much do you like the heat?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "Hate it",
+      "highLabel": "Cannot get enough"
+    },
+    {
+      "id": "summer-su3",
+      "text": "What is the one thing we should do before it ends?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "summer-su4",
+      "text": "Which summer do I bring up most?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

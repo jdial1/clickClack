@@ -1,0 +1,36 @@
+{
+  "id": "presidents-day",
+  "title": "Presidents' Day",
+  "blurb": "A day off, mostly.",
+  "theme": "PLAYFUL",
+  "questions": [
+    {
+      "id": "presidents-day-pd1",
+      "text": "A free Monday is for:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Doing something",
+        "Doing nothing"
+      ]
+    },
+    {
+      "id": "presidents-day-pd2",
+      "text": "Who would run our household better?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "Me",
+        "You",
+        "Neither of us",
+        "Whoever is less tired"
+      ]
+    },
+    {
+      "id": "presidents-day-pd3",
+      "text": "If I ran the country for a day, what is the first thing I would change?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

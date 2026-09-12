@@ -97,6 +97,7 @@ class FirestoreCoupleRepository(
     private var todayAnswers: Map<String, Answer> = emptyMap()
     private var history: List<DayEntry> = emptyList()
     private var plates: List<BuildPlate> = emptyList()
+    private var anniversary: LocalDate? = null
 
     private val couple get() = db.collection(COUPLES).document(coupleId)
     private val dayRef get() = couple.collection(DAYS).document(today.toString())
@@ -106,6 +107,12 @@ class FirestoreCoupleRepository(
             .addSnapshotListener { d, _ -> me = d; recompose() }
         regs += db.collection(USERS).document(partnerUid)
             .addSnapshotListener { d, _ -> them = d; recompose() }
+
+        regs += couple.addSnapshotListener { d, _ ->
+            anniversary = d?.getString("anniversary")
+                ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            recompose()
+        }
 
         regs += dayRef.addSnapshotListener { d, _ -> todayDoc = d; recompose() }
 
@@ -179,7 +186,8 @@ class FirestoreCoupleRepository(
         val you = me.toMember(myUid, current.you)
         val partner = them.toMember(partnerUid, current.them)
 
-        val question = pool.question(todayDoc?.getString("questionId")) ?: pool.daily(today)
+        val question = pool.question(todayDoc?.getString("questionId"))
+            ?: pool.daily(today, anniversary)
 
         val todayEntry = DayEntry(
             date = today,
@@ -206,6 +214,7 @@ class FirestoreCoupleRepository(
             plate = live,
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
             quizRuns = runs.values.flatten(),
+            anniversary = anniversary,
             streak = streakOf(history, todayEntry),
         )
     }
@@ -321,14 +330,19 @@ class FirestoreCoupleRepository(
         )
     }
 
-    override fun setColor(uid: String, colorArgb: Long) {
-        // Only your own. A colour is part of a profile, and the rules would
-        // refuse a write to the partner's document anyway.
-        if (uid != myUid) return
+    override fun setColor(colorArgb: Long) {
         db.collection(USERS).document(myUid).set(
             mapOf("colorArgb" to colorArgb),
             SetOptions.merge(),
         )
+    }
+
+    /**
+     * On the couple document, not yours: it is a fact about the pair, and both
+     * of you have to see the same one.
+     */
+    override fun setAnniversary(date: LocalDate) {
+        couple.set(mapOf("anniversary" to date.toString()), SetOptions.merge())
     }
 
     override fun placeBlock(blockId: String, x: Int, y: Int) {

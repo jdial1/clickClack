@@ -1,0 +1,40 @@
+{
+  "id": "mlk-day",
+  "title": "Martin Luther King Jr. Day",
+  "blurb": "A day about other people.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "mlk-day-mlk1",
+      "text": "What is something you have changed your mind about?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "mlk-day-mlk2",
+      "text": "Which matters more in a disagreement?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "Being understood",
+        "Understanding them",
+        "Getting it settled",
+        "Keeping the peace"
+      ]
+    },
+    {
+      "id": "mlk-day-mlk3",
+      "text": "How good are we at admitting we were wrong?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Terrible",
+      "highLabel": "Very good"
+    },
+    {
+      "id": "mlk-day-mlk4",
+      "text": "Who taught you the most about being fair?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

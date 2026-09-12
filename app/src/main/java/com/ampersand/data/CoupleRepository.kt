@@ -40,7 +40,15 @@ interface CoupleRepository {
     /** Submit your own answer for today. Irreversible, by design. */
     fun submitToday(values: List<String>, guess: List<String>?)
 
-    fun setColor(uid: String, colorArgb: Long)
+    /**
+     * Only your own. A colour is part of a profile, and the rules refuse a
+     * write to your partner's document anyway -- so the UI offering to change
+     * it was offering something that could not happen.
+     */
+    fun setColor(colorArgb: Long)
+
+    /** The day the two of you started. Either of you may set it. */
+    fun setAnniversary(date: LocalDate)
 
     /** Put an earned brick on the shared plate. Ignored if the spot is illegal. */
     fun placeBlock(blockId: String, x: Int, y: Int)
@@ -270,13 +278,11 @@ class FakeCoupleRepository(
         )
     }
 
-    override fun setColor(uid: String, colorArgb: Long) = mutate { current ->
-        when (uid) {
-            current.you.uid -> current.copy(you = current.you.copy(colorArgb = colorArgb))
-            current.them.uid -> current.copy(them = current.them.copy(colorArgb = colorArgb))
-            else -> current
-        }
+    override fun setColor(colorArgb: Long) = mutate { current ->
+        current.copy(you = current.you.copy(colorArgb = colorArgb))
     }
+
+    override fun setAnniversary(date: LocalDate) = mutate { it.copy(anniversary = date) }
 
     private inline fun mutate(block: (CoupleState) -> CoupleState) {
         _state.value = block(_state.value)

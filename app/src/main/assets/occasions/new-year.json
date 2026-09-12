@@ -1,0 +1,50 @@
+{
+  "id": "new-year",
+  "title": "New Year's Day",
+  "blurb": "The year is new and nobody has ruined it yet.",
+  "theme": "FUTURE",
+  "questions": [
+    {
+      "id": "new-year-ny1",
+      "text": "Order these by what you actually want out of this year.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "More money",
+        "More time",
+        "Better health",
+        "More of each other"
+      ]
+    },
+    {
+      "id": "new-year-ny2",
+      "text": "Resolutions are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Worth making",
+        "A waste of time"
+      ]
+    },
+    {
+      "id": "new-year-ny3",
+      "text": "What is the one thing you want us to do differently this year?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "new-year-ny4",
+      "text": "How hopeful are you feeling about this one?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Cautious",
+      "highLabel": "Very"
+    },
+    {
+      "id": "new-year-ny5",
+      "text": "What will I say I am giving up, and quietly not give up?",
+      "type": "GUESS_ME",
+      "depth": 1
+    }
+  ]
+}

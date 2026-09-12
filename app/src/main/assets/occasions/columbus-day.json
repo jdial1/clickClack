@@ -1,0 +1,36 @@
+{
+  "id": "columbus-day",
+  "title": "Columbus Day",
+  "blurb": "Somebody went somewhere.",
+  "theme": "TRAVEL",
+  "questions": [
+    {
+      "id": "columbus-day-cd1",
+      "text": "Which counts as an adventure?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "A new country",
+        "A new road home",
+        "A new restaurant",
+        "Saying yes to something"
+      ]
+    },
+    {
+      "id": "columbus-day-cd2",
+      "text": "Where should we go that neither of us has been?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "columbus-day-cd3",
+      "text": "Getting lost is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Half the fun",
+        "To be avoided"
+      ]
+    }
+  ]
+}

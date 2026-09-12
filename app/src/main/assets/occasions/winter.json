@@ -1,0 +1,38 @@
+{
+  "id": "winter",
+  "title": "Winter solstice",
+  "blurb": "The longest night, and it gets better from here.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "winter-wi1",
+      "text": "The dark months are:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "Hard",
+        "Cosy"
+      ]
+    },
+    {
+      "id": "winter-wi2",
+      "text": "How are you doing, really, at this point in the year?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Worn out",
+      "highLabel": "Good"
+    },
+    {
+      "id": "winter-wi3",
+      "text": "What gets you through the dark bit?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "winter-wi4",
+      "text": "What would I say I need most right now?",
+      "type": "GUESS_ME",
+      "depth": 3
+    }
+  ]
+}

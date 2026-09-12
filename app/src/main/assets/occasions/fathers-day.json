@@ -1,0 +1,38 @@
+{
+  "id": "fathers-day",
+  "title": "Father's Day",
+  "blurb": "For the fathers, and about them.",
+  "theme": "DEEP",
+  "questions": [
+    {
+      "id": "fathers-day-fd1",
+      "text": "What did your father teach you without ever saying it?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "fathers-day-fd2",
+      "text": "How much am I like my father?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "fathers-day-fd3",
+      "text": "Which would I say was the better piece of advice I got from him?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "fathers-day-fd4",
+      "text": "Fathers should be:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "Softer than they were",
+        "Exactly as they were"
+      ]
+    }
+  ]
+}

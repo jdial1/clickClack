@@ -1,0 +1,49 @@
+{
+  "id": "halloween",
+  "title": "Halloween",
+  "blurb": "Dark evenings and too many sweets.",
+  "theme": "PLAYFUL",
+  "questions": [
+    {
+      "id": "halloween-hw1",
+      "text": "Halloween is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Great",
+        "Other people's business"
+      ]
+    },
+    {
+      "id": "halloween-hw2",
+      "text": "What would I dress as if I had to?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "halloween-hw3",
+      "text": "Order these from most to least frightening.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Ghosts",
+        "Heights",
+        "Public speaking",
+        "Our joint account"
+      ]
+    },
+    {
+      "id": "halloween-hw4",
+      "text": "Which sweet do I raid first?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "Chocolate",
+        "Anything sour",
+        "Toffee",
+        "The unloved fruit ones",
+        "All of it"
+      ]
+    }
+  ]
+}

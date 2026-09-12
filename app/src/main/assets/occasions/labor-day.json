@@ -1,0 +1,44 @@
+{
+  "id": "labor-day",
+  "title": "Labor Day",
+  "blurb": "The last long weekend of the summer.",
+  "theme": "EVERYDAY",
+  "questions": [
+    {
+      "id": "labor-day-lb1",
+      "text": "Work, honestly:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "Mostly fine",
+        "Taking too much"
+      ]
+    },
+    {
+      "id": "labor-day-lb2",
+      "text": "Order these by what you would give up first.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "The money",
+        "The status",
+        "The people",
+        "The routine"
+      ]
+    },
+    {
+      "id": "labor-day-lb3",
+      "text": "What would you do instead, if it paid the same?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "labor-day-lb4",
+      "text": "How much does my job take out of me, in your view?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not much",
+      "highLabel": "Too much"
+    }
+  ]
+}

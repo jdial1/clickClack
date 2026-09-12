@@ -1,0 +1,36 @@
+{
+  "id": "autumn",
+  "title": "First day of autumn",
+  "blurb": "Darker, and not unwelcome.",
+  "theme": "EVERYDAY",
+  "questions": [
+    {
+      "id": "autumn-au1",
+      "text": "Autumn is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "The best one",
+        "The sad one"
+      ]
+    },
+    {
+      "id": "autumn-au2",
+      "text": "Order these by how much you look forward to them.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Dark evenings",
+        "Proper food",
+        "Jumpers",
+        "Being indoors together"
+      ]
+    },
+    {
+      "id": "autumn-au3",
+      "text": "What do you want to slow down about?",
+      "type": "REFLECT",
+      "depth": 2
+    }
+  ]
+}

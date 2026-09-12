@@ -182,6 +182,8 @@ data class CoupleState(
     val history: List<DayEntry> = emptyList(),
     /** Both people's runs through any deck either of them has started. */
     val quizRuns: List<QuizRun> = emptyList(),
+    /** The day the two of you started, once someone has told the app. */
+    val anniversary: LocalDate? = null,
     val streak: Int = 0,
     val freezesLeft: Int = 1,
 ) {

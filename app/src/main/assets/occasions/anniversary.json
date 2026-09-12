@@ -1,0 +1,60 @@
+{
+  "id": "anniversary",
+  "title": "Your anniversary",
+  "blurb": "The day the two of you started.",
+  "theme": "KNOW_ME",
+  "questions": [
+    {
+      "id": "anniversary-an1",
+      "text": "What do you remember most clearly about the day we started?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "anniversary-an2",
+      "text": "Order these by how much they have changed us.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "Living together",
+        "The hard year",
+        "The trips",
+        "Just the time"
+      ]
+    },
+    {
+      "id": "anniversary-an3",
+      "text": "What is the thing you would not have guessed about me back then?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "anniversary-an4",
+      "text": "How different am I from the person you met?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Exactly the same",
+      "highLabel": "Completely different"
+    },
+    {
+      "id": "anniversary-an5",
+      "text": "What will I say was the best year of us so far?",
+      "type": "GUESS_ME",
+      "depth": 3
+    },
+    {
+      "id": "anniversary-an6",
+      "text": "Pick everything you would happily do all over again.",
+      "type": "MULTI_SELECT",
+      "depth": 3,
+      "options": [
+        "The beginning",
+        "The moving",
+        "The arguing",
+        "The quiet years",
+        "All of it"
+      ],
+      "maxChoices": 3
+    }
+  ]
+}
