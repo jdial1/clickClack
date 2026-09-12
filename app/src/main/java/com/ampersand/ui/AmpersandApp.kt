@@ -544,6 +544,10 @@ private fun SignedInApp(
                                 vm.repo.submitInstrument(kit.id, responses)
                                 sitting = null
                             },
+                            resume = state.instrumentRuns
+                                .lastOrNull { it.instrumentId == kit.id }
+                                ?.draft.orEmpty(),
+                            onSaveDraft = { vm.repo.saveInstrumentDraft(kit.id, it) },
                         )
 
                         deck != null -> DeckScreen(

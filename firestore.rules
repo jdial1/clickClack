@@ -186,6 +186,20 @@ service cloud.firestore {
           // No edits. A retake is a new sitting, not a correction to an old one.
           allow update, delete: if false;
         }
+
+        // A half-finished sitting, kept so that leaving does not throw it
+        // away. Yours alone in both directions, and never readable by your
+        // partner at any point -- a draft is unsealed answers, which is
+        // precisely what the seal exists to hide, and unlike a run it has no
+        // later moment at which it is safe to open. What crosses between the
+        // two of you is the count on the parent document, which says how far
+        // somebody has got and nothing about what they said.
+        //
+        // Writable rather than create-only, because rewriting it is what
+        // resuming *is*. Deletable because sealing consumes it.
+        match /drafts/{uid} {
+          allow read, write: if isLive(cid) && uid == me();
+        }
       }
 
       // Questions the two of you wrote. Not sealed: a question is not a

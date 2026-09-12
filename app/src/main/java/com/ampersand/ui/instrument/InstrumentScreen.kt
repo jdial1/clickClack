@@ -87,6 +87,10 @@ fun InstrumentScreen(
     onBack: () -> Unit,
     onSeal: (responses: List<Int>) -> Unit,
     modifier: Modifier = Modifier,
+    /** What you had answered when you last left, if you did. */
+    resume: List<Int> = emptyList(),
+    /** Called as each page is turned, and on the way out. */
+    onSaveDraft: (responses: List<Int>) -> Unit = {},
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
@@ -95,10 +99,19 @@ fun InstrumentScreen(
     // outside the 1..5 the instrument accepts, so it can never be mistaken for
     // a real answer the way a defaulted 3 could.
     val responses = remember(instrument.id) {
-        mutableStateListOf<Int>().apply { repeat(instrument.length) { add(0) } }
+        mutableStateListOf<Int>().apply {
+            repeat(instrument.length) { i -> add(resume.getOrElse(i) { 0 }) }
+        }
     }
     val pages = remember(instrument.id) { instrument.pages() }
-    var page by rememberSaveable(instrument.id) { mutableStateOf(0) }
+    // Open on the first page with something still to answer, so resuming lands
+    // where you stopped rather than making you page past work you have done.
+    var page by rememberSaveable(instrument.id) {
+        mutableStateOf(
+            pages.indexOfFirst { p -> p.slots.any { responses[it] == 0 } }
+                .coerceAtLeast(0),
+        )
+    }
     val here = pages[page.coerceIn(pages.indices)]
 
     val pageDone = here.slots.count { responses[it] > 0 }
@@ -130,6 +143,9 @@ fun InstrumentScreen(
                 // Back means the previous page while there is one. Leaving from
                 // page three and losing twenty answers is not what anybody
                 // reaching for that word intends.
+                // Saved on the way out too, not only on a page turn. Backing
+                // out of page one after answering six is still six answers.
+                onSaveDraft(responses.toList())
                 if (here.index > 0) page-- else onBack()
             },
         )
@@ -188,7 +204,12 @@ fun InstrumentScreen(
                 sfx = if (last) Sfx.SEAL else Sfx.PRESS,
                 feelOnClick = if (last) Feel.SEAL else Feel.PRESS,
             ) {
-                if (last) onSeal(responses.toList()) else page++
+                if (last) {
+                    onSeal(responses.toList())
+                } else {
+                    onSaveDraft(responses.toList())
+                    page++
+                }
             }
 
             Spacer(Modifier.height(12.dp))

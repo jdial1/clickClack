@@ -170,7 +170,6 @@ private fun WallGroup(
                         // Status earns the slot over "what is this": once a
                         // test is done, how long it took stops being useful.
                         group.isEarned -> if (explaining) "Done" else "Done · What is this?"
-                        group.waitingOnThem -> "Waiting on them"
                         else -> "${group.minutes} min · What is this?"
                     },
                     style = MaterialTheme.typography.labelSmall,
@@ -230,7 +229,7 @@ private fun TakeIt(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     val interaction = remember { MutableInteractionSource() }
-    val yourTurn = !group.waitingOnThem
+    val yourTurn = group.yourTurn
 
     val tap = if (yourTurn) {
         Modifier.clickable(interactionSource = interaction, indication = null) {
@@ -254,8 +253,13 @@ private fun TakeIt(
                 Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Where the two of you have got to, which is the only place
+                // either of you can see the other mid-sitting. Falls back to
+                // the length when nobody has started, because "5 min, each"
+                // is the useful thing to know before you begin and useless
+                // once somebody has.
                 Text(
-                    text = if (yourTurn) "${group.minutes} min, each" else "You are done",
+                    text = group.standing.ifBlank { "${group.minutes} min, each" },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(
                         alpha = if (yourTurn) 0.72f else 0.5f,
@@ -263,7 +267,7 @@ private fun TakeIt(
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    text = if (yourTurn) "Take it" else "Waiting on ${group.partnerName}",
+                    text = group.action,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(
                         alpha = if (yourTurn) 1f else 0.55f,

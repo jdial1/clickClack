@@ -9,6 +9,7 @@ import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Member
 import com.ampersand.model.Owner
 import com.ampersand.model.Reading
+import com.ampersand.model.Standing
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -28,48 +29,109 @@ import kotlin.math.roundToInt
  */
 object BadgeWall {
 
-    fun groups(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeGroup> {
-        val jungian = runs.of(Instruments.JUNGIAN)
-        val language = runs.of(Instruments.LOVE_LANGUAGES)
-        val style = runs.of(Instruments.LOVE_ATTITUDES)
-        return listOf(
-            BadgeGroup(
-                instrumentId = Instruments.JUNGIAN.id,
-                title = Instruments.JUNGIAN.title,
-                about = Instruments.JUNGIAN.blurb,
-                minutes = Instruments.JUNGIAN.minutes,
-                partnerName = them.name,
-                // One course, so no sub-label: a heading above a single row
-                // that repeats the group's own name is noise.
-                rows = listOf(typeRow(jungian, you, them)),
-            ),
-            BadgeGroup(
-                instrumentId = Instruments.LOVE_ATTITUDES.id,
-                title = Instruments.LOVE_ATTITUDES.title,
-                about = Instruments.LOVE_ATTITUDES.blurb,
-                minutes = Instruments.LOVE_ATTITUDES.minutes,
-                partnerName = them.name,
-                rows = listOf(styleRow(style, you, them)),
-            ),
-            BadgeGroup(
-                instrumentId = Instruments.LOVE_LANGUAGES.id,
-                title = Instruments.LOVE_LANGUAGES.title,
-                about = Instruments.LOVE_LANGUAGES.blurb,
-                minutes = Instruments.LOVE_LANGUAGES.minutes,
-                partnerName = them.name,
-                rows = listOf(
-                    languageRow(language, you, them, Instruments.FELT,
-                        "What makes you feel loved", "wanted"),
-                    languageRow(language, you, them, Instruments.GIVEN,
-                        "What you each tend to do", "given"),
-                    fitRow(language, you, them),
-                ),
-            ),
+    fun groups(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeGroup> = listOf(
+        group(runs, Instruments.JUNGIAN, you, them) {
+            // One course, so no sub-label: a heading above a single row that
+            // repeats the group's own name is noise.
+            listOf(typeRow(it, you, them))
+        },
+        group(runs, Instruments.LOVE_ATTITUDES, you, them) {
+            listOf(styleRow(it, you, them))
+        },
+        group(runs, Instruments.LOVE_LANGUAGES, you, them) {
+            listOf(
+                languageRow(it, you, them, Instruments.FELT,
+                    "What makes you feel loved", "wanted"),
+                languageRow(it, you, them, Instruments.GIVEN,
+                    "What you each tend to do", "given"),
+                fitRow(it, you, them),
+            )
+        },
+    )
+
+    private fun group(
+        runs: List<InstrumentRun>,
+        instrument: Instrument,
+        you: Member,
+        them: Member,
+        rows: (InstrumentRun?) -> List<BadgeRow>,
+    ): BadgeGroup {
+        val yours = standing(runs, instrument, you.uid)
+        val theirs = standing(runs, instrument, them.uid)
+        val (note, action) = caption(yours, theirs, them.name)
+        return BadgeGroup(
+            instrumentId = instrument.id,
+            title = instrument.title,
+            about = instrument.blurb,
+            minutes = instrument.minutes,
+            partnerName = them.name,
+            standing = note,
+            action = action,
+            yourTurn = !yours.finished,
+            rows = rows(runs.of(instrument)),
         )
     }
 
     private fun List<InstrumentRun>.of(instrument: Instrument): InstrumentRun? =
         lastOrNull { it.instrumentId == instrument.id }
+
+    /**
+     * Where each of you has got to with one test.
+     *
+     * Returned even when nobody has started, so the caller never has to reason
+     * about nulls to decide what a brick says.
+     */
+    fun standing(
+        runs: List<InstrumentRun>,
+        instrument: Instrument,
+        uid: String,
+    ): Standing {
+        val run = runs.of(instrument) ?: return Standing.none(instrument.length, instrument.passCount)
+        return instrument.standingOf(run.answeredBy(uid, instrument.length))
+    }
+
+    /**
+     * The line on an unclaimed brick, which is the only place the two of you
+     * can see each other mid-sitting.
+     *
+     * Six states, and the one worth the trouble is the last: both of you have
+     * finished round one of love languages and neither has started round two.
+     * Before this, that looked identical to neither of you having opened it --
+     * two people each waiting for the other to go first on something they had
+     * both already half done.
+     */
+    fun caption(yours: Standing, theirs: Standing, them: String): Pair<String, String> = when {
+        yours.finished && theirs.inProgress ->
+            (them + " is " + at(theirs)) to ("Waiting on " + them)
+
+        yours.finished ->
+            "You are done" to ("Waiting on " + them)
+
+        // Said once when you are in the same place. Spelling out both sides
+        // produced "Both of you are on round 2 of 2, on round 2 of 2", which is
+        // the sentence a template writes and nobody reads back.
+        yours.inProgress && theirs.inProgress && at(yours) == at(theirs) ->
+            ("Both of you are " + at(yours)) to "Carry on"
+
+        yours.inProgress && theirs.inProgress ->
+            ("You are " + at(yours) + ", " + them + " is " + at(theirs)) to "Carry on"
+
+        yours.inProgress ->
+            ("You are " + at(yours)) to "Carry on"
+
+        theirs.finished ->
+            (them + " has finished") to "Take it"
+
+        theirs.inProgress ->
+            (them + " is " + at(theirs)) to "Take it"
+
+        else -> "" to "Take it"
+    }
+
+    /** "on round 2" where there are rounds, "12 of 32" where there are not. */
+    private fun at(standing: Standing): String =
+        if (standing.hasRounds) "on round " + (standing.pass + 1) + " of " + standing.passes
+        else standing.answered.toString() + " of " + standing.total
 
     // ---- type ------------------------------------------------------------
 

@@ -103,6 +103,21 @@ interface CoupleRepository {
      * wrong and the citation on it false.
      */
     fun submitInstrument(instrumentId: String, responses: List<Int>)
+
+    /**
+     * Keep a half-finished sitting, so leaving does not throw it away.
+     *
+     * Written as each page is turned rather than on every tap: a page is the
+     * unit somebody actually commits to, and forty writes for forty ratings is
+     * a lot of network for a form nobody is racing.
+     *
+     * [responses] is the whole list with zeros where nothing has been answered
+     * yet. The draft is yours alone -- the rules make it unreadable to your
+     * partner, because unsealed answers are exactly what the seal is for. What
+     * they *can* see is the count, which is written alongside it and gives away
+     * nothing about the answers.
+     */
+    fun saveInstrumentDraft(instrumentId: String, responses: List<Int>)
 }
 
 /**
@@ -329,11 +344,30 @@ class FakeCoupleRepository(
             )
         }
 
+    override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) =
+        mutate { current ->
+            val existing = current.instrumentRuns.lastOrNull { it.instrumentId == instrumentId }
+            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now())).let {
+                it.copy(
+                    draft = responses,
+                    progress = it.progress + (current.you.uid to responses.count { v -> v > 0 }),
+                )
+            }
+            current.copy(
+                instrumentRuns = current.instrumentRuns.filterNot { it === existing } + updated,
+            )
+        }
+
     override fun submitInstrument(instrumentId: String, responses: List<Int>) =
         mutate { current ->
             val existing = current.instrumentRuns.lastOrNull { it.instrumentId == instrumentId }
-            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now()))
-                .let { it.copy(answers = it.answers + (current.you.uid to responses)) }
+            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now())).let {
+                it.copy(
+                    answers = it.answers + (current.you.uid to responses),
+                    progress = it.progress + (current.you.uid to responses.size),
+                    draft = emptyList(),
+                )
+            }
             current.copy(
                 instrumentRuns = current.instrumentRuns.filterNot { it === existing } + updated,
             )

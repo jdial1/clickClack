@@ -11,7 +11,7 @@
 //     "node rules-test/instrument.test.mjs"
 import { readFileSync } from 'node:fs'
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing'
-import { doc, getDoc, setDoc, getDocs, collection, serverTimestamp, arrayUnion } from 'firebase/firestore'
+import { doc, getDoc, setDoc, deleteDoc, getDocs, collection, serverTimestamp, arrayUnion } from 'firebase/firestore'
 
 const RULES = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8')
 const env = await initializeTestEnvironment({
@@ -120,6 +120,102 @@ await check('a submitted run cannot be edited', async () => {
 await check('an ended couple cannot start a new sitting', async () => {
   await seed({ ended: new Date() })
   await assertFails(submit(as('alice'), 'alice'))
+})
+
+// ---- drafts: a half-finished sitting -------------------------------------
+//
+// The one thing that must never leak. A sealed run at least has a moment when
+// it is meant to open; a draft is answers somebody is still giving, and there
+// is no point at which the other half of the couple is entitled to them.
+const draftRef = (db, uid) => doc(db, 'couples', CID, 'instruments', KIT, 'drafts', uid)
+const drafts = (db) => collection(db, 'couples', CID, 'instruments', KIT, 'drafts')
+
+async function seedDraft(uid, responses) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(draftRef(ctx.firestore(), uid), { responses })
+  })
+}
+
+await check('you may save your own draft', async () => {
+  await seed()
+  await assertSucceeds(setDoc(draftRef(as('alice'), 'alice'), { responses: [1, 2, 3] }))
+})
+
+await check('you may rewrite your own draft, because that is what resuming is', async () => {
+  await seed()
+  await seedDraft('alice', [1, 2, 3])
+  await assertSucceeds(setDoc(draftRef(as('alice'), 'alice'), { responses: [1, 2, 3, 4] }))
+})
+
+await check('you may delete your own draft, because sealing consumes it', async () => {
+  await seed()
+  await seedDraft('alice', [1, 2, 3])
+  await assertSucceeds(deleteDoc(draftRef(as('alice'), 'alice')))
+})
+
+await check('their draft is unreadable, sealed or not', async () => {
+  await seed()
+  await seedDraft('bob', [5, 5, 5])
+  await assertFails(getDoc(draftRef(as('alice'), 'bob')))
+})
+
+// Even once the instrument has opened. A draft has no later moment at which it
+// becomes fair game -- if it still exists after a reveal it is a leftover, and
+// a leftover is not an invitation.
+await check('their draft stays unreadable even after the seal lifts', async () => {
+  await seed({
+    kitDoc: { revealed: true },
+    given: { alice: { responses: THIRTY_TWO }, bob: { responses: THIRTY_TWO } },
+  })
+  await seedDraft('bob', [5, 5, 5])
+  await assertFails(getDoc(draftRef(as('alice'), 'bob')))
+})
+
+await check('nobody may write a draft under another uid', async () => {
+  await seed()
+  await assertFails(setDoc(draftRef(as('alice'), 'bob'), { responses: [5, 5, 5] }))
+})
+
+await check('listing the drafts is refused', async () => {
+  await seed()
+  await seedDraft('alice', [1])
+  await assertFails(getDocs(drafts(as('alice'))))
+})
+
+await check('an outsider may not touch drafts at all', async () => {
+  await seed()
+  await seedDraft('alice', [1])
+  await assertFails(getDoc(draftRef(as('mallory'), 'alice')))
+  await assertFails(setDoc(draftRef(as('mallory'), 'mallory'), { responses: [1] }))
+})
+
+await check('an ended couple cannot save a draft', async () => {
+  await seed({ ended: new Date() })
+  await assertFails(setDoc(draftRef(as('alice'), 'alice'), { responses: [1] }))
+})
+
+// ---- progress: the half that is meant to be shared ------------------------
+//
+// A count, not the answers. Both of you need it -- it is what turns "neither of
+// us has started" into "we have both finished round one" -- and it gives away
+// nothing about what anybody said.
+await check('a progress count is readable by both', async () => {
+  await seed({ kitDoc: { revealed: false, progress: { alice: 20 } } })
+  await assertSucceeds(getDoc(kitRef(as('bob'))))
+})
+
+await check('a member may write their own progress without opening the seal', async () => {
+  await seed({ kitDoc: { revealed: false } })
+  await assertSucceeds(
+    setDoc(kitRef(as('alice')), { revealed: false, progress: { alice: 12 } }, { merge: true }),
+  )
+})
+
+await check('writing progress cannot smuggle the seal open', async () => {
+  await seed({ kitDoc: { revealed: false } })
+  await assertFails(
+    setDoc(kitRef(as('alice')), { revealed: true, progress: { alice: 40 } }, { merge: true }),
+  )
 })
 
 await env.cleanup()

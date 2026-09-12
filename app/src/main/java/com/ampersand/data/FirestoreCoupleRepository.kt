@@ -45,6 +45,7 @@ private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
 private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
+private const val DRAFTS = "drafts"
 
 /** Ten weeks, which is what the Shelf draws. */
 private const val HistoryDays = 70L
@@ -206,7 +207,14 @@ class FirestoreCoupleRepository(
                     doc.getString("takenOn")?.let { d ->
                         instrumentDates = instrumentDates + (doc.id to LocalDate.parse(d))
                     }
+                    @Suppress("UNCHECKED_CAST")
+                    val counts = doc.get("progress") as? Map<String, Long>
+                    if (counts != null) {
+                        instrumentProgress = instrumentProgress +
+                            (doc.id to counts.mapValues { it.value.toInt() })
+                    }
                     watchInstrumentRun(doc.id, myUid)
+                    watchInstrumentDraft(doc.id)
                     if (doc.getBoolean("revealed") == true) watchInstrumentRun(doc.id, partnerUid)
                     liftInstrumentSealIfBothIn(doc.id)
                 }
@@ -307,11 +315,16 @@ class FirestoreCoupleRepository(
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
             knowing = knowing,
-            instrumentRuns = instrumentResponses.map { (id, byUid) ->
+            // Every instrument anybody has touched, whether that was sealing
+            // it or answering four questions and putting the phone down.
+            instrumentRuns = (instrumentResponses.keys + instrumentProgress.keys +
+                instrumentDrafts.keys).map { id ->
                 InstrumentRun(
                     instrumentId = id,
                     takenOn = instrumentDates[id] ?: today,
-                    answers = byUid,
+                    answers = instrumentResponses[id].orEmpty(),
+                    progress = instrumentProgress[id].orEmpty(),
+                    draft = instrumentDrafts[id].orEmpty(),
                 )
             },
         )
@@ -347,6 +360,37 @@ class FirestoreCoupleRepository(
     private var instrumentResponses: Map<String, Map<String, List<Int>>> = emptyMap()
     private var instrumentDocs: Map<String, DocumentSnapshot> = emptyMap()
     private var instrumentDates: Map<String, LocalDate> = emptyMap()
+
+    /** instrument id -> uid -> how many answered, sealed or not. */
+    private var instrumentProgress: Map<String, Map<String, Int>> = emptyMap()
+
+    /** Your own half-finished answers. There is nowhere for theirs to come from. */
+    private var instrumentDrafts: Map<String, List<Int>> = emptyMap()
+
+    /**
+     * Your draft, and only ever yours.
+     *
+     * The rules refuse a read of anybody else's, which is the same protection
+     * the sealed run has -- a draft is unsealed answers and is the one thing
+     * that must not leak early. What crosses between the two of you is the
+     * count on the parent document.
+     */
+    private fun watchInstrumentDraft(id: String) {
+        val key = "draft/" + id
+        if (key in instrumentRegs) return
+        instrumentRegs[key] = couple.collection(INSTRUMENTS).document(id)
+            .collection(DRAFTS).document(myUid)
+            .addSnapshotListener { d, _ ->
+                @Suppress("UNCHECKED_CAST")
+                val raw = d?.get("responses") as? List<Long>
+                instrumentDrafts = if (raw == null) {
+                    instrumentDrafts - id
+                } else {
+                    instrumentDrafts + (id to raw.map { it.toInt() })
+                }
+                recompose()
+            }
+    }
 
     /**
      * One listener per person per instrument.
@@ -760,6 +804,7 @@ class FirestoreCoupleRepository(
                 "revealed" to false,
                 "takenOn" to today.toString(),
                 "submitted" to FieldValue.arrayUnion(myUid),
+                "progress" to mapOf(myUid to responses.size),
             ),
             SetOptions.merge(),
         )
@@ -767,6 +812,31 @@ class FirestoreCoupleRepository(
             mapOf(
                 "responses" to responses,
                 "completedAt" to FieldValue.serverTimestamp(),
+            ),
+        )
+        // The draft has done its job. Leaving it would keep a second, editable
+        // copy of answers that are now supposed to be immutable.
+        doc.collection(DRAFTS).document(myUid).delete()
+    }
+
+    override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) {
+        if (instrumentResponses[instrumentId]?.get(myUid) != null) return
+        val doc = couple.collection(INSTRUMENTS).document(instrumentId)
+
+        doc.set(
+            mapOf(
+                "revealed" to false,
+                "takenOn" to today.toString(),
+                // A count, not the answers. This is the half that is meant to
+                // be visible to the other person.
+                "progress" to mapOf(myUid to responses.count { it > 0 }),
+            ),
+            SetOptions.merge(),
+        )
+        doc.collection(DRAFTS).document(myUid).set(
+            mapOf(
+                "responses" to responses,
+                "updatedAt" to FieldValue.serverTimestamp(),
             ),
         )
     }

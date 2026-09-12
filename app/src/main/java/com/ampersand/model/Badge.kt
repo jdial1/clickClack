@@ -82,11 +82,13 @@ data class BadgeGroup(
     val minutes: Int,
     /** For the one line that has to name them: "Waiting on Maya". */
     val partnerName: String,
+    /** The line above the action, saying where the two of you have got to. */
+    val standing: String,
+    /** What the action brick says: "Take it", "Carry on", "Waiting on Maya". */
+    val action: String,
+    /** False once you have sealed your half; there is nothing left to tap. */
+    val yourTurn: Boolean,
     val rows: List<BadgeRow>,
 ) {
     val isEarned: Boolean get() = rows.all { it.isEarned }
-
-    /** You are done and they are not, anywhere in the group. */
-    val waitingOnThem: Boolean
-        get() = rows.any { row -> row.badges.any { it.waitingOnThem } }
 }

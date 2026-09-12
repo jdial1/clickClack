@@ -152,6 +152,27 @@ data class Instrument(
     val shown: List<Subscale> get() = subscales.filterNot { it.id in hidden }
 
     /**
+     * How far [answered] responses gets someone through this instrument.
+     *
+     * Only love languages has rounds, so for everything else this collapses to
+     * a count and the UI never says the word. That asymmetry is the reason it
+     * is computed here rather than in the wall: two of the three tests have no
+     * part one, and a screen that reasons about rounds would have to keep
+     * remembering which.
+     */
+    fun standingOf(answered: Int): Standing {
+        val safe = answered.coerceIn(0, length)
+        return Standing(
+            answered = safe,
+            total = length,
+            // The round you are *in*, so a finished round one reads as round
+            // two rather than as round one over and over until you start it.
+            pass = if (items.isEmpty()) 0 else (safe / items.size).coerceAtMost(passCount - 1),
+            passes = passCount,
+        )
+    }
+
+    /**
      * Whether this is long enough to be worth showing progress against.
      *
      * A form you can see all of at once does not need a header telling you how
@@ -196,6 +217,37 @@ data class Instrument(
         val from = pass * items.size
         val slice = responses.drop(from).take(items.size)
         return subscales.map { Reading(it, it.scoreOf(slice), pass) }
+    }
+}
+
+/**
+ * How far one person has got with one instrument.
+ *
+ * Deliberately a count and a round rather than a percentage. "Round 1 of 2" is
+ * a thing the other person can act on -- it tells them what you are in the
+ * middle of -- and 47% is not.
+ *
+ * This is the only thing about an unfinished sitting that crosses between the
+ * two of you. The answers themselves stay private until both are sealed, which
+ * is the whole mechanic; a count of how many you have given away nothing about
+ * what they were.
+ */
+data class Standing(
+    val answered: Int,
+    val total: Int,
+    /** 0-based round they are currently in. */
+    val pass: Int,
+    val passes: Int,
+) {
+    val started: Boolean get() = answered > 0
+    val finished: Boolean get() = answered >= total
+    val inProgress: Boolean get() = started && !finished
+
+    /** True where the instrument has rounds at all, so wording can say so. */
+    val hasRounds: Boolean get() = passes > 1
+
+    companion object {
+        fun none(total: Int, passes: Int) = Standing(0, total, 0, passes)
     }
 }
 
@@ -272,10 +324,37 @@ data class InstrumentRun(
     val takenOn: LocalDate,
     /** uid to responses, in item order, every pass concatenated. */
     val answers: Map<String, List<Int>> = emptyMap(),
+    /**
+     * uid to how many responses they have given so far, sealed or not.
+     *
+     * The only thing about a half-finished sitting that both of you can see.
+     * A count is safe to share where the answers are not: knowing Maya is
+     * twenty questions in tells you she is on round two, and nothing about
+     * what she said.
+     */
+    val progress: Map<String, Int> = emptyMap(),
+    /**
+     * Your own saved-but-unsealed answers, if you left part way.
+     *
+     * Only ever yours -- the rules make a draft readable to its owner alone, so
+     * there is nowhere for a partner's to come from even if this tried to hold
+     * one. Empty once sealed.
+     */
+    val draft: List<Int> = emptyList(),
 ) {
     val isOpen: Boolean get() = answers.size >= 2
 
     fun has(uid: String): Boolean = answers.containsKey(uid)
 
     fun responsesFor(uid: String): List<Int>? = answers[uid]
+
+    /**
+     * How far [uid] has got, preferring a finished run over a running count.
+     *
+     * A sealed run is the truth even if a stale progress number disagrees --
+     * the two are written separately and a phone that died between them would
+     * otherwise report somebody as mid-round forever.
+     */
+    fun answeredBy(uid: String, of: Int): Int =
+        if (answers.containsKey(uid)) of else (progress[uid] ?: 0).coerceIn(0, of)
 }
