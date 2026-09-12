@@ -1,0 +1,102 @@
+{
+  "id": "firsts",
+  "title": "Firsts and favourites",
+  "theme": "KNOW_ME",
+  "blurb": "Where we started, and what stuck.",
+  "questions": [
+    {
+      "id": "fs1",
+      "text": "What did you actually think of me the first time we met?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "fs2",
+      "text": "Which of our firsts do I remember best?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "fs3",
+      "text": "The better story is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "How we met",
+        "The first proper date"
+      ]
+    },
+    {
+      "id": "fs4",
+      "text": "Which one changed things?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "The first trip",
+        "The first row",
+        "The first time one of us was ill",
+        "The first time we met the family"
+      ]
+    },
+    {
+      "id": "fs5",
+      "text": "Pick the ones you would happily do again exactly as they were.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "The first date",
+        "The first holiday",
+        "The first place we lived",
+        "The first Christmas",
+        "None of it, forwards only"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "fs6",
+      "text": "Order these by how often I bring them up.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "How we met",
+        "A holiday",
+        "Something you said once",
+        "An old job"
+      ]
+    },
+    {
+      "id": "fs7",
+      "text": "How much do I look back, honestly?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Never",
+      "highLabel": "Constantly"
+    },
+    {
+      "id": "fs8",
+      "text": "Which year has been the best one so far?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "The first one",
+        "The second",
+        "The third",
+        "A later one",
+        "This one",
+        "Still coming"
+      ]
+    },
+    {
+      "id": "fs9",
+      "text": "Which small ritual of ours would you miss most?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "fs10",
+      "text": "What is the first thing you would tell someone about me?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

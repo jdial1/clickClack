@@ -1,0 +1,135 @@
+{
+  "id": "everyday",
+  "title": "The ordinary stuff",
+  "theme": "EVERYDAY",
+  "blurb": "Weeknights, washing up, and who does what.",
+  "questions": [
+    {
+      "id": "ev1",
+      "text": "The washing up gets done:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Straight away",
+        "In the morning"
+      ]
+    },
+    {
+      "id": "ev2",
+      "text": "Which chore do I secretly not mind?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "ev3",
+      "text": "Which one of these is most likely to start a row?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "The bins",
+        "Being late",
+        "Money",
+        "The thermostat"
+      ]
+    },
+    {
+      "id": "ev4",
+      "text": "Pick the ones that would make a weeknight feel good.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Nobody cooks",
+        "An early night",
+        "A walk",
+        "A film neither of us has seen",
+        "Both on our phones, quietly"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "ev5",
+      "text": "Order these from most to least worth paying someone else to do.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Cleaning",
+        "Cooking",
+        "Laundry",
+        "Admin and forms"
+      ]
+    },
+    {
+      "id": "ev6",
+      "text": "How fairly is the invisible work split at the moment?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Down the middle"
+    },
+    {
+      "id": "ev7",
+      "text": "Which room in this place do I like best?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "Kitchen",
+        "Living room",
+        "Bedroom",
+        "Bathroom",
+        "Outside",
+        "Wherever you are"
+      ]
+    },
+    {
+      "id": "ev8",
+      "text": "What is one small thing I do that makes your day easier?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "ev9",
+      "text": "Mornings are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Talk to me",
+        "Do not talk to me"
+      ]
+    },
+    {
+      "id": "ev10",
+      "text": "What do we spend money on that neither of us would defend out loud?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Food we throw away",
+        "Subscriptions",
+        "Getting things delivered",
+        "Things for the house we never use"
+      ]
+    },
+    {
+      "id": "ev11",
+      "text": "Which day of the week is hardest?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    },
+    {
+      "id": "ev12",
+      "text": "How well are we eating and sleeping at the moment?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Badly",
+      "highLabel": "Properly"
+    }
+  ]
+}

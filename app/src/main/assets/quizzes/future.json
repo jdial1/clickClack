@@ -1,0 +1,134 @@
+{
+  "id": "future",
+  "title": "Further out",
+  "theme": "FUTURE",
+  "blurb": "The stuff we keep meaning to talk about properly.",
+  "questions": [
+    {
+      "id": "fu1",
+      "text": "Order these by what should come first.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "Somewhere better to live",
+        "Money put away",
+        "More time off",
+        "Something learned properly"
+      ]
+    },
+    {
+      "id": "fu2",
+      "text": "Five years out, the bigger change is:",
+      "type": "THIS_OR_THAT",
+      "depth": 3,
+      "options": [
+        "Where we live",
+        "What we do all day"
+      ]
+    },
+    {
+      "id": "fu3",
+      "text": "Which would you regret not doing?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "Living somewhere else for a year",
+        "Starting something of our own",
+        "Taking a long break",
+        "Getting properly good at one thing"
+      ]
+    },
+    {
+      "id": "fu4",
+      "text": "Pick what would make next year a good one.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "A trip somewhere new",
+        "Moving",
+        "More time with friends",
+        "Getting fit",
+        "Less work"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "fu5",
+      "text": "How settled do you feel about where we are heading?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Completely"
+    },
+    {
+      "id": "fu6",
+      "text": "When I picture us in ten years, what is the first thing I see?",
+      "type": "GUESS_ME",
+      "depth": 3
+    },
+    {
+      "id": "fu7",
+      "text": "What would you want said about the two of us, later?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "fu8",
+      "text": "Where should we be living in five years?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "Right here",
+        "Same town, bigger place",
+        "A city",
+        "The countryside",
+        "By the sea",
+        "Another country"
+      ]
+    },
+    {
+      "id": "fu9",
+      "text": "Money, honestly:",
+      "type": "THIS_OR_THAT",
+      "depth": 3,
+      "options": [
+        "Spend it now",
+        "Put it away"
+      ]
+    },
+    {
+      "id": "fu10",
+      "text": "What is the decision we keep postponing?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "Where to live",
+        "Work",
+        "Family",
+        "Nothing, we are fine"
+      ]
+    },
+    {
+      "id": "fu11",
+      "text": "Which season should we plan the big change for?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "This spring",
+        "This summer",
+        "This autumn",
+        "This winter",
+        "Next year",
+        "When it happens"
+      ]
+    },
+    {
+      "id": "fu12",
+      "text": "How much do you want things to stay roughly as they are?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Change it all",
+      "highLabel": "Do not touch it"
+    }
+  ]
+}

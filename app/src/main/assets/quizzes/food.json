@@ -1,0 +1,112 @@
+{
+  "id": "food",
+  "title": "What's for dinner",
+  "theme": "FOOD",
+  "blurb": "Ranking the food you argue about.",
+  "questions": [
+    {
+      "id": "fd1",
+      "text": "Put these in order, favourite first.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "A proper roast",
+        "Curry night",
+        "Pasta, any pasta",
+        "Something on toast"
+      ]
+    },
+    {
+      "id": "fd2",
+      "text": "Friday night is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Takeaway on the sofa",
+        "Cook it together"
+      ]
+    },
+    {
+      "id": "fd3",
+      "text": "Which could I eat every day for a month?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "fd4",
+      "text": "Pick the three that make a good night out.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "Somewhere new",
+        "The usual place",
+        "Too much bread",
+        "A long pudding",
+        "Nowhere, stay in"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "fd5",
+      "text": "How much do I actually enjoy cooking?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "It is a chore",
+      "highLabel": "It is the best bit"
+    },
+    {
+      "id": "fd6",
+      "text": "Who is the better cook, honestly?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Me",
+        "You",
+        "Neither of us",
+        "Depends entirely on the dish"
+      ]
+    },
+    {
+      "id": "fd7",
+      "text": "Which meal of the day matters most to me?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "Breakfast",
+        "Brunch",
+        "Lunch",
+        "Afternoon something",
+        "Dinner",
+        "The one after midnight"
+      ]
+    },
+    {
+      "id": "fd8",
+      "text": "What food from your childhood do you still miss?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "fd9",
+      "text": "Pudding is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Always",
+        "Only out"
+      ]
+    },
+    {
+      "id": "fd10",
+      "text": "Order these by how much of a treat they are.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Good coffee",
+        "A bottle worth opening",
+        "Cheese you would not normally buy",
+        "Breakfast made for you"
+      ]
+    }
+  ]
+}

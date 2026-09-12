@@ -1,0 +1,128 @@
+{
+  "id": "playful",
+  "title": "Not serious",
+  "theme": "PLAYFUL",
+  "blurb": "Nothing here matters. Answer fast.",
+  "questions": [
+    {
+      "id": "pl1",
+      "text": "If I had to win a competition tomorrow, what would I pick?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "pl2",
+      "text": "Which would I survive longest without?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "My phone",
+        "Coffee",
+        "Music",
+        "Sitting down"
+      ]
+    },
+    {
+      "id": "pl3",
+      "text": "Superpower:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Fly",
+        "Be invisible"
+      ]
+    },
+    {
+      "id": "pl4",
+      "text": "Pick the ones I would genuinely enjoy.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Karaoke",
+        "A pub quiz",
+        "A very long walk",
+        "Board games",
+        "Doing absolutely nothing"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "pl5",
+      "text": "Order these by how badly I would do at them.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Dancing",
+        "Keeping a secret",
+        "Parallel parking",
+        "Small talk with strangers"
+      ]
+    },
+    {
+      "id": "pl6",
+      "text": "How competitive am I really?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "Not at all",
+      "highLabel": "Do not play me at anything"
+    },
+    {
+      "id": "pl7",
+      "text": "What animal am I, and why?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "A cat",
+        "A dog",
+        "A crow",
+        "A heron",
+        "Something in a burrow",
+        "A goose"
+      ]
+    },
+    {
+      "id": "pl8",
+      "text": "What is the most ridiculous thing you have ever seen me do?",
+      "type": "REFLECT",
+      "depth": 1
+    },
+    {
+      "id": "pl9",
+      "text": "What is my most annoying habit that you secretly find endearing?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "pl10",
+      "text": "What would you put on a t-shirt to embarrass me?",
+      "type": "REFLECT",
+      "depth": 1
+    },
+    {
+      "id": "pl11",
+      "text": "Pick everything I would put in a time capsule.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "A photo",
+        "Something I wrote",
+        "A ticket stub",
+        "Something of yours",
+        "A list of complaints"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "pl12",
+      "text": "Order these by how long I would last.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Without talking",
+        "Without sugar",
+        "Without checking my phone",
+        "Without complaining about the weather"
+      ]
+    }
+  ]
+}
