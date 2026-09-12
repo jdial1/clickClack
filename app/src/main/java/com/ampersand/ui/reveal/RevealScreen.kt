@@ -37,7 +37,7 @@ import com.ampersand.model.Member
 import com.ampersand.model.Question
 import com.ampersand.model.Reaction
 import com.ampersand.ui.components.AmpReactionRow
-import com.ampersand.ui.components.AnswerPanel
+import com.ampersand.ui.components.AnswerPanelPair
 import com.ampersand.ui.components.arrive
 import com.ampersand.ui.components.DepthDots
 import com.ampersand.ui.components.PartnerReaction
@@ -88,9 +88,9 @@ fun RevealScreen(
     // restart the whole unpacking under the reader's hands.
     LaunchedEffect(day.date, animateIn) {
         if (!animateIn) return@LaunchedEffect
-        // Four beats, not five: the question is already on screen when you
-        // arrive, and a cue for it would be a cue for nothing.
-        repeat(4) { i ->
+        // Three beats: the question is already on screen when you arrive, and
+        // the two answers share a beat now that they share a row.
+        repeat(3) { i ->
             delay(Motion.StaggerMs.toLong())
             sounds.play(if (i % 2 == 0) Sfx.CLICK else Sfx.CLACK)
             feel.play(Feel.TICK)
@@ -143,43 +143,32 @@ fun RevealScreen(
         Spacer(Modifier.height(24.dp))
 
         Box(Modifier.arrive(day.date, index = 2, enabled = animateIn)) {
-        AnswerPanel(
-            ownerName = state.you.name,
-            ownerColor = youColor,
-            type = day.question.type,
-            answer = day.answerFor(state.you.uid)?.values.orEmpty(),
-            guess = day.answerFor(state.them.uid)?.guess,
-            guesserName = state.them.name,
-            scored = day.question.isScored,
-            hit = day.question.guessHit(
-                day.answerFor(state.them.uid)?.guess,
-                day.answerFor(state.you.uid)?.values.orEmpty(),
-            ),
-        )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
-        AnswerPanel(
-            ownerName = state.them.name,
-            ownerColor = themColor,
-            type = day.question.type,
-            answer = day.answerFor(state.them.uid)?.values.orEmpty(),
-            guess = day.answerFor(state.you.uid)?.guess,
-            guesserName = "You",
-            scored = day.question.isScored,
-            hit = day.question.guessHit(
-                day.answerFor(state.you.uid)?.guess,
-                day.answerFor(state.them.uid)?.values.orEmpty(),
-            ),
-        )
+            AnswerPanelPair(
+                type = day.question.type,
+                scored = day.question.isScored,
+                yourName = state.you.name,
+                yourColor = youColor,
+                yourAnswer = day.answerFor(state.you.uid)?.values.orEmpty(),
+                yourGuess = day.answerFor(state.you.uid)?.guess,
+                youKnewThem = day.question.guessHit(
+                    day.answerFor(state.you.uid)?.guess,
+                    day.answerFor(state.them.uid)?.values.orEmpty(),
+                ),
+                theirName = state.them.name,
+                theirColor = themColor,
+                theirAnswer = day.answerFor(state.them.uid)?.values.orEmpty(),
+                theirGuess = day.answerFor(state.them.uid)?.guess,
+                theyKnewYou = day.question.guessHit(
+                    day.answerFor(state.them.uid)?.guess,
+                    day.answerFor(state.you.uid)?.values.orEmpty(),
+                ),
+            )
         }
 
         Spacer(Modifier.height(30.dp))
         SectionLabel("Say something back")
         Spacer(Modifier.height(10.dp))
-        Box(Modifier.arrive(day.date, index = 4, enabled = animateIn)) {
+        Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
             AmpReactionRow(
                 selected = day.reactionFor(state.you.uid),
                 color = BrickColor.of(state.you.colorArgb),

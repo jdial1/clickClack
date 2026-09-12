@@ -43,7 +43,7 @@ import com.ampersand.model.QuizTheme
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
-import com.ampersand.ui.components.AnswerPanel
+import com.ampersand.ui.components.AnswerPanelPair
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
@@ -274,27 +274,19 @@ fun CrossAnswerRow(
         }
 
         Spacer(Modifier.height(12.dp))
-        AnswerPanel(
-            ownerName = yourName,
-            ownerColor = Color(you.argb),
+        AnswerPanelPair(
             type = row.question.type,
-            answer = row.yours,
-            guess = row.theirGuess,
-            guesserName = theirName,
             scored = row.question.isScored,
-            hit = row.theyKnewYou,
-        )
-
-        Spacer(Modifier.height(10.dp))
-        AnswerPanel(
-            ownerName = theirName,
-            ownerColor = Color(them.argb),
-            type = row.question.type,
-            answer = row.theirs,
-            guess = row.yourGuess,
-            guesserName = yourName,
-            scored = row.question.isScored,
-            hit = row.youKnewThem,
+            yourName = yourName,
+            yourColor = Color(you.argb),
+            yourAnswer = row.yours,
+            yourGuess = row.yourGuess,
+            youKnewThem = row.youKnewThem,
+            theirName = theirName,
+            theirColor = Color(them.argb),
+            theirAnswer = row.theirs,
+            theirGuess = row.theirGuess,
+            theyKnewYou = row.theyKnewYou,
         )
     }
 }

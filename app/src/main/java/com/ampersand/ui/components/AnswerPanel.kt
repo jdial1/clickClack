@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,11 +35,11 @@ import com.ampersand.ui.theme.Duo
  * interesting half. "You got this one wrong" is a fact about nothing; "you
  * thought I'd say coffee" is the conversation.
  *
- * One panel per person, full width and stacked, rather than two columns side by
- * side. Half a phone's width is fine for the reference designs, whose answers
- * are always a word from a fixed list; ours can be a sentence someone typed,
- * and a column of wrapped prose 180dp wide is not a comparison anyone can read.
- * The owner's colour and the label do the work the columns would have done.
+ * Laid out side by side by [AnswerPanelPair], which is where the sizing
+ * happens. [compact] is what a panel does about being half a phone wide:
+ * tighter padding, and the guess label stacked over its verdict rather than
+ * beside it, because "MAYA GUESSED  NAILED IT" does not fit on one line at
+ * that width and wrapping it mid-phrase reads as broken.
  */
 @Composable
 fun AnswerPanel(
@@ -51,17 +53,18 @@ fun AnswerPanel(
     scored: Boolean,
     hit: Boolean,
     modifier: Modifier = Modifier,
+    compact: Boolean = false,
 ) {
     Column(
         modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(if (compact) 20.dp else 28.dp))
             .background(ownerColor.copy(alpha = 0.12f))
-            .padding(20.dp),
+            .padding(if (compact) 14.dp else 20.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            PersonDot(ownerName, ownerColor, size = 26)
-            Spacer(Modifier.size(10.dp))
+            PersonDot(ownerName, ownerColor, size = if (compact) 22 else 26)
+            Spacer(Modifier.size(if (compact) 7.dp else 10.dp))
             SectionLabel("$ownerName said")
         }
         Spacer(Modifier.height(10.dp))
@@ -95,16 +98,91 @@ fun AnswerPanel(
 
         if (scored && guess != null) {
             Spacer(Modifier.height(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (compact) {
                 SectionLabel("$guesserName guessed")
-                Spacer(Modifier.size(8.dp))
+                Spacer(Modifier.height(6.dp))
                 HitBadge(hit)
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SectionLabel("$guesserName guessed")
+                    Spacer(Modifier.size(8.dp))
+                    HitBadge(hit)
+                }
             }
             Spacer(Modifier.height(6.dp))
             // Through AnswerValues, not joinToString: a ranked guess is an
             // order, and a comma list throws away the only thing it says.
             AnswerValues(guess, type, quiet = true)
         }
+    }
+}
+
+/**
+ * Both answers, on one row.
+ *
+ * Side by side rather than stacked, so the comparison is a glance rather than a
+ * scroll: the two cards are the same question answered twice, and reading one
+ * after the other makes them feel like two separate facts.
+ *
+ * [IntrinsicSize.Min] is what keeps them honest. Without it the shorter answer
+ * gets a shorter card and the pair reads as one person having said less, which
+ * is a claim about the people rather than about the text. Measuring both and
+ * taking the taller means the cards differ only in what is written in them.
+ *
+ * The cost of the row is width: each side is about half a phone, so a typed
+ * sentence wraps hard. That is what [AnswerPanel]'s compact mode is for, and it
+ * is the trade the layout makes -- the comparison is worth more than the line
+ * length.
+ */
+@Composable
+fun AnswerPanelPair(
+    type: QuestionType,
+    scored: Boolean,
+    yourName: String,
+    yourColor: Color,
+    yourAnswer: List<String>,
+    /** Your prediction about them. */
+    yourGuess: List<String>?,
+    youKnewThem: Boolean,
+    theirName: String,
+    theirColor: Color,
+    theirAnswer: List<String>,
+    /** Their prediction about you. */
+    theirGuess: List<String>?,
+    theyKnewYou: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        AnswerPanel(
+            ownerName = yourName,
+            ownerColor = yourColor,
+            type = type,
+            answer = yourAnswer,
+            // Their guess sits under your answer, because that is what it was
+            // aiming at. Pairing a guess with its own author instead would put
+            // the prediction and the truth in different columns.
+            guess = theirGuess,
+            guesserName = theirName,
+            scored = scored,
+            hit = theyKnewYou,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            compact = true,
+        )
+        AnswerPanel(
+            ownerName = theirName,
+            ownerColor = theirColor,
+            type = type,
+            answer = theirAnswer,
+            guess = yourGuess,
+            guesserName = yourName,
+            scored = scored,
+            hit = youKnewThem,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            compact = true,
+        )
     }
 }
 
