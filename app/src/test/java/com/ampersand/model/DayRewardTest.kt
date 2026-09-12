@@ -54,16 +54,70 @@ class DayRewardTest {
         assertNotEquals(Slope.NONE, shapeOf(day(q = wild)).slope)
     }
 
-    /** The conversation carrying on away from the phone is the whole point. */
+    /**
+     * The day's own brick cannot know it was talked about: that is only said
+     * the morning after, long after this brick is laid. The piece for it comes
+     * from [Rewards.forTalk] instead.
+     */
     @Test
-    fun `a day you talked about again earns the piece that is not a box`() {
-        assertNotEquals(Slope.NONE, shapeOf(day(talked = setOf(you.uid))).slope)
+    fun `the day brick ignores talked about, which arrives too late for it`() {
+        assertEquals(shapeOf(day()), shapeOf(day(talked = setOf(you.uid))))
     }
 
-    /** One person remembering is the event; it need not be you. */
+    // ---- the morning-after piece ------------------------------------------
+
+    private val tomorrow = date.plusDays(1)
+
     @Test
-    fun `either of you marking it is enough`() {
-        assertNotEquals(Slope.NONE, shapeOf(day(talked = setOf(them.uid))).slope)
+    fun `a day that came up again earns a small slope the morning after`() {
+        val piece = Rewards.forTalk(day(talked = setOf(you.uid)), you, them, tomorrow).single()
+        assertNotEquals(Slope.NONE, piece.shape.slope)
+        assertEquals(2, piece.shape.w)
+        assertEquals(BrickHeight.MEDIUM.rows, piece.shape.h)
+        assertEquals("dated the morning it was said", tomorrow, piece.earnedOn)
+    }
+
+    /** The conversation was had by two people, whichever of them tapped. */
+    @Test
+    fun `both of you earn one whoever tapped`() {
+        val d = day(talked = setOf(them.uid))
+        assertEquals(you.uid, Rewards.forTalk(d, you, them, tomorrow).single().ownerUid)
+        assertEquals(them.uid, Rewards.forTalk(d, them, you, tomorrow).single().ownerUid)
+    }
+
+    @Test
+    fun `the two pieces face each other`() {
+        val d = day(talked = setOf(you.uid))
+        val mine = Rewards.forTalk(d, you, them, tomorrow).single().shape.slope
+        val theirs = Rewards.forTalk(d, them, you, tomorrow).single().shape.slope
+        assertNotEquals(mine, theirs)
+    }
+
+    @Test
+    fun `no piece until somebody says it came up`() {
+        assertTrue(Rewards.forTalk(day(), you, them, tomorrow).isEmpty())
+    }
+
+    @Test
+    fun `no piece for a day that never opened`() {
+        val sealed = DayEntry(date = date, question = question(), talkedAbout = setOf(you.uid))
+        assertTrue(Rewards.forTalk(sealed, you, them, tomorrow).isEmpty())
+    }
+
+    /** Past days load without answers; the flag is what says they opened. */
+    @Test
+    fun `a past day opened only by its flag still earns the piece`() {
+        val past = DayEntry(date = date, question = question(), opened = true, talkedAbout = setOf(you.uid))
+        assertEquals(1, Rewards.forTalk(past, you, them, tomorrow).size)
+    }
+
+    /** Never the same id as the day's own brick, or one would hide the other. */
+    @Test
+    fun `the piece has its own id`() {
+        val d = day(talked = setOf(you.uid))
+        val dayBrick = Rewards.forDay(d, you, them, 1).single().id
+        val talkPiece = Rewards.forTalk(d, you, them, tomorrow).single().id
+        assertNotEquals(dayBrick, talkPiece)
     }
 
     @Test

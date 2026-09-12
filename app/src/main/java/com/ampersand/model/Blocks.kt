@@ -256,13 +256,10 @@ object Rewards {
         val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
             milestone -> CharacterShape
-            // Two days were earning the same box as every other: the one where
-            // the question came from inside the relationship, and the one that
-            // carried on away from the phone. Both are rarer and better than
-            // calling a multiple choice, and both now get the piece that is not
-            // a box -- which is the only thing that makes a sculpture legible
-            // from across the room.
-            day.wasTalkedAbout -> roof(member, partner)
+            // The one day whose question came from inside the relationship
+            // earns the piece that is not a box. A day that carried on away
+            // from the phone earns one too, but not here: that is only known
+            // the morning after, long after this brick is laid -- see [forTalk].
             Wildcard.isWildcard(day.question.id) -> roof(member, partner)
             // The rarest good outcome in the app: you called the answer to a
             // question that was actually hard. It earns the only piece that is
@@ -281,6 +278,36 @@ object Rewards {
                 ownerUid = member.uid,
                 earnedOn = day.date,
                 face = if (milestone) faceFor(streakAfter) else null,
+            ),
+        )
+    }
+
+    /**
+     * A small sloped piece for a day that came up again, laid the morning after.
+     *
+     * An extra piece rather than an upgrade to the day's own brick, for two
+     * reasons. That brick is already built into the plate by then, and turning
+     * a two-stud stub into anything wider could collide with whatever was laid
+     * beside it. And the week it belonged to may have sealed overnight -- a new
+     * piece simply lands on the week you are in, dated the morning you said so.
+     *
+     * Both of you earn one, whichever of you tapped: the conversation was had by
+     * two people. Two studs wide so it adds to a week without dominating it, and
+     * sloped so it still reads from across the room.
+     */
+    fun forTalk(day: DayEntry, member: Member, partner: Member, on: LocalDate): List<Block> {
+        if (!day.isRevealed || !day.wasTalkedAbout) return emptyList()
+        return listOf(
+            Block(
+                id = "talk_${day.date}_${member.uid}",
+                shape = BrickShape(
+                    studs = 2,
+                    height = BrickHeight.MEDIUM,
+                    slope = if (member.uid < partner.uid) Slope.LEFT else Slope.RIGHT,
+                ),
+                colorArgb = member.colorArgb,
+                ownerUid = member.uid,
+                earnedOn = on,
             ),
         )
     }

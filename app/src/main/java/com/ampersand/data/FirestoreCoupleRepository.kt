@@ -354,6 +354,29 @@ class FirestoreCoupleRepository(
             recordKnowing(todayEntry)
         }
         awardForQuizzes(next)
+        awardForTalks(next)
+    }
+
+    /**
+     * Lay the next-morning piece for any day either of you said came up again.
+     *
+     * Checked against every plate ever built, not just this week's, because the
+     * day being talked about usually belongs to a week that has already sealed
+     * -- and a piece is never laid twice.
+     */
+    private fun awardForTalks(s: CoupleState) {
+        val plate = s.plate
+        if (plate.isSealed) return
+        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
+        val fresh = s.history.filter { it.wasTalkedAbout }.flatMap { day ->
+            Rewards.forTalk(day, s.you, s.them, today) + Rewards.forTalk(day, s.them, s.you, today)
+        }.filter { it.id !in laid }
+        if (fresh.isEmpty()) return
+
+        plateRef(plate).set(
+            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            SetOptions.merge(),
+        )
     }
 
     private val runRegs = mutableMapOf<String, ListenerRegistration>()

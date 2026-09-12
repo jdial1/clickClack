@@ -359,10 +359,20 @@ class FakeCoupleRepository(
             if (this.date != date || !isRevealed) this
             else copy(talkedAbout = talkedAbout + current.you.uid)
 
-        current.copy(
+        val marked = current.copy(
             today = current.today.mark(),
             history = current.history.map { it.mark() },
         )
+        val day = (listOf(marked.today) + marked.history).firstOrNull { it.date == date }
+            ?: return@mutate marked
+        if (marked.plate.isSealed) return@mutate marked
+
+        val laid = (marked.shelf.flatMap { it.blocks } + marked.plate.blocks).mapTo(mutableSetOf()) { it.id }
+        val fresh = (
+            Rewards.forTalk(day, marked.you, marked.them, marked.today.date) +
+                Rewards.forTalk(day, marked.them, marked.you, marked.today.date)
+            ).filter { it.id !in laid }
+        marked.copy(plate = marked.plate.copy(blocks = marked.plate.blocks + fresh))
     }
 
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) =
