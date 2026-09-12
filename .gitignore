@@ -10,3 +10,6 @@ local.properties
 
 # Firebase config: per-project, regenerate with firebase apps:sdkconfig.
 google-services.json
+
+# The testing build, rebuilt on demand.
+clickclack-debug.apk
