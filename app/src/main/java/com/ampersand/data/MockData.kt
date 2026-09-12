@@ -10,6 +10,8 @@ import com.ampersand.model.Slope
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
+import com.ampersand.model.Knowing
+import com.ampersand.model.KnowingMonth
 import com.ampersand.model.Depth
 import com.ampersand.model.Member
 import com.ampersand.model.Placement
@@ -17,7 +19,9 @@ import com.ampersand.model.Question
 import com.ampersand.model.QuizRun
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
+import com.ampersand.model.Wildcard
 import java.time.LocalDate
+import java.time.YearMonth
 import kotlin.random.Random
 
 /**
@@ -596,6 +600,54 @@ object MockCouple {
         ),
     )
 
+    /**
+     * The day today's question is coming back from.
+     *
+     * Six months, and the same question id as [freshToday] -- that match is
+     * what makes it a capsule rather than an old day that happens to be
+     * loaded. Answered differently then, obviously: a capsule where nothing
+     * changed would be a screenshot of the feature rather than the feature.
+     */
+    fun capsule(today: LocalDate = LocalDate.now()): DayEntry = day(
+        today.minusMonths(6),
+        "g1",
+        yourResponse = "The laptop, probably. I would regret it.",
+        theirResponse = "Whichever of us was nearest the door.",
+        youGuess = "The photos",
+        themGuess = "The laptop",
+    )
+
+    /** One waiting, so the queue on Today has something in it. */
+    fun wildcards(): List<Wildcard> = listOf(
+        Wildcard(
+            id = "w1",
+            text = "What did you nearly say this week and did not?",
+            type = QuestionType.REFLECT,
+            byUid = them.uid,
+            byName = them.name,
+            createdAtMillis = System.currentTimeMillis() - 86_400_000L,
+        ),
+    )
+
+    /**
+     * Four months of scoreboard, lopsided on purpose.
+     *
+     * A tidy fifty-fifty would say nothing, and the whole reason this is kept
+     * is that it is usually not even -- one of you is better at this, and the
+     * app has never been able to say so before.
+     */
+    fun knowing(today: LocalDate = LocalDate.now()): Knowing = Knowing(
+        (0L..3L).map { back ->
+            val month = YearMonth.from(today.minusMonths(back))
+            when (back) {
+                0L -> KnowingMonth(month, youHits = 7, theyHits = 9, scored = 12)
+                1L -> KnowingMonth(month, youHits = 14, theyHits = 21, scored = 27)
+                2L -> KnowingMonth(month, youHits = 11, theyHits = 16, scored = 24)
+                else -> KnowingMonth(month, youHits = 6, theyHits = 8, scored = 15)
+            }
+        },
+    )
+
     fun state(today: LocalDate = LocalDate.now()) = CoupleState(
         you = you,
         them = them,
@@ -606,5 +658,8 @@ object MockCouple {
         quizRuns = runs(),
         streak = 7,
         freezesLeft = 0,
+        capsule = capsule(today),
+        wildcards = wildcards(),
+        knowing = knowing(today),
     )
 }

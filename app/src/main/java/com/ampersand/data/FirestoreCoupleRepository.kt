@@ -11,10 +11,15 @@ import com.ampersand.model.BrickShape
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
+import com.ampersand.model.Knowing
+import com.ampersand.model.KnowingMonth
+import com.ampersand.model.Question
+import com.ampersand.model.QuestionType
 import com.ampersand.model.Member
 import com.ampersand.model.Placement
 import com.ampersand.model.QuizResult
 import com.ampersand.model.QuizRun
+import com.ampersand.model.Wildcard
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
@@ -27,6 +32,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
+import java.time.DayOfWeek
+import java.time.YearMonth
 
 private const val TAG = "Couple"
 private const val DAYS = "days"
@@ -34,6 +41,8 @@ private const val ANSWERS = "answers"
 private const val PLATES = "plates"
 private const val QUIZZES = "quizzes"
 private const val RUNS = "runs"
+private const val WILDCARDS = "wildcards"
+private const val KNOWING = "knowing"
 
 /** Ten weeks, which is what the Shelf draws. */
 private const val HistoryDays = 70L
@@ -99,6 +108,15 @@ class FirestoreCoupleRepository(
     private var history: List<DayEntry> = emptyList()
     private var plates: List<BuildPlate> = emptyList()
     private var anniversary: LocalDate? = null
+
+    /** Every wildcard either of you has written, used or not. */
+    private var allWildcards: List<Wildcard> = emptyList()
+
+    /** The day today's question came back from, on a capsule day. */
+    private var capsuleSource: DayEntry? = null
+
+    /** Month rollups of who called whom, for as long as the two of you have played. */
+    private var knowing: Knowing = Knowing()
 
     private val couple get() = db.collection(COUPLES).document(coupleId)
     private val dayRef get() = couple.collection(DAYS).document(today.toString())
@@ -171,6 +189,33 @@ class FirestoreCoupleRepository(
                 }
             }
 
+        regs += couple.collection(WILDCARDS)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "wildcard listener failed", error)
+                    return@addSnapshotListener
+                }
+                allWildcards = snap?.documents.orEmpty().mapNotNull { it.toWildcard() }
+                recompose()
+            }
+
+        // One document per month, holding a map keyed by day. Writing the same
+        // day twice writes the same values, so two phones noticing the same
+        // reveal cannot double-count -- which a running total would.
+        regs += couple.collection(KNOWING)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "knowing listener failed", error)
+                    return@addSnapshotListener
+                }
+                knowing = Knowing(
+                    snap?.documents.orEmpty().mapNotNull { it.toKnowingMonth(myUid, partnerUid) },
+                )
+                recompose()
+            }
+
+        loadCapsule()
+
         regs += couple.collection(PLATES)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
@@ -190,12 +235,22 @@ class FirestoreCoupleRepository(
      */
     private fun recompose() {
         val current = _state.value
+        val waiting = allWildcards.filter { it.usedOn == null }.sortedBy { it.createdAtMillis }
 
         val you = me.toMember(myUid, current.you)
         val partner = them.toMember(partnerUid, current.them)
 
-        val question = pool.question(todayDoc?.getString("questionId"))
-            ?: pool.daily(today, anniversary)
+        // Pinned first, always: whoever answered first decided what today is,
+        // and re-deciding it on the second phone is how two people end up
+        // answering two different questions.
+        val pinned = todayDoc?.getString("questionId")
+        val question = when {
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary)
+            // A question one of you wrote outranks one a stranger wrote.
+            waiting.isNotEmpty() -> waiting.first().asQuestion()
+            capsuleSource != null -> capsuleSource!!.question
+            else -> pool.daily(today, anniversary)
+        }
 
         val todayEntry = DayEntry(
             date = today,
@@ -224,6 +279,11 @@ class FirestoreCoupleRepository(
             quizRuns = runs.values.flatMap { it.values },
             anniversary = anniversary,
             streak = streakOf(history, todayEntry),
+            // Only a capsule if today really is asking the old question again.
+            // The ladder can find a day whose question the pin then overrode.
+            capsule = capsuleSource?.takeIf { it.question.id == question.id },
+            wildcards = waiting,
+            knowing = knowing,
         )
 
         // The assignment. Without it every listener in this class computed the
@@ -235,7 +295,10 @@ class FirestoreCoupleRepository(
         // Earning is done here rather than in the write that caused it, because
         // a day or a deck opens when the *other* person submits -- which this
         // phone learns from a listener, not from anything it did.
-        if (todayDoc?.getBoolean("revealed") == true) awardForToday()
+        if (todayDoc?.getBoolean("revealed") == true) {
+            awardForToday()
+            recordKnowing(todayEntry)
+        }
         awardForQuizzes(next)
     }
 
@@ -345,6 +408,15 @@ class FirestoreCoupleRepository(
                 "submittedAt" to FieldValue.serverTimestamp(),
             ),
         )
+
+        // Asked, so it leaves the queue. Stamped here rather than when it is
+        // chosen, because being chosen is a guess about today until someone
+        // actually answers it.
+        val asked = _state.value.today.question.id
+        if (Wildcard.isWildcard(asked)) {
+            couple.collection(WILDCARDS).document(Wildcard.idOf(asked))
+                .set(mapOf("usedOn" to today.toString()), SetOptions.merge())
+        }
     }
 
     /**
@@ -426,6 +498,101 @@ class FirestoreCoupleRepository(
             plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
             SetOptions.merge(),
         )
+    }
+
+    override fun addWildcard(text: String, type: QuestionType, options: List<String>) {
+        couple.collection(WILDCARDS).add(
+            mapOf(
+                "text" to text,
+                "type" to type.name,
+                "options" to options,
+                "byUid" to myUid,
+                "byName" to _state.value.you.name,
+                "createdAt" to FieldValue.serverTimestamp(),
+                "usedOn" to null,
+            ),
+        )
+    }
+
+    /**
+     * Record who called whom, once a day has opened.
+     *
+     * Keyed by uid rather than by "you" and "them", because both phones write
+     * this document and each one's idea of "you" is the other's idea of "them".
+     * The first version of this flipped the scoreboard every time the second
+     * person's app noticed the reveal.
+     */
+    private fun recordKnowing(day: DayEntry) {
+        if (!day.isRevealed || !day.question.isScored) return
+        val mine = day.answerFor(myUid) ?: return
+        val theirs = day.answerFor(partnerUid) ?: return
+
+        couple.collection(KNOWING).document(YearMonth.from(day.date).toString()).set(
+            mapOf(
+                day.date.toString() to mapOf(
+                    myUid to day.question.guessHit(mine.guess, theirs.values),
+                    partnerUid to day.question.guessHit(theirs.guess, mine.values),
+                ),
+            ),
+            SetOptions.merge(),
+        )
+    }
+
+    /**
+     * Find a day worth asking again, and read it back in full.
+     *
+     * Sundays only: a capsule every day would make the app a quiz about itself,
+     * and the point is that it is rare enough to be worth reading.
+     *
+     * The ladder runs a year, six months, three, then one. A couple three weeks
+     * in has no year to look back on, and a feature that only switches on after
+     * six months is a feature nobody ever sees working.
+     */
+    private fun loadCapsule() {
+        if (today.dayOfWeek != DayOfWeek.SUNDAY) return
+        tryCapsule(listOf(12L, 6L, 3L, 1L))
+    }
+
+    private fun tryCapsule(months: List<Long>) {
+        val ahead = months.firstOrNull() ?: return
+        val date = today.minusMonths(ahead)
+        val rest = months.drop(1)
+
+        couple.collection(DAYS).document(date.toString()).get()
+            .addOnSuccessListener { doc ->
+                val question = resolveQuestion(doc.getString("questionId"))
+                if (doc.exists() && doc.getBoolean("revealed") == true && question != null) {
+                    readCapsuleAnswers(date, question, doc)
+                } else {
+                    tryCapsule(rest)
+                }
+            }
+            .addOnFailureListener { tryCapsule(rest) }
+    }
+
+    private fun readCapsuleAnswers(date: LocalDate, question: Question, dayDoc: DocumentSnapshot) {
+        val answers = couple.collection(DAYS).document(date.toString()).collection(ANSWERS)
+        answers.document(myUid).get().addOnSuccessListener { mine ->
+            answers.document(partnerUid).get().addOnSuccessListener { theirs ->
+                val both = listOfNotNull(mine.toAnswer(), theirs.toAnswer())
+                if (both.size < 2) return@addOnSuccessListener
+                capsuleSource = DayEntry(
+                    date = date,
+                    question = question,
+                    answers = both.associateBy { it.uid },
+                    reactions = dayDoc.toReactions(),
+                )
+                recompose()
+            }
+        }
+    }
+
+    /** A pool question, or one of you wrote it. */
+    private fun resolveQuestion(id: String?): Question? = when {
+        id == null -> null
+        Wildcard.isWildcard(id) ->
+            allWildcards.firstOrNull { it.id == Wildcard.idOf(id) }?.asQuestion()
+        else -> pool.question(id)
     }
 
     override fun setColor(colorArgb: Long) {
@@ -545,6 +712,37 @@ private fun DocumentSnapshot?.toReactions(): Map<String, Reaction> {
         val name = v as? String ?: return@mapNotNull null
         Reaction.entries.firstOrNull { it.name == name }?.let { uid to it }
     }.toMap()
+}
+
+private fun DocumentSnapshot.toWildcard(): Wildcard? {
+    val text = getString("text")?.takeIf { it.isNotBlank() } ?: return null
+    val type = QuestionType.entries.firstOrNull { it.name == getString("type") } ?: return null
+    @Suppress("UNCHECKED_CAST")
+    val options = (get("options") as? List<String>).orEmpty()
+    return Wildcard(
+        id = id,
+        text = text,
+        type = type,
+        options = options,
+        byUid = getString("byUid").orEmpty(),
+        byName = getString("byName").orEmpty(),
+        createdAtMillis = getTimestamp("createdAt")?.toDate()?.time ?: 0L,
+        usedOn = getString("usedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    )
+}
+
+private fun DocumentSnapshot.toKnowingMonth(myUid: String, partnerUid: String): KnowingMonth? {
+    val month = runCatching { YearMonth.parse(id) }.getOrNull() ?: return null
+    var mine = 0
+    var theirs = 0
+    var scored = 0
+    data.orEmpty().forEach { (_, value) ->
+        val day = value as? Map<*, *> ?: return@forEach
+        scored++
+        if (day[myUid] == true) mine++
+        if (day[partnerUid] == true) theirs++
+    }
+    return KnowingMonth(month, youHits = mine, theyHits = theirs, scored = scored)
 }
 
 private fun DocumentSnapshot.toAnswer(): Answer? {

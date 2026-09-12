@@ -28,6 +28,16 @@
             </intent-filter>
         </activity>
 
+        <!-- Firebase hands the message to this. Everything about how it is
+             drawn (icon, channel, where a tap goes) stays ours. -->
+        <service
+            android:name=".notify.MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".notify.ReminderReceiver"
             android:exported="false">

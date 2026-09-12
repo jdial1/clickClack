@@ -31,6 +31,7 @@ androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-ru
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 # Credential Manager, not the old GoogleSignIn API -- that one is deprecated and
 # its Activity-result flow does not fit Compose.
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }

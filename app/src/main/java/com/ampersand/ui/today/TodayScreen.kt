@@ -72,6 +72,7 @@ import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.AnswerValues
+import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.arrive
 import com.ampersand.ui.feel.Feel
@@ -85,7 +86,9 @@ import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 private val DayFormat = DateTimeFormatter.ofPattern("EEEE d MMMM")
 
@@ -97,6 +100,7 @@ fun TodayScreen(
     modifier: Modifier = Modifier,
     decks: List<Quiz> = emptyList(),
     onOpenDeck: (String) -> Unit = {},
+    onWrite: () -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -123,6 +127,7 @@ fun TodayScreen(
 
         Spacer(Modifier.height(18.dp))
         QuestionHero(
+            askedBefore = state.capsule?.date,
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -162,6 +167,9 @@ fun TodayScreen(
             }
         }
 
+        Spacer(Modifier.height(32.dp))
+        WriteOne(state, onWrite)
+
         if (decks.isNotEmpty()) {
             Spacer(Modifier.height(40.dp))
             SectionLabel("Decks")
@@ -195,7 +203,13 @@ fun TodayScreen(
  * blend. Every couple gets a different hero.
  */
 @Composable
-private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) {
+private fun QuestionHero(
+    question: Question,
+    you: BrickColor,
+    them: BrickColor,
+    /** Set when the two of you answered this exact question once before. */
+    askedBefore: LocalDate? = null,
+) {
     // One line of text crosses both halves of the wall, so the ink has to suit
     // the paler of the two. White over pack yellow is unreadable.
     val ink = inkOnBricks(you.slug, them.slug)
@@ -228,6 +242,18 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
             )
             DepthDots(question.depth, tint = ink)
         }
+
+        // Said before the question rather than after it. Knowing this one is
+        // coming back changes how you answer it, and finding out afterwards
+        // would make the app feel like it had kept something from you.
+        askedBefore?.let { then ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "You both answered this ${agoIn(then)}. Answer it again.",
+                style = MaterialTheme.typography.labelSmall,
+                color = ink,
+            )
+        }
         Spacer(Modifier.height(14.dp))
         SelectionContainer {
             Text(
@@ -237,6 +263,63 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
             )
         }
     }
+    }
+}
+
+/**
+ * The way in to writing your own question.
+ *
+ * Sits under the day rather than above it: today already has a question, and
+ * offering to write one before you have answered the one in front of you is
+ * offering a way out of it.
+ *
+ * When something is already queued it says so instead. Two people who both
+ * write one on the same evening should be able to see that they did.
+ */
+@Composable
+private fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val queued = state.wildcards
+    val mine = queued.count { it.byUid == state.you.uid }
+    val theirs = queued.size - mine
+
+    SectionLabel("Your own")
+    Spacer(Modifier.height(10.dp))
+    AmpButton(
+        label = if (queued.isEmpty()) "Write one for ${state.them.name}" else "Write another",
+        slug = you.slug,
+        onClick = onWrite,
+    )
+
+    if (queued.isNotEmpty()) {
+        Spacer(Modifier.height(10.dp))
+        QuietNote(
+            when {
+                mine > 0 && theirs > 0 ->
+                    "One of yours and one of ${state.them.name}'s are waiting."
+                theirs > 0 ->
+                    "${state.them.name} has written one. It is the next question."
+                mine == 1 -> "Yours is waiting. It will be the next question."
+                else -> "$mine of yours are waiting."
+            },
+        )
+    }
+}
+
+/**
+ * How long ago, roughly, and never in days.
+ *
+ * "One hundred and eighty-three days ago" is a number; "six months ago" is a
+ * memory. The whole feature is about distance feeling like distance.
+ */
+internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
+    val months = ChronoUnit.MONTHS.between(then, now)
+    return when {
+        months >= 24 -> "${months / 12} years ago"
+        months >= 12 -> "a year ago"
+        months == 1L -> "a month ago"
+        months >= 2 -> "$months months ago"
+        else -> "a few weeks ago"
     }
 }
 

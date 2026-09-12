@@ -55,6 +55,7 @@ import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Motion
+import com.ampersand.ui.today.agoIn
 import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
@@ -163,6 +164,38 @@ fun RevealScreen(
                     day.answerFor(state.you.uid)?.values.orEmpty(),
                 ),
             )
+        }
+
+        // Only on a capsule day, and only after the seal -- the whole trick is
+        // that you answered today without being able to see this.
+        state.capsule?.takeIf { it.question.id == day.question.id && day.isRevealed }?.let { then ->
+            Spacer(Modifier.height(30.dp))
+            Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
+                Column(Modifier.fillMaxWidth()) {
+                    SectionLabel("And ${agoIn(then.date, day.date)}")
+                    Spacer(Modifier.height(10.dp))
+                    AnswerPanelPair(
+                        type = then.question.type,
+                        scored = then.question.isScored,
+                        yourName = state.you.name,
+                        yourColor = youColor,
+                        yourAnswer = then.answerFor(state.you.uid)?.values.orEmpty(),
+                        yourGuess = then.answerFor(state.you.uid)?.guess,
+                        youKnewThem = then.question.guessHit(
+                            then.answerFor(state.you.uid)?.guess,
+                            then.answerFor(state.them.uid)?.values.orEmpty(),
+                        ),
+                        theirName = state.them.name,
+                        theirColor = themColor,
+                        theirAnswer = then.answerFor(state.them.uid)?.values.orEmpty(),
+                        theirGuess = then.answerFor(state.them.uid)?.guess,
+                        theyKnewYou = then.question.guessHit(
+                            then.answerFor(state.them.uid)?.guess,
+                            then.answerFor(state.you.uid)?.values.orEmpty(),
+                        ),
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.height(30.dp))

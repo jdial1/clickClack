@@ -83,6 +83,7 @@ import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.pressDepth
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.history.HistoryScreen
+import com.ampersand.notify.Push
 import com.ampersand.notify.Reminder
 import com.ampersand.ui.notify.ReminderSetupScreen
 import com.ampersand.ui.quiz.DeckScreen
@@ -105,6 +106,7 @@ import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
 import com.ampersand.ui.today.TodayScreen
 import com.ampersand.ui.us.UsScreen
+import com.ampersand.ui.wildcard.WildcardScreen
 import java.time.LocalDate
 
 /**
@@ -378,6 +380,7 @@ private fun PairedGate(
 private sealed interface Screen {
     data class Deck(val id: String) : Screen
     data class Reveal(val date: LocalDate) : Screen
+    data object Wildcard : Screen
     data class Main(val tab: Tab) : Screen
 }
 
@@ -393,8 +396,13 @@ private fun SignedInApp(
 ) {
         // Point both halves of the couple at the real accounts. Keyed on the
         // uids so this runs once per pairing rather than every recomposition.
+        val appContext = LocalContext.current
         LaunchedEffect(account.uid, account.displayName) {
             vm.repo.bindLocalUser(account.uid, account.displayName)
+            // Where the sender finds this phone. Re-run on every signed-in
+            // launch rather than tracked, because the system can rotate a token
+            // whenever it likes and a stale one fails silently.
+            Push.register(appContext, account.uid)
         }
 
         // Leave the receiver a note about what is actually outstanding. It
@@ -427,6 +435,7 @@ private fun SignedInApp(
         // would let the reveal put on its whole performance again on the way
         // back in. Saveable so a rotation does not do the same.
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
+        var writing by remember { mutableStateOf(false) }
 
         val sounds = LocalSounds.current
         val feel = LocalFeel.current
@@ -438,7 +447,9 @@ private fun SignedInApp(
         // closed the app. Out of a deck or a reveal first, then off whichever
         // tab you are on, and only from Today does the press fall through and
         // leave -- which is where leaving should mean leaving.
-        BackHandler(enabled = openDeck != null || openDate != null || tab != Tab.TODAY) {
+        BackHandler(
+            enabled = writing || openDeck != null || openDate != null || tab != Tab.TODAY,
+        ) {
             // Going back is a navigation, and only the forward direction ever
             // said so. Note the handler is disabled on Today, so leaving the
             // app stays silent -- which is right: the app has no opinion about
@@ -446,6 +457,7 @@ private fun SignedInApp(
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
             when {
+                writing -> writing = false
                 openDeck != null -> openDeck = null
                 openDate != null -> openDate = null
                 else -> tab = Tab.TODAY
@@ -459,7 +471,7 @@ private fun SignedInApp(
                     BottomBar(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
-                        enabled = openDate == null && openDeck == null,
+                        enabled = openDate == null && openDeck == null && !writing,
                         onSelect = { tab = it; openDate = null; openDeck = null },
                     )
                 },
@@ -479,6 +491,7 @@ private fun SignedInApp(
                         .padding(padding),
                 ) {
                     val here: Screen = when {
+                        writing -> Screen.Wildcard
                         openDeck != null -> Screen.Deck(openDeck!!)
                         openDate != null -> Screen.Reveal(openDate!!)
                         else -> Screen.Main(tab)
@@ -533,6 +546,12 @@ private fun SignedInApp(
                             onOpened = { openedReveal = day.date.toString() },
                         )
 
+                        screen is Screen.Wildcard -> WildcardScreen(
+                            state = state,
+                            onBack = { writing = false },
+                            onSubmit = vm.repo::addWildcard,
+                        )
+
                         screen !is Screen.Main -> Unit
 
                         screen.tab == Tab.TODAY -> TodayScreen(
@@ -541,6 +560,7 @@ private fun SignedInApp(
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
                             onOpenDeck = { openDeck = it },
+                            onWrite = { writing = true },
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -51,6 +52,7 @@ import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.pressDepth
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
@@ -65,6 +67,7 @@ import com.ampersand.ui.theme.ThemeMode
 import com.ampersand.ui.theme.ColorChoices
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.toArgbLong
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun UsScreen(
@@ -129,6 +132,9 @@ fun UsScreen(
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
         )
+
+        Spacer(Modifier.height(32.dp))
+        Knowing(state)
 
         Spacer(Modifier.height(32.dp))
         Anniversary(state, onSetAnniversary)
@@ -242,6 +248,102 @@ private fun ColorRow(name: String, current: Color, onPick: (Long) -> Unit) {
         }
     }
 }
+
+/**
+ * How well you have known each other, kept.
+ *
+ * Every day already worked this out and then threw it away: you saw "nailed
+ * it" on Tuesday and by Friday it was gone. Six months of that is the only
+ * thing in the app that could say something neither of you would have noticed
+ * -- that one of you is better at this, and by how much, and whether it is
+ * changing.
+ *
+ * Two rows of studs per month rather than a percentage, for the same reason
+ * the deck result is two towers: the lopsided months are the interesting ones
+ * and one number hides exactly that.
+ */
+@Composable
+private fun Knowing(state: CoupleState) {
+    val knowing = state.knowing
+    val you = BrickColor.of(state.you.colorArgb)
+    val them = BrickColor.of(state.them.colorArgb)
+
+    SectionLabel("How well you know each other")
+    Spacer(Modifier.height(10.dp))
+
+    if (knowing.isEmpty) {
+        QuietNote(
+            "Nothing to count yet. Every day the two of you both answer a " +
+                "scored question adds one to this.",
+        )
+        return
+    }
+
+    Text(
+        text = "${state.you.name} ${knowing.youHits}  ·  " +
+            "${state.them.name} ${knowing.theyHits}  ·  of ${knowing.scored}",
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onBackground,
+    )
+    Spacer(Modifier.height(4.dp))
+    Text(
+        text = verdict(state, knowing),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+    Spacer(Modifier.height(18.dp))
+    knowing.recent.take(6).forEach { month ->
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SectionLabel(
+                month.month.format(MonthLabel),
+                modifier = Modifier.width(64.dp),
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                StudBar(month.youHits, month.scored, you)
+                StudBar(month.theyHits, month.scored, them)
+            }
+        }
+    }
+}
+
+/**
+ * Who is ahead, said once, in a sentence rather than a league table.
+ *
+ * Deliberately generous when it is close: a scoreboard that declares a winner
+ * over three guesses is a scoreboard people start playing to.
+ */
+@Composable
+private fun verdict(state: CoupleState, knowing: com.ampersand.model.Knowing): String {
+    val gap = knowing.youHits - knowing.theyHits
+    val share = knowing.scored.takeIf { it > 0 } ?: return ""
+    return when {
+        kotlin.math.abs(gap) <= share / 10 -> "About even, which is rarer than it sounds."
+        gap > 0 -> "${state.you.name} calls it more often."
+        else -> "${state.them.name} calls it more often."
+    }
+}
+
+/** Ten studs, filled to the share. A bar made of the thing the app is made of. */
+@Composable
+private fun StudBar(hits: Int, of: Int, color: BrickColor) {
+    val lit = if (of == 0) 0 else ((hits * StudsInBar + of / 2) / of).coerceIn(0, StudsInBar)
+    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        repeat(StudsInBar) { i ->
+            BrickDot(
+                slug = if (i < lit) color.slug else quietSlug(),
+                studSize = 13.dp,
+                filled = i < lit,
+            )
+        }
+    }
+}
+
+private const val StudsInBar = 10
+private val MonthLabel: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")
 
 /**
  * The two switches worth having on this screen.

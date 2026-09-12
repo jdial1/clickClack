@@ -6,7 +6,9 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Placement
 import com.ampersand.model.QuizRun
+import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
+import com.ampersand.model.Wildcard
 import com.ampersand.model.Rewards
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,6 +82,15 @@ interface CoupleRepository {
      * answers.
      */
     fun submitQuizRun(quizId: String, answers: Map<String, List<String>>, guesses: Map<String, List<String>>)
+
+    /**
+     * Write a question of your own for the two of you.
+     *
+     * Queued rather than asked immediately: a question that arrives the instant
+     * it is written is a message, and this app deliberately has no messages.
+     * Waiting until tomorrow is what makes it a question.
+     */
+    fun addWildcard(text: String, type: QuestionType, options: List<String>)
 }
 
 /**
@@ -284,6 +295,21 @@ class FakeCoupleRepository(
     }
 
     override fun setAnniversary(date: LocalDate) = mutate { it.copy(anniversary = date) }
+
+    override fun addWildcard(text: String, type: QuestionType, options: List<String>) =
+        mutate { current ->
+            current.copy(
+                wildcards = current.wildcards + Wildcard(
+                    id = "wc${current.wildcards.size + 1}",
+                    text = text,
+                    type = type,
+                    options = options,
+                    byUid = current.you.uid,
+                    byName = current.you.name,
+                    createdAtMillis = System.currentTimeMillis(),
+                ),
+            )
+        }
 
     private inline fun mutate(block: (CoupleState) -> CoupleState) {
         _state.value = block(_state.value)

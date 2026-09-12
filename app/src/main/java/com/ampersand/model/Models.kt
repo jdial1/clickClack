@@ -191,6 +191,18 @@ data class CoupleState(
     val anniversary: LocalDate? = null,
     val streak: Int = 0,
     val freezesLeft: Int = 1,
+    /**
+     * The day today's question came back from, when today is a capsule.
+     *
+     * Null on an ordinary day. When it is set, the two of you answered this
+     * exact question once before and the reveal has four answers in it rather
+     * than two.
+     */
+    val capsule: DayEntry? = null,
+    /** Questions the two of you wrote, oldest first, none of them asked yet. */
+    val wildcards: List<Wildcard> = emptyList(),
+    /** How often each of you has called the other, for as long as you have played. */
+    val knowing: Knowing = Knowing(),
 ) {
     /**
      * Answered days falling on today's date in an earlier month or year.
