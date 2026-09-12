@@ -43,7 +43,11 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Motion
 
-private val Tile = BrickShape(2, BrickHeight.HIGH)
+// MEDIUM, matching the nav tab. These are two identical-looking 2-stud
+// tiles on two bars that sit within a hundred dp of each other, and they were
+// different thicknesses. HIGH is for things thick enough to press *down*,
+// which is a button, not a row of markers.
+private val Tile = BrickShape(2, BrickHeight.MEDIUM)
 
 /**
  * The drawable behind a [Reaction].

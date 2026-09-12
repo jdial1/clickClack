@@ -489,8 +489,8 @@ class FirestoreCoupleRepository(
             val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
             val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
             val result = QuizResult.of(quiz, mine, theirs)
-            Rewards.forQuiz(result, s.you, result.youKnewThem, today) +
-                Rewards.forQuiz(result, s.them, result.theyKnewYou, today)
+            Rewards.forQuiz(result, s.you, s.them, result.youKnewThem, today) +
+                Rewards.forQuiz(result, s.them, s.you, result.theyKnewYou, today)
         }.filter { b -> plate.blocks.none { it.id == b.id } }
 
         if (fresh.isEmpty()) return

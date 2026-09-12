@@ -65,7 +65,7 @@ fun AnswerPanel(
         Row(verticalAlignment = Alignment.CenterVertically) {
             PersonDot(ownerName, ownerColor, size = if (compact) 22 else 26)
             Spacer(Modifier.size(if (compact) 7.dp else 10.dp))
-            SectionLabel("$ownerName said")
+            SectionLabel("$ownerName said", panel = false)
         }
         Spacer(Modifier.height(10.dp))
 
@@ -99,12 +99,12 @@ fun AnswerPanel(
         if (scored && guess != null) {
             Spacer(Modifier.height(16.dp))
             if (compact) {
-                SectionLabel("$guesserName guessed")
+                SectionLabel("$guesserName guessed", panel = false)
                 Spacer(Modifier.height(6.dp))
                 HitBadge(hit)
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    SectionLabel("$guesserName guessed")
+                    SectionLabel("$guesserName guessed", panel = false)
                     Spacer(Modifier.size(8.dp))
                     HitBadge(hit)
                 }

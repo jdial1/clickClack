@@ -75,6 +75,7 @@ import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.toArgbLong
+import com.ampersand.ui.theme.Stud
 
 /**
  * The form kit, in brick.
@@ -204,7 +205,7 @@ fun AmpRadioGroup(
                 BrickTile(
                     shape = shape,
                     color = brick,
-                    studSize = 30.dp,
+                    studSize = Stud.chip,
                     atlas = atlas,
                     alpha = alpha,
                 )

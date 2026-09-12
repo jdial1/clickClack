@@ -72,6 +72,7 @@ import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
+import com.ampersand.ui.theme.Stud
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -499,7 +500,7 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
         if (score != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 repeat(2) { i ->
-                    BrickDot(slug = quietSlug(), studSize = 12.dp, filled = i < score)
+                    BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < score)
                 }
             }
         }

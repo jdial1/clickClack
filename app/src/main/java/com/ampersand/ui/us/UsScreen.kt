@@ -67,6 +67,7 @@ import com.ampersand.ui.theme.ThemeMode
 import com.ampersand.ui.theme.ColorChoices
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.toArgbLong
+import com.ampersand.ui.theme.Stud
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -335,7 +336,7 @@ private fun StudBar(hits: Int, of: Int, color: BrickColor) {
         repeat(StudsInBar) { i ->
             BrickDot(
                 slug = if (i < lit) color.slug else quietSlug(),
-                studSize = 13.dp,
+                studSize = Stud.pip,
                 filled = i < lit,
             )
         }
@@ -410,7 +411,7 @@ private fun ThemeBricks(you: BrickColor) {
 
             BrickPill(
                 slug = if (on) you.slug else structureSlug(),
-                studSize = 30.dp,
+                studSize = Stud.chip,
                 height = BrickHeight.MEDIUM,
                 alpha = 0.55f + 0.45f * lift,
                 modifier = Modifier.clickable(
@@ -511,7 +512,7 @@ private fun Upcoming(title: String, detail: String) {
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        BrickDot(slug = quietSlug(), studSize = 13.dp, modifier = Modifier.padding(top = 3.dp))
+        BrickDot(slug = quietSlug(), studSize = Stud.pip, modifier = Modifier.padding(top = 3.dp))
         Spacer(Modifier.size(14.dp))
         Column {
             Text(title, style = MaterialTheme.typography.titleSmall)

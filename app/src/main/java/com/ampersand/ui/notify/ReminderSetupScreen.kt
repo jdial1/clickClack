@@ -66,6 +66,11 @@ fun ReminderSetupScreen(
         onDone()
     }
 
+    // Its own ground. Without this the screen paints straight onto the window
+    // background from themes.xml, which is the dark one whatever the theme says
+    // -- so in light mode a light-mode wall and light-mode ink both landed on a
+    // dark sheet and the headline vanished into it.
+    Surface(color = MaterialTheme.colorScheme.background) {
     Box(modifier.fillMaxSize()) {
         BrickWall(you = color, them = BrickColor.BLUE, alpha = 0.12f)
 
@@ -121,6 +126,7 @@ fun ReminderSetupScreen(
                 Text("Not now")
             }
         }
+    }
     }
 }
 

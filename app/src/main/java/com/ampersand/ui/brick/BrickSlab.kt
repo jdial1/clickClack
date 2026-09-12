@@ -69,6 +69,34 @@ fun structureSlug(): String? =
     if (MaterialTheme.colorScheme.background.luminance() < 0.5f) "black" else null
 
 /**
+ * The same frosting, for text sitting on the wall rather than on a slab.
+ *
+ * The wall is brick too. It is quieter than a slab, which made it easy to
+ * forget, but it still has a seam and a shadow every course and a run of studs
+ * across the top of each one -- and a line of type crossing those is a line of
+ * type with a stripe through it. In light mode the wall's pale bands run right
+ * behind a paragraph and the eye keeps trying to read the brick.
+ *
+ * Keyed to the ground's own ink, so it darkens under light type and lightens
+ * under dark type without anyone choosing.
+ */
+@Composable
+fun Modifier.onWall(corner: Dp = 14.dp, strength: Float = 1f): Modifier {
+    // Decided from the ground, not by comparing the ink to a known constant:
+    // the slab version does that and it is right there, because a brick's ink
+    // is one of exactly two colours. The background's is not -- it is built
+    // from the couple's palette -- so the comparison silently failed and light
+    // mode got a black scrim under black type.
+    val light = MaterialTheme.colorScheme.background.luminance() > 0.5f
+    val pane = if (light) Color.White else Color.Black
+    val shape = RoundedCornerShape(corner)
+    return this
+        .clip(shape)
+        .background(pane.copy(alpha = (if (light) 0.58f else 0.34f) * strength))
+        .padding(horizontal = 10.dp, vertical = 6.dp)
+}
+
+/**
  * A frosted panel to sit text on, when the text is on brick.
  *
  * Brick art is not a flat colour: every course has a seam and a shadow, and a

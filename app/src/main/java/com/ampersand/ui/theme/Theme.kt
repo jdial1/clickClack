@@ -173,6 +173,33 @@ val AmpersandShapes = Shapes(
     extraLarge = RoundedCornerShape(36.dp),
 )
 
+/**
+ * How big a stud is, in one place.
+ *
+ * Eleven hard-coded sizes had accreted across nine files -- 12, 13 and 14dp
+ * were three answers to one question (a marker), and 24 turned up twice by
+ * coincidence rather than by agreement. Four numbers is the whole vocabulary.
+ *
+ * Surfaces are not in here on purpose. Anything that fills its width derives
+ * its own stud by dividing: **the page is twelve studs**, the nav bar is
+ * eleven because four two-stud tabs and three joiners come to eleven, and the
+ * ten-week plate is seven because a week is. Those are ratios, not sizes, and
+ * pinning them to a dp would break the moment a phone got wider.
+ */
+object Stud {
+    /** Markers and pips: depth dots, score pips, a person's initial. */
+    val pip = 13.dp
+
+    /** A small brick carrying something: a tray piece, the streak pill. */
+    val small = 24.dp
+
+    /** A brick you press that hugs its own label. */
+    val chip = 30.dp
+
+    /** The splash, and nothing else in the app is this size. */
+    val hero = 46.dp
+}
+
 object Radius {
     val chip = RoundedCornerShape(14.dp)
     val control = RoundedCornerShape(20.dp)

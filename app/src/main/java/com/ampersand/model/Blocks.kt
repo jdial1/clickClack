@@ -246,10 +246,15 @@ object Rewards {
         val theirs = day.answerFor(partner.uid) ?: return emptyList()
 
         val milestone = streakAfter > 0 && streakAfter % 7 == 0
+        val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
             milestone -> CharacterShape
+            // The rarest good outcome in the app: you called the answer to a
+            // question that was actually hard. It earns the only piece that is
+            // not a box, which is the only way a week ever stops being one.
+            called && day.question.depth.level >= 3 -> roof(member, partner)
             !day.question.isScored -> unscored(day.question.depth)
-            day.question.guessHit(mine.guess, theirs.values) -> landed(day.question.depth)
+            called -> landed(day.question.depth)
             else -> missed(day.question.depth)
         }
 
@@ -276,6 +281,7 @@ object Rewards {
     fun forQuiz(
         result: QuizResult,
         member: Member,
+        partner: Member,
         hits: Int,
         earnedOn: LocalDate,
     ): List<Block> {
@@ -284,6 +290,13 @@ object Rewards {
                 block(result, member, BrickShape(4, BrickHeight.MEDIUM), earnedOn),
             )
         }
+        // Every scorable question in the deck, called. Worth a roof for the
+        // same reason a deep day is: it is the outcome that does not happen by
+        // turning up.
+        if (hits == result.possible) {
+            return listOf(block(result, member, roof(member, partner), earnedOn))
+        }
+
         val share = hits.toFloat() / result.possible
         val width = when {
             share >= 0.7f -> 6
@@ -308,6 +321,25 @@ object Rewards {
         colorArgb = member.colorArgb,
         ownerUid = member.uid,
         earnedOn = earnedOn,
+    )
+
+    /**
+     * The piece that gives a sculpture a skyline.
+     *
+     * Flats can only ever make a rectangle: every week the two of you built
+     * came out the same shape, wider or narrower, and the silhouette said
+     * nothing the caption did not. A slope is the one piece that changes the
+     * outline, and it is deliberately the hardest to get.
+     *
+     * The pair face opposite ways, decided by whose uid sorts first so both
+     * phones agree without talking. When you both call the same deep question
+     * the two slopes meet in a peak, which is the sculpture saying something
+     * about the two of you rather than about each of you.
+     */
+    private fun roof(member: Member, partner: Member): BrickShape = BrickShape(
+        studs = 4,
+        height = BrickHeight.HIGH,
+        slope = if (member.uid < partner.uid) Slope.LEFT else Slope.RIGHT,
     )
 
     /** Wide and solid: you called it. */

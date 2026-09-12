@@ -54,6 +54,7 @@ import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Stud
 
 /**
  * The whole pool, grouped by what it wants from you.
@@ -270,7 +271,7 @@ private fun BrickChip(
 
     BrickPill(
         slug = color?.slug,
-        studSize = 30.dp,
+        studSize = Stud.chip,
         height = BrickHeight.MEDIUM,
         alpha = 0.45f + 0.55f * lift,
         modifier = Modifier.clickable(

@@ -30,7 +30,9 @@ import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.Stud
 import com.ampersand.ui.theme.toArgbLong
+import com.ampersand.ui.brick.onWall
 
 /** Small, letter-spaced, uppercase. Used for every section heading in the app. */
 @Composable
@@ -38,12 +40,17 @@ fun SectionLabel(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    /**
+     * False when the label is already inside a panel of its own. Two frostings
+     * stacked is a panel with a panel in it, which reads as a mistake.
+     */
+    panel: Boolean = true,
 ) {
     Text(
         text = text.uppercase(),
         style = MaterialTheme.typography.labelSmall,
         color = color,
-        modifier = modifier,
+        modifier = if (panel) modifier.onWall(corner = 10.dp) else modifier,
     )
 }
 
@@ -58,7 +65,7 @@ fun DepthDots(depth: Depth, modifier: Modifier = Modifier, tint: Color? = null) 
     // would disappear into the background it is drawn on.
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         repeat(3) { i ->
-            BrickDot(slug = quietSlug(), studSize = 13.dp, filled = i < depth.level)
+            BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < depth.level)
         }
     }
 }
@@ -95,12 +102,12 @@ fun PersonDot(
 
 /** Centred, quiet, used for empty and waiting states. */
 @Composable
-fun QuietNote(text: String, modifier: Modifier = Modifier) {
+fun QuietNote(text: String, modifier: Modifier = Modifier, panel: Boolean = true) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
-        modifier = modifier.fillMaxWidth(),
+        modifier = (if (panel) modifier.onWall() else modifier).fillMaxWidth(),
     )
 }

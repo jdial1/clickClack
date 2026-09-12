@@ -50,11 +50,12 @@ import com.ampersand.ui.sound.awaitReady
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Wordmark
+import com.ampersand.ui.theme.Stud
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 private val Tile = BrickShape(2, BrickHeight.MEDIUM)
-private const val StudSize = 46
+private val StudSize = Stud.hero
 
 /** Accelerating, because things fall faster the longer they have been falling. */
 private val Gravity = CubicBezierEasing(0.5f, 0f, 1f, 0.5f)
@@ -133,7 +134,7 @@ fun SplashScreen(
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val stud = StudSize.dp
+                    val stud = StudSize
                     val course = stud * Tile.h * BrickArt.ROW_RATIO
                     val nub = stud * BrickArt.NUB_RATIO
 

@@ -68,6 +68,7 @@ import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
@@ -86,6 +87,7 @@ import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
+import com.ampersand.ui.theme.Stud
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -326,11 +328,11 @@ internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
 /** Small filled capsule, used for metadata that should not compete. */
 @Composable
 private fun Pill(text: String) {
-    BrickPill(slug = null, studSize = 24.dp, height = BrickHeight.LOW) {
+    BrickPill(slug = quietSlug(), studSize = Stud.small, height = BrickHeight.LOW) {
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.labelSmall,
-            color = inkOnBrick(null),
+            color = inkOnBrick(quietSlug()),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
         )
     }
@@ -625,7 +627,7 @@ private fun WaitingLine(theirName: String) {
 @Composable
 private fun FieldLabel(text: String, accent: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        BrickDot(slug = BrickColor.of(accent.toArgbLong()).slug, studSize = 14.dp)
+        BrickDot(slug = BrickColor.of(accent.toArgbLong()).slug, studSize = Stud.pip)
         Spacer(Modifier.size(8.dp))
         SectionLabel(text)
     }
