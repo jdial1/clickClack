@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ampersand.ui.theme.Motion
+import kotlinx.coroutines.delay
 import kotlin.math.floor
 import kotlin.math.max
 
@@ -130,6 +131,51 @@ fun Modifier.shake(key: Int, distance: Dp = 6.dp): Modifier = composed {
         )
     }
     graphicsLayer { translationX = offset.value * density }
+}
+
+/**
+ * A thing settling into place, on its own beat.
+ *
+ * Drawn, not laid out: the child occupies its final space from the first frame
+ * and only its pixels move. That is what keeps a staggered group from reflowing
+ * a scrolling column five times in a third of a second -- and it is the more
+ * physical reading anyway. The bricks are already there; they are bedding in.
+ *
+ * [index] is the child's place in a stagger, in beats of [Motion.StaggerMs].
+ * Restarts whenever [key] changes, which for a group means every child restarts
+ * together.
+ */
+fun Modifier.arrive(
+    key: Any?,
+    index: Int = 0,
+    rise: Dp = 8.dp,
+    slide: Dp = 0.dp,
+    enabled: Boolean = true,
+    /** Fired on the frame it comes to rest, for a cue that has to land with it. */
+    onLanded: () -> Unit = {},
+): Modifier = composed {
+    val progress = remember { Animatable(if (enabled) 0f else 1f) }
+    LaunchedEffect(key, enabled) {
+        if (!enabled) {
+            // Already seen. Render finished rather than flashing through it.
+            progress.snapTo(1f)
+            return@LaunchedEffect
+        }
+        progress.snapTo(0f)
+        delay(index * Motion.StaggerMs.toLong())
+        progress.animateTo(1f, Motion.glide)
+        // Deliberately after animateTo, and deliberately not in a finally: if
+        // this composable is disposed mid-flight the coroutine is cancelled and
+        // the cue never fires, which is what you want. A sound with no picture
+        // is worse than neither.
+        onLanded()
+    }
+    graphicsLayer {
+        val p = progress.value
+        alpha = p
+        translationY = (1f - p) * rise.toPx()
+        translationX = (1f - p) * slide.toPx()
+    }
 }
 
 /** Stud metrics for UI chrome. Looser than the real art, which is very fine at UI scale. */

@@ -2,8 +2,13 @@ package com.ampersand.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -351,6 +356,20 @@ private fun PairedGate(
     }
 }
 
+/**
+ * Where you are, as one value.
+ *
+ * The screen used to be chosen by reading three pieces of state inside a
+ * `when`, which is fine for drawing and useless for animating: a transition
+ * needs one thing to compare, and comparing `CoupleState` would restart it
+ * every time Firestore pushed anything at all.
+ */
+private sealed interface Screen {
+    data class Deck(val id: String) : Screen
+    data class Reveal(val date: LocalDate) : Screen
+    data class Main(val tab: Tab) : Screen
+}
+
 /** The whole product, once we know who is using it. */
 @Composable
 private fun SignedInApp(
@@ -392,6 +411,14 @@ private fun SignedInApp(
         // the screen re-resolves it and a deck that gains a question mid-play
         // does not leave a stale copy on screen.
         var openDeck by remember { mutableStateOf<String?>(null) }
+        // Which day has already been unpacked. Hoisted above the screen because
+        // the screen is disposed every time you leave it, and a flag inside it
+        // would let the reveal put on its whole performance again on the way
+        // back in. Saveable so a rotation does not do the same.
+        var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
+
+        val sounds = LocalSounds.current
+        val feel = LocalFeel.current
 
         // Back walks back through the app rather than out of it.
         //
@@ -401,6 +428,12 @@ private fun SignedInApp(
         // tab you are on, and only from Today does the press fall through and
         // leave -- which is where leaving should mean leaving.
         BackHandler(enabled = openDeck != null || openDate != null || tab != Tab.TODAY) {
+            // Going back is a navigation, and only the forward direction ever
+            // said so. Note the handler is disabled on Today, so leaving the
+            // app stays silent -- which is right: the app has no opinion about
+            // you closing it.
+            sounds.play(Sfx.NAV)
+            feel.play(Feel.NAV)
             when {
                 openDeck != null -> openDeck = null
                 openDate != null -> openDate = null
@@ -434,9 +467,33 @@ private fun SignedInApp(
                         .fillMaxSize()
                         .padding(padding),
                 ) {
-                    // Re-resolved every composition, so the screen sees the live
-                    // day rather than the one that was open when it was tapped.
-                    val day = openDate?.let { date ->
+                    val here: Screen = when {
+                        openDeck != null -> Screen.Deck(openDeck!!)
+                        openDate != null -> Screen.Reveal(openDate!!)
+                        else -> Screen.Main(tab)
+                    }
+
+                    // One surface leaving, then the next arriving -- never both
+                    // at once. Every screen here is a transparent column on the
+                    // same brick wall, so a true crossfade draws two sets of
+                    // cards at half opacity over one background and reads as a
+                    // double exposure rather than as a transition.
+                    //
+                    // SizeTransform off: BrickSlab reports its own height, and a
+                    // container animating between two measured heights around
+                    // one is a fight nobody wins.
+                    AnimatedContent(
+                        targetState = here,
+                        transitionSpec = {
+                            fadeIn(tween(Motion.SwapMs - Motion.PressMs, Motion.PressMs))
+                                .togetherWith(fadeOut(tween(Motion.PressMs))) using null
+                        },
+                        label = "screen",
+                    ) { screen ->
+                    // Resolved from the *target* screen, not from the live vars:
+                    // reading those would make the outgoing screen draw the
+                    // incoming one's content for the length of the transition.
+                    val day = (screen as? Screen.Reveal)?.date?.let { date ->
                         if (state.today.date == date) {
                             state.today
                         } else {
@@ -444,7 +501,7 @@ private fun SignedInApp(
                         }
                     }
 
-                    val deck = openDeck?.let { pool.deck(it) }
+                    val deck = (screen as? Screen.Deck)?.id?.let { pool.deck(it) }
 
                     when {
                         deck != null -> DeckScreen(
@@ -461,9 +518,13 @@ private fun SignedInApp(
                             day = day,
                             onBack = { openDate = null },
                             onReact = { vm.repo.react(day.date, it) },
+                            animateIn = openedReveal != day.date.toString(),
+                            onOpened = { openedReveal = day.date.toString() },
                         )
 
-                        tab == Tab.TODAY -> TodayScreen(
+                        screen !is Screen.Main -> Unit
+
+                        screen.tab == Tab.TODAY -> TodayScreen(
                             state = state,
                             decks = pool.decks,
                             onSubmit = vm.repo::submitToday,
@@ -471,13 +532,13 @@ private fun SignedInApp(
                             onOpenDeck = { openDeck = it },
                         )
 
-                        tab == Tab.BUILD -> BuildScreen(
+                        screen.tab == Tab.BUILD -> BuildScreen(
                             state = state,
                             plate = state.plate,
                             onPlace = vm.repo::placeBlock,
                         )
 
-                        tab == Tab.SHELF -> HistoryScreen(
+                        screen.tab == Tab.SHELF -> HistoryScreen(
                             state = state,
                             onOpenDay = { openDate = it.date },
                         )
@@ -490,6 +551,7 @@ private fun SignedInApp(
                             onSignOut = onSignOut,
                             onUnpair = onUnpair,
                         )
+                    }
                     }
 
                 }

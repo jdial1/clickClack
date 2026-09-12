@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -61,6 +62,14 @@ import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.drawable
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.components.arrive
+import com.ampersand.ui.components.pressDepth
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.theme.AmpersandTheme
 import java.time.LocalDate
@@ -141,15 +150,21 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
     // The card is a wall of both colours and the text crosses it.
     val ink = inkOnBricks(you.slug, them.slug)
 
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+
     BrickSlab(
         slugs = listOf(you.slug, them.slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick,
-        ),
+        modifier = Modifier
+            .pressDepth(pressed)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+            ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); onClick() },
     ) {
         Column(
             Modifier
@@ -296,9 +311,15 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
     }
 
     var selected by remember(shelf) { mutableStateOf(shelf.first()) }
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
 
     Column(Modifier.fillMaxWidth()) {
-        Sculpture(selected, Modifier.fillMaxWidth())
+        // Dissolved in place rather than crossfaded. Sculpture sizes itself from
+        // how tall the piece actually is, so two plates are two heights and a
+        // Crossfade would size its box to the larger -- the column would grow
+        // and shrink as you browsed the shelf.
+        Sculpture(selected, Modifier.fillMaxWidth().arrive(selected.id, rise = 0.dp))
         // A neutral course under the piece, so it stands on something rather
         // than floating in the middle of the screen.
         BrickSlab(
@@ -325,7 +346,13 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
                     Modifier
                         .width(86.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .clickable { selected = plate }
+                        .clickable {
+                            if (!on) {
+                                sounds.play(Sfx.TAP)
+                                feel.play(Feel.TAP)
+                                selected = plate
+                            }
+                        }
                         .padding(6.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -354,6 +381,8 @@ private fun StudPlate(
     byDate: Map<LocalDate, DayEntry>,
     onOpenDay: (DayEntry) -> Unit,
 ) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val today = state.today.date
     val start = today.minusDays((WeeksShown * DaysPerWeek - 1).toLong())
     val you = BrickColor.of(state.you.colorArgb)
@@ -380,7 +409,17 @@ private fun StudPlate(
                             return@detectTapGestures
                         }
                         val date = start.plusDays((row * DaysPerWeek + col).toLong())
-                        byDate[date]?.let(onOpenDay)
+                        val entry = byDate[date]
+                        if (entry != null) {
+                            sounds.play(Sfx.TAP)
+                            feel.play(Feel.TAP)
+                            onOpenDay(entry)
+                        } else {
+                            // A day neither of you answered. Said by feel and
+                            // not out loud: nothing happened, and announcing
+                            // that with a noise is just noise.
+                            feel.play(Feel.REJECT)
+                        }
                     }
                 },
         ) {
@@ -422,6 +461,8 @@ private fun StudPlate(
 
 @Composable
 private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val score = entry.score(state.you, state.them)
     val marks = entry.reactions.values.toList()
 
@@ -429,7 +470,10 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); onClick() }
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

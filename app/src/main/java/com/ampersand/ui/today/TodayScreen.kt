@@ -72,8 +72,14 @@ import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.components.arrive
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.quiz.DeckList
+import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Radius
@@ -122,10 +128,37 @@ fun TodayScreen(
         )
         Spacer(Modifier.height(28.dp))
 
+        // Whether *this* phone just did it, rather than whether it is done.
+        // Coming back to an already-answered day should find the panel sitting
+        // there, not watch it arrive again.
+        var justSealed by remember { mutableStateOf(false) }
+
         if (yourAnswer == null) {
-            AnswerForm(state, you, them, onSubmit)
+            AnswerForm(state, you, them) { values, guess ->
+                justSealed = true
+                onSubmit(values, guess)
+            }
         } else {
-            SealedPanel(state, you, them, onOpenReveal)
+            val sounds = LocalSounds.current
+            val feel = LocalFeel.current
+            Box(
+                Modifier.arrive(
+                    key = Unit,
+                    rise = 10.dp,
+                    enabled = justSealed,
+                    // The seal is cued by the picture, not by the tap -- the
+                    // button that made the noise has already gone by then, which
+                    // is why the old one landed on nothing.
+                    onLanded = {
+                        if (justSealed) {
+                            sounds.play(Sfx.SEAL)
+                            feel.play(Feel.SEAL)
+                        }
+                    },
+                ),
+            ) {
+                SealedPanel(state, you, them, onOpenReveal)
+            }
         }
 
         if (decks.isNotEmpty()) {
@@ -299,7 +332,9 @@ private fun AnswerForm(
         label = "Seal it",
         slug = BrickColor.of(state.you.colorArgb).slug,
         enabled = ready,
-        sfx = Sfx.SEAL,
+        // Silent on the click: the seal is cued by the panel landing instead.
+        sfx = null,
+        feelOnClick = Feel.PRESS,
         onClick = {
             onSubmit(
                 mine.values(question.type),

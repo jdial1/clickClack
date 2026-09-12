@@ -1,6 +1,7 @@
 package com.ampersand.ui.quiz
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,7 +42,15 @@ import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.arrive
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.play
+import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.today.QuestionInput
 import com.ampersand.ui.today.rememberDraft
@@ -119,7 +129,12 @@ private fun DeckPlayer(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+            val sounds = LocalSounds.current
+            val feel = LocalFeel.current
+            TextButton(
+                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+            ) {
                 Text("Leave")
             }
             SectionLabel("${index + 1} of ${quiz.size}")
@@ -133,7 +148,10 @@ private fun DeckPlayer(
             slugs = listOf(quiz.theme.brick.slug),
             studs = 12,
             height = BrickHeight.MEDIUM,
-            modifier = Modifier.fillMaxWidth(),
+            // The next question comes in from the side. Enter only: the page
+            // being replaced is the one you have just finished with, and
+            // animating its exit holds the deck up for no one's benefit.
+            modifier = Modifier.fillMaxWidth().arrive(index, slide = 16.dp),
         ) {
             Column(
                 Modifier
@@ -163,13 +181,17 @@ private fun DeckPlayer(
         Spacer(Modifier.height(24.dp))
         SectionLabel("Your answer")
         Spacer(Modifier.height(10.dp))
-        QuestionInput(question, mine, you, forPartner = false, state = state)
+        Box(Modifier.arrive(index, index = 1, slide = 16.dp)) {
+            QuestionInput(question, mine, you, forPartner = false, state = state)
+        }
 
         if (question.isScored) {
             Spacer(Modifier.height(26.dp))
             SectionLabel("What ${state.them.name} will say")
             Spacer(Modifier.height(10.dp))
-            QuestionInput(question, guess, them, forPartner = true, state = state)
+            Box(Modifier.arrive(index, index = 2, slide = 16.dp)) {
+                QuestionInput(question, guess, them, forPartner = true, state = state)
+            }
         }
 
         Spacer(Modifier.height(28.dp))
@@ -181,6 +203,10 @@ private fun DeckPlayer(
             label = if (last) "Done" else "Next",
             slug = you.slug,
             enabled = ready,
+            // Finishing a deck is the same act as sealing a day, and until now
+            // it made the same noise as stepping to question three.
+            sfx = if (last) Sfx.SEAL else Sfx.RELEASE,
+            feelOnClick = if (last) Feel.SEAL else Feel.RELEASE,
         ) {
             answers[question.id] = mine.value.values(question)
             if (question.isScored) guesses[question.id] = guess.value.values(question)
@@ -290,12 +316,23 @@ private fun DeckResult(
 private fun Progress(done: Int, total: Int, color: BrickColor) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         repeat(total) { i ->
+            val lit = i <= done
+            // Glide on the alpha, spring on the position. A bouncy spring here
+            // would overshoot 1.0 and hand that straight to drawImage.
+            val alpha by animateFloatAsState(
+                if (lit) 1f else 0.22f, Motion.glide, label = "progressLit",
+            )
+            val press by animateFloatAsState(
+                if (lit) 1f else 0f, Motion.settle, label = "progressPress",
+            )
             BrickSlab(
                 slugs = listOf(color.slug),
                 studs = 1,
                 height = BrickHeight.LOW,
-                alpha = if (i <= done) 1f else 0.22f,
-                modifier = Modifier.weight(1f),
+                alpha = alpha,
+                modifier = Modifier
+                    .weight(1f)
+                    .graphicsLayer { translationY = (1f - press) * -6.dp.toPx() },
             )
         }
     }

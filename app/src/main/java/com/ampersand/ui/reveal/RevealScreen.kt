@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +37,7 @@ import com.ampersand.model.Member
 import com.ampersand.model.Question
 import com.ampersand.model.Reaction
 import com.ampersand.ui.components.AmpReactionRow
+import com.ampersand.ui.components.arrive
 import com.ampersand.ui.components.DepthDots
 import com.ampersand.ui.components.PartnerReaction
 import com.ampersand.ui.components.PersonDot
@@ -43,9 +45,17 @@ import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.today.AnswerValues
+import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
 private val DayFormat = DateTimeFormatter.ofPattern("EEEE d MMMM")
@@ -63,10 +73,30 @@ fun RevealScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     onReact: (Reaction?) -> Unit = {},
+    /** False once this day has already opened, so it never unpacks twice. */
+    animateIn: Boolean = true,
+    onOpened: () -> Unit = {},
 ) {
     val youColor = Color(state.you.colorArgb)
     val themColor = Color(state.them.colorArgb)
     val score = day.score(state.you, state.them)
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+
+    // Keyed on the *date*, not on the day. DayEntry is a data class, so a
+    // reaction arriving from the other phone changes its equality and would
+    // restart the whole unpacking under the reader's hands.
+    LaunchedEffect(day.date, animateIn) {
+        if (!animateIn) return@LaunchedEffect
+        // Four beats, not five: the question is already on screen when you
+        // arrive, and a cue for it would be a cue for nothing.
+        repeat(4) { i ->
+            delay(Motion.StaggerMs.toLong())
+            sounds.play(if (i % 2 == 0) Sfx.CLICK else Sfx.CLACK)
+            feel.play(Feel.TICK)
+        }
+        onOpened()
+    }
 
     Column(
         modifier
@@ -80,7 +110,10 @@ fun RevealScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+            TextButton(
+                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+            ) {
                 Text("Back")
             }
             Row(
@@ -97,15 +130,19 @@ fun RevealScreen(
             text = day.question.text,
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.arrive(day.date, index = 0, enabled = animateIn),
         )
 
         if (score != null) {
             Spacer(Modifier.height(18.dp))
-            ScoreBanner(score)
+            Box(Modifier.arrive(day.date, index = 1, enabled = animateIn)) {
+                ScoreBanner(score)
+            }
         }
 
         Spacer(Modifier.height(24.dp))
 
+        Box(Modifier.arrive(day.date, index = 2, enabled = animateIn)) {
         PersonPanel(
             owner = state.you,
             ownerColor = youColor,
@@ -114,9 +151,11 @@ fun RevealScreen(
             guessAboutOwner = day.answerFor(state.them.uid)?.guess,
             guessLabelPrefix = state.them.name,
         )
+        }
 
         Spacer(Modifier.height(16.dp))
 
+        Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
         PersonPanel(
             owner = state.them,
             ownerColor = themColor,
@@ -125,15 +164,18 @@ fun RevealScreen(
             guessAboutOwner = day.answerFor(state.you.uid)?.guess,
             guessLabelPrefix = "You",
         )
+        }
 
         Spacer(Modifier.height(30.dp))
         SectionLabel("Say something back")
         Spacer(Modifier.height(10.dp))
-        AmpReactionRow(
-            selected = day.reactionFor(state.you.uid),
-            color = BrickColor.of(state.you.colorArgb),
-            onSelect = onReact,
-        )
+        Box(Modifier.arrive(day.date, index = 4, enabled = animateIn)) {
+            AmpReactionRow(
+                selected = day.reactionFor(state.you.uid),
+                color = BrickColor.of(state.you.colorArgb),
+                onSelect = onReact,
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
         val theirs = day.reactionFor(state.them.uid)

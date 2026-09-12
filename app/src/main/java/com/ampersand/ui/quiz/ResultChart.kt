@@ -17,6 +17,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -39,7 +43,15 @@ import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
+import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.AmpersandTheme
+import kotlinx.coroutines.delay
 
 /**
  * How a finished quiz is reported: two towers, not one number.
@@ -64,6 +76,27 @@ fun CrossAnswerChart(
     modifier: Modifier = Modifier,
 ) {
     val possible = result.possible
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+
+    // Both towers build off one counter, so they race rather than take turns --
+    // the lopsided result, which is the whole reason there are two towers, is
+    // only legible if the shorter one visibly stops first.
+    //
+    // One cue per course, not one per brick per tower: twelve clicks in a row
+    // stops being a thing being built and starts being a slot machine.
+    val built = remember(result.quiz.id) { mutableIntStateOf(0) }
+    LaunchedEffect(result.quiz.id) {
+        val tallest = maxOf(result.youKnewThem, result.theyKnewYou)
+        // Keeps a long deck's build under about two thirds of a second.
+        val beat = if (tallest > 6) Motion.BrickMs / 2 else Motion.BrickMs
+        repeat(tallest) {
+            delay(beat.toLong())
+            built.intValue = it + 1
+            sounds.play(Sfx.CLICK)
+            feel.play(Feel.TICK)
+        }
+    }
 
     Column(modifier.fillMaxWidth()) {
         Row(
@@ -72,6 +105,7 @@ fun CrossAnswerChart(
         ) {
             ScoreTower(
                 score = result.youKnewThem,
+                built = built,
                 possible = possible,
                 color = you,
                 // Whose *knowledge* is being measured, not whose answer.
@@ -80,6 +114,7 @@ fun CrossAnswerChart(
             )
             ScoreTower(
                 score = result.theyKnewYou,
+                built = built,
                 possible = possible,
                 color = them,
                 caption = "$theirName knew $yourName",
@@ -131,6 +166,8 @@ fun CrossAnswerChart(
 @Composable
 private fun ScoreTower(
     score: Int,
+    /** Courses laid so far, shared with the other tower. Read inside the Canvas. */
+    built: MutableIntState,
     possible: Int,
     color: BrickColor,
     caption: String,
@@ -153,6 +190,12 @@ private fun ScoreTower(
             ) {
                 val studPx = size.width / shape.w
                 val coursePx = studPx * shape.h * BrickArt.ROW_RATIO
+                // `built` is read here, inside the draw lambda, and nowhere
+                // else. A snapshot read in this scope invalidates draw only --
+                // so a tower can lay six courses without recomposing, which
+                // matters because this Canvas lives inside a BoxWithConstraints
+                // and recomposing it re-subcomposes the whole measurement.
+                val laid = minOf(built.intValue, score)
                 for (i in 0 until possible.coerceAtLeast(1)) {
                     drawBrickArt(
                         atlas = atlas,
@@ -162,7 +205,7 @@ private fun ScoreTower(
                         left = 0f,
                         bottom = size.height - i * coursePx,
                         studPx = studPx,
-                        alpha = if (i < score) 1f else 0.16f,
+                        alpha = if (i < laid) 1f else 0.16f,
                     )
                 }
             }
