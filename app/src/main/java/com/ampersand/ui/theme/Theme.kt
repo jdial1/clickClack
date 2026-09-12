@@ -1,5 +1,8 @@
 package com.ampersand.ui.theme
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
@@ -159,6 +162,50 @@ object Radius {
     val card = RoundedCornerShape(28.dp)
     val hero = RoundedCornerShape(32.dp)
     val pill = RoundedCornerShape(100.dp)
+}
+
+/**
+ * How long things take, in one place.
+ *
+ * The register is *physical, not showy*: everything in this app is a brick, and
+ * a brick has weight, a short travel and a hard stop. Nothing here celebrates.
+ * If a number below grows past its comment the app stops feeling like objects
+ * and starts feeling like a slideshow, which is the failure mode to watch for.
+ *
+ * Two springs, not a family of easings. [settle] is a thing arriving and
+ * bedding in -- it overshoots a little, the way the splash bricks recoil.
+ * [glide] is a thing moving that never stopped -- a ghost following a finger,
+ * a row shuffling past another. Almost everything is one or the other.
+ */
+object Motion {
+    /** A key going down is instant; coming back up is allowed to be seen. */
+    const val PressMs = 60
+    const val LiftMs = 110
+
+    /** One surface replacing another: a screen, a panel, a question. */
+    const val SwapMs = 200
+
+    /** The beat between children arriving in a staggered group. */
+    const val StaggerMs = 70
+
+    /** The beat between courses as a tower builds itself. */
+    const val BrickMs = 90
+
+    /** Refusing something. Two cycles, and over before it is a cartoon. */
+    const val ShakeMs = 180
+
+    /** One nub of travel. More than this and buttons read as squashy. */
+    val Depth = 3.dp
+
+    val settle: SpringSpec<Float> = spring(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessHigh,
+    )
+
+    val glide: SpringSpec<Float> = spring(
+        dampingRatio = Spring.DampingRatioNoBouncy,
+        stiffness = Spring.StiffnessMediumLow,
+    )
 }
 
 /**

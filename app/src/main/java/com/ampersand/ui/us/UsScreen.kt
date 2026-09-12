@@ -3,6 +3,8 @@ package com.ampersand.ui.us
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,9 +47,14 @@ import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.components.pressDepth
 import com.ampersand.ui.components.brickFace
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.ColorChoices
 import com.ampersand.ui.theme.Duo
@@ -121,7 +128,7 @@ fun UsScreen(
         Anniversary(state, onSetAnniversary)
 
         Spacer(Modifier.height(32.dp))
-        SoundToggle(you = BrickColor.of(state.you.colorArgb))
+        FeedbackToggles(you = BrickColor.of(state.you.colorArgb))
 
 
         if (onSignOut != null) {
@@ -226,51 +233,95 @@ private fun ColorRow(name: String, current: Color, onPick: (Long) -> Unit) {
 }
 
 /**
- * The one switch worth having on this screen.
+ * The two switches worth having on this screen.
  *
- * Toggled before the confirming click plays, so turning sound *on* is audible;
- * the other order would silently enable it and feel broken.
+ * Two rather than one, because the pair is wanted in every combination: a phone
+ * face-down in a quiet room still wants to feel the brick land, and someone who
+ * finds vibration unpleasant still wants the click. Keeping them apart also
+ * closes a small dead end -- turning *sound* off could never confirm itself, for
+ * the obvious reason, and now the phone answers by feel instead.
  */
 @Composable
-private fun SoundToggle(you: BrickColor) {
+private fun FeedbackToggles(you: BrickColor) {
     val sounds = LocalSounds.current
-    val on = sounds?.enabled ?: false
+    val feel = LocalFeel.current
+
+    SwitchSlab(
+        on = sounds?.enabled ?: false,
+        title = { if (it) "Sound on" else "Sound off" },
+        subtitle = "Clicks, snaps and the seal.",
+        you = you,
+    ) {
+        sounds?.let { it.enabled = !it.enabled }
+        // Toggled before the confirming click plays, so turning sound *on* is
+        // audible; the other order would silently enable it and feel broken.
+        if (sounds?.enabled == true) sounds.play(Sfx.SELECT)
+        feel.play(if (sounds?.enabled == true) Feel.SELECT else Feel.DESELECT)
+    }
+
+    Spacer(Modifier.height(12.dp))
+
+    SwitchSlab(
+        on = feel?.enabled ?: false,
+        title = { if (it) "Vibration on" else "Vibration off" },
+        subtitle = "The weight of a brick going down.",
+        you = you,
+    ) {
+        feel?.let { it.enabled = !it.enabled }
+        val nowOn = feel?.enabled == true
+        sounds.play(if (nowOn) Sfx.SELECT else Sfx.DESELECT)
+        // Only the *on* direction can confirm itself here, the mirror of sound.
+        if (nowOn) feel.play(Feel.SELECT)
+    }
+}
+
+/** One full-width brick that is either lit or not. */
+@Composable
+private fun SwitchSlab(
+    on: Boolean,
+    title: (Boolean) -> String,
+    subtitle: String,
+    you: BrickColor,
+    onToggle: () -> Unit,
+) {
     val accent = you.slug
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
 
     BrickSlab(
         slugs = listOf(if (on) accent else null),
         studs = 12,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                sounds?.let {
-                    it.enabled = !it.enabled
-                    if (it.enabled) it.play(Sfx.SELECT)
-                }
-            },
+            .pressDepth(pressed)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                onClick = onToggle,
+            ),
     ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
-            .glassOn(if (on) accent else null, corner = 14.dp)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(
-                if (on) "Sound on" else "Sound off",
-                style = MaterialTheme.typography.titleSmall,
-                color = inkOnBrick(if (on) accent else null),
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                "Clicks, snaps and the seal.",
-                style = MaterialTheme.typography.bodySmall,
-                color = inkOnBrick(if (on) accent else null).copy(alpha = 0.75f),
-            )
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+                .glassOn(if (on) accent else null, corner = 14.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    title(on),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = inkOnBrick(if (on) accent else null),
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = inkOnBrick(if (on) accent else null).copy(alpha = 0.75f),
+                )
+            }
         }
-    }
     }
 }
 

@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,9 +35,13 @@ import com.ampersand.model.Reaction
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
+import com.ampersand.ui.theme.Motion
 
 private val Tile = BrickShape(2, BrickHeight.HIGH)
 
@@ -78,6 +83,7 @@ fun AmpReactionRow(
     modifier: Modifier = Modifier,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val asset = color.asset(Tile)
     val atlas = rememberBricks(listOf(asset))
 
@@ -91,7 +97,16 @@ fun AmpReactionRow(
                 val on = reaction == selected
                 // The unpicked ones are the same brick, further away. Hiding
                 // them until you tap would mean not knowing what is on offer.
-                val lift by animateFloatAsState(if (on) 1f else 0f, label = "reactionLift")
+                // Glide, not settle: `lift` feeds the brick's alpha below, and
+                // a bouncy spring overshoots 1.0 straight into drawImage. The
+                // spring lives on the emote's scale instead, where overshoot is
+                // the whole point.
+                val lift by animateFloatAsState(
+                    if (on) 1f else 0f, Motion.glide, label = "reactionLift",
+                )
+                val pop by animateFloatAsState(
+                    if (on) 1f else 0f, Motion.settle, label = "reactionPop",
+                )
 
                 Box(
                     Modifier
@@ -102,6 +117,7 @@ fun AmpReactionRow(
                             indication = null,
                         ) {
                             sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+                            feel.play(if (on) Feel.DESELECT else Feel.SELECT)
                             onSelect(if (on) null else reaction)
                         },
                 ) {
@@ -130,6 +146,13 @@ fun AmpReactionRow(
                             // Body starts below the nub; centring in the whole
                             // tile sits the art half on the studs.
                             .padding(top = nub)
+                            // The chosen one leans in. A tenth, not a pop: six
+                            // of these sit in a row and anything larger turns
+                            // the row into a fairground.
+                            .graphicsLayer {
+                                scaleX = 1f + 0.10f * pop
+                                scaleY = 1f + 0.10f * pop
+                            }
                             .size(stud * 1.1f),
                     )
                 }

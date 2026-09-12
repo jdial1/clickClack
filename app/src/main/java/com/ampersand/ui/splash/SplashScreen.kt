@@ -32,6 +32,9 @@ import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.BrickWall
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.awaitReady
@@ -72,6 +75,7 @@ fun SplashScreen(
     onDone: () -> Unit = {},
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val finish by rememberUpdatedState(onDone)
 
     // 0 is resting; negative is above it.
@@ -94,11 +98,13 @@ fun SplashScreen(
 
         lowerY.animateTo(0f, tween(420, easing = Gravity))
         sounds.play(Sfx.CLICK)
+        feel.play(Feel.PLACE)
         lowerY.animateTo(-0.10f, tween(80))
         lowerY.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh))
 
         upperY.animateTo(0f, tween(380, easing = Gravity))
         sounds.play(Sfx.CLACK)
+        feel.play(Feel.PLACE)
         upperY.animateTo(-0.09f, tween(75))
         upperY.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh))
 

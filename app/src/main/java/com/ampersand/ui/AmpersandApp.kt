@@ -8,6 +8,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -32,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,6 +74,7 @@ import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.build.BuildScreen
 import com.ampersand.ui.components.BrickWall
+import com.ampersand.ui.components.pressDepth
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.history.HistoryScreen
@@ -80,12 +83,17 @@ import com.ampersand.ui.notify.ReminderSetupScreen
 import com.ampersand.ui.quiz.DeckScreen
 import com.ampersand.ui.reveal.RevealScreen
 import com.ampersand.ui.splash.SplashScreen
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.feel.rememberFeelKit
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.sound.rememberSoundKit
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
 import com.ampersand.ui.today.TodayScreen
@@ -167,14 +175,18 @@ fun AmpersandApp() {
     val auth by authVm.auth.state.collectAsStateWithLifecycle()
 
     val sounds = rememberSoundKit()
+    val feel = rememberFeelKit()
 
     AmpersandTheme {
-      CompositionLocalProvider(LocalSounds provides sounds) {
+      CompositionLocalProvider(LocalSounds provides sounds, LocalFeel provides feel) {
         // The splash is gated on its own animation finishing, not on auth, so
         // the click-clack always plays in full. It is under a second, and
         // cutting it short the moment a cached session resolves would mean the
         // animation is only ever seen by people who are signed out.
-        var splashDone by remember { mutableStateOf(false) }
+        // Saveable, not remembered. The Activity is recreated on rotation, and
+        // a plain remember replayed the whole drop -- and now the two landing
+        // thumps with it -- every time the phone turned.
+        var splashDone by rememberSaveable { mutableStateOf(false) }
         if (!splashDone) {
             // Fixed colours: this plays before anyone is signed in, so there is
             // no profile to take them from yet.
@@ -505,6 +517,7 @@ private fun BottomBar(
     onSelect: (Tab) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val tabShape = BrickShape(2, BrickHeight.MEDIUM)
     val joinShape = BrickShape(1, BrickHeight.MEDIUM)
     // Structure, not a choice -- and which brick counts as structure depends on
@@ -542,20 +555,30 @@ private fun BottomBar(
                 }
 
                 val on = enabled && entry == current
-                val lift by animateFloatAsState(if (on) 1f else 0f, label = "tabLift")
+                // Not a bouncy spring: this value feeds an alpha a few lines down, and an
+                // overshoot past 1.0 goes straight into drawImage.
+                val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "tabLift")
                 val fg by animateColorAsState(
                     if (on) Duo.inkOn(Color(color.argb)) else MaterialTheme.colorScheme.onSurfaceVariant,
                     label = "tabFg",
                 )
 
+                val interaction = remember { MutableInteractionSource() }
+                val pressed by interaction.collectIsPressedAsState()
+
                 Box(
                     Modifier
                         .width(stud * 2)
                         .height(barHeight)
+                        .pressDepth(pressed)
                         .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
+                            interactionSource = interaction,
                             indication = null,
-                        ) { sounds.play(Sfx.NAV); onSelect(entry) },
+                            // Dimmed inside a deck or a reveal, and now actually
+                            // unreachable there: the visual said disabled while
+                            // the tap still went through.
+                            enabled = enabled,
+                        ) { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onSelect(entry) },
                 ) {
                     Canvas(Modifier.fillMaxSize()) {
                         drawBrickArt(

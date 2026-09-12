@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,10 +65,14 @@ import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.BrickTile
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.toArgbLong
 
@@ -97,6 +102,7 @@ fun AmpField(
     enabled: Boolean = true,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val ring by animateColorAsState(
@@ -104,7 +110,7 @@ fun AmpField(
         label = "fieldRing",
     )
 
-    LaunchedEffect(focused) { if (focused) sounds.play(Sfx.FOCUS) }
+    LaunchedEffect(focused) { if (focused) { sounds.play(Sfx.FOCUS); feel.play(Feel.FOCUS) } }
 
     Box(
         modifier
@@ -152,6 +158,7 @@ fun AmpSegmented(
     onSelect: (String) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     Row(
         modifier
             .clip(RoundedCornerShape(Corner))
@@ -179,7 +186,7 @@ fun AmpSegmented(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                    ) { sounds.play(Sfx.TAP); onSelect(option) }
+                    ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); onSelect(option) }
                     .padding(vertical = 11.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -209,6 +216,7 @@ fun AmpRadioGroup(
     onSelect: (String) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val shape = BrickShape(1, BrickHeight.MEDIUM)
     val colors = remember(options.size) {
         List(options.size) { BrickColor.at(it) }
@@ -220,6 +228,7 @@ fun AmpRadioGroup(
             val on = option == selected
             val brick = colors[index]
             val alpha by animateFloatAsState(if (on) 1f else 0.3f, label = "radioBrick")
+            val down by animateFloatAsState(if (on) 1f else 0f, Motion.settle, label = "radioPress")
 
             Row(
                 Modifier
@@ -233,10 +242,15 @@ fun AmpRadioGroup(
                         },
                         corner = Corner,
                         studded = false,
-                        pressed = on,
+                        pressed = down,
                     )
-                    .clickable(enabled = enabled) {
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        enabled = enabled,
+                    ) {
                         sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+                        feel.play(if (on) Feel.DESELECT else Feel.SELECT)
                         onSelect(option)
                     }
                     .padding(start = 14.dp, end = Pad, top = 12.dp, bottom = 14.dp),
@@ -277,6 +291,11 @@ fun AmpCheckboxGroup(
     max: Int? = null,
     onToggle: (String) -> Unit,
 ) {
+    // Bumped on every refused tap, which is what restarts the shake. A counter
+    // rather than a boolean: tapping a second blocked row should shake again,
+    // and a boolean that is already true does nothing.
+    var refused by remember { mutableIntStateOf(0) }
+
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         options.forEach { option ->
             val on = option in selected
@@ -287,6 +306,7 @@ fun AmpCheckboxGroup(
                 accent = accent,
                 enabled = enabled && !blocked,
                 onClick = { onToggle(option) },
+                onBlocked = { refused++ },
             ) { checked, ink -> CheckBox(checked, ink) }
         }
         if (max != null) {
@@ -294,7 +314,9 @@ fun AmpCheckboxGroup(
                 "Pick up to $max.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 4.dp, top = 2.dp),
+                modifier = Modifier
+                    .padding(start = 4.dp, top = 2.dp)
+                    .shake(refused),
             )
         }
     }
@@ -355,9 +377,11 @@ private fun ChoiceRow(
     accent: Color,
     enabled: Boolean,
     onClick: () -> Unit,
+    onBlocked: () -> Unit = {},
     indicator: @Composable (Boolean, Color) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val bg by animateColorAsState(
         if (selected) accent else MaterialTheme.colorScheme.surfaceVariant,
         label = "rowBg",
@@ -366,15 +390,31 @@ private fun ChoiceRow(
         if (selected) Duo.inkOn(accent) else MaterialTheme.colorScheme.onSurface,
         label = "rowInk",
     )
+    // The lip travels rather than jumping, so choosing reads as pressing a key
+    // down rather than as the row swapping for a different row.
+    val down by animateFloatAsState(if (selected) 1f else 0f, Motion.settle, label = "rowPress")
+
     Row(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(Corner))
-            // Selected presses the brick down: the lip shortens.
-            .brickFace(bg, corner = Corner, pressed = selected)
-            .clickable(enabled = enabled) {
-                sounds.play(if (selected) Sfx.DESELECT else Sfx.SELECT)
-                onClick()
+            .brickFace(bg, corner = Corner, pressed = down)
+            // Blocked rows stay tappable and say no. Leaving them disabled meant
+            // the tap was swallowed whole -- no ripple (suppressed), no sound,
+            // no message -- which reads as the app having crashed quietly.
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                if (enabled) {
+                    sounds.play(if (selected) Sfx.DESELECT else Sfx.SELECT)
+                    feel.play(if (selected) Feel.DESELECT else Feel.SELECT)
+                    onClick()
+                } else {
+                    sounds.play(Sfx.DESELECT)
+                    feel.play(Feel.REJECT)
+                    onBlocked()
+                }
             }
             .padding(start = Pad, end = Pad, top = 26.dp, bottom = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -406,6 +446,7 @@ fun AmpDropdown(
     onSelect: (String) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     var open by remember { mutableStateOf(false) }
     val caret by animateFloatAsState(if (open) 180f else 0f, label = "ddCaret")
 
@@ -417,9 +458,11 @@ fun AmpDropdown(
                 .brickFace(
                     if (open) accent else MaterialTheme.colorScheme.surfaceVariant,
                     corner = Corner,
-                    pressed = open,
+                    pressed = animateFloatAsState(
+                        if (open) 1f else 0f, Motion.settle, label = "ddPress",
+                    ).value,
                 )
-                .clickable(enabled = enabled) { sounds.play(Sfx.TAP); open = true }
+                .clickable(enabled = enabled) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); open = true }
                 .padding(start = Pad, end = Pad, top = 26.dp, bottom = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -463,7 +506,7 @@ fun AmpDropdown(
                             },
                         )
                     },
-                    onClick = { sounds.play(Sfx.SELECT); onSelect(option); open = false },
+                    onClick = { sounds.play(Sfx.SELECT); feel.play(Feel.SELECT); onSelect(option); open = false },
                 )
             }
         }
@@ -510,6 +553,7 @@ fun AmpScale(
     onSelect: (Int) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val brick = remember(accent) { BrickColor.of(accent.toArgbLong()) }
     val assets = remember(brick) { BrickArt.WIDTHS.map { brick.asset(BrickShape(it, BrickHeight.MEDIUM)) } }
     val atlas = rememberBricks(assets)
@@ -546,6 +590,7 @@ fun AmpScale(
                             down.consume()
                             var last = studAt(down.position.x)
                             sounds.play(Sfx.PICK_UP)
+                            feel.play(Feel.PICK_UP)
                             onSelect(last)
 
                             while (true) {
@@ -559,11 +604,14 @@ fun AmpScale(
                                     if (next != last) {
                                         last = next
                                         sounds.play(Sfx.TAP)
+                                        // One notch crossed, not a new choice.
+                                        feel.play(Feel.TICK)
                                         onSelect(next)
                                     }
                                 }
                             }
                             sounds.play(Sfx.PLACE)
+                            feel.play(Feel.PLACE)
                         }
                     },
             ) {
@@ -637,12 +685,31 @@ fun AmpButton(
     slug: String?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    sfx: Sfx = Sfx.PRESS,
+    /** Null when the caller makes its own noise, timed to its own animation. */
+    sfx: Sfx? = Sfx.RELEASE,
+    feelOnClick: Feel = Feel.RELEASE,
     onClick: () -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
+
+    // Click on the way down, clack on the way up -- which is the name of the
+    // app, and the reason `Sfx.RELEASE` has sat unused since the pack was
+    // imported. A button that only makes a noise in one direction is a picture
+    // of a button.
+    //
+    // The down cue is the generic keypress, so a press that is dragged off and
+    // cancelled says "you pressed something" and nothing more. The *meaning* --
+    // the seal on an answer -- rides on the click, which only fires if the
+    // press actually completes.
+    LaunchedEffect(pressed) {
+        if (pressed) {
+            sounds.play(Sfx.PRESS)
+            feel.play(Feel.PRESS)
+        }
+    }
 
     // Disabled is a real brick, and the *quiet* brick for whichever ground it
     // sits on: black on navy, neutral on a pale background. Two wrong answers
@@ -659,14 +726,17 @@ fun AmpButton(
         slugs = listOf(if (enabled) slug else offSlug),
         studs = 12,
         height = BrickHeight.HIGH,
-        alpha = if (pressed) 0.82f else 1f,
+        // Softer than it was: 3dp of travel plus a fifth of the light is two
+        // effects saying the same thing, and the pair read as a glitch.
+        alpha = if (pressed) 0.90f else 1f,
         modifier = modifier
             .fillMaxWidth()
+            .pressDepth(pressed)
             .clickable(
                 interactionSource = interaction,
                 indication = null,
                 enabled = enabled,
-            ) { sounds.play(sfx); onClick() },
+            ) { sfx?.let(sounds::play); feel.play(feelOnClick); onClick() },
     ) {
         Text(
             label,

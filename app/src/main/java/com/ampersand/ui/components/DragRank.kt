@@ -55,6 +55,9 @@ import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.BrickAtlas
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
@@ -92,6 +95,7 @@ fun AmpDragRank(
     onReorder: (List<String>) -> Unit,
 ) {
     val sounds = LocalSounds.current
+    val feel = LocalFeel.current
     val latest by rememberUpdatedState(items)
     var dragging by remember { mutableStateOf<String?>(null) }
     var offsetY by remember { mutableFloatStateOf(0f) }
@@ -136,15 +140,22 @@ fun AmpDragRank(
                             detectDragGestures(
                                 onDragStart = {
                                     sounds.play(Sfx.PICK_UP)
+                                    feel.play(Feel.PICK_UP)
                                     dragging = item
                                     offsetY = 0f
                                 },
                                 onDragEnd = {
                                     sounds.play(Sfx.PLACE)
+                                    feel.play(Feel.PLACE)
                                     dragging = null
                                     offsetY = 0f
                                 },
                                 onDragCancel = {
+                                    // A dropped drag is still a drop. It used to
+                                    // end in silence, which reads as the row
+                                    // having been lost rather than let go.
+                                    sounds.play(Sfx.PLACE)
+                                    feel.play(Feel.REJECT)
                                     dragging = null
                                     offsetY = 0f
                                 },
@@ -157,6 +168,7 @@ fun AmpDragRank(
                                     val to = (from + shift).coerceIn(0, latest.lastIndex)
                                     if (to != from) {
                                         sounds.play(Sfx.TAP)
+                                        feel.play(Feel.TICK)
                                         onReorder(
                                             latest.toMutableList()
                                                 .apply { add(to, removeAt(from)) },
