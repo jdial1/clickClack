@@ -185,16 +185,19 @@ fun SplashScreen(
 }
 
 
-/** One piece of the wall: which colour, and which cell it ended up in. */
-private data class Piece(val slug: String?, val col: Int, val row: Int)
+/** One piece of the wall: colour, where it starts in studs, and how wide. */
+private data class Piece(val slug: String?, val stud: Int, val row: Int, val width: Int)
 
-/** Grid of the wall, in 4-stud pieces across a 12-stud screen. */
-private const val WallCols = 3
+/** The wall is a 12-stud course, the same width the rest of the app builds on. */
+private const val WallStuds = 12
 private const val WallRows = 32
+private val WallHeight = BrickHeight.MEDIUM
 
 /** Courses already down when the splash opens. */
 private const val WallBase = 7
-private val WallPiece = BrickShape(4, BrickHeight.MEDIUM)
+
+/** How often a course leaves a hole rather than laying the next piece. */
+private const val GapChance = 0.28f
 
 /**
  * The wall behind the splash, being built while you watch.
@@ -202,9 +205,9 @@ private val WallPiece = BrickShape(4, BrickHeight.MEDIUM)
  * Everywhere else in the app the wall is a still background generated once from
  * a fixed seed -- it is the ground, and ground does not move. Here it is the
  * only screen with nothing to do, so it does the thing the whole app is about:
- * a piece arrives, hovers while it decides, and settles into place. By the time
- * the wordmark has faded up there is a wall under it that was not there when
- * you opened the app.
+ * a piece arrives, hovers while it decides, and settles. By the time the
+ * wordmark has faded up there is a wall under it that was not there when you
+ * opened the app.
  *
  * Bottom row first. A wall built top-down reads as tetris; built from the floor
  * up it reads as a wall.
@@ -218,39 +221,37 @@ private val WallPiece = BrickShape(4, BrickHeight.MEDIUM)
 @Composable
 private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier = Modifier) {
     val slugs = remember(you, them) { listOf(you.slug, them.slug, null) }
-    val atlas = rememberBricks(slugs.map { BrickArt.assetFor(it, WallPiece) })
+    val atlas = rememberBricks(
+        remember(slugs) {
+            slugs.flatMap { slug ->
+                WallWidths.map { BrickArt.assetFor(slug, BrickShape(it, WallHeight)) }
+            }
+        },
+    )
 
     val placed = remember { mutableStateListOf<Piece>() }
-    val ghost = remember { Animatable(Offset(1f, 0f), Offset.VectorConverter) }
-    var ghostSlug by remember { mutableStateOf<String?>(null) }
-    var ghostShowing by remember { mutableStateOf(false) }
+    val ghost = remember { Animatable(Offset(4f, 0f), Offset.VectorConverter) }
+    var ghostPiece by remember { mutableStateOf<Piece?>(null) }
 
     LaunchedEffect(Unit) {
         val rng = Random(11)
-        // Shuffled within each row, so it fills unevenly rather than sweeping
-        // left to right like a progress bar.
-        val cells = (0 until WallRows).flatMap { row ->
-            (0 until WallCols).map { col -> col to row }.shuffled(rng)
-        }
+        val courses = (0 until WallRows).flatMap { row -> courseOf(row, rng, slugs) }
 
         // The bottom courses are already down when you arrive. A splash that
         // starts on bare ground and places six pieces reads as an empty screen
         // with something loading on it; starting part-built reads as a wall
         // that is going up, which is the thing worth showing.
-        val seeded = WallBase * WallCols
-        cells.take(seeded).forEach { (col, row) ->
-            placed += Piece(slugs[rng.nextInt(slugs.size)], col, row)
-        }
+        val seeded = courses.count { it.row < WallBase }
+        placed.addAll(courses.take(seeded))
 
-        ghostShowing = true
-        cells.drop(seeded).forEach { (col, row) ->
-            ghostSlug = slugs[rng.nextInt(slugs.size)]
+        courses.drop(seeded).forEach { piece ->
+            ghostPiece = piece
             // One hesitation, not three. Any longer and the splash becomes a
             // screensaver with a logo on it.
             ghost.animateTo(
                 targetValue = Offset(
-                    rng.nextFloat() * (WallCols - 1),
-                    (row + rng.nextFloat() * 2f).coerceAtMost(WallRows - 1f),
+                    rng.nextInt(WallStuds - piece.width + 1).toFloat(),
+                    (piece.row + rng.nextFloat() * 2f).coerceAtMost(WallRows - 1f),
                 ),
                 animationSpec = tween(70, easing = FastOutSlowInEasing),
             )
@@ -259,12 +260,12 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
             // second that is the difference between a wall going up and five
             // bricks arriving before the splash ends.
             ghost.animateTo(
-                targetValue = Offset(col.toFloat(), row.toFloat()),
+                targetValue = Offset(piece.stud.toFloat(), piece.row.toFloat()),
                 animationSpec = tween(80, easing = FastOutSlowInEasing),
             )
-            placed += Piece(ghostSlug, col, row)
+            placed += piece
         }
-        ghostShowing = false
+        ghostPiece = null
     }
 
     // Alpha on the layer, not on each brick -- the same trap BrickWall
@@ -283,12 +284,10 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
             // Read inside the draw lambda, so a piece landing invalidates the
             // draw and nothing else -- this runs under a screen that is already
             // animating three other things.
-            placed.forEach { p ->
-                wallPiece(atlas, p.slug, p.col.toFloat(), p.row.toFloat())
-            }
+            placed.forEach { p -> wallPiece(atlas, p, p.stud.toFloat(), p.row.toFloat()) }
         }
 
-        if (ghostShowing) {
+        ghostPiece?.let { piece ->
             Canvas(
                 Modifier
                     .fillMaxSize()
@@ -296,26 +295,64 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
                     // it: it is a decision, not an object.
                     .graphicsLayer { alpha = 0.40f },
             ) {
-                wallPiece(atlas, ghostSlug, ghost.value.x, ghost.value.y)
+                wallPiece(atlas, piece, ghost.value.x, ghost.value.y)
             }
         }
     }
 }
 
-/** One wall piece, in cell coordinates. Opaque: the layer does the fading. */
-private fun DrawScope.wallPiece(atlas: BrickAtlas, slug: String?, col: Float, row: Float) {
-    val studPx = size.width / (WallCols * WallPiece.w).toFloat()
-    val coursePx = studPx * WallPiece.h * BrickArt.ROW_RATIO
+/** The stock widths this wall builds from. */
+private val WallWidths = listOf(6, 4, 2)
+
+/**
+ * One course, left to right, with holes in it.
+ *
+ * A wall of identical pieces butted edge to edge is a tiled background, which
+ * is what the app already has three screens of. Mixed widths give it bond, and
+ * the gaps are what stop it reading as a texture: a wall someone is part way
+ * through building has holes in it, and those holes are the only thing that
+ * says a person is doing this rather than a pattern being drawn.
+ *
+ * Gaps are two studs, because a one-stud hole reads as a seam and a four-stud
+ * hole reads as a missing row.
+ */
+private fun courseOf(row: Int, rng: Random, slugs: List<String?>): List<Piece> {
+    val out = mutableListOf<Piece>()
+    var stud = 0
+    while (stud < WallStuds) {
+        val room = WallStuds - stud
+        val fits = WallWidths.filter { it <= room }
+        // Never open the course with a hole: a wall that starts in mid-air
+        // looks like a drawing mistake rather than an unfinished job.
+        if (stud > 0 && room > 2 && rng.nextFloat() < GapChance) {
+            stud += 2
+            continue
+        }
+        val width = fits[rng.nextInt(fits.size)]
+        out += Piece(slugs[rng.nextInt(slugs.size)], stud, row, width)
+        stud += width
+    }
+    // Shuffled so a course fills unevenly rather than sweeping left to right
+    // like a progress bar. Order only matters to the eye -- every piece in a
+    // course lands before the one above it either way.
+    return out.shuffled(rng)
+}
+
+/** One wall piece, in stud coordinates. Opaque: the layer does the fading. */
+private fun DrawScope.wallPiece(atlas: BrickAtlas, piece: Piece, stud: Float, row: Float) {
+    val studPx = size.width / WallStuds
+    val coursePx = studPx * WallHeight.rows * BrickArt.ROW_RATIO
     drawBrickArt(
         atlas = atlas,
-        asset = BrickArt.assetFor(slug, WallPiece),
-        studs = WallPiece.w,
-        rows = WallPiece.h,
-        left = col * studPx * WallPiece.w,
+        asset = BrickArt.assetFor(piece.slug, BrickShape(piece.width, WallHeight)),
+        studs = piece.width,
+        rows = WallHeight.rows,
+        left = stud * studPx,
         bottom = size.height - row * coursePx,
         studPx = studPx,
     )
 }
+
 
 @Preview(name = "Splash", showBackground = true, heightDp = 640)
 @Composable
