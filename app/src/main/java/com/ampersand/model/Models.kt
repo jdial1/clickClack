@@ -201,6 +201,15 @@ data class CoupleState(
     val capsule: DayEntry? = null,
     /** Questions the two of you wrote, oldest first, none of them asked yet. */
     val wildcards: List<Wildcard> = emptyList(),
+    /**
+     * Sittings with the whole-instrument tests, oldest first.
+     *
+     * Kept apart from [history] on purpose. A day is one question and a run is
+     * thirty-two, and the moment an instrument can be reached through the same
+     * list as a daily question is the moment one of them gets shuffled into a
+     * Tuesday and the citation on it becomes false.
+     */
+    val instrumentRuns: List<InstrumentRun> = emptyList(),
     /** How often each of you has called the other, for as long as you have played. */
     val knowing: Knowing = Knowing(),
 ) {

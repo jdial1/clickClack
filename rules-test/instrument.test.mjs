@@ -1,0 +1,131 @@
+// Whole-instrument sittings, against the real firestore.rules.
+//
+// The seal matters more here than anywhere else in the app. A love-language
+// sitting is forty ratings of what you want and what you give, and the finding
+// it is built on is the *gap* between one person's wants and the other's
+// habits -- which is worth nothing if either of you could read the other's
+// answers while giving your own.
+//
+//   npm install
+//   npx firebase emulators:exec --only firestore --project clickclack-rules \
+//     "node rules-test/instrument.test.mjs"
+import { readFileSync } from 'node:fs'
+import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing'
+import { doc, getDoc, setDoc, getDocs, collection, serverTimestamp, arrayUnion } from 'firebase/firestore'
+
+const RULES = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8')
+const env = await initializeTestEnvironment({
+  projectId: 'clickclack-instrument',
+  firestore: { rules: RULES, host: '127.0.0.1', port: 8080 },
+})
+
+const CID = 'c1', KIT = 'oejts'
+const kitRef = (db) => doc(db, 'couples', CID, 'instruments', KIT)
+const runRef = (db, uid) => doc(db, 'couples', CID, 'instruments', KIT, 'runs', uid)
+const runs = (db) => collection(db, 'couples', CID, 'instruments', KIT, 'runs')
+
+const THIRTY_TWO = Array.from({ length: 32 }, () => 3)
+
+async function seed({ kitDoc = null, given = {}, ended = null } = {}) {
+  await env.clearFirestore()
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore()
+    await setDoc(doc(db, 'couples', CID), { members: ['alice', 'bob'], endedAt: ended })
+    if (kitDoc) await setDoc(kitRef(db), kitDoc)
+    for (const [uid, r] of Object.entries(given)) await setDoc(runRef(db, uid), r)
+  })
+}
+
+const as = (uid) => env.authenticatedContext(uid).firestore()
+const results = []
+async function check(name, fn) {
+  try { await fn(); results.push(['PASS', name]) }
+  catch (e) { results.push(['FAIL', name, String((e && e.message) || e)]) }
+}
+
+// Exactly what the app does on "Seal it".
+async function submit(db, uid, responses = THIRTY_TWO) {
+  await setDoc(
+    kitRef(db),
+    { revealed: false, takenOn: '2026-09-12', submitted: arrayUnion(uid) },
+    { merge: true },
+  )
+  await setDoc(runRef(db, uid), { responses, completedAt: serverTimestamp() })
+}
+
+await check('a member may submit their own sitting', async () => {
+  await seed()
+  await assertSucceeds(submit(as('alice'), 'alice'))
+})
+
+await check('nobody may write a run under another uid', async () => {
+  await seed()
+  await assertFails(setDoc(runRef(as('alice'), 'bob'), { responses: THIRTY_TWO }))
+})
+
+await check('an outsider may not submit at all', async () => {
+  await seed()
+  await assertFails(submit(as('mallory'), 'mallory'))
+})
+
+await check('you may always read back your own run', async () => {
+  await seed({ kitDoc: { revealed: false }, given: { alice: { responses: THIRTY_TWO } } })
+  await assertSucceeds(getDoc(runRef(as('alice'), 'alice')))
+})
+
+// The seal itself.
+await check('their run is unreadable while sealed', async () => {
+  await seed({ kitDoc: { revealed: false }, given: { bob: { responses: THIRTY_TWO } } })
+  await assertFails(getDoc(runRef(as('alice'), 'bob')))
+})
+
+await check('their run opens once revealed', async () => {
+  await seed({
+    kitDoc: { revealed: true },
+    given: { alice: { responses: THIRTY_TWO }, bob: { responses: THIRTY_TWO } },
+  })
+  await assertSucceeds(getDoc(runRef(as('alice'), 'bob')))
+})
+
+// The reason the app watches two named documents rather than the collection:
+// a query over a collection holding one unreadable document is refused whole,
+// which is what silently broke the day screen once already.
+await check('listing the runs is refused while sealed', async () => {
+  await seed({ kitDoc: { revealed: false }, given: { alice: { responses: THIRTY_TWO } } })
+  await assertFails(getDocs(runs(as('alice'))))
+})
+
+// The client asks to open it and lets the rules decide, so this is the check
+// that stops a phone simply declaring itself revealed.
+await check('revealed cannot be set with only one run in', async () => {
+  await seed({ kitDoc: { revealed: false }, given: { alice: { responses: THIRTY_TWO } } })
+  await assertFails(setDoc(kitRef(as('alice')), { revealed: true }, { merge: true }))
+})
+
+await check('revealed may be set once both runs exist', async () => {
+  await seed({
+    kitDoc: { revealed: false },
+    given: { alice: { responses: THIRTY_TWO }, bob: { responses: THIRTY_TWO } },
+  })
+  await assertSucceeds(setDoc(kitRef(as('alice')), { revealed: true }, { merge: true }))
+})
+
+// A sitting is a statement made under seal. Editing it after the fact would
+// let somebody read their partner's answers and then change their own.
+await check('a submitted run cannot be edited', async () => {
+  await seed({ kitDoc: { revealed: true }, given: { alice: { responses: THIRTY_TWO } } })
+  await assertFails(setDoc(runRef(as('alice'), 'alice'), { responses: Array(32).fill(5) }))
+})
+
+await check('an ended couple cannot start a new sitting', async () => {
+  await seed({ ended: new Date() })
+  await assertFails(submit(as('alice'), 'alice'))
+})
+
+await env.cleanup()
+for (const [state, name, err] of results) {
+  console.log(`${state}  ${name}${err ? `\n      ${err}` : ''}`)
+}
+const failed = results.filter(([s]) => s === 'FAIL').length
+console.log(`\n${results.length - failed}/${results.length} passed`)
+process.exit(failed ? 1 : 0)

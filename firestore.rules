@@ -160,6 +160,34 @@ service cloud.firestore {
         }
       }
 
+      // Whole-instrument sittings, sealed exactly like decks. A run is one
+      // document per person: forty love-language ratings on a shared document
+      // could not be hidden from the other half of the couple, and the gap
+      // between what one wants and what the other gives is only worth
+      // measuring if neither could see the answer while giving theirs.
+      match /instruments/{instrumentId} {
+        allow read: if isMember(cid);
+        allow create: if isLive(cid);
+        allow update: if isLive(cid) && (
+          request.resource.data.revealed == false ||
+          (
+            exists(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)/runs/$(couple(cid).members[0])) &&
+            exists(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)/runs/$(couple(cid).members[1]))
+          )
+        );
+        allow delete: if false;
+
+        match /runs/{uid} {
+          allow read: if isMember(cid) && (
+            uid == me() ||
+            get(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)).data.revealed == true
+          );
+          allow create: if isLive(cid) && uid == me();
+          // No edits. A retake is a new sitting, not a correction to an old one.
+          allow update, delete: if false;
+        }
+      }
+
       // Questions the two of you wrote. Not sealed: a question is not a
       // secret, and half the point is seeing what they asked before you
       // answer it. Only the text is protected -- either of you may stamp one

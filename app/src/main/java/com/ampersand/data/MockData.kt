@@ -9,6 +9,7 @@ import com.ampersand.model.CharacterShape
 import com.ampersand.model.Slope
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
+import com.ampersand.model.InstrumentRun
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Knowing
 import com.ampersand.model.KnowingMonth
@@ -661,5 +662,37 @@ object MockCouple {
         capsule = capsule(today),
         wildcards = wildcards(),
         knowing = knowing(today),
+        instrumentRuns = instrumentRuns(today),
     )
+
+    /**
+     * One instrument taken, one not.
+     *
+     * Deliberately half-finished, because the badge wall has two states worth
+     * looking at and a fully populated mock only ever shows one of them. Love
+     * languages is in; the Jungian scales are the ghost brick.
+     *
+     * The numbers are a specific, plausible couple rather than noise: you want
+     * acts of service and give words, they want time and give touch. That is
+     * the shape the research is about -- two people both trying and both
+     * spending it in the wrong place -- and noise would average out into a
+     * perfect match, which would make the feature look like it does nothing.
+     */
+    private fun instrumentRuns(today: LocalDate) = listOf(
+        InstrumentRun(
+            instrumentId = Instruments.LOVE_LANGUAGES.id,
+            takenOn = today.minusDays(31),
+            answers = mapOf(
+                //                        words time gifts acts touch
+                you.uid to language(felt = listOf(3, 3, 3, 5, 4),
+                                    given = listOf(5, 3, 3, 3, 4)),
+                them.uid to language(felt = listOf(3, 5, 3, 3, 4),
+                                     given = listOf(3, 3, 3, 3, 5)),
+            ),
+        ),
+    )
+
+    /** Five per-language levels, expanded to the four items each one covers. */
+    private fun language(felt: List<Int>, given: List<Int>): List<Int> =
+        (felt + given).flatMap { level -> List(4) { level } }
 }

@@ -123,4 +123,9 @@ dependencies {
 
     // Renders the @Preview composables in Android Studio.
     debugImplementation(libs.compose.ui.tooling)
+
+    // The published scoring keys are transcribed by hand and a sign error in
+    // one of them is invisible on screen -- a wrong letter still looks like a
+    // letter. That is what there is a JVM test source set for.
+    testImplementation(libs.junit)
 }

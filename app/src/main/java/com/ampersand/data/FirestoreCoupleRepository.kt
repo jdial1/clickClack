@@ -11,6 +11,7 @@ import com.ampersand.model.BrickShape
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
+import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Knowing
 import com.ampersand.model.KnowingMonth
 import com.ampersand.model.Question
@@ -43,6 +44,7 @@ private const val QUIZZES = "quizzes"
 private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
 private const val KNOWING = "knowing"
+private const val INSTRUMENTS = "instruments"
 
 /** Ten weeks, which is what the Shelf draws. */
 private const val HistoryDays = 70L
@@ -189,6 +191,27 @@ class FirestoreCoupleRepository(
                 }
             }
 
+        // Instruments, sealed exactly like decks. One document per person, so
+        // the partner's forty ratings are genuinely unreadable until both are
+        // in -- and a half-open sitting is simply a run with one set of
+        // responses in it, which the badge wall already draws as unclaimed.
+        regs += couple.collection(INSTRUMENTS)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "instrument listener failed", error)
+                    return@addSnapshotListener
+                }
+                snap?.documents.orEmpty().forEach { doc ->
+                    instrumentDocs = instrumentDocs + (doc.id to doc)
+                    doc.getString("takenOn")?.let { d ->
+                        instrumentDates = instrumentDates + (doc.id to LocalDate.parse(d))
+                    }
+                    watchInstrumentRun(doc.id, myUid)
+                    if (doc.getBoolean("revealed") == true) watchInstrumentRun(doc.id, partnerUid)
+                    liftInstrumentSealIfBothIn(doc.id)
+                }
+            }
+
         regs += couple.collection(WILDCARDS)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
@@ -284,6 +307,13 @@ class FirestoreCoupleRepository(
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
             knowing = knowing,
+            instrumentRuns = instrumentResponses.map { (id, byUid) ->
+                InstrumentRun(
+                    instrumentId = id,
+                    takenOn = instrumentDates[id] ?: today,
+                    answers = byUid,
+                )
+            },
         )
 
         // The assignment. Without it every listener in this class computed the
@@ -310,6 +340,50 @@ class FirestoreCoupleRepository(
 
     /** The deck documents themselves, so a run landing can ask to open one. */
     private var quizDocs: Map<String, DocumentSnapshot> = emptyMap()
+
+    private val instrumentRegs = mutableMapOf<String, ListenerRegistration>()
+
+    /** instrument id -> uid -> responses, in published order, passes concatenated. */
+    private var instrumentResponses: Map<String, Map<String, List<Int>>> = emptyMap()
+    private var instrumentDocs: Map<String, DocumentSnapshot> = emptyMap()
+    private var instrumentDates: Map<String, LocalDate> = emptyMap()
+
+    /**
+     * One listener per person per instrument.
+     *
+     * Keyed by both, unlike the deck version which needed two maps, because an
+     * instrument has no partner-specific bookkeeping -- there is nothing to
+     * read but the numbers.
+     */
+    private fun watchInstrumentRun(id: String, uid: String) {
+        val key = "$id/$uid"
+        if (key in instrumentRegs) return
+        instrumentRegs[key] = couple.collection(INSTRUMENTS).document(id)
+            .collection(RUNS).document(uid)
+            .addSnapshotListener { d, _ -> putInstrumentRun(id, uid, d) }
+    }
+
+    private fun putInstrumentRun(id: String, uid: String, doc: DocumentSnapshot?) {
+        @Suppress("UNCHECKED_CAST")
+        val raw = doc?.get("responses") as? List<Long>
+        val forId = instrumentResponses[id].orEmpty().let { existing ->
+            if (raw == null) existing - uid else existing + (uid to raw.map { it.toInt() })
+        }
+        instrumentResponses = instrumentResponses + (id to forId)
+        liftInstrumentSealIfBothIn(id)
+        recompose()
+    }
+
+    /** Ask the rules to open it; refusal means the other half is not in yet. */
+    private fun liftInstrumentSealIfBothIn(id: String) {
+        val doc = instrumentDocs[id] ?: return
+        if (doc.getBoolean("revealed") == true) return
+        if (instrumentResponses[id]?.get(myUid) == null) return
+
+        couple.collection(INSTRUMENTS).document(id)
+            .set(mapOf("revealed" to true), SetOptions.merge())
+            .addOnFailureListener { Log.d(TAG, "instrument not ready to open yet", it) }
+    }
 
     /** Your own run, by name. A query over the runs is denied while sealed. */
     private fun watchRuns(quizId: String) {
@@ -677,11 +751,33 @@ class FirestoreCoupleRepository(
         )
     }
 
+    override fun submitInstrument(instrumentId: String, responses: List<Int>) {
+        if (instrumentResponses[instrumentId]?.get(myUid) != null) return
+        val doc = couple.collection(INSTRUMENTS).document(instrumentId)
+
+        doc.set(
+            mapOf(
+                "revealed" to false,
+                "takenOn" to today.toString(),
+                "submitted" to FieldValue.arrayUnion(myUid),
+            ),
+            SetOptions.merge(),
+        )
+        doc.collection(RUNS).document(myUid).set(
+            mapOf(
+                "responses" to responses,
+                "completedAt" to FieldValue.serverTimestamp(),
+            ),
+        )
+    }
+
     fun close() {
         regs.forEach { it.remove() }
         regs.clear()
         runRegs.values.forEach { it.remove() }
         runRegs.clear()
+        instrumentRegs.values.forEach { it.remove() }
+        instrumentRegs.clear()
         partnerRunRegs.values.forEach { it.remove() }
         partnerRunRegs.clear()
     }

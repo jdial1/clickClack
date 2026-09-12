@@ -2,6 +2,7 @@
 # Temurin 25 build JVM, bytecode targeting 17).
 [versions]
 agp = "9.4.0"
+junit = "4.13.2"
 kotlin = "2.4.10"
 composeBom = "2026.08.00"
 activity = "1.13.0"
@@ -13,6 +14,7 @@ credentials = "1.6.0"
 googleid = "1.2.0"
 
 [libraries]
+junit = { module = "junit:junit", version.ref = "junit" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 # Versionless: the BOM above pins these.
 compose-ui = { module = "androidx.compose.ui:ui" }

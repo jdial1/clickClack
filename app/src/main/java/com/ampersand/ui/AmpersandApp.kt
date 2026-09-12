@@ -53,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
 import com.ampersand.data.FirestoreCoupleRepository
 import com.ampersand.data.createCoupleRepository
+import com.ampersand.data.Instruments
 import com.ampersand.data.QuestionPool
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
@@ -106,6 +107,7 @@ import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.glow
 import com.ampersand.ui.today.TodayScreen
 import com.ampersand.ui.us.UsScreen
+import com.ampersand.ui.instrument.InstrumentScreen
 import com.ampersand.ui.wildcard.WildcardScreen
 import java.time.LocalDate
 
@@ -379,6 +381,7 @@ private fun PairedGate(
  */
 private sealed interface Screen {
     data class Deck(val id: String) : Screen
+    data class Sitting(val instrumentId: String) : Screen
     data class Reveal(val date: LocalDate) : Screen
     data object Wildcard : Screen
     data class Main(val tab: Tab) : Screen
@@ -436,6 +439,7 @@ private fun SignedInApp(
         // back in. Saveable so a rotation does not do the same.
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
         var writing by remember { mutableStateOf(false) }
+        var sitting by remember { mutableStateOf<String?>(null) }
 
         val sounds = LocalSounds.current
         val feel = LocalFeel.current
@@ -471,7 +475,8 @@ private fun SignedInApp(
                     BottomBar(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
-                        enabled = openDate == null && openDeck == null && !writing,
+                        enabled = openDate == null && openDeck == null && !writing &&
+                            sitting == null,
                         onSelect = { tab = it; openDate = null; openDeck = null },
                     )
                 },
@@ -491,6 +496,7 @@ private fun SignedInApp(
                         .padding(padding),
                 ) {
                     val here: Screen = when {
+                        sitting != null -> Screen.Sitting(sitting!!)
                         writing -> Screen.Wildcard
                         openDeck != null -> Screen.Deck(openDeck!!)
                         openDate != null -> Screen.Reveal(openDate!!)
@@ -527,7 +533,19 @@ private fun SignedInApp(
 
                     val deck = (screen as? Screen.Deck)?.id?.let { pool.deck(it) }
 
+                    val kit = (screen as? Screen.Sitting)?.instrumentId?.let { Instruments[it] }
+
                     when {
+                        kit != null -> InstrumentScreen(
+                            instrument = kit,
+                            you = BrickColor.of(state.you.colorArgb),
+                            onBack = { sitting = null },
+                            onSeal = { responses ->
+                                vm.repo.submitInstrument(kit.id, responses)
+                                sitting = null
+                            },
+                        )
+
                         deck != null -> DeckScreen(
                             state = state,
                             quiz = deck,
@@ -578,6 +596,7 @@ private fun SignedInApp(
                             state = state,
                             onPickColor = vm.repo::setColor,
                             onSetAnniversary = vm.repo::setAnniversary,
+                            onTakeInstrument = { sitting = it },
                             account = account.email ?: account.displayName,
                             onSignOut = onSignOut,
                             onUnpair = onUnpair,

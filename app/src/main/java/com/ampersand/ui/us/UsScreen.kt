@@ -75,6 +75,8 @@ fun UsScreen(
     state: CoupleState,
     onPickColor: (colorArgb: Long) -> Unit,
     onSetAnniversary: ((java.time.LocalDate) -> Unit)? = null,
+    /** Open a whole-instrument sitting. Null in previews. */
+    onTakeInstrument: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier,
     account: String? = null,
     onSignOut: (() -> Unit)? = null,
@@ -106,6 +108,9 @@ fun UsScreen(
                 modifier = Modifier.weight(1f),
             )
         }
+
+        Spacer(Modifier.height(32.dp))
+        ProfileBadges(state = state, onTake = { onTakeInstrument?.invoke(it) })
 
         Spacer(Modifier.height(32.dp))
         SectionLabel("Your colors")

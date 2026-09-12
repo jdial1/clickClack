@@ -4,6 +4,7 @@ import com.ampersand.model.Answer
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
+import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Placement
 import com.ampersand.model.QuizRun
 import com.ampersand.model.QuestionType
@@ -91,6 +92,17 @@ interface CoupleRepository {
      * Waiting until tomorrow is what makes it a question.
      */
     fun addWildcard(text: String, type: QuestionType, options: List<String>)
+
+    /**
+     * Submit a whole sitting with one instrument. Irreversible, like a day.
+     *
+     * [responses] is every item, in the published order, every pass
+     * concatenated -- `Instrument.length` of them, each 1..5. Positional rather
+     * than keyed, because unlike a deck an instrument's item list cannot change
+     * between the two of you taking it: changing it would make the scoring key
+     * wrong and the citation on it false.
+     */
+    fun submitInstrument(instrumentId: String, responses: List<Int>)
 }
 
 /**
@@ -181,6 +193,12 @@ class FakeCoupleRepository(
             history = history.map { it.rebind() },
             plate = plate.rebind(),
             shelf = shelf.map { it.rebind() },
+            // Responses are keyed by uid too, so a seeded sitting would belong
+            // to a user who no longer exists and the badge wall would read as
+            // half-finished the moment somebody signed in.
+            instrumentRuns = instrumentRuns.map { run ->
+                run.copy(answers = run.answers.mapKeys { remap(it.key) })
+            },
         )
     }
 
@@ -308,6 +326,16 @@ class FakeCoupleRepository(
                     byName = current.you.name,
                     createdAtMillis = System.currentTimeMillis(),
                 ),
+            )
+        }
+
+    override fun submitInstrument(instrumentId: String, responses: List<Int>) =
+        mutate { current ->
+            val existing = current.instrumentRuns.lastOrNull { it.instrumentId == instrumentId }
+            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now()))
+                .let { it.copy(answers = it.answers + (current.you.uid to responses)) }
+            current.copy(
+                instrumentRuns = current.instrumentRuns.filterNot { it === existing } + updated,
             )
         }
 
