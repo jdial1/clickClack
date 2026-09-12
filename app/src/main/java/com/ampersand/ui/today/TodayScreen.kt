@@ -603,13 +603,14 @@ internal fun AnswerInput(
         QuestionType.REFLECT, QuestionType.GUESS_ME -> AmpField(
             value = draft.text,
             onValueChange = { onChange(draft.copy(text = it)) },
-            accent = accent,
+            // The accent is always one of the four brick colours; the field
+            // needs the brick itself, not just its paint.
+            color = BrickColor.of(accent.toArgbLong()),
             placeholder = if (forPartner) {
                 "Your best guess."
             } else {
                 "Honestly, though."
             },
-            minLines = if (question.type == QuestionType.REFLECT) 4 else 2,
         )
 
         QuestionType.THIS_OR_THAT, QuestionType.PICK_ONE -> AmpRadioGroup(

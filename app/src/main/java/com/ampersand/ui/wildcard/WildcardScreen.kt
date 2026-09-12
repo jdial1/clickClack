@@ -114,8 +114,7 @@ fun WildcardScreen(
             value = text,
             onValueChange = { text = it },
             placeholder = "What do you want to ask?",
-            accent = Color(you.argb),
-            minLines = 3,
+            color = you,
         )
 
         Spacer(Modifier.height(26.dp))
@@ -140,14 +139,14 @@ fun WildcardScreen(
                 value = optionA,
                 onValueChange = { optionA = it },
                 placeholder = "One",
-                accent = Color(you.argb),
+                color = you,
             )
             Spacer(Modifier.height(10.dp))
             AmpField(
                 value = optionB,
                 onValueChange = { optionB = it },
                 placeholder = "Or the other",
-                accent = Color(you.argb),
+                color = you,
             )
         }
 

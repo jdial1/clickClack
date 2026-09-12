@@ -76,14 +76,20 @@ import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.theme.Stud
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
+import kotlin.math.floor
 
 /**
  * The form kit, in brick.
  *
- * One rule keeps it coherent: **things you press are bricks** -- studs on top, a
- * darker lip underneath that shortens when pressed, like a key going down.
- * **Things you type into are sockets** -- recessed, no studs, because studs
- * behind a cursor is just clutter.
+ * One rule keeps it coherent: **everything is a brick**. Things you press have
+ * a darker lip underneath that shortens when pressed, like a key going down.
+ * Things you type into are laid a brick at a time as the text grows -- they were
+ * recessed studless sockets once, and were the last grey rectangles in the app.
  */
 
 private val Pad = 18.dp
@@ -91,61 +97,152 @@ private val Corner = 20.dp
 
 // --- Text input --------------------------------------------------------------
 
-/** A socket: recessed, studless, with the accent arriving on focus. */
+/**
+ * A text box built out of bricks, growing as you write.
+ *
+ * It starts as a single four-stud brick. Once the line's text runs past that
+ * brick a second one is laid beside it, and when the text wraps a new course
+ * starts underneath with one brick again -- so an answer builds a little wall
+ * as it gets longer, and a one-word answer stays one brick. It was the last
+ * control in the app that was a rounded grey rectangle.
+ *
+ * Each line of text is one course, which only works because the line height
+ * is set from the brick rather than from the type scale. The bricks are drawn
+ * from the text's own layout on every change, so they always cover exactly the
+ * text you can see -- including the placeholder, which is why a long
+ * placeholder starts out as two bricks rather than overhanging one.
+ *
+ * Height follows the content, so there is no `minLines`. A box that opens
+ * four empty courses tall is a box that looks already built.
+ */
 @Composable
 fun AmpField(
     value: String,
     onValueChange: (String) -> Unit,
-    accent: Color,
+    color: BrickColor,
     modifier: Modifier = Modifier,
     placeholder: String = "",
-    minLines: Int = 1,
     enabled: Boolean = true,
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
-    val ring by animateColorAsState(
-        if (focused) accent else Color.Transparent,
-        label = "fieldRing",
-    )
-
     LaunchedEffect(focused) { if (focused) { sounds.play(Sfx.FOCUS); feel.play(Feel.FOCUS) } }
 
-    Box(
-        modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(Corner))
-            // Inset rather than raised: the socket is the inverse of a brick.
-            .background(lerp(MaterialTheme.colorScheme.surfaceVariant, Color.Black, 0.14f))
-            .padding(bottom = 5.dp)
-            .clip(RoundedCornerShape(Corner))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .border(2.dp, ring, RoundedCornerShape(Corner))
-            .padding(horizontal = Pad, vertical = 16.dp),
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            enabled = enabled,
-            interactionSource = interaction,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.onSurface,
+    // Picked up, a couple of dp, while you are typing in it. The old socket
+    // showed focus with a coloured ring; a brick shows it the way a brick would.
+    val lift by animateFloatAsState(if (focused) 1f else 0f, Motion.glide, label = "fieldLift")
+
+    // Ink from the brick, so it is white on red, blue and green and dark on
+    // yellow -- the text now sits on the brick itself, not on a panel.
+    val ink = inkOnBrick(color.slug)
+    val asset = BrickArt.assetFor(color.slug, FieldBrick)
+    val atlas = rememberBricks(listOf(asset))
+
+    // What the visible text lays out to: its lines, and how far the last reaches.
+    var lines by remember { mutableIntStateOf(1) }
+    var lastRight by remember { mutableFloatStateOf(0f) }
+
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val density = LocalDensity.current
+        val studPx = constraints.maxWidth.toFloat() / (FieldCourses.Studs * FieldCourses.PerLine)
+        // Rounded down, so a brick's art is never shorter than the line it
+        // covers: an overlap is hidden by the course drawn over it, where a
+        // gap would let the wall show through between two lines.
+        val coursePx = floor(studPx * FieldBrick.h * BrickArt.ROW_RATIO)
+        val nubPx = studPx * BrickArt.NUB_RATIO
+        val insetPx = studPx * FieldInset
+        val oneBrick = FieldCourses.Studs * studPx - insetPx - studPx * FieldEdge
+
+        val courses = FieldCourses.of(lines, lastRight, oneBrick)
+
+        val style = MaterialTheme.typography.bodyLarge.copy(
+            color = ink,
+            lineHeight = with(density) { coursePx.toSp() },
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center,
+                trim = LineHeightStyle.Trim.None,
             ),
-            cursorBrush = SolidColor(accent),
-            minLines = minLines,
-            modifier = Modifier.fillMaxWidth(),
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
         )
-        if (value.isEmpty()) {
-            Text(
-                text = placeholder,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+        val textPad = with(density) {
+            Modifier.padding(start = insetPx.toDp(), end = insetPx.toDp(), top = nubPx.toDp())
+        }
+
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    translationY = -lift * FieldLift.toPx()
+                    // One layer for the lot, never alpha per brick: drawn
+                    // translucent one at a time, a lower course's nubs show
+                    // through the course stacked on it.
+                    alpha = if (enabled) 1f else 0.5f
+                    compositingStrategy = CompositingStrategy.Offscreen
+                },
+        ) {
+            Canvas(Modifier.matchParentSize()) {
+                // Bottom course first, so each course above covers the nubs of
+                // the one below and only the top row's studs show.
+                for (row in courses.indices.reversed()) {
+                    repeat(courses[row]) { brick ->
+                        drawBrickArt(
+                            atlas = atlas,
+                            asset = asset,
+                            studs = FieldCourses.Studs,
+                            rows = FieldBrick.h,
+                            left = brick * FieldCourses.Studs * studPx,
+                            bottom = nubPx + (row + 1) * coursePx,
+                            studPx = studPx,
+                        )
+                    }
+                }
+            }
+
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                enabled = enabled,
+                interactionSource = interaction,
+                textStyle = style,
+                cursorBrush = SolidColor(ink),
+                onTextLayout = { layout ->
+                    // While empty the placeholder is what is visible, so it is
+                    // the placeholder's layout that sizes the bricks.
+                    if (value.isNotEmpty()) {
+                        lines = layout.lineCount
+                        lastRight = layout.getLineRight(layout.lineCount - 1)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().then(textPad),
             )
+            if (value.isEmpty()) {
+                Text(
+                    text = placeholder,
+                    style = style.copy(color = ink.copy(alpha = 0.75f)),
+                    onTextLayout = { layout ->
+                        lines = layout.lineCount
+                        lastRight = layout.getLineRight(layout.lineCount - 1)
+                    },
+                    modifier = Modifier.fillMaxWidth().then(textPad),
+                )
+            }
         }
     }
 }
+
+/** Every brick in a text box: four studs, two rows, one course per line of text. */
+private val FieldBrick = BrickShape(FieldCourses.Studs, BrickHeight.MEDIUM)
+
+/** Text keeps clear of the brick's shaded side edges, as a fraction of a stud. */
+private const val FieldInset = 0.4f
+
+/** How close text may get to the first brick's right edge before a second is laid. */
+private const val FieldEdge = 0.2f
+
+/** How far the box lifts while you are typing in it. */
+private val FieldLift = 2.dp
 
 // --- Radio -------------------------------------------------------------------
 

@@ -123,7 +123,9 @@ fun PairingScreen(
         AmpField(
             value = entered,
             onValueChange = { entered = it },
-            accent = MaterialTheme.colorScheme.primary,
+            // Blue to match the button under it. Nobody has picked a colour
+            // yet at this point, so there is no "yours" to use.
+            color = BrickColor.BLUE,
             placeholder = "8 characters",
         )
         Spacer(Modifier.height(14.dp))
