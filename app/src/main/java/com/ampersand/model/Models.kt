@@ -180,6 +180,8 @@ data class CoupleState(
     /** Sealed sculptures, newest first. Each one is a finished period. */
     val shelf: List<BuildPlate> = emptyList(),
     val history: List<DayEntry> = emptyList(),
+    /** Both people's runs through any deck either of them has started. */
+    val quizRuns: List<QuizRun> = emptyList(),
     val streak: Int = 0,
     val freezesLeft: Int = 1,
 ) {
@@ -194,6 +196,15 @@ data class CoupleState(
     fun onThisDay(on: LocalDate = today.date): List<DayEntry> =
         history.filter { it.date.dayOfMonth == on.dayOfMonth && it.date < on.minusDays(27) }
             .sortedByDescending { it.date }
+
+    /** Your run through [quizId], if you have played it. */
+    fun myRun(quizId: String): QuizRun? = quizRuns.firstOrNull {
+        it.quizId == quizId && it.uid == you.uid
+    }
+
+    fun theirRun(quizId: String): QuizRun? = quizRuns.firstOrNull {
+        it.quizId == quizId && it.uid == them.uid
+    }
 
     /** Predictions landed vs. possible, across scoreable revealed days. */
     val syncPercent: Int

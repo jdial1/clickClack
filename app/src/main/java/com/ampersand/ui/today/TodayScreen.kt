@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
+import com.ampersand.model.Quiz
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.unit.sp
 import com.ampersand.model.CoupleState
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
@@ -61,6 +65,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.SectionLabel
@@ -79,6 +84,8 @@ fun TodayScreen(
     onSubmit: (values: List<String>, guess: List<String>?) -> Unit,
     onOpenReveal: () -> Unit,
     modifier: Modifier = Modifier,
+    decks: List<Quiz> = emptyList(),
+    onOpenDeck: (String) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -115,6 +122,22 @@ fun TodayScreen(
             AnswerForm(state, you, them, onSubmit)
         } else {
             SealedPanel(state, you, them, onOpenReveal)
+        }
+
+        if (decks.isNotEmpty()) {
+            Spacer(Modifier.height(40.dp))
+            SectionLabel("Decks")
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "One question a day is the habit. These are for when you have an evening.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(14.dp))
+            decks.forEach { deck ->
+                DeckRow(deck, state, onOpenDeck)
+                Spacer(Modifier.height(10.dp))
+            }
         }
 
         Spacer(Modifier.height(48.dp))
@@ -202,13 +225,17 @@ private fun Pill(text: String) {
  * A single object rather than eight loose `remember`s, so resetting on a
  * question change is one line and cannot half-happen.
  */
-private data class Draft(
+internal data class Draft(
     val text: String = "",
     val pick: String? = null,
     val multi: Set<String> = emptySet(),
     val rank: List<String> = emptyList(),
     val scale: Int? = null,
 ) {
+    fun values(question: Question): List<String> = values(question.type)
+
+    fun isComplete(question: Question): Boolean = isComplete(question.type)
+
     fun values(type: QuestionType): List<String> = when (type) {
         QuestionType.REFLECT, QuestionType.GUESS_ME -> listOf(text.trim())
         QuestionType.MULTI_SELECT -> multi.toList()
@@ -296,7 +323,7 @@ private fun themLabel(type: QuestionType, name: String) = when (type) {
 
 /** Dispatches to the right control. The only place question type maps to UI. */
 @Composable
-private fun AnswerInput(
+internal fun AnswerInput(
     question: Question,
     draft: Draft,
     accent: Color,
@@ -586,5 +613,88 @@ private fun PreviewSealed() = AmpersandTheme {
 private fun PreviewRankDark() = AmpersandTheme(darkTheme = true) {
     Surface(color = MaterialTheme.colorScheme.background) {
         TodayScreen(previewOf("k1"), { _, _ -> }, {})
+    }
+}
+
+/**
+ * One question's input, with the draft held for you.
+ *
+ * The deck player needs exactly what the daily question needs -- the same eight
+ * controls, chosen the same way -- so this is the shared entry point rather
+ * than a second copy that drifts. [rememberDraft] is keyed on the question, so
+ * moving to the next one genuinely clears the form instead of carrying the last
+ * answer forward as a suggestion.
+ */
+@Composable
+internal fun rememberDraft(question: Question): MutableState<Draft> =
+    remember(question.id) { mutableStateOf(Draft.forQuestion(question)) }
+
+@Composable
+internal fun QuestionInput(
+    question: Question,
+    draft: MutableState<Draft>,
+    color: BrickColor,
+    forPartner: Boolean,
+    state: CoupleState,
+) {
+    AnswerInput(
+        question = question,
+        draft = draft.value,
+        accent = Color(color.argb),
+        forPartner = forPartner,
+        state = state,
+    ) { draft.value = it }
+}
+
+
+/**
+ * One deck, with where the two of you are in it.
+ *
+ * The status is the whole point of the row. "Played" is not a state worth
+ * showing on its own -- what you want to know before tapping is whether this is
+ * a fresh one, one you are waiting on them for, or one with a result sitting in
+ * it.
+ */
+@Composable
+private fun DeckRow(deck: Quiz, state: CoupleState, onOpen: (String) -> Unit) {
+    val mine = state.myRun(deck.id)
+    val theirs = state.theirRun(deck.id)
+    val status = when {
+        mine != null && theirs != null -> "Open the result"
+        mine != null -> "Waiting on ${state.them.name}"
+        theirs != null -> "${state.them.name} has played this"
+        else -> "${deck.size} questions  ·  about ${deck.minutes} min"
+    }
+
+    BrickSlab(
+        slugs = listOf(deck.theme.brick.slug),
+        studs = 12,
+        height = BrickHeight.MEDIUM,
+        alpha = if (mine != null && theirs == null) 0.55f else 1f,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onOpen(deck.id) },
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, top = 26.dp, bottom = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(deck.theme.glyph, fontSize = 20.sp)
+            Spacer(Modifier.size(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = deck.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = inkOnBrick(deck.theme.brick.slug),
+                )
+                Text(
+                    text = status,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = inkOnBrick(deck.theme.brick.slug).copy(alpha = 0.85f),
+                )
+            }
+        }
     }
 }

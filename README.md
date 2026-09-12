@@ -6,8 +6,9 @@ readable until both are in. Then it unseals, and you talk.
 Answering earns bricks. You both drop them on one shared plate, and at the end
 of the week the sculpture is sealed with a date and a fresh plate starts.
 
-Scaffold stage: the UI is complete and driven by an in-memory mock repository.
-There is no backend yet.
+Auth, pairing, answers, reactions, bricks and decks are all real and live in
+Firestore. The in-memory repository survives only as fixture data for the
+`@Preview` composables.
 
 See [DESIGN.md](DESIGN.md) for what the app is *for* — the name, the voice, the
 rules that settle arguments. This file is how it is built.
@@ -83,21 +84,16 @@ If you do want it on a device:
 adb install -r app/build/outputs/apk/debug/app-debug.apk && adb shell am start -n com.ampersand/.MainActivity
 ```
 
-### Scaffold controls
+### No scaffold controls
 
-There is an unlabelled 28dp tap target in the **top-right corner** of any screen.
-Tapping it opens a panel that fakes the things that normally need a second
-person, a second phone, or a week of waiting:
+There used to be a hidden tap target opening a panel that faked the partner,
+reset the day and swapped question types, plus two gallery screens. All of it
+is gone. Once the security rules only let you write your own documents there is
+no honest way to answer as someone else, so a chip that pretended to was worse
+than nothing — it tested a path the app does not have.
 
-- **Partner answers** — fakes Maya submitting, so the seal lifts.
-- **Partner reacts** — toggles a reaction from her on today, so both halves of
-  the reveal can be seen.
-- **Seal the week** — archives the current plate onto the shelf and starts a
-  fresh one. Otherwise this is a thing that happens once every seven days and is
-  impossible to design.
-- **Reset day**, **Form kit**, and a question-type switcher.
-
-This panel and `FakeCoupleRepository` both come out when Firestore lands.
+Testing the seal needs two accounts. Sealing a plate is now driven by the
+calendar: the repository dates the sculpture itself once the period has run out.
 
 ## The one mechanic
 

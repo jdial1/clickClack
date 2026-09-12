@@ -13,7 +13,7 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Member
 import com.ampersand.model.Placement
-import com.ampersand.model.Question
+import com.ampersand.model.QuizRun
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
@@ -31,9 +31,14 @@ private const val TAG = "Couple"
 private const val DAYS = "days"
 private const val ANSWERS = "answers"
 private const val PLATES = "plates"
+private const val QUIZZES = "quizzes"
+private const val RUNS = "runs"
 
 /** Ten weeks, which is what the Shelf draws. */
 private const val HistoryDays = 70L
+
+/** A sculpture is a week. Short enough that you finish one and start again. */
+private const val PeriodDays = 7
 
 /**
  * The real one.
@@ -43,11 +48,10 @@ private const val HistoryDays = 70L
  * phones signed into two profiles see each other's contributions, which is what
  * makes this testable at all.
  *
- * **Questions are still mock.** The pool arrives as JSON later, so today's
- * question is picked out of [MockQuestions] by date. Picking by date rather
- * than storing it matters more than it looks: both phones must land on the same
- * question without either having written it first, or whoever opens the app
- * second gets a different one.
+ * Today's question comes from the bundled [QuestionPool], picked by date.
+ * Picking rather than storing matters more than it looks: both phones must land
+ * on the same question before either has written anything, or whoever opens the
+ * app second gets a different one.
  *
  * ```
  * couples/{cid}/days/{yyyy-mm-dd}   questionId, revealed, reactions{uid:name}
@@ -66,6 +70,7 @@ class FirestoreCoupleRepository(
     private val coupleId: String,
     private val myUid: String,
     private val partnerUid: String,
+    private val pool: QuestionPool,
     private val today: LocalDate = LocalDate.now(),
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) : CoupleRepository {
@@ -76,7 +81,7 @@ class FirestoreCoupleRepository(
         CoupleState(
             you = Member(myUid, "You", 0xFFF54E4F),
             them = Member(partnerUid, "Them", 0xFF108BE2),
-            today = DayEntry(today, questionFor(today)),
+            today = DayEntry(today, pool.daily(today)),
             plate = emptyPlate(today),
         ),
     )
@@ -132,10 +137,23 @@ class FirestoreCoupleRepository(
                     return@addSnapshotListener
                 }
                 history = snap?.documents.orEmpty()
-                    .mapNotNull { it.toDayEntry() }
+                    .mapNotNull { it.toDayEntry(pool) }
                     .filter { it.date != today }
                     .sortedByDescending { it.date }
                 recompose()
+            }
+
+        // Every run either of you has written. Before a deck is revealed the
+        // rules deny the partner's document, so this returns one run per deck;
+        // afterwards it returns two. Nothing in the UI has to know the
+        // difference -- a deck with one run is simply still waiting.
+        regs += couple.collection(QUIZZES)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "quiz listener failed", error)
+                    return@addSnapshotListener
+                }
+                snap?.documents.orEmpty().forEach { watchRuns(it.id) }
             }
 
         regs += couple.collection(PLATES)
@@ -161,9 +179,7 @@ class FirestoreCoupleRepository(
         val you = me.toMember(myUid, current.you)
         val partner = them.toMember(partnerUid, current.them)
 
-        val question = todayDoc?.getString("questionId")
-            ?.let { MockQuestions.pool.firstOrNull { q -> q.id == it } }
-            ?: questionFor(today)
+        val question = pool.question(todayDoc?.getString("questionId")) ?: pool.daily(today)
 
         val todayEntry = DayEntry(
             date = today,
@@ -175,6 +191,13 @@ class FirestoreCoupleRepository(
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
             ?: emptyPlate(today)
 
+        // The period is over, so the sculpture is dated. Driven by the calendar
+        // rather than by a button: a week ends whether or not anyone opened the
+        // app that day.
+        if (live.isSealed.not() && live.placed.isNotEmpty() && live.endsOn() < today) {
+            sealPlate()
+        }
+
         _state.value = current.copy(
             you = you,
             them = partner,
@@ -182,8 +205,36 @@ class FirestoreCoupleRepository(
             history = history,
             plate = live,
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
+            quizRuns = runs.values.flatten(),
             streak = streakOf(history, todayEntry),
         )
+    }
+
+    private val runRegs = mutableMapOf<String, ListenerRegistration>()
+    private var runs: Map<String, List<QuizRun>> = emptyMap()
+
+    private fun watchRuns(quizId: String) {
+        if (quizId in runRegs) return
+        runRegs[quizId] = couple.collection(QUIZZES).document(quizId).collection(RUNS)
+            .addSnapshotListener { snap, error ->
+                val found = if (error != null) {
+                    // Denied before the reveal; our own run is still readable.
+                    emptyList()
+                } else {
+                    snap?.documents.orEmpty().mapNotNull { it.toQuizRun(quizId) }
+                }
+                runs = runs + (quizId to found)
+                if (error != null) readOwnRun(quizId)
+                recompose()
+            }
+    }
+
+    private fun readOwnRun(quizId: String) {
+        couple.collection(QUIZZES).document(quizId).collection(RUNS).document(myUid).get()
+            .addOnSuccessListener { doc ->
+                runs = runs + (quizId to listOfNotNull(doc.toQuizRun(quizId)))
+                recompose()
+            }
     }
 
     /** Before the reveal the collection query is denied; our own doc is not. */
@@ -316,19 +367,40 @@ class FirestoreCoupleRepository(
         couple.collection(PLATES).document().set(next.toMap())
     }
 
-    // --- Scaffolding ---------------------------------------------------------
-    // Deliberately no-ops against the real backend: there is no honest way to
-    // fake your partner from your own phone once the rules only let you write
-    // your own documents. Use a second account.
+    /**
+     * Submit a run through a deck.
+     *
+     * Same shape as a day, and sealed the same way: your run is its own
+     * document, the partner's is unreadable until the quiz document says both
+     * are in, and the rules enforce that rather than the app.
+     */
+    override fun submitQuizRun(
+        quizId: String,
+        answers: Map<String, List<String>>,
+        guesses: Map<String, List<String>>,
+    ) {
+        if (_state.value.myRun(quizId) != null) return
+        val quiz = couple.collection(QUIZZES).document(quizId)
 
-    override fun simulatePartnerAnswer() = Unit
-    override fun simulatePartnerReaction(date: LocalDate) = Unit
-    override fun previewQuestion(question: Question) = Unit
-    override fun resetToday() = Unit
+        quiz.set(mapOf("revealed" to false), SetOptions.merge())
+        quiz.collection(RUNS).document(myUid).set(
+            mapOf(
+                "answers" to answers,
+                "guesses" to guesses,
+                "completedAt" to FieldValue.serverTimestamp(),
+            ),
+        ).addOnSuccessListener {
+            quiz.collection(RUNS).get().addOnSuccessListener { snap ->
+                if (snap.size() >= 2) quiz.set(mapOf("revealed" to true), SetOptions.merge())
+            }
+        }
+    }
 
     fun close() {
         regs.forEach { it.remove() }
         regs.clear()
+        runRegs.values.forEach { it.remove() }
+        runRegs.clear()
     }
 
     private fun plateRef(plate: BuildPlate) = couple.collection(PLATES).document(plate.id)
@@ -336,25 +408,13 @@ class FirestoreCoupleRepository(
     private fun emptyPlate(from: LocalDate) = BuildPlate(
         id = "plate_${from}",
         startedOn = from,
-        periodDays = MockCouple.PeriodDays,
+        periodDays = PeriodDays,
         gridW = 12,
         gridH = 14,
     )
 }
 
 // --- Mapping -----------------------------------------------------------------
-
-/**
- * Today's question, chosen by date.
- *
- * Deterministic so both phones land on the same one before either has written
- * anything. Replaced when the real pool arrives; the scheduling problem it
- * solves does not go away.
- */
-private fun questionFor(date: LocalDate): Question {
-    val pool = MockQuestions.pool
-    return pool[(date.toEpochDay().mod(pool.size))]
-}
 
 private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = Member(
     uid = uid,
@@ -380,14 +440,26 @@ private fun DocumentSnapshot.toAnswer(): Answer? {
     return Answer(uid = id, values = values, guess = guess)
 }
 
-private fun DocumentSnapshot.toDayEntry(): DayEntry? {
+private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
     val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
-    val question = MockQuestions.pool.firstOrNull { it.id == getString("questionId") }
-        ?: questionFor(date)
+    val question = pool.question(getString("questionId")) ?: pool.daily(date)
     // History carries no answers: they live in a subcollection that would need
     // a read each. The Shelf shows questions, dates and reactions, so this is
     // what it needs; the Reveal screen loads a single day in full.
     return DayEntry(date = date, question = question, reactions = toReactions())
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun DocumentSnapshot.toQuizRun(quizId: String): QuizRun? {
+    if (!exists()) return null
+    val answers = (get("answers") as? Map<String, List<String>>).orEmpty()
+    if (answers.isEmpty()) return null
+    return QuizRun(
+        quizId = quizId,
+        uid = id,
+        answers = answers,
+        guesses = (get("guesses") as? Map<String, List<String>>).orEmpty(),
+    )
 }
 
 private fun DocumentSnapshot.toPlate(): BuildPlate? {

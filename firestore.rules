@@ -100,6 +100,31 @@ service cloud.firestore {
         }
       }
 
+      // Decks, sealed exactly like days. A run is one document per person, so
+      // the partner's is genuinely unreadable until both are in -- the same
+      // reason answers are not two fields on one document.
+      match /quizzes/{quizId} {
+        allow read: if isMember(cid);
+        allow create: if isLive(cid);
+        allow update: if isLive(cid) && (
+          request.resource.data.revealed == false ||
+          (
+            exists(/databases/$(database)/documents/couples/$(cid)/quizzes/$(quizId)/runs/$(couple(cid).members[0])) &&
+            exists(/databases/$(database)/documents/couples/$(cid)/quizzes/$(quizId)/runs/$(couple(cid).members[1]))
+          )
+        );
+        allow delete: if false;
+
+        match /runs/{uid} {
+          allow read: if isMember(cid) && (
+            uid == me() ||
+            get(/databases/$(database)/documents/couples/$(cid)/quizzes/$(quizId)).data.revealed == true
+          );
+          allow create: if isLive(cid) && uid == me();
+          allow update, delete: if false;
+        }
+      }
+
       // Sealed sculptures. completedOn != null means finished, and a finished
       // plate must not gain bricks from a late listener.
       match /plates/{pid} {

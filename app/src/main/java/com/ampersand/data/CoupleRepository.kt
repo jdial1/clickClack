@@ -5,8 +5,7 @@ import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Placement
-import com.ampersand.model.Question
-import com.ampersand.model.QuestionType
+import com.ampersand.model.QuizRun
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,28 +57,21 @@ interface CoupleRepository {
     /**
      * Seal the current plate and start the next one.
      *
-     * Driven by the calendar in the real implementation -- the period ends and
-     * the sculpture is dated whether or not anyone opened the app. Exposed here
-     * because a thing that happens once a week is otherwise impossible to see
-     * while designing it.
+     * Driven by the calendar: the Firestore implementation calls this itself
+     * once the period has run out, so a sculpture is dated whether or not
+     * anyone opened the app that day.
      */
     fun sealPlate()
 
-    // --- Scaffolding-only controls -------------------------------------------
-    // These exist so the UI can be designed on one device with no backend.
-    // They go away when the Firestore implementation lands.
-
-    /** Fakes the partner submitting, so the reveal transition can be seen. */
-    fun simulatePartnerAnswer()
-
-    /** Fakes the partner reacting, so both halves of a reveal can be seen. */
-    fun simulatePartnerReaction(date: LocalDate)
-
-    /** Swaps today's question, to design each input style quickly. */
-    fun previewQuestion(question: Question)
-
-    /** Back to an unanswered day. */
-    fun resetToday()
+    /**
+     * Submit your run through a deck. Irreversible, like a day.
+     *
+     * [answers] and [guesses] are keyed by question id rather than positional,
+     * because a deck can gain or lose a question between you starting it and
+     * your partner finishing it, and an index would then pair up the wrong two
+     * answers.
+     */
+    fun submitQuizRun(quizId: String, answers: Map<String, List<String>>, guesses: Map<String, List<String>>)
 }
 
 /**
@@ -94,9 +86,10 @@ fun createCoupleRepository(
     coupleId: String,
     myUid: String,
     partnerUid: String,
+    pool: QuestionPool,
 ): CoupleRepository =
     if (hasFirebase && !coupleId.startsWith("c_fake")) {
-        FirestoreCoupleRepository(coupleId, myUid, partnerUid)
+        FirestoreCoupleRepository(coupleId, myUid, partnerUid, pool)
     } else {
         FakeCoupleRepository()
     }
@@ -185,22 +178,6 @@ class FakeCoupleRepository(
         )
     }
 
-    override fun simulatePartnerAnswer() = mutate { current ->
-        val them = current.them
-        val today = current.today
-        if (today.answerFor(them.uid) != null) return@mutate current
-
-        val q = today.question
-        awardIfComplete(
-            current.copy(
-                today = today.copy(
-                    answers = today.answers +
-                        (them.uid to Answer(them.uid, cannedResponse(q), cannedGuess(q))),
-                ),
-            ),
-        )
-    }
-
     /**
      * Both answered, so both earn a brick.
      *
@@ -232,23 +209,6 @@ class FakeCoupleRepository(
                     day.reactions + (uid to reaction)
                 },
             )
-        }
-    }
-
-    override fun simulatePartnerReaction(date: LocalDate) = mutate { current ->
-        val uid = current.them.uid
-        current.withDay(date) { day ->
-            if (!day.isRevealed) {
-                day
-            } else {
-                day.copy(
-                    reactions = if (uid in day.reactions) {
-                        day.reactions - uid
-                    } else {
-                        day.reactions + (uid to Reaction.entries.random())
-                    },
-                )
-            }
         }
     }
 
@@ -299,40 +259,23 @@ class FakeCoupleRepository(
         )
     }
 
+    override fun submitQuizRun(
+        quizId: String,
+        answers: Map<String, List<String>>,
+        guesses: Map<String, List<String>>,
+    ) = mutate { current ->
+        if (current.myRun(quizId) != null) return@mutate current
+        current.copy(
+            quizRuns = current.quizRuns + QuizRun(quizId, current.you.uid, answers, guesses),
+        )
+    }
+
     override fun setColor(uid: String, colorArgb: Long) = mutate { current ->
         when (uid) {
             current.you.uid -> current.copy(you = current.you.copy(colorArgb = colorArgb))
             current.them.uid -> current.copy(them = current.them.copy(colorArgb = colorArgb))
             else -> current
         }
-    }
-
-    override fun previewQuestion(question: Question) = mutate { current ->
-        current.copy(today = current.today.copy(question = question, answers = emptyMap()))
-    }
-
-    override fun resetToday() = mutate { current ->
-        current.copy(today = current.today.copy(answers = emptyMap()))
-    }
-
-    /** Plausible partner answers, shaped correctly for each question type. */
-    private fun cannedResponse(q: Question): List<String> = when (q.type) {
-        QuestionType.REFLECT, QuestionType.GUESS_ME ->
-            listOf("The shoebox of photos under the bed.")
-
-        QuestionType.RANK -> q.options.reversed()
-        QuestionType.MULTI_SELECT -> q.options.take(q.maxChoices ?: 2)
-        QuestionType.SCALE -> listOf("4")
-        else -> listOf(q.options.lastOrNull().orEmpty())
-    }
-
-    private fun cannedGuess(q: Question): List<String>? = when (q.type) {
-        QuestionType.REFLECT -> null
-        QuestionType.GUESS_ME -> listOf("Probably your laptop, knowing you.")
-        QuestionType.RANK -> q.options
-        QuestionType.MULTI_SELECT -> q.options.takeLast(q.maxChoices ?: 2)
-        QuestionType.SCALE -> listOf("3")
-        else -> listOf(q.options.firstOrNull().orEmpty())
     }
 
     private inline fun mutate(block: (CoupleState) -> CoupleState) {

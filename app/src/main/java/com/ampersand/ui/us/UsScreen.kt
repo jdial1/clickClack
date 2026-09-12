@@ -52,6 +52,7 @@ fun UsScreen(
     modifier: Modifier = Modifier,
     account: String? = null,
     onSignOut: (() -> Unit)? = null,
+    onUnpair: (() -> Unit)? = null,
 ) {
     Column(
         modifier
@@ -111,12 +112,6 @@ fun UsScreen(
         Spacer(Modifier.height(32.dp))
         SoundToggle(you = BrickColor.of(state.you.colorArgb))
 
-        Spacer(Modifier.height(32.dp))
-        SectionLabel("Coming next")
-        Spacer(Modifier.height(12.dp))
-        Upcoming("Wildcard", "One day a week, one of you writes the question.")
-        Upcoming("Time capsule", "Some questions come back in six months, then vs. now.")
-        Upcoming("Daily nudge", "One gentle reminder, at a time you choose.")
 
         if (onSignOut != null) {
             Spacer(Modifier.height(32.dp))
@@ -133,6 +128,19 @@ fun UsScreen(
             // Black, not the user's colour. Leaving is structure, not a choice
             // -- the same reason the nav joiners are black.
             AmpButton(label = "Sign out", slug = "black", onClick = onSignOut)
+
+            if (onUnpair != null) {
+                Spacer(Modifier.height(28.dp))
+                SectionLabel("${state.you.name} and ${state.them.name}")
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Unpairing ends it for both of you. Nothing you have made is deleted.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+                AmpButton(label = "Unpair", slug = "black", onClick = onUnpair)
+            }
         }
 
         Spacer(Modifier.height(48.dp))

@@ -44,7 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
 import com.ampersand.data.FirestoreCoupleRepository
 import com.ampersand.data.createCoupleRepository
-import com.ampersand.data.MockQuestions
+import com.ampersand.data.QuestionPool
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,9 +73,8 @@ import com.ampersand.ui.build.BuildScreen
 import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
-import com.ampersand.ui.gallery.GalleryScreen
 import com.ampersand.ui.history.HistoryScreen
-import com.ampersand.ui.quiz.QuizKitScreen
+import com.ampersand.ui.quiz.DeckScreen
 import com.ampersand.ui.reveal.RevealScreen
 import com.ampersand.ui.splash.SplashScreen
 import com.ampersand.ui.sound.LocalSounds
@@ -107,10 +106,11 @@ class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
             coupleId: String,
             myUid: String,
             partnerUid: String,
+            pool: QuestionPool,
         ) = viewModelFactory {
             initializer {
                 AmpersandViewModel(
-                    createCoupleRepository(hasFirebase, coupleId, myUid, partnerUid),
+                    createCoupleRepository(hasFirebase, coupleId, myUid, partnerUid, pool),
                 )
             }
         }
@@ -252,6 +252,9 @@ private fun PairedGate(
 ) {
     val context = LocalContext.current
     val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
+    // Loaded once. The decks are both the thing you play and the pool the daily
+    // question is drawn from, so there is exactly one list.
+    val pool = remember(context) { QuestionPool.load(context) }
     val pairVm: PairingViewModel = viewModel(
         key = "pairing_${account.uid}",
         factory = PairingViewModel.factory(context, account.uid, account.displayName),
@@ -276,6 +279,7 @@ private fun PairedGate(
                     coupleId = p.coupleId,
                     myUid = account.uid,
                     partnerUid = p.partnerUid,
+                    pool = pool,
                 ),
             )
             val state by vm.repo.state.collectAsStateWithLifecycle()
@@ -287,7 +291,7 @@ private fun PairedGate(
                     vm = vm,
                     state = state,
                     account = account,
-                    partner = p,
+                    pool = pool,
                     onSignOut = onSignOut,
                     onUnpair = { scope.launch { pairVm.pairing.unpair() } },
                 )
@@ -327,7 +331,7 @@ private fun SignedInApp(
     vm: AmpersandViewModel,
     state: CoupleState,
     account: AuthState.SignedIn,
-    partner: PairState.Paired,
+    pool: QuestionPool,
     onSignOut: () -> Unit,
     onUnpair: () -> Unit,
 ) {
@@ -336,45 +340,27 @@ private fun SignedInApp(
         LaunchedEffect(account.uid, account.displayName) {
             vm.repo.bindLocalUser(account.uid, account.displayName)
         }
-        LaunchedEffect(partner.partnerUid, partner.partnerName) {
-            vm.repo.bindPartner(partner.partnerUid, partner.partnerName)
-        }
 
         var tab by remember { mutableStateOf(Tab.TODAY) }
         // The *date* of the open day, not the day itself. Holding the entry
         // would freeze it at the moment it was opened, so a reaction added on
         // the reveal screen would never appear on the reveal screen.
         var openDate by remember { mutableStateOf<LocalDate?>(null) }
-        var showScaffoldControls by remember { mutableStateOf(false) }
-        // Scaffold only, and off the tab bar: five pills do not fit a phone.
-        var showKit by remember { mutableStateOf(false) }
-        var showQuizKit by remember { mutableStateOf(false) }
+        // The deck you are playing, if any. A quiz id rather than the Quiz, so
+        // the screen re-resolves it and a deck that gains a question mid-play
+        // does not leave a stale copy on screen.
+        var openDeck by remember { mutableStateOf<String?>(null) }
 
         Surface(color = MaterialTheme.colorScheme.background) {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = {
-                    Column {
-                        AnimatedVisibility(visible = showScaffoldControls) {
-                            ScaffoldControls(
-                                repo = vm.repo,
-                                today = state.today.date,
-                                kitOpen = showKit,
-                                onToggleKit = { showKit = !showKit; showQuizKit = false },
-                                quizKitOpen = showQuizKit,
-                                onToggleQuizKit = { showQuizKit = !showQuizKit; showKit = false },
-                                onUnpair = onUnpair,
-                            )
-                        }
-                        BottomBar(
-                            current = tab,
-                            color = BrickColor.of(state.you.colorArgb),
-                            enabled = openDate == null && !showKit && !showQuizKit,
-                            onSelect = {
-                                tab = it; openDate = null; showKit = false; showQuizKit = false
-                            },
-                        )
-                    }
+                    BottomBar(
+                        current = tab,
+                        color = BrickColor.of(state.you.colorArgb),
+                        enabled = openDate == null && openDeck == null,
+                        onSelect = { tab = it; openDate = null; openDeck = null },
+                    )
                 },
             ) { padding ->
                 Box(Modifier.fillMaxSize()) {
@@ -401,10 +387,17 @@ private fun SignedInApp(
                         }
                     }
 
-                    when {
-                        showKit -> GalleryScreen(state = state)
+                    val deck = openDeck?.let { pool.deck(it) }
 
-                        showQuizKit -> QuizKitScreen(state = state)
+                    when {
+                        deck != null -> DeckScreen(
+                            state = state,
+                            quiz = deck,
+                            onBack = { openDeck = null },
+                            onSubmit = { answers, guesses ->
+                                vm.repo.submitQuizRun(deck.id, answers, guesses)
+                            },
+                        )
 
                         day != null -> RevealScreen(
                             state = state,
@@ -415,8 +408,10 @@ private fun SignedInApp(
 
                         tab == Tab.TODAY -> TodayScreen(
                             state = state,
+                            decks = pool.decks,
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
+                            onOpenDeck = { openDeck = it },
                         )
 
                         tab == Tab.BUILD -> BuildScreen(
@@ -435,18 +430,10 @@ private fun SignedInApp(
                             onPickColor = vm.repo::setColor,
                             account = account.email ?: account.displayName,
                             onSignOut = onSignOut,
+                            onUnpair = onUnpair,
                         )
                     }
 
-                    // Tap target for the scaffold panel. Deliberately unlabelled
-                    // and tiny; it comes out with the mock repository.
-                    Box(
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .size(28.dp)
-                            .clickable { showScaffoldControls = !showScaffoldControls },
-                    )
                 }
             }
         }
@@ -555,72 +542,3 @@ private fun BottomBar(
     }
 }
 
-/**
- * Scaffolding only. Drives the states that normally need a second person and a
- * second device: the partner answering, and each question type in turn.
- */
-@Composable
-private fun ScaffoldControls(
-    repo: CoupleRepository,
-    today: LocalDate,
-    kitOpen: Boolean,
-    onToggleKit: () -> Unit,
-    quizKitOpen: Boolean,
-    onToggleQuizKit: () -> Unit,
-    onUnpair: () -> Unit,
-) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(14.dp),
-    ) {
-        SectionLabel("Scaffold controls")
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chip("Partner answers") { repo.simulatePartnerAnswer() }
-            Chip("Partner reacts") { repo.simulatePartnerReaction(today) }
-            Chip("Reset day") { repo.resetToday() }
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chip("Seal the week") { repo.sealPlate() }
-            Chip(if (kitOpen) "Close kit" else "Form kit", onClick = onToggleKit)
-            Chip(if (quizKitOpen) "Close decks" else "Quiz kit", onClick = onToggleQuizKit)
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            // Its own row: four chips overflow the width and the last one wraps
-            // one character per line.
-            Chip("Unpair", onClick = onUnpair)
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chip("Reflect") { repo.previewQuestion(MockQuestions.byId("r2")) }
-            Chip("Guess Me") { repo.previewQuestion(MockQuestions.byId("g1")) }
-            Chip("This or That") { repo.previewQuestion(MockQuestions.byId("t3")) }
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chip("Rank") { repo.previewQuestion(MockQuestions.byId("k1")) }
-            Chip("Multi") { repo.previewQuestion(MockQuestions.byId("m1")) }
-            Chip("Scale") { repo.previewQuestion(MockQuestions.byId("s1")) }
-            Chip("Dropdown") { repo.previewQuestion(MockQuestions.byId("d1")) }
-        }
-    }
-}
-
-@Composable
-private fun Chip(label: String, onClick: () -> Unit) {
-    Box(
-        Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.background)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-    ) {
-        Text(label, style = MaterialTheme.typography.labelLarge)
-    }
-}
