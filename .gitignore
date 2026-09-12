@@ -15,3 +15,5 @@ google-services.json
 clickclack-debug.apk
 
 clickclack.apk
+node_modules/
+firestore-debug.log

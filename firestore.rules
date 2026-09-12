@@ -21,10 +21,45 @@ service cloud.firestore {
       return isMember(cid) && couple(cid).endedAt == null;
     }
 
+    // Redeeming an invite has to land in *both* user documents at once --
+    // otherwise the person who made the code is never told it was taken -- and
+    // a user document is writable only by its owner, which is precisely the
+    // write the joiner cannot make. So being paired is treated as a thing you
+    // consent to in advance: you are only joinable while you are holding out a
+    // live invite, and the write may do nothing but set the couple and consume
+    // the code.
+    //
+    // It asks your document rather than the invite document, even though the
+    // invite is the thing being redeemed. `inviteCode` and `inviteExpiresAt`
+    // are on your document because *you* put them there -- nobody else may
+    // write them -- so it is the same assertion one read cheaper.
+    //
+    // What this does not do is prove the joiner knows the code, which no rule
+    // can: the couple document they point you at is created in the same
+    // transaction, so a rule cannot read it. The window is what bounds it --
+    // someone who knows your uid can join you only while you are holding a live
+    // invite out, and only for the hour it lasts.
+    function joining(uid) {
+      return resource != null
+        && 'inviteCode' in resource.data
+        && resource.data.inviteCode is string
+        && 'inviteExpiresAt' in resource.data
+        && resource.data.inviteExpiresAt is timestamp
+        && resource.data.inviteExpiresAt > request.time
+        && (!('coupleId' in resource.data) || resource.data.coupleId == null)
+        && request.resource.data.coupleId is string
+        // Everything else about you is untouchable: not your name, not your
+        // colour, not anything added later.
+        && request.resource.data.diff(resource.data)
+             .affectedKeys().hasOnly(['coupleId', 'inviteCode', 'inviteExpiresAt']);
+    }
+
     match /users/{uid} {
       allow get: if signedIn();
       allow list: if false;
-      allow create, update: if signedIn() && uid == me();
+      allow create: if signedIn() && uid == me();
+      // Yours, or the one write another person may make to it: joining you.
+      allow update: if signedIn() && (uid == me() || joining(uid));
       allow delete: if false;
     }
 

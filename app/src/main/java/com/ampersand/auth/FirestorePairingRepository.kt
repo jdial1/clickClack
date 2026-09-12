@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Date
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 private const val TAG = "Pairing"
 
@@ -235,7 +236,9 @@ class FirestorePairingRepository(
                 },
             )
         }.map { }.recoverCatching { e ->
-            throw if (e is RedeemException) e else RedeemException(RedeemError.FAILED)
+            val reason = e as? RedeemException ?: e.cause as? RedeemException
+            Log.w(TAG, "redeem failed", e)
+            throw reason ?: RedeemException(RedeemError.FAILED)
         }
     }
 
@@ -278,10 +281,19 @@ class FirestorePairingRepository(
         stopWatchingCouple()
     }
 
-    /** One place to bridge Play Services Tasks, instead of a whole dependency. */
+    /**
+     * One place to bridge Play Services Tasks, instead of a whole dependency.
+     *
+     * Fails with [resumeWithException], not `cancel`. Cancelling a continuation
+     * raises a CancellationException that merely *carries* the cause, so every
+     * failure arrived here as a cancellation: the specific reason a code did
+     * not work -- expired, unknown, your own -- was thrown inside the
+     * transaction and then replaced by the generic "try again in a moment" on
+     * the way out. It also killed the coroutine that was waiting.
+     */
     private suspend fun <T> await(task: com.google.android.gms.tasks.Task<T>): T =
         suspendCancellableCoroutine { cont ->
             task.addOnSuccessListener { cont.resume(it) }
-                .addOnFailureListener { cont.cancel(it) }
+                .addOnFailureListener { cont.resumeWithException(it) }
         }
 }
