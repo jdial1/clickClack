@@ -289,8 +289,8 @@ private fun DeckResult(
 
         Spacer(Modifier.height(28.dp))
         SectionLabel("Question by question")
-        result.rows.forEach {
-            CrossAnswerRow(it, you, them, state.you.name, state.them.name)
+        result.rows.forEachIndexed { i, row ->
+            CrossAnswerRow(row, you, them, state.you.name, state.them.name, number = i + 1)
         }
 
         Spacer(Modifier.height(20.dp))

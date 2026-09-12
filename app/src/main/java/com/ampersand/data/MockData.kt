@@ -554,14 +554,45 @@ object MockCouple {
         QuizRun(
             quizId = "playful-fast",
             uid = you.uid,
-            answers = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Coffee")),
-            guesses = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("Coffee")),
+            // pl5 is a RANK, and it is here on purpose: an ordered answer is
+            // the one shape that cannot be checked by reading a comma list, so
+            // the finished deck needs one to be worth looking at.
+            answers = mapOf(
+                "pl3" to listOf("Fly"),
+                "pl2" to listOf("Coffee"),
+                "pl5" to listOf(
+                    "Dancing", "Small talk with strangers",
+                    "Parallel parking", "Keeping a secret",
+                ),
+            ),
+            guesses = mapOf(
+                "pl3" to listOf("Be invisible"),
+                "pl2" to listOf("Coffee"),
+                "pl5" to listOf(
+                    "Parallel parking", "Dancing",
+                    "Keeping a secret", "Small talk with strangers",
+                ),
+            ),
         ),
         QuizRun(
             quizId = "playful-fast",
             uid = them.uid,
-            answers = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("My phone")),
-            guesses = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Sitting down")),
+            answers = mapOf(
+                "pl3" to listOf("Be invisible"),
+                "pl2" to listOf("My phone"),
+                "pl5" to listOf(
+                    "Parallel parking", "Keeping a secret",
+                    "Dancing", "Small talk with strangers",
+                ),
+            ),
+            guesses = mapOf(
+                "pl3" to listOf("Fly"),
+                "pl2" to listOf("Sitting down"),
+                "pl5" to listOf(
+                    "Dancing", "Keeping a secret",
+                    "Parallel parking", "Small talk with strangers",
+                ),
+            ),
         ),
     )
 

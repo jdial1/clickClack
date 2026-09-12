@@ -37,6 +37,7 @@ import com.ampersand.model.Member
 import com.ampersand.model.Question
 import com.ampersand.model.Reaction
 import com.ampersand.ui.components.AmpReactionRow
+import com.ampersand.ui.components.AnswerPanel
 import com.ampersand.ui.components.arrive
 import com.ampersand.ui.components.DepthDots
 import com.ampersand.ui.components.PartnerReaction
@@ -54,7 +55,6 @@ import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Motion
-import com.ampersand.ui.today.AnswerValues
 import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
@@ -143,26 +143,36 @@ fun RevealScreen(
         Spacer(Modifier.height(24.dp))
 
         Box(Modifier.arrive(day.date, index = 2, enabled = animateIn)) {
-        PersonPanel(
-            owner = state.you,
+        AnswerPanel(
+            ownerName = state.you.name,
             ownerColor = youColor,
-            question = day.question,
-            answer = day.answerFor(state.you.uid),
-            guessAboutOwner = day.answerFor(state.them.uid)?.guess,
-            guessLabelPrefix = state.them.name,
+            type = day.question.type,
+            answer = day.answerFor(state.you.uid)?.values.orEmpty(),
+            guess = day.answerFor(state.them.uid)?.guess,
+            guesserName = state.them.name,
+            scored = day.question.isScored,
+            hit = day.question.guessHit(
+                day.answerFor(state.them.uid)?.guess,
+                day.answerFor(state.you.uid)?.values.orEmpty(),
+            ),
         )
         }
 
         Spacer(Modifier.height(16.dp))
 
         Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
-        PersonPanel(
-            owner = state.them,
+        AnswerPanel(
+            ownerName = state.them.name,
             ownerColor = themColor,
-            question = day.question,
-            answer = day.answerFor(state.them.uid),
-            guessAboutOwner = day.answerFor(state.you.uid)?.guess,
-            guessLabelPrefix = "You",
+            type = day.question.type,
+            answer = day.answerFor(state.them.uid)?.values.orEmpty(),
+            guess = day.answerFor(state.you.uid)?.guess,
+            guesserName = "You",
+            scored = day.question.isScored,
+            hit = day.question.guessHit(
+                day.answerFor(state.you.uid)?.guess,
+                day.answerFor(state.them.uid)?.values.orEmpty(),
+            ),
         )
         }
 
@@ -203,67 +213,6 @@ fun RevealScreen(
     }
 }
 
-/** One person's truth, and whether the other one called it. */
-@Composable
-private fun PersonPanel(
-    owner: Member,
-    ownerColor: Color,
-    question: Question,
-    answer: Answer?,
-    guessAboutOwner: List<String>?,
-    guessLabelPrefix: String,
-) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .background(ownerColor.copy(alpha = 0.12f))
-            .padding(20.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            PersonDot(owner.name, ownerColor, size = 26)
-            Spacer(Modifier.size(10.dp))
-            SectionLabel("${owner.name} said")
-        }
-        Spacer(Modifier.height(10.dp))
-        AnswerValues(answer?.values.orEmpty(), question.type)
-
-        if (question.isScored && guessAboutOwner != null) {
-            val hit = question.guessHit(guessAboutOwner, answer?.values.orEmpty())
-
-            Spacer(Modifier.height(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                SectionLabel("$guessLabelPrefix guessed")
-                Spacer(Modifier.size(8.dp))
-                HitBadge(hit)
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = guessAboutOwner.joinToString(", "),
-                style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun HitBadge(hit: Boolean) {
-    val bg = if (hit) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-    Box(
-        Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(bg)
-            .padding(horizontal = 7.dp, vertical = 2.dp),
-    ) {
-        Text(
-            text = if (hit) "NAILED IT" else "MISSED",
-            style = MaterialTheme.typography.labelSmall,
-            color = Duo.inkOn(bg),
-        )
-    }
-}
 
 @Composable
 private fun ScoreBanner(score: Int) {

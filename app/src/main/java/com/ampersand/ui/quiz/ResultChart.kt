@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import com.ampersand.model.QuizTheme
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.components.AnswerPanel
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
@@ -225,8 +227,17 @@ private fun ScoreTower(
 /**
  * The per-question breakdown under the chart.
  *
- * Both answers and both guesses, because "you got this one wrong" is useless
- * without what each of you actually said.
+ * Was four stacked lines -- your answer, their answer, and two lines of small
+ * grey text saying who called it. That showed the two *answers* and never the
+ * two *guesses*, even though the row holds both, which left the scoring
+ * unexplained: "Justin called it" with nothing to say what Justin had said.
+ * The verdict was also the quietest thing in the row, on the screen whose only
+ * job is the verdict.
+ *
+ * Now the same two panels the reveal uses, for the same reason it uses them.
+ * Both screens are answering one question -- what did you each say, and did the
+ * other one see it coming -- and having two different shapes for that was the
+ * real bug.
  */
 @Composable
 fun CrossAnswerRow(
@@ -236,85 +247,58 @@ fun CrossAnswerRow(
     yourName: String,
     theirName: String,
     modifier: Modifier = Modifier,
+    /** Position in the deck, so a row can be pointed at out loud. */
+    number: Int? = null,
 ) {
-    Column(modifier.fillMaxWidth().padding(vertical = 12.dp)) {
+    Column(modifier.fillMaxWidth().padding(vertical = 14.dp)) {
+        if (number != null) {
+            SectionLabel("Question $number")
+            Spacer(Modifier.height(6.dp))
+        }
         Text(
             text = row.question.text,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(8.dp))
-        Said(yourName, row.yours, you)
-        Spacer(Modifier.height(4.dp))
-        Said(theirName, row.theirs, them)
 
-        if (row.question.isScored) {
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Hit("$yourName called it", row.youKnewThem, you)
-                Hit("$theirName called it", row.theyKnewYou, them)
-            }
+        // Agreeing is not the same as knowing, and the chart only counts it in
+        // aggregate. Worth marking here too: a row where you both independently
+        // said the same thing is the one to talk about.
+        if (row.question.isScored && row.agreed) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = "You both said the same thing.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
-    }
-}
 
-@Composable
-private fun Said(name: String, values: List<String>, color: BrickColor) {
-    if (values.isEmpty()) return
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Pip(color)
-        Spacer(Modifier.size(8.dp))
-        Text(
-            text = "$name: ${values.joinToString(", ")}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Spacer(Modifier.height(12.dp))
+        AnswerPanel(
+            ownerName = yourName,
+            ownerColor = Color(you.argb),
+            type = row.question.type,
+            answer = row.yours,
+            guess = row.theirGuess,
+            guesserName = theirName,
+            scored = row.question.isScored,
+            hit = row.theyKnewYou,
+        )
+
+        Spacer(Modifier.height(10.dp))
+        AnswerPanel(
+            ownerName = theirName,
+            ownerColor = Color(them.argb),
+            type = row.question.type,
+            answer = row.theirs,
+            guess = row.yourGuess,
+            guesserName = yourName,
+            scored = row.question.isScored,
+            hit = row.youKnewThem,
         )
     }
 }
 
-/** A 1-stud brick, used as a colour key rather than a bullet. */
-@Composable
-private fun Pip(color: BrickColor) {
-    val shape = BrickShape(1, BrickHeight.LOW)
-    val asset = color.asset(shape)
-    val atlas = rememberBricks(listOf(asset))
-    val stud = 11.dp
-    Canvas(Modifier.size(stud, stud * (shape.h * BrickArt.ROW_RATIO + BrickArt.NUB_RATIO))) {
-        drawBrickArt(atlas, asset, shape.w, shape.h, 0f, size.height, size.width)
-    }
-}
-
-/**
- * Landed or missed, in Kenney's icons rather than dingbats.
- *
- * The pack art is a white silhouette, so it tints to whatever ink the row is
- * using and works in both themes from one file.
- */
-@Composable
-private fun Hit(label: String, hit: Boolean, color: BrickColor) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            painter = painterResource(if (hit) R.drawable.icon_check else R.drawable.icon_cross),
-            contentDescription = null,
-            tint = if (hit) {
-                MaterialTheme.colorScheme.onBackground
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            },
-            modifier = Modifier.size(14.dp),
-        )
-        Spacer(Modifier.width(5.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (hit) {
-                MaterialTheme.colorScheme.onBackground
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            },
-        )
-    }
-}
 
 // --- Previews ----------------------------------------------------------------
 

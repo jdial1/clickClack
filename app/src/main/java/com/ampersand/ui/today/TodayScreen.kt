@@ -71,6 +71,7 @@ import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
+import com.ampersand.ui.components.AnswerValues
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.arrive
 import com.ampersand.ui.feel.Feel
@@ -546,25 +547,6 @@ private fun WaitingLine(theirName: String) {
     }
 }
 
-/** A ranked answer is numbered; everything else is one line. */
-@Composable
-internal fun AnswerValues(values: List<String>, type: QuestionType) {
-    if (type == QuestionType.RANK) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            values.forEachIndexed { i, value ->
-                Text(
-                    "${i + 1}.  $value",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-        }
-    } else {
-        Text(
-            values.joinToString(", "),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-    }
-}
 
 @Composable
 private fun FieldLabel(text: String, accent: Color) {
