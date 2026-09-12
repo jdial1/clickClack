@@ -82,6 +82,26 @@ await check('listing the answers is refused while sealed, even with only yours i
   await assertFails(getDocs(answers(as('alice'))))
 })
 
+// The stranded case: a day document written before `submitted` existed can
+// never come to hold both names, so a client that waits for it waits forever.
+// The rules do not care about that list at all -- which is why asking them is
+// the thing that gets two people unstuck.
+await check('a day with no submitted list still opens once both answers are in', async () => {
+  await seed({
+    dayDoc: { questionId: 'q', revealed: false },
+    given: { alice: { values: ['mine'] }, bob: { values: ['theirs'] } },
+  })
+  await assertSucceeds(setDoc(dayRef(as('alice')), { revealed: true }, { merge: true }))
+})
+
+await check('a day with no submitted list stays shut on one answer', async () => {
+  await seed({
+    dayDoc: { questionId: 'q', revealed: false },
+    given: { alice: { values: ['mine'] } },
+  })
+  await assertFails(setDoc(dayRef(as('alice')), { revealed: true }, { merge: true }))
+})
+
 await check('a phone that lies in submitted still cannot open the day', async () => {
   await seed()
   await assertSucceeds(submit('alice', ['mine']))

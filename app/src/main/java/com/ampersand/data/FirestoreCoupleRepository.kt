@@ -164,9 +164,10 @@ class FirestoreCoupleRepository(
                     return@addSnapshotListener
                 }
                 snap?.documents.orEmpty().forEach { quiz ->
+                    quizDocs = quizDocs + (quiz.id to quiz)
                     watchRuns(quiz.id)
                     if (quiz.getBoolean("revealed") == true) watchPartnerRun(quiz.id)
-                    liftQuizSealIfBothIn(quiz)
+                    liftQuizSealIfBothIn(quiz.id)
                 }
             }
 
@@ -244,6 +245,9 @@ class FirestoreCoupleRepository(
     /** quiz id -> uid -> run, so one listener per person cannot clobber the other. */
     private var runs: Map<String, Map<String, QuizRun>> = emptyMap()
 
+    /** The deck documents themselves, so a run landing can ask to open one. */
+    private var quizDocs: Map<String, DocumentSnapshot> = emptyMap()
+
     /** Your own run, by name. A query over the runs is denied while sealed. */
     private fun watchRuns(quizId: String) {
         if (quizId in runRegs) return
@@ -266,17 +270,19 @@ class FirestoreCoupleRepository(
         val forQuiz = runs[quizId].orEmpty() - uid +
             listOfNotNull(run).associateBy { it.uid }
         runs = runs + (quizId to forQuiz)
+        liftQuizSealIfBothIn(quizId)
         recompose()
     }
 
-    /** The deck's own version of [liftSealIfBothIn], off the same marker. */
-    private fun liftQuizSealIfBothIn(quiz: DocumentSnapshot) {
+    /** The deck's own version of [liftSealIfBothIn], asked for the same way. */
+    private fun liftQuizSealIfBothIn(quizId: String) {
+        val quiz = quizDocs[quizId] ?: return
         if (quiz.getBoolean("revealed") == true) return
-        val submitted = quiz.get("submitted") as? List<*> ?: return
-        if (submitted.containsAll(listOf(myUid, partnerUid))) {
-            couple.collection(QUIZZES).document(quiz.id)
-                .set(mapOf("revealed" to true), SetOptions.merge())
-        }
+        if (runs[quizId]?.get(myUid) == null) return
+
+        couple.collection(QUIZZES).document(quizId)
+            .set(mapOf("revealed" to true), SetOptions.merge())
+            .addOnFailureListener { Log.d(TAG, "deck not ready to open yet", it) }
     }
 
     private var partnerAnswerReg: ListenerRegistration? = null
@@ -291,6 +297,11 @@ class FirestoreCoupleRepository(
     private fun putAnswer(uid: String, doc: DocumentSnapshot?) {
         val answer = doc?.toAnswer()
         todayAnswers = todayAnswers - uid + listOfNotNull(answer).associateBy { it.uid }
+        // The second of the two moments a day can become ready to open. Without
+        // it, the phone that answers second asks too early -- off its own local
+        // echo, before its answer has reached the server -- is refused, and
+        // then has nothing left to ask from.
+        liftSealIfBothIn()
         recompose()
     }
 
@@ -317,11 +328,11 @@ class FirestoreCoupleRepository(
             mapOf(
                 "questionId" to _state.value.today.question.id,
                 "revealed" to (todayDoc?.getBoolean("revealed") ?: false),
-                // Who has answered, said out loud on a document you are both
-                // allowed to read. Neither of you can see the other's answer
-                // before the reveal -- not even whether it exists -- so without
-                // this there is no honest way for either phone to notice that
-                // the day is ready to open.
+                // A breadcrumb, not the mechanism. Neither of you can see the
+                // other's answer before the reveal, so this is the only record
+                // on a readable document of who is in -- but it is the client's
+                // account of the truth rather than the truth, and trusting it
+                // is what stranded two people who had both answered.
                 "submitted" to FieldValue.arrayUnion(myUid),
             ),
             SetOptions.merge(),
@@ -337,25 +348,36 @@ class FirestoreCoupleRepository(
     }
 
     /**
-     * Flip `revealed` once both of you have said you are in.
+     * Ask for the day to be opened, and let the rules decide.
      *
-     * Read off the day document's `submitted` list rather than by counting the
-     * answers: counting meant querying a collection where one of the two
-     * documents is deliberately unreadable, which Firestore refuses outright,
-     * so the seal could never lift at all.
+     * It used to decide here, by checking the day's `submitted` list for both
+     * names -- and a list the client maintains is a second copy of the truth
+     * that is free to be wrong. It was: a day document written before that list
+     * existed can never come to hold both names, so two people who had both
+     * genuinely answered sat forever on "has not answered yet", each looking at
+     * their own answer, with nothing in the data able to fix itself.
      *
-     * Done by whichever client notices, and safe because the rules will not
-     * accept `revealed = true` unless both answer documents are really there --
-     * a phone that lies in `submitted` gets nothing. Properly this belongs in a
-     * Cloud Function; the rule is what makes the client version honest.
+     * The rules already hold the real answer and are the only thing that can be
+     * trusted with it: `revealed = true` is refused unless both answer
+     * documents actually exist. So the client asks whenever it has skin in the
+     * game, and a refusal is not an error -- it is "not yet".
+     *
+     * Asking cannot loop, because a refused write changes no document and so
+     * produces no new snapshot to ask again from. The two moments that *do*
+     * produce one are exactly the two that matter: the other person touching
+     * the day, and your own answer landing.
+     *
+     * Properly this belongs in a Cloud Function. The rule is what makes the
+     * client version honest.
      */
     private fun liftSealIfBothIn() {
         val doc = todayDoc ?: return
         if (doc.getBoolean("revealed") == true) return
-        val submitted = doc.get("submitted") as? List<*> ?: return
-        if (submitted.containsAll(listOf(myUid, partnerUid))) {
-            dayRef.set(mapOf("revealed" to true), SetOptions.merge())
-        }
+        // Nothing to ask for until I am actually in.
+        if (todayAnswers[myUid] == null) return
+
+        dayRef.set(mapOf("revealed" to true), SetOptions.merge())
+            .addOnFailureListener { Log.d(TAG, "day not ready to open yet", it) }
     }
 
     /**
