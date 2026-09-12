@@ -5,6 +5,7 @@ import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Member
 import com.ampersand.model.QuestionType
+import com.ampersand.model.Reaction
 import com.ampersand.model.Taste
 import kotlin.math.abs
 
@@ -15,7 +16,7 @@ import kotlin.math.abs
  * hundred answers each, and the daily question computed from the calendar and
  * nothing else. This is the part that makes taking them worth the six minutes.
  *
- * Four honest rules rather than a model. Each one is a sentence somebody could
+ * A handful of honest rules rather than a model. Each one is a sentence somebody could
  * have said out loud -- "Maya wants time more than you tend to give it, so
  * there is more about that this fortnight" -- and each one carries that
  * sentence with it, because an app that quietly steers what it asks based on a
@@ -62,6 +63,23 @@ object Profiles {
             names.forEach { themes[it] = (themes[it] ?: 1) + by }
         }
 
+        // The week first, then the questionnaires. These say what is alive
+        // right now, where the profile tests are taken once a year -- so they
+        // weigh more, and they come first in what the Us page reads out.
+        lately(state).let { (talked, curious) ->
+            if (talked.isNotEmpty()) {
+                favour(talked, by = 2)
+                reasons += "You kept talking about the " +
+                    talked.joinToString(" and ") { it.lowercase() } +
+                    " ones lately, so there are more of those."
+            }
+            if (curious) {
+                favour(listOf("Deep"))
+                reasons += "One of you asked to say more tonight, so the questions go a " +
+                    "little further in."
+            }
+        }
+
         shortfall(state)?.let { (language, who, label) ->
             favour(languageThemes[language].orEmpty(), by = 2)
             reasons += "$who wants ${label.lowercase()} more than the other of you tends to " +
@@ -84,10 +102,13 @@ object Profiles {
         if (knowing.scored >= EnoughDays) {
             val share = (knowing.youHits + knowing.theyHits).toFloat() / (knowing.scored * 2)
             when {
+                // Either-or, not guess-me. Two options is the easiest call there
+                // is; more open guess-me days were more chances to miss, which is
+                // the opposite of helping a couple who keep missing.
                 share < Struggling -> {
-                    types += QuestionType.GUESS_ME
+                    types += QuestionType.THIS_OR_THAT
                     reasons += "You have been missing each other lately, so there are more " +
-                        "days you can call."
+                        "quick either-or days, which are easier to call."
                 }
                 share > Sharp -> {
                     favour(listOf("Deep"))
@@ -98,6 +119,25 @@ object Profiles {
         }
 
         return Taste(themes = themes, types = types, reasons = reasons)
+    }
+
+    /**
+     * What the last fortnight says, from the two signals a past day carries.
+     *
+     * The categories of days either of you said came up again, and whether
+     * anybody reached for "Say more tonight". How much you wrote would be the
+     * third signal, and on the real app it is not available: past days are
+     * loaded without their answers, and a read per day to count words is not
+     * worth it for a lean.
+     */
+    private fun lately(state: CoupleState): Pair<List<String>, Boolean> {
+        val since = state.today.date.minusDays(Fortnight)
+        val recent = state.history.filter { it.date >= since && it.date < state.today.date }
+        val talked = recent.filter { it.wasTalkedAbout }
+            .map { it.question.category }
+            .distinct()
+        val curious = recent.any { day -> Reaction.CURIOUS in day.reactions.values }
+        return talked to curious
     }
 
     /**
@@ -189,6 +229,9 @@ object Profiles {
 
     /** Out of 8..40, a sixteen-point split is two people who genuinely differ. */
     private const val AxisGap = 16
+
+    /** How far back "lately" reaches. */
+    private const val Fortnight = 14L
 
     /** Enough scored days that a hit rate means something. */
     private const val EnoughDays = 10
