@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
 import com.ampersand.model.BuildPlate
 
 /**
@@ -45,7 +46,11 @@ fun Sculpture(
             Modifier
                 .fillMaxWidth()
                 .height(height)
-                .clipToBounds(),
+                .clipToBounds()
+                // Alpha on the layer, not per brick: a dimmed thumbnail drawn
+                // brick by brick shows the nubs of the course underneath
+                // through the one standing on it.
+                .graphicsLayer { this.alpha = alpha },
         ) {
             val stud = size.width / plate.gridW
             val rowPx = stud * BrickArt.ROW_RATIO
@@ -60,7 +65,6 @@ fun Sculpture(
                         left = p.x * stud,
                         bottom = size.height - p.y * rowPx,
                         studPx = stud,
-                        alpha = alpha,
                     )
                 }
         }

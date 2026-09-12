@@ -28,6 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,6 +37,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
+import com.ampersand.ui.brick.BrickAtlas
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.BrickWall
@@ -264,35 +267,54 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
         ghostShowing = false
     }
 
-    Canvas(modifier.fillMaxSize()) {
-        val studPx = size.width / (WallCols * WallPiece.w).toFloat()
-        val coursePx = studPx * WallPiece.h * BrickArt.ROW_RATIO
-        val span = studPx * WallPiece.w
-
-        fun piece(slug: String?, col: Float, row: Float, alpha: Float) {
-            drawBrickArt(
-                atlas = atlas,
-                asset = BrickArt.assetFor(slug, WallPiece),
-                studs = WallPiece.w,
-                rows = WallPiece.h,
-                left = col * span,
-                bottom = size.height - row * coursePx,
-                studPx = studPx,
-                alpha = alpha,
-            )
+    // Alpha on the layer, not on each brick -- the same trap BrickWall
+    // documents. Drawn translucent one at a time, the nub of a lower course
+    // shows *through* the course stacked on it and the wall grows studs in its
+    // middle. One offscreen layer lets them occlude first, then fades the lot.
+    //
+    // Two layers rather than one, because the ghost is a different opacity from
+    // the wall it is about to join.
+    Box(modifier.fillMaxSize()) {
+        Canvas(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = 0.13f },
+        ) {
+            // Read inside the draw lambda, so a piece landing invalidates the
+            // draw and nothing else -- this runs under a screen that is already
+            // animating three other things.
+            placed.forEach { p ->
+                wallPiece(atlas, p.slug, p.col.toFloat(), p.row.toFloat())
+            }
         }
-
-        // Read inside the draw lambda, so a piece landing invalidates the draw
-        // and nothing else -- this runs under a screen that is already
-        // animating three other things.
-        placed.forEach { piece(it.slug, it.col.toFloat(), it.row.toFloat(), 0.13f) }
 
         if (ghostShowing) {
-            // Brighter than the wall, dimmer than anything in front of it: it
-            // is a decision, not an object.
-            piece(ghostSlug, ghost.value.x, ghost.value.y, 0.40f)
+            Canvas(
+                Modifier
+                    .fillMaxSize()
+                    // Brighter than the wall, dimmer than anything in front of
+                    // it: it is a decision, not an object.
+                    .graphicsLayer { alpha = 0.40f },
+            ) {
+                wallPiece(atlas, ghostSlug, ghost.value.x, ghost.value.y)
+            }
         }
     }
+}
+
+/** One wall piece, in cell coordinates. Opaque: the layer does the fading. */
+private fun DrawScope.wallPiece(atlas: BrickAtlas, slug: String?, col: Float, row: Float) {
+    val studPx = size.width / (WallCols * WallPiece.w).toFloat()
+    val coursePx = studPx * WallPiece.h * BrickArt.ROW_RATIO
+    drawBrickArt(
+        atlas = atlas,
+        asset = BrickArt.assetFor(slug, WallPiece),
+        studs = WallPiece.w,
+        rows = WallPiece.h,
+        left = col * studPx * WallPiece.w,
+        bottom = size.height - row * coursePx,
+        studPx = studPx,
+    )
 }
 
 @Preview(name = "Splash", showBackground = true, heightDp = 640)
