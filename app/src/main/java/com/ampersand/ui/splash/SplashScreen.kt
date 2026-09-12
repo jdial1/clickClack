@@ -211,22 +211,24 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
 
         courses.drop(seeded).forEach { piece ->
             ghostPiece = piece
-            // One hesitation, not three. Any longer and the splash becomes a
-            // screensaver with a logo on it.
+            // One hesitation, not three, but a hesitation you can actually
+            // see. At the original pacing the ghost crossed the wall and
+            // landed inside a sixth of a second, which read as pieces
+            // appearing rather than as a piece being carried somewhere.
             ghost.animateTo(
                 targetValue = Offset(
                     rng.nextInt(WallStuds - piece.width + 1).toFloat(),
                     (piece.row + rng.nextFloat() * 2f).coerceAtMost(WallRows - 1f),
                 ),
-                animationSpec = tween(70, easing = FastOutSlowInEasing),
+                animationSpec = tween(WanderMs, easing = FastOutSlowInEasing),
             )
-            // A tween rather than a spring for the landing: a spring settles
-            // over a couple of hundred milliseconds, and at three pieces a
-            // second that is the difference between a wall going up and five
-            // bricks arriving before the splash ends.
+            // A tween rather than a spring for the landing. A spring settles
+            // over a couple of hundred milliseconds of its own, which at this
+            // cadence would blur the moment of contact into the next wander --
+            // and contact is the only frame in the loop worth seeing.
             ghost.animateTo(
                 targetValue = Offset(piece.stud.toFloat(), piece.row.toFloat()),
-                animationSpec = tween(80, easing = FastOutSlowInEasing),
+                animationSpec = tween(PlaceMs, easing = FastOutSlowInEasing),
             )
             placed += piece
         }
@@ -267,6 +269,22 @@ private fun BuildingWall(you: BrickColor, them: BrickColor, modifier: Modifier =
 }
 
 /** The stock widths this wall builds from. */
+/**
+ * How long the ghost drifts before it commits, and how long the drop takes.
+ *
+ * Together they are the whole pacing of the wall: one piece every 600ms, or
+ * not quite two a second. They were 70 and 80, which is six and a half pieces
+ * a second -- fast enough that the ghost never appeared to be anywhere, and
+ * the wall read as bricks popping into existence rather than as something
+ * being built. Quartering the speed is what makes the wandering legible, which
+ * was the only reason to have a ghost rather than just fade pieces in.
+ *
+ * The wall keeps building for as long as anyone is looking at it, so a slower
+ * cadence costs nothing: it is not a progress bar and has nothing to finish.
+ */
+private const val WanderMs = 280
+private const val PlaceMs = 320
+
 private val WallWidths = listOf(6, 4, 2)
 
 /**
