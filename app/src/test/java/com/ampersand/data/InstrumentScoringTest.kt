@@ -159,8 +159,9 @@ class InstrumentScoringTest {
             takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(you.uid to List(32) { 3 }),
         )
-        val badge = BadgeWall.rows(listOf(half), you, them)
-            .first { it.label == "Type" }
+        val badge = BadgeWall.groups(listOf(half), you, them)
+            .first { it.instrumentId == Instruments.JUNGIAN.id }
+            .rows.single()
             .badges.first { it.owner == Owner.YOU }
 
         assertNull(badge.result)
@@ -192,9 +193,7 @@ class InstrumentScoringTest {
             ),
         )
 
-        val fit = BadgeWall.rows(listOf(run), you, them)
-            .first { it.label == "How well that lines up" }
-            .badges.single()
+        val fit = fitBadge(run)
 
         assertNotNull(fit.result)
         assertEquals(5, fit.detail.size)
@@ -215,13 +214,45 @@ class InstrumentScoringTest {
                 them.uid to expand(same, same),
             ),
         )
-        val fit = BadgeWall.rows(listOf(run), you, them)
-            .first { it.label == "How well that lines up" }
-            .badges.single()
+        val fit = fitBadge(run)
 
         assertEquals("Lines up on 5 of 5", fit.result)
         assertEquals(100, BadgeWall.fitPercent(run, you, them))
     }
+
+    /**
+     * Every course a test produces sits under that test's own heading.
+     *
+     * Love languages yields three, and they were siblings of the type row until
+     * it became clear that three rows called "Love language something" read as
+     * three separate tests rather than as one sitting.
+     */
+    @Test
+    fun `each test owns its own courses`() {
+        val groups = BadgeWall.groups(emptyList(), you, them)
+        assertEquals(2, groups.size)
+
+        val type = groups.first { it.instrumentId == Instruments.JUNGIAN.id }
+        assertEquals(1, type.rows.size)
+        assertEquals("a lone course needs no sub-heading", "", type.rows.single().label)
+
+        val language = groups.first { it.instrumentId == Instruments.LOVE_LANGUAGES.id }
+        assertEquals("wanted, given, and the gap", 3, language.rows.size)
+        assertTrue("every course is labelled", language.rows.all { it.label.isNotBlank() })
+
+        // The heading has to carry the explanation: a badge on its own is a
+        // result with no question attached to it.
+        groups.forEach {
+            assertTrue("${it.title} explains itself", it.about.length > 60)
+            assertTrue("${it.title} says how long", it.minutes > 0)
+        }
+    }
+
+    private fun fitBadge(run: InstrumentRun) =
+        BadgeWall.groups(listOf(run), you, them)
+            .first { it.instrumentId == Instruments.LOVE_LANGUAGES.id }
+            .rows.last()
+            .badges.single()
 
     /** Five per-language levels to the four items each one covers, twice. */
     private fun expand(felt: List<Int>, given: List<Int>): List<Int> =

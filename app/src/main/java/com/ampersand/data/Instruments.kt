@@ -107,7 +107,13 @@ object Instruments {
         id = "oejts",
         sourceId = "oejts",
         title = "Type",
-        blurb = "Thirty-two either-ors. Four letters at the end of it.",
+        // Carries the wall heading as well as the top of the sitting, so it
+        // has to say what the test asks *and* what comes out of it. A badge
+        // reading "INTJ" is a result with no question attached to it, and
+        // nobody remembers in April what they answered in January.
+        blurb = "Thirty-two either-ors: makes lists or relies on memory, " +
+            "energetic or mellow. Eight of them on each of four axes, and where " +
+            "you land on all four is the four letters.",
         cadence = Cadence.ONCE,
         minutes = 4,
         items = listOf(
@@ -207,7 +213,9 @@ object Instruments {
         id = "lovelang",
         sourceId = "lovelang",
         title = "Love language",
-        blurb = "Twenty small things, rated twice: what you want, then what you do.",
+        blurb = "Twenty small things, rated twice: once for what makes you feel " +
+            "loved, once for what you tend to do for them. The part that matters " +
+            "is the gap between what one of you wants and what the other gives.",
         cadence = Cadence.YEARLY,
         minutes = 6,
         passes = listOf(

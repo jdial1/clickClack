@@ -2,6 +2,7 @@ package com.ampersand.data
 
 import com.ampersand.model.Badge
 import com.ampersand.model.BadgeBar
+import com.ampersand.model.BadgeGroup
 import com.ampersand.model.BadgeRow
 import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentRun
@@ -12,27 +13,49 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * The Us page's row of results.
+ * The Us page's results, one heading per test.
  *
- * Six slots from two instruments, because love languages fills three on its own
- * -- what you want, what you give, and the fit between them. That asymmetry is
- * correct: it is the only source in the app whose headline finding is about the
- * pair rather than the person, so it earns the extra rows.
+ * Grouped by the sitting that produced them rather than laid out as peers.
+ * Love languages yields three courses on its own -- what you want, what you
+ * give, and the fit between them -- and as three sibling rows they read as
+ * three unrelated tests sharing a word, when in fact the third only means
+ * anything because the first two exist.
  *
- * Every badge needs both of you. A row fills when the second person finishes,
- * never before. A wall of half-filled rows would read as nagging; a wall where
- * every filled row means you both showed up reads as the thing the app is for.
+ * Every badge needs both of you. A course fills when the second person
+ * finishes, never before. A wall of half-filled rows would read as nagging; a
+ * wall where every filled row means you both showed up reads as the thing the
+ * app is for.
  */
 object BadgeWall {
 
-    fun rows(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeRow> = listOf(
-        typeRow(runs.of(Instruments.JUNGIAN), you, them),
-        languageRow(runs.of(Instruments.LOVE_LANGUAGES), you, them, Instruments.FELT,
-            "Love language · wanted", "wanted"),
-        languageRow(runs.of(Instruments.LOVE_LANGUAGES), you, them, Instruments.GIVEN,
-            "Love language · given", "given"),
-        fitRow(runs.of(Instruments.LOVE_LANGUAGES), you, them),
-    )
+    fun groups(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeGroup> {
+        val jungian = runs.of(Instruments.JUNGIAN)
+        val language = runs.of(Instruments.LOVE_LANGUAGES)
+        return listOf(
+            BadgeGroup(
+                instrumentId = Instruments.JUNGIAN.id,
+                title = Instruments.JUNGIAN.title,
+                about = Instruments.JUNGIAN.blurb,
+                minutes = Instruments.JUNGIAN.minutes,
+                // One course, so no sub-label: a heading above a single row
+                // that repeats the group's own name is noise.
+                rows = listOf(typeRow(jungian, you, them)),
+            ),
+            BadgeGroup(
+                instrumentId = Instruments.LOVE_LANGUAGES.id,
+                title = Instruments.LOVE_LANGUAGES.title,
+                about = Instruments.LOVE_LANGUAGES.blurb,
+                minutes = Instruments.LOVE_LANGUAGES.minutes,
+                rows = listOf(
+                    languageRow(language, you, them, Instruments.FELT,
+                        "What makes you feel loved", "wanted"),
+                    languageRow(language, you, them, Instruments.GIVEN,
+                        "What you each tend to do", "given"),
+                    fitRow(language, you, them),
+                ),
+            ),
+        )
+    }
 
     private fun List<InstrumentRun>.of(instrument: Instrument): InstrumentRun? =
         lastOrNull { it.instrumentId == instrument.id }
@@ -40,7 +63,7 @@ object BadgeWall {
     // ---- type ------------------------------------------------------------
 
     private fun typeRow(run: InstrumentRun?, you: Member, them: Member) = BadgeRow(
-        label = "Type",
+        label = "",
         badges = listOf(
             typeBadge(run, you, Owner.YOU),
             typeBadge(run, them, Owner.THEM),
@@ -201,7 +224,7 @@ object BadgeWall {
             minutes = kit.minutes,
             waitingOnThem = run != null && !open,
         )
-        return BadgeRow("How well that lines up", listOf(badge))
+        return BadgeRow("How well those two line up", listOf(badge))
     }
 
     private fun readings(run: InstrumentRun?, uid: String, pass: Int): List<Reading> =

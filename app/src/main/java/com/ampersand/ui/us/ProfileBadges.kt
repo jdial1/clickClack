@@ -33,6 +33,7 @@ import com.ampersand.data.BadgeWall
 import com.ampersand.data.Instruments
 import com.ampersand.data.Sources
 import com.ampersand.model.Badge
+import com.ampersand.model.BadgeGroup
 import com.ampersand.model.BadgeRow
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
@@ -42,6 +43,7 @@ import com.ampersand.model.Owner
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.inkOnBricks
+import com.ampersand.ui.brick.onWall
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
@@ -73,8 +75,8 @@ fun ProfileBadges(
     onTake: (instrumentId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val rows = remember(state.instrumentRuns, state.you, state.them) {
-        BadgeWall.rows(state.instrumentRuns, state.you, state.them)
+    val groups = remember(state.instrumentRuns, state.you, state.them) {
+        BadgeWall.groups(state.instrumentRuns, state.you, state.them)
     }
     var open by remember { mutableStateOf<String?>(null) }
 
@@ -91,10 +93,10 @@ fun ProfileBadges(
         )
         Spacer(Modifier.height(16.dp))
 
-        rows.forEachIndexed { i, row ->
-            if (i > 0) Spacer(Modifier.height(18.dp))
-            WallRow(
-                row = row,
+        groups.forEachIndexed { i, group ->
+            if (i > 0) Spacer(Modifier.height(30.dp))
+            WallGroup(
+                group = group,
                 you = you,
                 them = them,
                 openSlot = open,
@@ -108,8 +110,67 @@ fun ProfileBadges(
             )
         }
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(18.dp))
         QuietNote("Nothing fills until you have both finished.")
+    }
+}
+
+/**
+ * One test, and everything it produced.
+ *
+ * The heading carries the explanation because a badge on its own is a result
+ * with no question attached to it -- "Acts of service" means nothing in April
+ * to somebody who answered in January. It is also what makes three courses
+ * legible as one sitting rather than as three tests sharing a word.
+ */
+@Composable
+private fun WallGroup(
+    group: BadgeGroup,
+    you: BrickColor,
+    them: BrickColor,
+    openSlot: String?,
+    onTap: (Badge) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxWidth().onWall(corner = 12.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    group.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+                Text(
+                    text = when {
+                        group.isEarned -> "Done"
+                        group.waitingOnThem -> "Waiting on them"
+                        else -> "${group.minutes} min"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                group.about,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        group.rows.forEach { row ->
+            Spacer(Modifier.height(12.dp))
+            WallRow(
+                row = row,
+                you = you,
+                them = them,
+                openSlot = openSlot,
+                onTap = onTap,
+            )
+        }
     }
 }
 
@@ -122,12 +183,12 @@ private fun WallRow(
     onTap: (Badge) -> Unit,
 ) {
     Column(Modifier.fillMaxWidth()) {
-        Text(
-            row.label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(7.dp))
+        // Empty on a test that produces a single course: a sub-heading above
+        // one row that restates the group's own name is noise.
+        if (row.label.isNotBlank()) {
+            SectionLabel(row.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(7.dp))
+        }
 
         Row(
             Modifier.fillMaxWidth().height(IntrinsicSize.Min),
