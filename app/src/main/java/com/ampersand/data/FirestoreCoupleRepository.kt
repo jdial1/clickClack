@@ -637,13 +637,22 @@ class FirestoreCoupleRepository(
         val plate = s.plate
         if (plate.isSealed) return
 
+        // Every plate ever built, not just this one. Checking only this week's
+        // plate meant that when a week sealed, every deck the two of you had
+        // ever finished was paid out again on the new one.
+        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
         val fresh = pool.decks.flatMap { quiz ->
             val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
             val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
             val result = QuizResult.of(quiz, mine, theirs)
-            Rewards.forQuiz(result, s.you, s.them, result.youKnewThem, today) +
-                Rewards.forQuiz(result, s.them, s.you, result.theyKnewYou, today)
-        }.filter { b -> plate.blocks.none { it.id == b.id } }
+            Rewards.forQuiz(
+                result, s.you, s.them, result.youKnewThem, today,
+                effort = Rewards.deckEffort(result.rows, yours = true),
+            ) + Rewards.forQuiz(
+                result, s.them, s.you, result.theyKnewYou, today,
+                effort = Rewards.deckEffort(result.rows, yours = false),
+            )
+        }.filter { it.id !in laid }
 
         if (fresh.isEmpty()) return
         plateRef(plate).set(

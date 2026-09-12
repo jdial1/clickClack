@@ -326,10 +326,12 @@ object Rewards {
         partner: Member,
         hits: Int,
         earnedOn: LocalDate,
+        /** From [deckEffort]: 1 if you wrote properly, 0 otherwise. */
+        effort: Int = 0,
     ): List<Block> {
         if (result.possible == 0) {
             return listOf(
-                block(result, member, BrickShape(4, BrickHeight.MEDIUM), earnedOn),
+                block(result, member, BrickShape(4, deckHeight(4, effort)), earnedOn),
             )
         }
         // Every scorable question in the deck, called. Worth a roof for the
@@ -346,9 +348,53 @@ object Rewards {
             else -> 2
         }
         return listOf(
-            block(result, member, BrickShape(width, BrickHeight.MEDIUM), earnedOn),
+            block(result, member, BrickShape(width, deckHeight(width, effort)), earnedOn),
         )
     }
+
+    /**
+     * Whether you wrote properly across a deck: 0 or 1, the same cap as a day.
+     *
+     * One step if at least half of the deck's text questions got a real answer
+     * from you, by the same fifteen-word line [effortOf] uses. Half rather than
+     * all, because a deck is five or six questions played in one go and one
+     * short answer in the middle of it should not undo the rest. A deck with no
+     * text questions has nothing to measure and earns nothing extra.
+     *
+     * [yours] picks which side of each cross-answer is the member's own writing,
+     * since a result holds both of you and only your words count toward yours.
+     */
+    fun deckEffort(rows: List<CrossAnswer>, yours: Boolean): Int {
+        val text = rows.filter {
+            it.question.type == QuestionType.REFLECT || it.question.type == QuestionType.GUESS_ME
+        }
+        if (text.isEmpty()) return 0
+        val substantial = text.count { row ->
+            val written = Answer(
+                uid = "",
+                values = if (yours) row.yours else row.theirs,
+                guess = if (yours) row.yourGuess else row.theirGuess,
+            )
+            effortOf(written, row.question) > 0
+        }
+        return if (substantial * 2 >= text.size) 1 else 0
+    }
+
+    /**
+     * A deck pays a step taller than a day, and what you wrote adds one more --
+     * but only where the result still fits under the roof.
+     *
+     * The six-stud brick for guessing most of a deck right is the one that
+     * cannot grow: at four rows it would be twenty-four cells, half again the
+     * rarest piece in the app. It is already the widest thing a deck can earn,
+     * so effort shows on everything narrower instead.
+     */
+    private fun deckHeight(width: Int, effort: Int): BrickHeight =
+        if (effort > 0 && width * BrickHeight.HIGH.rows <= RoofArea) BrickHeight.HIGH
+        else BrickHeight.MEDIUM
+
+    /** The slope's footprint, and the ceiling nothing ordinary may exceed. */
+    const val RoofArea = 4 * 4
 
     private fun block(
         result: QuizResult,
