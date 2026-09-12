@@ -9,6 +9,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
+import com.ampersand.model.BrickShape
+import com.ampersand.ui.brick.BrickArt
+import com.ampersand.ui.brick.drawBrickArt
+import com.ampersand.ui.brick.rememberBricks
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -124,7 +129,7 @@ fun TodayScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SectionLabel(day.date.format(DayFormat))
-            Pill("${state.streak} day streak")
+            StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
         }
 
         Spacer(Modifier.height(18.dp))
@@ -337,6 +342,71 @@ private fun Pill(text: String) {
         )
     }
 }
+
+/**
+ * A week of one-stud bricks, lit as far as the streak has got.
+ *
+ * A pill reading "7 DAY STREAK" is a number about bricks printed on a brick.
+ * Seven studs is the same fact as a thing you can see filling up, and it says
+ * what a number cannot: how much of the week is left. Which is the part that
+ * makes anybody open the app on a Thursday.
+ *
+ * Seven, and it wraps. A streak of ten lights all seven and reads as the week
+ * it is in, because a strip that grows without bound is a strip that stops
+ * fitting on the row -- and the count is still there beside it for anyone who
+ * wants the whole number.
+ */
+@Composable
+private fun StreakStuds(days: Int, you: BrickColor) {
+    val lit = if (days <= 0) 0 else ((days - 1) % StreakWeek) + 1
+    val shape = BrickShape(1, BrickHeight.LOW)
+    val quiet = quietSlug()
+    val atlas = rememberBricks(
+        remember(you, quiet) {
+            listOf(BrickArt.assetFor(you.slug, shape), BrickArt.assetFor(quiet, shape))
+        },
+    )
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (days > 0) {
+            Text(
+                text = "$days",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+        }
+        // Pip, not small: these are markers, which is the size that word means
+        // in this app. Seven at 24dp is 168 of them beside a date, and the
+        // streak starts arguing with the day it is counting.
+        Canvas(
+            Modifier.size(
+                width = Stud.pip * StreakWeek,
+                height = Stud.pip * (shape.h * BrickArt.ROW_RATIO + BrickArt.NUB_RATIO),
+            ),
+        ) {
+            val studPx = size.width / StreakWeek
+            repeat(StreakWeek) { i ->
+                drawBrickArt(
+                    atlas = atlas,
+                    asset = BrickArt.assetFor(if (i < lit) you.slug else quiet, shape),
+                    studs = 1,
+                    rows = shape.h,
+                    left = i * studPx,
+                    bottom = size.height,
+                    studPx = studPx,
+                    // Unlit days are there to be counted, not read. Full
+                    // opacity on seven grey studs makes a row that competes
+                    // with the question underneath it.
+                    alpha = if (i < lit) 1f else 0.32f,
+                )
+            }
+        }
+    }
+}
+
+/** Seven, because a streak is measured in days and shown as a week. */
+private const val StreakWeek = 7
 
 // --- Draft -------------------------------------------------------------------
 

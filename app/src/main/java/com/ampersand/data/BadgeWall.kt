@@ -38,6 +38,7 @@ object BadgeWall {
                 title = Instruments.JUNGIAN.title,
                 about = Instruments.JUNGIAN.blurb,
                 minutes = Instruments.JUNGIAN.minutes,
+                partnerName = them.name,
                 // One course, so no sub-label: a heading above a single row
                 // that repeats the group's own name is noise.
                 rows = listOf(typeRow(jungian, you, them)),
@@ -47,6 +48,7 @@ object BadgeWall {
                 title = Instruments.LOVE_ATTITUDES.title,
                 about = Instruments.LOVE_ATTITUDES.blurb,
                 minutes = Instruments.LOVE_ATTITUDES.minutes,
+                partnerName = them.name,
                 rows = listOf(styleRow(style, you, them)),
             ),
             BadgeGroup(
@@ -54,6 +56,7 @@ object BadgeWall {
                 title = Instruments.LOVE_LANGUAGES.title,
                 about = Instruments.LOVE_LANGUAGES.blurb,
                 minutes = Instruments.LOVE_LANGUAGES.minutes,
+                partnerName = them.name,
                 rows = listOf(
                     languageRow(language, you, them, Instruments.FELT,
                         "What makes you feel loved", "wanted"),

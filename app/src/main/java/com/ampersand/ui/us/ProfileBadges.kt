@@ -109,12 +109,9 @@ fun ProfileBadges(
                     explaining =
                         if (explaining == group.instrumentId) null else group.instrumentId
                 },
+                onTake = onTake,
                 onTap = { badge ->
-                    if (badge.isEarned) {
-                        open = if (open == badge.slotId) null else badge.slotId
-                    } else {
-                        onTake(badge.instrumentId)
-                    }
+                    if (badge.isEarned) open = if (open == badge.slotId) null else badge.slotId
                 },
             )
         }
@@ -141,6 +138,7 @@ private fun WallGroup(
     explaining: Boolean,
     onExplain: () -> Unit,
     onTap: (Badge) -> Unit,
+    onTake: (String) -> Unit,
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
@@ -191,15 +189,88 @@ private fun WallGroup(
             }
         }
 
-        group.rows.forEach { row ->
-            Spacer(Modifier.height(12.dp))
-            WallRow(
-                row = row,
-                you = you,
-                them = them,
-                openSlot = openSlot,
-                onTap = onTap,
-            )
+        Spacer(Modifier.height(12.dp))
+
+        // One button per test, not one per slot.
+        //
+        // Rendering the unclaimed state slot by slot put six "Take it" bricks
+        // under Love language -- two people times three courses -- for a
+        // single six-minute sitting that neither of them can take twice. The
+        // courses only exist once there is something to put in them.
+        if (group.isEarned) {
+            group.rows.forEachIndexed { i, row ->
+                if (i > 0) Spacer(Modifier.height(12.dp))
+                WallRow(
+                    row = row,
+                    you = you,
+                    them = them,
+                    openSlot = openSlot,
+                    onTap = onTap,
+                )
+            }
+        } else {
+            TakeIt(group = group, onTake = onTake)
+        }
+    }
+}
+
+/**
+ * The whole unclaimed test, as one brick.
+ *
+ * Disabled once you have done your half: there is nothing left for you to tap
+ * and a live button that does nothing is the dead end this app keeps trying to
+ * design out. It still draws as a brick rather than vanishing, because the
+ * slot is the invitation -- to the other person.
+ */
+@Composable
+private fun TakeIt(
+    group: BadgeGroup,
+    onTake: (String) -> Unit,
+) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val interaction = remember { MutableInteractionSource() }
+    val yourTurn = !group.waitingOnThem
+
+    val tap = if (yourTurn) {
+        Modifier.clickable(interactionSource = interaction, indication = null) {
+            sounds.play(Sfx.PRESS)
+            feel.play(Feel.PRESS)
+            onTake(group.instrumentId)
+        }
+    } else {
+        Modifier
+    }
+
+    BrickSlab(
+        slugs = listOf(quietSlug()),
+        modifier = Modifier.fillMaxWidth().then(tap),
+        studs = HalfRow * 2,
+        height = BrickHeight.MEDIUM,
+        alpha = if (yourTurn) GhostAlpha else GhostAlpha * 0.7f,
+    ) {
+        Box(Modifier.fillMaxWidth(), Alignment.Center) {
+            Column(
+                Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = if (yourTurn) "${group.minutes} min, each" else "You are done",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(
+                        alpha = if (yourTurn) 0.72f else 0.5f,
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = if (yourTurn) "Take it" else "Waiting on ${group.partnerName}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(
+                        alpha = if (yourTurn) 1f else 0.55f,
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }

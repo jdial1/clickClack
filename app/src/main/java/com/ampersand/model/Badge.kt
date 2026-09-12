@@ -80,6 +80,8 @@ data class BadgeGroup(
     val title: String,
     val about: String,
     val minutes: Int,
+    /** For the one line that has to name them: "Waiting on Maya". */
+    val partnerName: String,
     val rows: List<BadgeRow>,
 ) {
     val isEarned: Boolean get() = rows.all { it.isEarned }

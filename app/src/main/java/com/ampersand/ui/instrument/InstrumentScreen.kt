@@ -133,6 +133,13 @@ fun InstrumentScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        // Said once, at the top, rather than repeated under thirty-two rows.
+        // Two anchors and five identical bricks do not explain themselves: the
+        // ends are obvious and the middle is not, and on a pole pair the middle
+        // is the only stop with an instruction attached to it.
+        Spacer(Modifier.height(14.dp))
+        QuietNote(scaleNote(instrument))
+
         Spacer(Modifier.height(22.dp))
 
         instrument.items.forEachIndexed { i, item ->
@@ -232,9 +239,13 @@ private fun ItemRow(
         }
 
         Spacer(Modifier.height(10.dp))
+        // Spread, not centred. Centred stops float in the middle of the row
+        // with the two anchors marooned at the edges, and nothing says which
+        // end means which -- the first stop has to sit under "Not like me" or
+        // the labels above it are decoration.
         Row(
             Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             (1..5).forEach { stop ->
@@ -260,8 +271,65 @@ private fun ItemRow(
                 }
             }
         }
+
+        // What you just said, in words. Five identical bricks record a number
+        // and show nothing back, so a row you answered and a row you answered
+        // differently look the same on a scroll back up before sealing.
+        if (answered) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stopLabel(item, value),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
+
+/** How to read the five stops on this instrument, said once at the top. */
+private fun scaleNote(instrument: Instrument): String =
+    if (instrument.items.firstOrNull()?.isPolePair == true) {
+        "Five steps between the two descriptions. The far ends mean that side " +
+            "is always you; the middle one means half and half."
+    } else {
+        "Five steps, from not at all like you on the left to very much like " +
+            "you on the right. The middle one means sometimes."
+    }
+
+/**
+ * What one of the five stops means, in words.
+ *
+ * The two kinds of item mean genuinely different things by the same five
+ * positions, which is the whole reason this is worth saying out loud. On a
+ * statement the scale is *how true of you* -- the middle is "sometimes". On a
+ * pole pair it is *how far between two descriptions* -- the middle is "half
+ * and half", which is the one instruction Jorgenson's own sheet spells out.
+ *
+ * Pole pairs say left and right rather than naming the pole, because the poles
+ * run to nine words ("when describing an event, will tell people what
+ * happened") and a caption that wraps to three lines under every answered row
+ * is worse than no caption.
+ */
+private fun stopLabel(item: InstrumentItem, stop: Int): String =
+    if (item.isPolePair) {
+        when (stop) {
+            1 -> "Always the left"
+            2 -> "Usually the left"
+            3 -> "Half and half"
+            4 -> "Usually the right"
+            else -> "Always the right"
+        }
+    } else {
+        when (stop) {
+            1 -> "Not at all"
+            2 -> "A little"
+            3 -> "Sometimes"
+            4 -> "Quite a lot"
+            else -> "Very much"
+        }
+    }
 
 @Composable
 private fun Pole(text: String, modifier: Modifier, align: TextAlign, prominent: Boolean) {
