@@ -688,8 +688,6 @@ private fun DeckRow(deck: Quiz, state: CoupleState, onOpen: (String) -> Unit) {
                 .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(deck.theme.glyph, fontSize = 20.sp)
-            Spacer(Modifier.size(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = deck.title,
@@ -697,7 +695,7 @@ private fun DeckRow(deck: Quiz, state: CoupleState, onOpen: (String) -> Unit) {
                     color = inkOnBrick(deck.theme.brick.slug),
                 )
                 Text(
-                    text = status,
+                    text = "${deck.theme.label.uppercase()}  ·  $status",
                     style = MaterialTheme.typography.bodySmall,
                     color = inkOnBrick(deck.theme.brick.slug).copy(alpha = 0.85f),
                 )

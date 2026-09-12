@@ -1,7 +1,9 @@
 package com.ampersand.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -21,8 +23,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ampersand.R
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
@@ -35,6 +39,24 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 
 private val Tile = BrickShape(2, BrickHeight.HIGH)
+
+/**
+ * The drawable behind a [Reaction].
+ *
+ * Kenney's emotes pack, the speech-bubble style: a white bubble stays legible
+ * on all four brick colours, and a bubble is the right shape for the one place
+ * in the app where you say something back. Mapped here rather than in the enum
+ * so the model keeps no Android imports.
+ */
+@DrawableRes
+fun Reaction.drawable(): Int = when (icon) {
+    "heart" -> R.drawable.emote_heart
+    "laugh" -> R.drawable.emote_laugh
+    "hearts" -> R.drawable.emote_hearts
+    "exclamation" -> R.drawable.emote_exclamation
+    "question" -> R.drawable.emote_question
+    else -> R.drawable.emote_star
+}
 
 /**
  * The six reactions, each on its own brick, in your colour.
@@ -100,14 +122,15 @@ fun AmpReactionRow(
                             alpha = 0.55f + 0.45f * lift,
                         )
                     }
-                    Text(
-                        text = reaction.emoji,
-                        fontSize = (stud.value * 0.62f).sp,
+                    Image(
+                        painter = painterResource(reaction.drawable()),
+                        contentDescription = reaction.label,
                         modifier = Modifier
                             .align(Alignment.Center)
                             // Body starts below the nub; centring in the whole
-                            // tile sits the glyph half on the studs.
-                            .padding(top = nub),
+                            // tile sits the art half on the studs.
+                            .padding(top = nub)
+                            .size(stud * 1.1f),
                     )
                 }
             }
@@ -130,7 +153,7 @@ fun PartnerReaction(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        BrickBadge(color, reaction.emoji)
+        BrickBadge(color, reaction)
         Spacer(Modifier.size(10.dp))
         Text(
             text = "$name: ${reaction.label}",
@@ -149,7 +172,7 @@ fun PartnerReaction(
  * glyph is sized to the body it has to fit inside.
  */
 @Composable
-private fun BrickBadge(color: BrickColor, emoji: String) {
+private fun BrickBadge(color: BrickColor, reaction: Reaction) {
     val shape = BrickShape(2, BrickHeight.MEDIUM)
     val asset = color.asset(shape)
     val atlas = rememberBricks(listOf(asset))
@@ -172,10 +195,10 @@ private fun BrickBadge(color: BrickColor, emoji: String) {
                 studPx = size.width / shape.w,
             )
         }
-        Text(
-            text = emoji,
-            fontSize = (body.value * 0.72f).sp,
-            modifier = Modifier.padding(top = nub),
+        Image(
+            painter = painterResource(reaction.drawable()),
+            contentDescription = reaction.label,
+            modifier = Modifier.padding(top = nub).size(body * 0.9f),
         )
     }
 }

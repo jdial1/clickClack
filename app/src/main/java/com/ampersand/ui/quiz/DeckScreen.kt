@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -197,9 +198,12 @@ private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modif
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(60.dp))
-        Text(
-            text = quiz.theme.glyph,
-            fontSize = 40.sp,
+        // The deck's own colour, in its own brick. The identity was an emoji.
+        BrickSlab(
+            slugs = listOf(quiz.theme.brick.slug),
+            studs = 4,
+            height = BrickHeight.MEDIUM,
+            modifier = Modifier.width(120.dp),
         )
         Spacer(Modifier.height(20.dp))
         Text(

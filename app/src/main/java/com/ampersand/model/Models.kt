@@ -83,20 +83,25 @@ data class Question(
 /**
  * What you can say back once the seal lifts, without it becoming a chat.
  *
- * Maps **meaning** to glyph, the same way `Sfx` maps meaning to file: the label
- * is the sentence the emoji stands in for, so changing the glyph later does not
+ * Maps **meaning** to art, the same way `Sfx` maps meaning to file: the label is
+ * the sentence the picture stands in for, so swapping the artwork later does not
  * change what a stored reaction meant.
+ *
+ * [icon] is a name, not a resource id, because this file deliberately has no
+ * Android imports -- the UI resolves it. These were emoji until it became clear
+ * that an emoji is somebody else's art direction rendered by somebody else's
+ * font, and looks different on every phone the couple owns.
  *
  * Six, deliberately. The reveal is meant to send you into the other room to
  * talk, so a reaction is a nudge and a receipt that they read it -- not a reply.
  */
-enum class Reaction(val emoji: String, val label: String) {
-    LOVE("❤️", "That is lovely"),
-    LAUGH("😂", "Of course you did"),
-    MELT("🥹", "Oh"),
-    SURPRISE("😮", "I did not know that"),
-    CURIOUS("🤔", "Say more tonight"),
-    KNEW_IT("🎯", "Knew it"),
+enum class Reaction(val icon: String, val label: String) {
+    LOVE("heart", "That is lovely"),
+    LAUGH("laugh", "Of course you did"),
+    MELT("hearts", "Oh"),
+    SURPRISE("exclamation", "I did not know that"),
+    CURIOUS("question", "Say more tonight"),
+    KNEW_IT("star", "Knew it"),
 }
 
 data class Member(

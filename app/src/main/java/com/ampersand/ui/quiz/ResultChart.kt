@@ -12,16 +12,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ampersand.R
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
@@ -238,10 +241,25 @@ private fun Pip(color: BrickColor) {
     }
 }
 
+/**
+ * Landed or missed, in Kenney's icons rather than dingbats.
+ *
+ * The pack art is a white silhouette, so it tints to whatever ink the row is
+ * using and works in both themes from one file.
+ */
 @Composable
 private fun Hit(label: String, hit: Boolean, color: BrickColor) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = if (hit) "✓" else "✗", fontSize = 13.sp)
+        Icon(
+            painter = painterResource(if (hit) R.drawable.icon_check else R.drawable.icon_cross),
+            contentDescription = null,
+            tint = if (hit) {
+                MaterialTheme.colorScheme.onBackground
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            },
+            modifier = Modifier.size(14.dp),
+        )
         Spacer(Modifier.width(5.dp))
         Text(
             text = label,

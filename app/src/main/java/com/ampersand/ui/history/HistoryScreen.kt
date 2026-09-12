@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ampersand.data.MockCouple
@@ -42,6 +45,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import com.ampersand.model.BuildPlate
+import com.ampersand.model.Reaction
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.ui.brick.BrickArt
@@ -55,6 +59,7 @@ import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.components.drawable
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.theme.AmpersandTheme
@@ -172,11 +177,22 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
             val marks = entry.reactions.values.toList()
             if (marks.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                Text(
-                    text = marks.joinToString(" ") { it.emoji },
-                    fontSize = 15.sp,
-                )
+                ReactionMarks(marks, size = 20.dp)
             }
+        }
+    }
+}
+
+/** The reactions left on a day, as pack art rather than glyphs. */
+@Composable
+private fun ReactionMarks(marks: List<Reaction>, size: Dp) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        marks.forEach {
+            Image(
+                painter = painterResource(it.drawable()),
+                contentDescription = it.label,
+                modifier = Modifier.size(size),
+            )
         }
     }
 }
@@ -379,7 +395,7 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
                 )
                 if (marks.isNotEmpty()) {
                     Spacer(Modifier.size(8.dp))
-                    Text(marks.joinToString(" ") { it.emoji }, fontSize = 12.sp)
+                    ReactionMarks(marks, size = 14.dp)
                 }
             }
         }

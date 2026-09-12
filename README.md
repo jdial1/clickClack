@@ -138,8 +138,9 @@ meaning-first in `Reaction`:
 LOVE, LAUGH, MELT, SURPRISE, CURIOUS, KNEW_IT
 ```
 
-The enum stores the glyph *and* the sentence it stands in for, the same way
-`Sfx` maps meaning to file. Changing an emoji later does not change what a
+The enum stores an icon *name* and the sentence it stands in for, the same way
+`Sfx` maps meaning to file. A name rather than a resource id, because `model/`
+deliberately has no Android imports. Changing an emoji later does not change what a
 stored reaction meant, and the partner's reaction is displayed with its label
 rather than the glyph alone — an emoji on its own is ambiguous in exactly the
 way this app is trying not to be.
@@ -535,8 +536,8 @@ convention used throughout the Kotlin will fail `mergeDebugResources`.
 
 ## Credits
 
-Brick art and UI audio: [Kenney](https://kenney.nl) — Brick Pack 2.0 and the
-interface sound pack, both CC0. Credit is not required by the licence; it is
+Brick art, UI audio, icons and emotes: [Kenney](https://kenney.nl) — Brick Pack
+2.0, the interface sound pack, Game Icons and the Emotes Pack, all CC0. Credit is not required by the licence; it is
 here because the packs are good.
 
 ## Layout

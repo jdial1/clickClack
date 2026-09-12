@@ -385,7 +385,7 @@ private fun Anniversary(state: CoupleState, onSet: ((java.time.LocalDate) -> Uni
         Occasion.next(state.today.date.plusDays(1), since)?.let { (occasion, day) ->
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "${occasion.glyph}  Next up: ${occasion.label}, " +
+                text = "Next up: ${occasion.label}, " +
                     day.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM")),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -16,41 +16,45 @@ import java.time.temporal.TemporalAdjusters
  * [id] matches a file in `assets/occasions/`, so adding an occasion is a JSON
  * file and one line here.
  *
+ * No icons. There were emoji; no icon set has a Juneteenth or a Presidents' Day
+ * mark, and twenty occasions illustrated by whatever happened to be close is
+ * worse than twenty occasions named plainly.
+ *
  * **Declaration order is precedence**, because occasions collide: Father's Day
  * 2026 falls on the twenty-first of June, which is also the summer solstice.
  * The named days people actually mark come first and the astronomical markers
  * last, so nobody gets asked about the long evenings on Father's Day.
  */
-enum class Occasion(val id: String, val label: String, val glyph: String) {
+enum class Occasion(val id: String, val label: String) {
     // Named days first.
-    NEW_YEAR("new-year", "New Year's Day", "🎆"),
-    MLK_DAY("mlk-day", "Martin Luther King Jr. Day", "🕊️"),
-    VALENTINES("valentines", "Valentine's Day", "❤️"),
-    PRESIDENTS_DAY("presidents-day", "Presidents' Day", "🏛️"),
-    MOTHERS_DAY("mothers-day", "Mother's Day", "💐"),
-    MEMORIAL_DAY("memorial-day", "Memorial Day", "🇺🇸"),
-    JUNETEENTH("juneteenth", "Juneteenth", "🎗️"),
-    FATHERS_DAY("fathers-day", "Father's Day", "🛠️"),
-    INDEPENDENCE_DAY("independence-day", "Independence Day", "🎇"),
-    LABOR_DAY("labor-day", "Labor Day", "🧰"),
-    COLUMBUS_DAY("columbus-day", "Columbus Day", "🧭"),
-    HALLOWEEN("halloween", "Halloween", "🎃"),
-    VETERANS_DAY("veterans-day", "Veterans Day", "🎖️"),
-    THANKSGIVING("thanksgiving", "Thanksgiving", "🦃"),
-    CHRISTMAS("christmas", "Christmas Day", "🎄"),
-    NEW_YEARS_EVE("new-years-eve", "New Year's Eve", "🥂"),
+    NEW_YEAR("new-year", "New Year's Day"),
+    MLK_DAY("mlk-day", "Martin Luther King Jr. Day"),
+    VALENTINES("valentines", "Valentine's Day"),
+    PRESIDENTS_DAY("presidents-day", "Presidents' Day"),
+    MOTHERS_DAY("mothers-day", "Mother's Day"),
+    MEMORIAL_DAY("memorial-day", "Memorial Day"),
+    JUNETEENTH("juneteenth", "Juneteenth"),
+    FATHERS_DAY("fathers-day", "Father's Day"),
+    INDEPENDENCE_DAY("independence-day", "Independence Day"),
+    LABOR_DAY("labor-day", "Labor Day"),
+    COLUMBUS_DAY("columbus-day", "Columbus Day"),
+    HALLOWEEN("halloween", "Halloween"),
+    VETERANS_DAY("veterans-day", "Veterans Day"),
+    THANKSGIVING("thanksgiving", "Thanksgiving"),
+    CHRISTMAS("christmas", "Christmas Day"),
+    NEW_YEARS_EVE("new-years-eve", "New Year's Eve"),
 
     // Astronomical markers last: they lose every collision.
-    SPRING("spring", "First day of spring", "🌱"),
-    SUMMER("summer", "Summer solstice", "☀️"),
-    AUTUMN("autumn", "First day of autumn", "🍂"),
-    WINTER("winter", "Winter solstice", "❄️"),
+    SPRING("spring", "First day of spring"),
+    SUMMER("summer", "Summer solstice"),
+    AUTUMN("autumn", "First day of autumn"),
+    WINTER("winter", "Winter solstice"),
 
     /**
      * The day the two of you started, which only exists once someone has told
      * the app when that was.
      */
-    ANNIVERSARY("anniversary", "Your anniversary", "🧱"),
+    ANNIVERSARY("anniversary", "Your anniversary"),
     ;
 
     companion object {

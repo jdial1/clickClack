@@ -35,25 +35,31 @@ data class Quiz(
  * A colour from the pack rather than a free hex value, because a deck header is
  * built out of bricks like everything else and there is no brick in a colour
  * the pack does not ship.
+ *
+ * Colour and label, and no icon. There was an emoji here; emoji are somebody
+ * else's art direction rendered by somebody else's font, and they are banned
+ * everywhere except the reactions, where the glyph *is* the message. Kenney's
+ * icon set is game-controller furniture -- gamepads, arrows, a trophy -- with
+ * nothing for "food" or "spicy", and a nearly-right icon is worse than none.
+ * The brick colour already identifies a deck at a glance.
  */
 enum class QuizTheme(
     val label: String,
     val brick: BrickColor,
-    val glyph: String,
 ) {
-    KNOW_ME("Know me", BrickColor.RED, "🧠"),
-    EVERYDAY("Everyday", BrickColor.YELLOW, "🏠"),
-    FUTURE("Future", BrickColor.BLUE, "🌱"),
-    PLAYFUL("Playful", BrickColor.GREEN, "🎲"),
-    DEEP("Deep", BrickColor.BLUE, "🌊"),
-    FOOD("Food", BrickColor.YELLOW, "🍜"),
-    TRAVEL("Travel", BrickColor.GREEN, "✈️"),
+    KNOW_ME("Know me", BrickColor.RED),
+    EVERYDAY("Everyday", BrickColor.YELLOW),
+    FUTURE("Future", BrickColor.BLUE),
+    PLAYFUL("Playful", BrickColor.GREEN),
+    DEEP("Deep", BrickColor.BLUE),
+    FOOD("Food", BrickColor.YELLOW),
+    TRAVEL("Travel", BrickColor.GREEN),
 
     /**
      * Warm, not explicit. The brief is playful: this is a couple on a sofa, and
      * a deck that turns into an interrogation gets closed and not reopened.
      */
-    SPICY("Spicy", BrickColor.RED, "🌶️"),
+    SPICY("Spicy", BrickColor.RED),
 }
 
 /**
