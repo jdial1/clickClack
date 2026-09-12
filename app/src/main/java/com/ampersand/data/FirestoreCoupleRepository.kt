@@ -115,24 +115,26 @@ class FirestoreCoupleRepository(
             recompose()
         }
 
-        regs += dayRef.addSnapshotListener { d, _ -> todayDoc = d; recompose() }
+        regs += dayRef.addSnapshotListener { d, _ ->
+            todayDoc = d
+            // Only once the seal is off is the other answer readable at all,
+            // so that is the first moment the listener for it can exist.
+            if (d?.getBoolean("revealed") == true) watchPartnerAnswer()
+            liftSealIfBothIn()
+            recompose()
+        }
 
-        // The answers subcollection, not the day document. A partner's answer
-        // is unreadable until `revealed` is true, so this listener simply
-        // returns one document until the seal lifts and then two -- the rules
-        // do the hiding, and the app never has to.
-        regs += dayRef.collection(ANSWERS)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    // Expected before the reveal: the query is denied rather
-                    // than filtered, so fall back to reading only our own.
-                    readOwnAnswer()
-                    return@addSnapshotListener
-                }
-                todayAnswers = snap?.documents.orEmpty().mapNotNull { it.toAnswer() }
-                    .associateBy { it.uid }
-                recompose()
-            }
+        // Your own answer document by name -- never the collection.
+        //
+        // A query over the answers is refused outright while the day is sealed,
+        // even when the only document in it is your own. The rule turns on
+        // *which* document is being asked for, and Firestore will not run a
+        // query whose safety it cannot establish before looking at the data. So
+        // the listener died on its very first snapshot and never came back:
+        // answering wrote the document successfully, and then nothing on the
+        // screen moved, with no error anywhere to say why.
+        regs += dayRef.collection(ANSWERS).document(myUid)
+            .addSnapshotListener { d, _ -> putAnswer(myUid, d) }
 
         regs += couple.collection(DAYS)
             .whereGreaterThanOrEqualTo(
@@ -161,7 +163,11 @@ class FirestoreCoupleRepository(
                     Log.w(TAG, "quiz listener failed", error)
                     return@addSnapshotListener
                 }
-                snap?.documents.orEmpty().forEach { watchRuns(it.id) }
+                snap?.documents.orEmpty().forEach { quiz ->
+                    watchRuns(quiz.id)
+                    if (quiz.getBoolean("revealed") == true) watchPartnerRun(quiz.id)
+                    liftQuizSealIfBothIn(quiz)
+                }
             }
 
         regs += couple.collection(PLATES)
@@ -214,46 +220,78 @@ class FirestoreCoupleRepository(
             history = history,
             plate = live,
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
-            quizRuns = runs.values.flatten(),
+            quizRuns = runs.values.flatMap { it.values },
             anniversary = anniversary,
             streak = streakOf(history, todayEntry),
         )
+
+        // The assignment. Without it every listener in this class computed the
+        // right answer and dropped it on the floor: the screen kept the
+        // placeholder the constructor built and nothing anyone did ever showed
+        // up, with no error to explain it.
+        _state.value = next
+
+        // Earning is done here rather than in the write that caused it, because
+        // a day or a deck opens when the *other* person submits -- which this
+        // phone learns from a listener, not from anything it did.
+        if (todayDoc?.getBoolean("revealed") == true) awardForToday()
+        awardForQuizzes(next)
     }
 
     private val runRegs = mutableMapOf<String, ListenerRegistration>()
-    private var runs: Map<String, List<QuizRun>> = emptyMap()
+    private val partnerRunRegs = mutableMapOf<String, ListenerRegistration>()
 
+    /** quiz id -> uid -> run, so one listener per person cannot clobber the other. */
+    private var runs: Map<String, Map<String, QuizRun>> = emptyMap()
+
+    /** Your own run, by name. A query over the runs is denied while sealed. */
     private fun watchRuns(quizId: String) {
         if (quizId in runRegs) return
-        runRegs[quizId] = couple.collection(QUIZZES).document(quizId).collection(RUNS)
-            .addSnapshotListener { snap, error ->
-                val found = if (error != null) {
-                    // Denied before the reveal; our own run is still readable.
-                    emptyList()
-                } else {
-                    snap?.documents.orEmpty().mapNotNull { it.toQuizRun(quizId) }
-                }
-                runs = runs + (quizId to found)
-                if (error != null) readOwnRun(quizId)
-                recompose()
-            }
+        runRegs[quizId] = runRef(quizId, myUid)
+            .addSnapshotListener { d, _ -> putRun(quizId, myUid, d) }
     }
 
-    private fun readOwnRun(quizId: String) {
-        couple.collection(QUIZZES).document(quizId).collection(RUNS).document(myUid).get()
-            .addOnSuccessListener { doc ->
-                runs = runs + (quizId to listOfNotNull(doc.toQuizRun(quizId)))
-                recompose()
-            }
+    /** Theirs, once the deck has opened and there is anything to read. */
+    private fun watchPartnerRun(quizId: String) {
+        if (quizId in partnerRunRegs) return
+        partnerRunRegs[quizId] = runRef(quizId, partnerUid)
+            .addSnapshotListener { d, _ -> putRun(quizId, partnerUid, d) }
     }
 
-    /** Before the reveal the collection query is denied; our own doc is not. */
-    private fun readOwnAnswer() {
-        dayRef.collection(ANSWERS).document(myUid).get()
-            .addOnSuccessListener { doc ->
-                todayAnswers = listOfNotNull(doc.toAnswer()).associateBy { it.uid }
-                recompose()
-            }
+    private fun runRef(quizId: String, uid: String) =
+        couple.collection(QUIZZES).document(quizId).collection(RUNS).document(uid)
+
+    private fun putRun(quizId: String, uid: String, doc: DocumentSnapshot?) {
+        val run = doc?.toQuizRun(quizId)
+        val forQuiz = runs[quizId].orEmpty() - uid +
+            listOfNotNull(run).associateBy { it.uid }
+        runs = runs + (quizId to forQuiz)
+        recompose()
+    }
+
+    /** The deck's own version of [liftSealIfBothIn], off the same marker. */
+    private fun liftQuizSealIfBothIn(quiz: DocumentSnapshot) {
+        if (quiz.getBoolean("revealed") == true) return
+        val submitted = quiz.get("submitted") as? List<*> ?: return
+        if (submitted.containsAll(listOf(myUid, partnerUid))) {
+            couple.collection(QUIZZES).document(quiz.id)
+                .set(mapOf("revealed" to true), SetOptions.merge())
+        }
+    }
+
+    private var partnerAnswerReg: ListenerRegistration? = null
+
+    private fun watchPartnerAnswer() {
+        if (partnerAnswerReg != null) return
+        partnerAnswerReg = dayRef.collection(ANSWERS).document(partnerUid)
+            .addSnapshotListener { d, _ -> putAnswer(partnerUid, d) }
+            .also { regs += it }
+    }
+
+    private fun putAnswer(uid: String, doc: DocumentSnapshot?) {
+        val answer = doc?.toAnswer()
+        todayAnswers = todayAnswers - uid + listOfNotNull(answer).associateBy { it.uid }
+        recompose()
     }
 
     // --- Writes --------------------------------------------------------------
@@ -279,6 +317,12 @@ class FirestoreCoupleRepository(
             mapOf(
                 "questionId" to _state.value.today.question.id,
                 "revealed" to (todayDoc?.getBoolean("revealed") ?: false),
+                // Who has answered, said out loud on a document you are both
+                // allowed to read. Neither of you can see the other's answer
+                // before the reveal -- not even whether it exists -- so without
+                // this there is no honest way for either phone to notice that
+                // the day is ready to open.
+                "submitted" to FieldValue.arrayUnion(myUid),
             ),
             SetOptions.merge(),
         )
@@ -289,23 +333,28 @@ class FirestoreCoupleRepository(
                 "guess" to guess,
                 "submittedAt" to FieldValue.serverTimestamp(),
             ),
-        ).addOnSuccessListener { liftSealIfBothIn() }
+        )
     }
 
     /**
-     * Flip `revealed` once both answers exist.
+     * Flip `revealed` once both of you have said you are in.
+     *
+     * Read off the day document's `submitted` list rather than by counting the
+     * answers: counting meant querying a collection where one of the two
+     * documents is deliberately unreadable, which Firestore refuses outright,
+     * so the seal could never lift at all.
      *
      * Done by whichever client notices, and safe because the rules will not
      * accept `revealed = true` unless both answer documents are really there --
-     * so a client cannot peek by writing it early. Properly this belongs in a
+     * a phone that lies in `submitted` gets nothing. Properly this belongs in a
      * Cloud Function; the rule is what makes the client version honest.
      */
     private fun liftSealIfBothIn() {
-        dayRef.collection(ANSWERS).get().addOnSuccessListener { snap ->
-            if (snap.size() >= 2) {
-                dayRef.set(mapOf("revealed" to true), SetOptions.merge())
-                    .addOnSuccessListener { awardForToday() }
-            }
+        val doc = todayDoc ?: return
+        if (doc.getBoolean("revealed") == true) return
+        val submitted = doc.get("submitted") as? List<*> ?: return
+        if (submitted.containsAll(listOf(myUid, partnerUid))) {
+            dayRef.set(mapOf("revealed" to true), SetOptions.merge())
         }
     }
 
@@ -423,18 +472,20 @@ class FirestoreCoupleRepository(
         if (_state.value.myRun(quizId) != null) return
         val quiz = couple.collection(QUIZZES).document(quizId)
 
-        quiz.set(mapOf("revealed" to false), SetOptions.merge())
+        quiz.set(
+            mapOf(
+                "revealed" to false,
+                "submitted" to FieldValue.arrayUnion(myUid),
+            ),
+            SetOptions.merge(),
+        )
         quiz.collection(RUNS).document(myUid).set(
             mapOf(
                 "answers" to answers,
                 "guesses" to guesses,
                 "completedAt" to FieldValue.serverTimestamp(),
             ),
-        ).addOnSuccessListener {
-            quiz.collection(RUNS).get().addOnSuccessListener { snap ->
-                if (snap.size() >= 2) quiz.set(mapOf("revealed" to true), SetOptions.merge())
-            }
-        }
+        )
     }
 
     fun close() {
@@ -442,6 +493,8 @@ class FirestoreCoupleRepository(
         regs.clear()
         runRegs.values.forEach { it.remove() }
         runRegs.clear()
+        partnerRunRegs.values.forEach { it.remove() }
+        partnerRunRegs.clear()
     }
 
     private fun plateRef(plate: BuildPlate) = couple.collection(PLATES).document(plate.id)
