@@ -118,6 +118,16 @@ interface CoupleRepository {
      * nothing about the answers.
      */
     fun saveInstrumentDraft(instrumentId: String, responses: List<Int>)
+
+    /**
+     * Say that a revealed day came up again, away from the phone.
+     *
+     * The one thing the app most wants to know and has never been able to see.
+     * Additive and un-take-backable by design: this is a note that something
+     * happened, and there is no version of "actually we did not talk about it
+     * after all" worth building a control for.
+     */
+    fun markTalkedAbout(date: LocalDate)
 }
 
 /**
@@ -343,6 +353,17 @@ class FakeCoupleRepository(
                 ),
             )
         }
+
+    override fun markTalkedAbout(date: LocalDate) = mutate { current ->
+        fun DayEntry.mark() =
+            if (this.date != date || !isRevealed) this
+            else copy(talkedAbout = talkedAbout + current.you.uid)
+
+        current.copy(
+            today = current.today.mark(),
+            history = current.history.map { it.mark() },
+        )
+    }
 
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) =
         mutate { current ->

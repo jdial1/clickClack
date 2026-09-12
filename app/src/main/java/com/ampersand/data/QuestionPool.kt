@@ -4,6 +4,7 @@ import android.content.Context
 import com.ampersand.model.Occasion
 import com.ampersand.model.Question
 import com.ampersand.model.Quiz
+import com.ampersand.model.Taste
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -50,7 +51,11 @@ class QuestionPool(
      * pool that ignores it will eventually ask what you are most afraid of at
      * 7am on a Monday.
      */
-    fun daily(date: LocalDate, anniversary: LocalDate? = null): Question {
+    fun daily(
+        date: LocalDate,
+        anniversary: LocalDate? = null,
+        taste: Taste = Taste.none,
+    ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
 
         // A day that is not like the others gets its own question. Rotated by
@@ -66,8 +71,28 @@ class QuestionPool(
 
         // A prime stride walks the list rather than stepping through it in
         // order, so consecutive days are not neighbours in the same deck.
-        val index = (date.toEpochDay() * 7).mod(candidates.size)
-        return candidates[index]
+        val draw = if (taste.isEmpty) candidates else tilted(candidates, taste)
+        val index = (date.toEpochDay() * 7).mod(draw.size)
+        return draw[index]
+    }
+
+    /**
+     * The pool, with what the tests found leaning on it.
+     *
+     * Laid out in tiers rather than by repeating each question in place: tier
+     * one is every candidate, tier two is every candidate the profile weights
+     * at two or more, and so on. Grouping a question's copies together would
+     * put them within a few strides of each other and the same question would
+     * come round twice in a fortnight; a tier is a whole pool apart.
+     *
+     * Every question survives tier one whatever the profile says. The tilt
+     * changes the odds and never the reachable set -- an app that quietly
+     * retires a third of its questions because of a test somebody took in March
+     * is a worse app than one that never asked.
+     */
+    private fun tilted(candidates: List<Question>, taste: Taste): List<Question> {
+        val top = candidates.maxOf { taste.weightOf(it) }
+        return (1..top).flatMap { tier -> candidates.filter { taste.weightOf(it) >= tier } }
     }
 
     companion object {

@@ -249,6 +249,14 @@ object Rewards {
         val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
             milestone -> CharacterShape
+            // Two days were earning the same box as every other: the one where
+            // the question came from inside the relationship, and the one that
+            // carried on away from the phone. Both are rarer and better than
+            // calling a multiple choice, and both now get the piece that is not
+            // a box -- which is the only thing that makes a sculpture legible
+            // from across the room.
+            day.wasTalkedAbout -> roof(member, partner)
+            Wildcard.isWildcard(day.question.id) -> roof(member, partner)
             // The rarest good outcome in the app: you called the answer to a
             // question that was actually hard. It earns the only piece that is
             // not a box, which is the only way a week ever stops being one.

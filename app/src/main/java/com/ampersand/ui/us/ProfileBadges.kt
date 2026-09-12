@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ampersand.data.BadgeWall
 import com.ampersand.data.Instruments
+import com.ampersand.data.Profiles
 import com.ampersand.data.Sources
 import com.ampersand.model.Badge
 import com.ampersand.model.BadgeGroup
@@ -117,7 +118,66 @@ fun ProfileBadges(
         }
 
         Spacer(Modifier.height(18.dp))
-        QuietNote("Nothing fills until you have both finished.")
+        WhatItDoes(state)
+    }
+}
+
+/**
+ * What taking these actually changes, said plainly.
+ *
+ * Two states and they are the same sentence at different times. Before: here is
+ * what finishing them would do. After: here is what they are doing, in your own
+ * names, one line per rule that fired.
+ *
+ * Saying it is not politeness. An app that quietly steers what it asks you
+ * based on a questionnaire somebody filled in months ago is doing something
+ * people are right to be wary of; the only difference between that and a good
+ * feature is that the arithmetic is out loud and you can see which sentence
+ * caused which.
+ */
+@Composable
+private fun WhatItDoes(state: CoupleState) {
+    val taste = remember(state.instrumentRuns, state.knowing, state.you, state.them) {
+        Profiles.of(state)
+    }
+
+    if (taste.reasons.isEmpty()) {
+        QuietNote(
+            "Nothing fills until you have both finished. Once they do, the daily " +
+                "question starts leaning toward what they found.",
+        )
+        return
+    }
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
+            .padding(horizontal = 14.dp, vertical = 13.dp),
+    ) {
+        Text(
+            "What this is doing",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        taste.reasons.forEach { reason ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                reason,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            // The promise that keeps this a tilt rather than a filter, which is
+            // also true of the code: every question survives tier one.
+            "Nothing is ever taken out of the pool -- these only change how often " +
+                "things come up.",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

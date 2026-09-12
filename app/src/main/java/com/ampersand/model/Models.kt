@@ -153,7 +153,23 @@ data class DayEntry(
      * of in the per-person subcollection: no rule has to hide it.
      */
     val reactions: Map<String, Reaction> = emptyMap(),
+    /**
+     * Who has said this one came up again, away from the phone.
+     *
+     * The app's whole intent is that the reveal sends you into the other room
+     * to talk, and until now it had no way of being told whether that ever
+     * happened -- the single most interesting fact about a day, and the only
+     * one it never collected. One tap, the following morning.
+     *
+     * Not sealed and not scored. It is a report about the two of you rather
+     * than an answer, so there is nothing to spoil and nothing to be right
+     * about, and either of you saying so is enough.
+     */
+    val talkedAbout: Set<String> = emptySet(),
 ) {
+    /** Either of you marked it. One person remembering is the whole event. */
+    val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()
+
     /** The seal only lifts once both have submitted. */
     val isRevealed: Boolean get() = answers.size >= 2
 

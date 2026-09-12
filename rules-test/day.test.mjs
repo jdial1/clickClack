@@ -111,6 +111,45 @@ await check('a phone that lies in submitted still cannot open the day', async ()
   await assertFails(setDoc(dayRef(db), { revealed: true }, { merge: true }))
 })
 
+// The one bit of a day that is written the morning *after* it opened. It goes
+// on the day document beside the reactions rather than in the sealed
+// subcollection, because there is nothing left to spoil once both answers are
+// in -- and additively, so two phones marking the same day cannot clobber each
+// other.
+await check('either of you may say a revealed day came up again', async () => {
+  await seed({
+    dayDoc: { revealed: true },
+    given: { alice: { values: ['a'] }, bob: { values: ['b'] } },
+  })
+  await assertSucceeds(
+    setDoc(dayRef(as('alice')), { talkedAbout: arrayUnion('alice') }, { merge: true }),
+  )
+  await assertSucceeds(
+    setDoc(dayRef(as('bob')), { talkedAbout: arrayUnion('bob') }, { merge: true }),
+  )
+})
+
+await check('an outsider cannot mark a day as talked about', async () => {
+  await seed({
+    dayDoc: { revealed: true },
+    given: { alice: { values: ['a'] }, bob: { values: ['b'] } },
+  })
+  await assertFails(
+    setDoc(dayRef(as('mallory')), { talkedAbout: arrayUnion('mallory') }, { merge: true }),
+  )
+})
+
+// Marking is a merge onto the day document, and the day rule refuses any write
+// that leaves `revealed` true without both answers behind it. A sealed day
+// therefore cannot be marked, which is correct: there is no conversation to
+// have had about a question only one of you has answered.
+await check('a sealed day cannot be marked as talked about', async () => {
+  await seed({ dayDoc: { revealed: false }, given: { alice: { values: ['a'] } } })
+  await assertFails(
+    setDoc(dayRef(as('alice')), { revealed: true, talkedAbout: arrayUnion('alice') }, { merge: true }),
+  )
+})
+
 await env.cleanup()
 for (const r of results) console.log(r[0].padEnd(5), r[1], r[2] ? '\n      ' + r[2] : '')
 process.exit(results.some((r) => r[0] === 'FAIL') ? 1 : 0)

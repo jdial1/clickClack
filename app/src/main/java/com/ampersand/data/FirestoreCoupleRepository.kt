@@ -274,13 +274,22 @@ class FirestoreCoupleRepository(
         // Pinned first, always: whoever answered first decided what today is,
         // and re-deciding it on the second phone is how two people end up
         // answering two different questions.
+        // What the profile tests found, as a lean on the pool.
+        //
+        // Computed from shared state, which is the requirement: both phones
+        // have to reach the same question before either has written anything.
+        // They can disagree for a moment if one has synced a sitting the other
+        // has not -- and it self-corrects, because the first answer pins the
+        // question and the pin outranks everything below.
+        val taste = Profiles.of(current)
+
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste)
             // A question one of you wrote outranks one a stranger wrote.
             waiting.isNotEmpty() -> waiting.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary)
+            else -> pool.daily(today, anniversary, taste)
         }
 
         val todayEntry = DayEntry(
@@ -288,6 +297,7 @@ class FirestoreCoupleRepository(
             question = question,
             answers = todayAnswers,
             reactions = todayDoc.toReactions(),
+            talkedAbout = todayDoc.toTalkedAbout(),
         )
 
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
@@ -659,16 +669,50 @@ class FirestoreCoupleRepository(
     /**
      * Find a day worth asking again, and read it back in full.
      *
-     * Sundays only: a capsule every day would make the app a quiz about itself,
-     * and the point is that it is rare enough to be worth reading.
-     *
      * The ladder runs a year, six months, three, then one. A couple three weeks
      * in has no year to look back on, and a feature that only switches on after
      * six months is a feature nobody ever sees working.
+     *
+     * **How often is a function of how much there is to look back on.** The pool
+     * is ninety-nine questions and it will run out; that is arithmetic rather
+     * than a bug, and the second lap is not something to be ashamed of. A
+     * question the two of you answered a year ago, shown beside what you said
+     * then, is a better thing than a question neither of you has seen -- so as
+     * the history fills, the capsule stops being a Sunday treat and becomes a
+     * regular part of the week.
+     *
+     * It never takes more than half the days. Every day would make the app a
+     * quiz about itself, and the rest of the pool would stop arriving.
      */
     private fun loadCapsule() {
-        if (today.dayOfWeek != DayOfWeek.SUNDAY) return
+        if (today.dayOfWeek !in capsuleDays()) return
         tryCapsule(listOf(12L, 6L, 3L, 1L))
+    }
+
+    /**
+     * Which days of the week may look backwards, widening with the archive.
+     *
+     * Counted in sealed plates rather than in days, for two reasons. `history`
+     * is capped at seventy days by its own query, so it can never answer "how
+     * long have you been doing this" -- it would have sat at the first rung
+     * forever. And a plate is a week by construction, so the number is already
+     * the unit the question is about.
+     *
+     * Fixed sets rather than a draw: the day has to come out the same on both
+     * phones, and both phones count the same plates.
+     */
+    private fun capsuleDays(): Set<DayOfWeek> {
+        val weeks = plates.count { it.isSealed }
+        return when {
+            // Two years in. The past is now the better half of the pool.
+            weeks >= 104 -> setOf(
+                DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.MONDAY,
+            )
+            // Around the point the pool has been round once.
+            weeks >= 26 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
+            weeks >= 12 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY)
+            else -> setOf(DayOfWeek.SUNDAY)
+        }
     }
 
     private fun tryCapsule(months: List<Long>) {
@@ -746,6 +790,18 @@ class FirestoreCoupleRepository(
         val ref = if (date == today) dayRef else couple.collection(DAYS).document(date.toString())
         ref.set(
             mapOf("reactions" to mapOf(myUid to reaction?.name)),
+            SetOptions.merge(),
+        )
+    }
+
+    /**
+     * Additive, via arrayUnion, so two phones marking the same day cannot
+     * clobber each other and nobody has to hold a read-modify-write.
+     */
+    override fun markTalkedAbout(date: LocalDate) {
+        val ref = if (date == today) dayRef else couple.collection(DAYS).document(date.toString())
+        ref.set(
+            mapOf("talkedAbout" to FieldValue.arrayUnion(myUid)),
             SetOptions.merge(),
         )
     }
@@ -880,6 +936,12 @@ private fun DocumentSnapshot?.toReactions(): Map<String, Reaction> {
     }.toMap()
 }
 
+private fun DocumentSnapshot?.toTalkedAbout(): Set<String> {
+    @Suppress("UNCHECKED_CAST")
+    val raw = this?.get("talkedAbout") as? List<String> ?: return emptySet()
+    return raw.toSet()
+}
+
 private fun DocumentSnapshot.toWildcard(): Wildcard? {
     val text = getString("text")?.takeIf { it.isNotBlank() } ?: return null
     val type = QuestionType.entries.firstOrNull { it.name == getString("type") } ?: return null
@@ -926,7 +988,12 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
     // History carries no answers: they live in a subcollection that would need
     // a read each. The Shelf shows questions, dates and reactions, so this is
     // what it needs; the Reveal screen loads a single day in full.
-    return DayEntry(date = date, question = question, reactions = toReactions())
+    return DayEntry(
+        date = date,
+        question = question,
+        reactions = toReactions(),
+        talkedAbout = toTalkedAbout(),
+    )
 }
 
 @Suppress("UNCHECKED_CAST")

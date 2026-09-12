@@ -53,6 +53,7 @@ import com.ampersand.model.Answer
 import com.ampersand.model.Quiz
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.unit.sp
 import com.ampersand.model.CoupleState
 import com.ampersand.model.Question
@@ -108,6 +109,7 @@ fun TodayScreen(
     decks: List<Quiz> = emptyList(),
     onOpenDeck: (String) -> Unit = {},
     onWrite: () -> Unit = {},
+    onTalkedAbout: (LocalDate) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -131,6 +133,12 @@ fun TodayScreen(
             SectionLabel(day.date.format(DayFormat))
             StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
         }
+
+        // Yesterday, asked about this morning. Above the question rather than
+        // below it, because it is about the day that has finished and the one
+        // below has not started.
+        Spacer(Modifier.height(14.dp))
+        DidYouTalk(state, onTalkedAbout)
 
         Spacer(Modifier.height(18.dp))
         QuestionHero(
@@ -331,6 +339,73 @@ internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
 }
 
 /** Small filled capsule, used for metadata that should not compete. */
+/**
+ * Did yesterday's question come up again?
+ *
+ * The only thing this app has ever wanted to know and had no way of being
+ * told. The reveal is designed to send the two of you into the other room --
+ * one of the six reactions is literally "Say more tonight" -- and until now
+ * whether that happened was invisible to it.
+ *
+ * One tap, no second state, and no way to take it back. There is no version of
+ * "actually we did not talk about it after all" worth building a control for,
+ * and a yes/no would turn a nice thing into a report card.
+ *
+ * Only ever about yesterday, and only when yesterday opened. Asking about a
+ * day somebody never finished is asking them about a conversation they could
+ * not have had.
+ */
+@Composable
+private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
+    val yesterday = remember(state.history, state.today.date) {
+        state.history.firstOrNull {
+            it.date == state.today.date.minusDays(1) && it.isRevealed && !it.wasTalkedAbout
+        }
+    } ?: return
+
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val interaction = remember { MutableInteractionSource() }
+    val you = BrickColor.of(state.you.colorArgb)
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
+            .clickable(interactionSource = interaction, indication = null) {
+                sounds.play(Sfx.SEAL)
+                feel.play(Feel.SEAL)
+                onTalkedAbout(yesterday.date)
+            }
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        BrickDot(slug = you.slug, studSize = Stud.pip)
+        Column(Modifier.weight(1f)) {
+            Text(
+                "Did yesterday's question come up again?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                yesterday.question.text,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+        }
+        Text(
+            "It did",
+            style = MaterialTheme.typography.titleSmall,
+            color = Color(you.argb),
+        )
+    }
+}
+
 @Composable
 private fun Pill(text: String) {
     BrickPill(slug = quietSlug(), studSize = Stud.small, height = BrickHeight.LOW) {

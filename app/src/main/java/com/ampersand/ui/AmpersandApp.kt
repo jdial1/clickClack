@@ -583,6 +583,7 @@ private fun SignedInApp(
                             onOpenReveal = { openDate = state.today.date },
                             onOpenDeck = { openDeck = it },
                             onWrite = { writing = true },
+                            onTalkedAbout = vm.repo::markTalkedAbout,
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(
