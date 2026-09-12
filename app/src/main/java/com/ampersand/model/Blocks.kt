@@ -235,6 +235,12 @@ object Rewards {
      * rough one builds out of stubs, and the two are different silhouettes
      * across the room. It is not a score anybody has to read.
      *
+     * **Height is depth, plus what you put in.** A deep question is taller
+     * than a light one, and a real answer to a text question is one step
+     * taller than a word or two -- see [effortOf]. It is your own words that
+     * count, so a partner who writes an essay does not grow your brick and one
+     * who writes "yeah" does not shrink it.
+     *
      * Nothing here pays more for *winning* an argument about who is better --
      * both people earn on their own knowledge of the other, independently.
      */
@@ -245,6 +251,7 @@ object Rewards {
         val mine = day.answerFor(member.uid) ?: return emptyList()
         val theirs = day.answerFor(partner.uid) ?: return emptyList()
 
+        val effort = effortOf(mine, day.question)
         val milestone = streakAfter > 0 && streakAfter % 7 == 0
         val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
@@ -261,9 +268,9 @@ object Rewards {
             // question that was actually hard. It earns the only piece that is
             // not a box, which is the only way a week ever stops being one.
             called && day.question.depth.level >= 3 -> roof(member, partner)
-            !day.question.isScored -> unscored(day.question.depth)
-            called -> landed(day.question.depth)
-            else -> missed(day.question.depth)
+            !day.question.isScored -> unscored(day.question.depth, effort)
+            called -> landed(day.question.depth, effort)
+            else -> missed(day.question.depth, effort)
         }
 
         return listOf(
@@ -350,17 +357,61 @@ object Rewards {
         slope = if (member.uid < partner.uid) Slope.LEFT else Slope.RIGHT,
     )
 
+    /**
+     * Whether you actually wrote something: 0 or 1, and never more.
+     *
+     * Only the two question types that are a text box. Every other type is a
+     * choice between options somebody else wrote, so its "length" is the length
+     * of the option label and measures nothing about you.
+     *
+     * One step, not a scale, and that is the cap. Fifteen words and fifteen
+     * hundred earn the same brick. Letting length keep climbing would turn a
+     * six-stud "you called it" into a four-row slab twenty-four cells big --
+     * half again the size of the rarest piece in the app -- and one long night
+     * would fill a third of the week's plate by itself. Worse, it would pay for
+     * an essay over a sentence that was true, which is the wrong thing to pay
+     * for in a couples app.
+     *
+     * Counts your answer and your guess together, since both are things you
+     * wrote. Words rather than characters, so "aaaaaaaaaaaaaaaa" is one.
+     */
+    fun effortOf(answer: Answer, question: Question): Int {
+        if (question.type != QuestionType.REFLECT && question.type != QuestionType.GUESS_ME) return 0
+        val words = (answer.values + answer.guess.orEmpty())
+            .sumOf { text -> text.split(Whitespace).count { it.isNotBlank() } }
+        return if (words >= SubstantialWords) 1 else 0
+    }
+
+    /** A couple of real sentences, typed on a phone. */
+    const val SubstantialWords = 15
+
+    private val Whitespace = Regex("\\s+")
+
+    /**
+     * Depth and effort, one step each, capped at the tallest brick the pack has.
+     *
+     * Adding rather than taking the higher is what lets both show: a light
+     * question answered properly stands as tall as a deep one answered in two
+     * words, and only a deep question answered properly reaches HIGH. Because
+     * the roof already takes every called deep day, the widest brick that can
+     * reach HIGH is the four-stud reflection -- sixteen cells, exactly the
+     * roof's own size -- so nothing ordinary ever outgrows the best piece.
+     */
+    private fun heightFor(depth: Depth, effort: Int): BrickHeight =
+        when ((if (depth.level >= 3) 1 else 0) + effort) {
+            0 -> BrickHeight.LOW
+            1 -> BrickHeight.MEDIUM
+            else -> BrickHeight.HIGH
+        }
+
     /** Wide and solid: you called it. */
-    private fun landed(depth: Depth) =
-        BrickShape(6, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
+    private fun landed(depth: Depth, effort: Int) = BrickShape(6, heightFor(depth, effort))
 
     /** A stub. You turned up, which is the part that earns anything at all. */
-    private fun missed(depth: Depth) =
-        BrickShape(2, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
+    private fun missed(depth: Depth, effort: Int) = BrickShape(2, heightFor(depth, effort))
 
     /** REFLECT days cannot be got right or wrong, so they are not judged. */
-    private fun unscored(depth: Depth) =
-        BrickShape(4, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
+    private fun unscored(depth: Depth, effort: Int) = BrickShape(4, heightFor(depth, effort))
 
     private fun faceFor(streak: Int): BlockFace =
         BlockFace.entries[(streak / 7 - 1).coerceAtLeast(0) % BlockFace.entries.size]

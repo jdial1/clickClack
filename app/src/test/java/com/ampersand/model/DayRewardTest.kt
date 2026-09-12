@@ -110,6 +110,103 @@ class DayRewardTest {
         assertTrue(Rewards.forDay(half, you, them, 1).isEmpty())
     }
 
+    // ---- what you wrote --------------------------------------------------
+
+    private fun words(n: Int) = List(n) { "word" }.joinToString(" ")
+
+    private val reflect = question(type = QuestionType.REFLECT)
+    private val guessMe = question(type = QuestionType.GUESS_ME)
+
+    @Test
+    fun `a real answer is one step taller than a word or two`() {
+        assertEquals(BrickHeight.LOW.rows, shapeOf(day(q = reflect, mine = "fine")).h)
+        assertEquals(BrickHeight.MEDIUM.rows, shapeOf(day(q = reflect, mine = words(15))).h)
+    }
+
+    @Test
+    fun `just under the line does not count`() {
+        assertEquals(BrickHeight.LOW.rows, shapeOf(day(q = reflect, mine = words(14))).h)
+    }
+
+    /** The cap. An essay is not a better answer than two true sentences. */
+    @Test
+    fun `fifteen hundred words earn exactly what fifteen do`() {
+        val sentence = shapeOf(day(q = reflect, mine = words(15)))
+        val essay = shapeOf(day(q = reflect, mine = words(1500)))
+        assertEquals(sentence, essay)
+    }
+
+    @Test
+    fun `only a deep question answered properly reaches the top`() {
+        val deep = question(type = QuestionType.REFLECT, depth = 3)
+        assertEquals(BrickHeight.MEDIUM.rows, shapeOf(day(q = deep, mine = "fine")).h)
+        assertEquals(BrickHeight.HIGH.rows, shapeOf(day(q = deep, mine = words(40))).h)
+    }
+
+    /** Your answer and your guess are both things you wrote. */
+    @Test
+    fun `a guess counts toward what you put in`() {
+        val shape = shapeOf(day(q = guessMe, mine = words(8), theirs = "x", myGuess = words(8)))
+        assertEquals(BrickHeight.MEDIUM.rows, shape.h)
+    }
+
+    /** Your brick is yours. Their essay does not grow it. */
+    @Test
+    fun `your partner writing a lot does not change your brick`() {
+        val terse = shapeOf(day(q = reflect, mine = "fine", theirs = "short"))
+        val theyWroteAnEssay = shapeOf(day(q = reflect, mine = "fine", theirs = words(900)))
+        assertEquals(terse, theyWroteAnEssay)
+    }
+
+    /** A choice between labels somebody else wrote measures nothing about you. */
+    @Test
+    fun `length is ignored on questions that are not a text box`() {
+        val picked = question(type = QuestionType.PICK_ONE)
+        val longLabel = words(40)
+        assertEquals(0, Rewards.effortOf(Answer.of(you.uid, longLabel), picked))
+        assertEquals(BrickHeight.LOW.rows, shapeOf(day(q = picked, mine = longLabel)).h)
+    }
+
+    @Test
+    fun `whitespace is not words`() {
+        val padded = "   fine   \n\n\t   ok   "
+        assertEquals(0, Rewards.effortOf(Answer.of(you.uid, padded), reflect))
+        assertEquals(1, Rewards.effortOf(Answer.of(you.uid, words(15)), reflect))
+    }
+
+    /**
+     * No ordinary day brick outgrows the rarest piece in the app.
+     *
+     * The whole point of the cap, checked across every combination rather than
+     * a hand-picked few: depth, type, whether you called it, how much you
+     * wrote. Letting length climb freely would make a six-stud "called it" a
+     * twenty-four cell slab.
+     */
+    @Test
+    fun `nothing outgrows the roof however much is written`() {
+        val roofArea = 4 * BrickHeight.HIGH.rows
+        val types = listOf(
+            QuestionType.REFLECT, QuestionType.GUESS_ME,
+            QuestionType.THIS_OR_THAT, QuestionType.PICK_ONE,
+        )
+        for (depth in 1..3) for (type in types) for (n in listOf(0, 14, 15, 1500)) {
+            for (called in listOf(true, false)) {
+                val q = question(type = type, depth = depth)
+                val d = day(
+                    q = q,
+                    mine = words(maxOf(n, 1)),
+                    theirs = "b",
+                    myGuess = if (called) "b" else words(maxOf(n, 1)),
+                )
+                val shape = shapeOf(d)
+                assertTrue(
+                    "depth $depth $type words $n called $called gave ${shape.w}x${shape.h}",
+                    shape.w * shape.h <= roofArea,
+                )
+            }
+        }
+    }
+
     // ---- the flag itself ---------------------------------------------------
 
     @Test
