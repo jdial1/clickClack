@@ -119,6 +119,25 @@ data class BuildPlate(
         p.y + (byId[p.blockId]?.shape?.h ?: 0)
     } ?: 0
 
+    /** How many bricks [uid] earned into this plate, placed or not. */
+    fun earnedBy(uid: String): Int = blocks.count { it.ownerUid == uid }
+
+    /**
+     * [uid]'s share of the bricks, 0..1, or null when the plate is empty.
+     *
+     * The sculpture already shows this in colour; this is for saying it out
+     * loud underneath. A week that came out three to one is worth a sentence,
+     * and not everyone reads a silhouette.
+     */
+    fun shareOf(uid: String): Float? {
+        if (blocks.isEmpty()) return null
+        return blocks.count { it.ownerUid == uid }.toFloat() / blocks.size
+    }
+
+    /** Total studs [uid] put in: volume rather than count, so size counts. */
+    fun studsBy(uid: String): Int =
+        blocks.filter { it.ownerUid == uid }.sumOf { it.shape.w * it.shape.h }
+
     /** Bricks earned but not yet on the plate, for [uid]. */
     fun tray(uid: String): List<Block> {
         val used = placed.mapTo(mutableSetOf()) { it.blockId }
@@ -178,24 +197,44 @@ data class BuildPlate(
     ): Int? = (0 until gridH).firstOrNull { canPlace(shape, x, it, occupied) }
 }
 
-/**
- * What a finished day is worth.
- *
- * Deliberately modest: one brick each per day, sized by how much the day asked
- * of you. Paying out more for a better score would make the plate a scoreboard,
- * and the point is that it records turning up together, not winning.
- */
+/** What turning up is worth, and what knowing them is worth. */
 object Rewards {
 
-    fun forDay(day: DayEntry, member: Member, streakAfter: Int): List<Block> {
+    /**
+     * One brick for each thing you personally finished, sized by how well you
+     * did on it.
+     *
+     * Both halves of that are deliberate, and both are changes from the first
+     * version, which handed each person one identical brick per completed day.
+     *
+     * **Volume is participation.** If you answer the daily question and play two
+     * decks and your partner answers the daily question, you earn three bricks
+     * and they earn one, and the week's sculpture is visibly three quarters your
+     * colour. Real couples are not symmetric -- one person nearly always turns
+     * up more -- and an app that quietly evens that out is telling a comfortable
+     * lie about the week. The sculpture is a record, so it should record it.
+     *
+     * **Size is how well you knew them.** A landed guess earns a six-stud
+     * brick, a miss earns a two. So a good week builds wide and solid and a
+     * rough one builds out of stubs, and the two are different silhouettes
+     * across the room. It is not a score anybody has to read.
+     *
+     * Nothing here pays more for *winning* an argument about who is better --
+     * both people earn on their own knowledge of the other, independently.
+     */
+    fun forDay(day: DayEntry, member: Member, partner: Member, streakAfter: Int): List<Block> {
         if (!day.isRevealed) return emptyList()
+        // You earn for turning up, so no answer means no brick -- even when
+        // your partner answered and the day is technically revealed.
+        val mine = day.answerFor(member.uid) ?: return emptyList()
+        val theirs = day.answerFor(partner.uid) ?: return emptyList()
 
         val milestone = streakAfter > 0 && streakAfter % 7 == 0
         val shape = when {
             milestone -> CharacterShape
-            day.question.depth.level >= 3 -> BrickShape(4, BrickHeight.MEDIUM)
-            day.question.depth.level == 2 -> BrickShape(4, BrickHeight.LOW)
-            else -> BrickShape(2, BrickHeight.LOW)
+            !day.question.isScored -> unscored(day.question.depth)
+            day.question.guessHit(mine.guess, theirs.values) -> landed(day.question.depth)
+            else -> missed(day.question.depth)
         }
 
         return listOf(
@@ -209,6 +248,62 @@ object Rewards {
             ),
         )
     }
+
+    /**
+     * A brick for finishing a deck, sized by the share of your guesses that
+     * landed.
+     *
+     * A deck is ten questions rather than one, so it pays a taller brick than a
+     * day: the height says how much you did, the width says how well.
+     */
+    fun forQuiz(
+        result: QuizResult,
+        member: Member,
+        hits: Int,
+        earnedOn: LocalDate,
+    ): List<Block> {
+        if (result.possible == 0) {
+            return listOf(
+                block(result, member, BrickShape(4, BrickHeight.MEDIUM), earnedOn),
+            )
+        }
+        val share = hits.toFloat() / result.possible
+        val width = when {
+            share >= 0.7f -> 6
+            share >= 0.35f -> 4
+            else -> 2
+        }
+        return listOf(
+            block(result, member, BrickShape(width, BrickHeight.MEDIUM), earnedOn),
+        )
+    }
+
+    private fun block(
+        result: QuizResult,
+        member: Member,
+        shape: BrickShape,
+        earnedOn: LocalDate,
+    ) = Block(
+        // Idempotent the same way a day is: one brick per deck per person, no
+        // matter how many listeners report the reveal.
+        id = "quiz_${result.quiz.id}_${member.uid}",
+        shape = shape,
+        colorArgb = member.colorArgb,
+        ownerUid = member.uid,
+        earnedOn = earnedOn,
+    )
+
+    /** Wide and solid: you called it. */
+    private fun landed(depth: Depth) =
+        BrickShape(6, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
+
+    /** A stub. You turned up, which is the part that earns anything at all. */
+    private fun missed(depth: Depth) =
+        BrickShape(2, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
+
+    /** REFLECT days cannot be got right or wrong, so they are not judged. */
+    private fun unscored(depth: Depth) =
+        BrickShape(4, if (depth.level >= 3) BrickHeight.MEDIUM else BrickHeight.LOW)
 
     private fun faceFor(streak: Int): BlockFace =
         BlockFace.entries[(streak / 7 - 1).coerceAtLeast(0) % BlockFace.entries.size]

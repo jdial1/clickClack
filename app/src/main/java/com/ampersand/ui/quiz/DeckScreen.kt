@@ -278,20 +278,24 @@ private fun DeckResult(
     }
 }
 
-/** How far through, in bricks rather than a bar. */
+/**
+ * How far through, in bricks rather than a bar: one brick per question.
+ *
+ * No height is set. BrickSlab rounds up to whole courses and ignores an
+ * incoming height constraint, so asking for a 10dp strip gets a taller slab
+ * that draws over its neighbour.
+ */
 @Composable
 private fun Progress(done: Int, total: Int, color: BrickColor) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         repeat(total) { i ->
-            Box(Modifier.weight(1f)) {
-                BrickSlab(
-                    slugs = listOf(color.slug),
-                    studs = 1,
-                    height = BrickHeight.LOW,
-                    alpha = if (i <= done) 1f else 0.22f,
-                    modifier = Modifier.height(10.dp),
-                )
-            }
+            BrickSlab(
+                slugs = listOf(color.slug),
+                studs = 1,
+                height = BrickHeight.LOW,
+                alpha = if (i <= done) 1f else 0.22f,
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }

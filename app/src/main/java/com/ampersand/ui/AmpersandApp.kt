@@ -74,6 +74,8 @@ import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.components.brickFace
 import com.ampersand.ui.history.HistoryScreen
+import com.ampersand.notify.Reminder
+import com.ampersand.ui.notify.ReminderSetupScreen
 import com.ampersand.ui.quiz.DeckScreen
 import com.ampersand.ui.reveal.RevealScreen
 import com.ampersand.ui.splash.SplashScreen
@@ -270,6 +272,17 @@ private fun PairedGate(
         }
 
         is PairState.Paired -> {
+            // Asked once, and only after pairing: permission to interrupt
+            // somebody lands better when there is already a reason to.
+            var askedReminder by remember { mutableStateOf(Reminder.hasBeenAsked(context)) }
+            if (!askedReminder) {
+                ReminderSetupScreen(
+                    color = BrickColor.RED,
+                    onDone = { askedReminder = true },
+                )
+                return@PairedGate
+            }
+
             // Keyed on the couple: a new pairing gets a new repository and a
             // new set of listeners rather than the previous couple's.
             val vm: AmpersandViewModel = viewModel(

@@ -4,6 +4,11 @@
     <!-- Not used yet; the mock repository is in-memory. Firebase needs it. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- One local reminder a day. RECEIVE_BOOT_COMPLETED is what lets it come
+         back after a restart: the system drops every alarm on reboot. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,5 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".notify.ReminderReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

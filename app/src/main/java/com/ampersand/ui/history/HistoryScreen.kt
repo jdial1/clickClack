@@ -109,7 +109,7 @@ fun HistoryScreen(
         item {
             SectionLabel("The shelf")
             Spacer(Modifier.height(12.dp))
-            Shelf(state.shelf)
+            Shelf(state.shelf, state)
             Spacer(Modifier.height(32.dp))
 
             SectionLabel("The last ten weeks")
@@ -232,8 +232,60 @@ private fun ago(then: LocalDate, now: LocalDate): String {
  * round: a row of thumbnails alone would make a week's build look like a
  * decoration rather than the thing you spent the week making.
  */
+/**
+ * Who built how much of it.
+ *
+ * One stud per brick earned, in each person's colour. Not a bar chart of a
+ * ratio -- an actual row you can count, which is the same trick the plate
+ * plays: the quantity is the picture.
+ *
+ * The two slabs take weights equal to their counts, so a stud is the same width
+ * in both halves and the row reads as one continuous strip rather than two bars
+ * at different scales.
+ *
+ * The heights are **not** set here. BrickSlab rounds its own height up to a
+ * whole number of courses and ignores an incoming height constraint, which is
+ * exactly what it is for -- asking it for a 14dp strip got a 70dp slab drawn
+ * straight over the caption underneath.
+ */
 @Composable
-private fun Shelf(shelf: List<BuildPlate>) {
+private fun Contribution(plate: BuildPlate, state: CoupleState) {
+    val mine = plate.earnedBy(state.you.uid)
+    val theirs = plate.earnedBy(state.them.uid)
+    if (mine + theirs == 0) return
+
+    val you = BrickColor.of(state.you.colorArgb)
+    val them = BrickColor.of(state.them.colorArgb)
+
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth()) {
+            if (mine > 0) {
+                BrickSlab(
+                    slugs = listOf(you.slug),
+                    studs = mine,
+                    height = BrickHeight.LOW,
+                    modifier = Modifier.weight(mine.toFloat()),
+                )
+            }
+            if (theirs > 0) {
+                BrickSlab(
+                    slugs = listOf(them.slug),
+                    studs = theirs,
+                    height = BrickHeight.LOW,
+                    modifier = Modifier.weight(theirs.toFloat()),
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        SectionLabel(
+            "${state.you.name} $mine  ·  ${state.them.name} $theirs  ·  " +
+                "${plate.placed.size} placed",
+        )
+    }
+}
+
+@Composable
+private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
     if (shelf.isEmpty()) {
         Text(
             text = "Nothing sealed yet. Your first sculpture lands at the end of the week.",
@@ -262,8 +314,8 @@ private fun Shelf(shelf: List<BuildPlate>) {
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(2.dp))
-        SectionLabel("${selected.placed.size} bricks  ·  built together")
+        Spacer(Modifier.height(10.dp))
+        Contribution(selected, state)
 
         Spacer(Modifier.height(16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

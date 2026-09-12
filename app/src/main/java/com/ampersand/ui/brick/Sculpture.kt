@@ -1,9 +1,12 @@
 package com.ampersand.ui.brick
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import com.ampersand.model.BuildPlate
 
 /**
@@ -28,22 +31,38 @@ fun Sculpture(
     val rows = plate.builtHeight().coerceAtLeast(1)
     val atlas = rememberBricks(plate.placed.mapNotNull { plate.block(it.blockId)?.asset })
 
-    Canvas(modifier.aspectRatio(BrickArt.aspectWithNub(plate.gridW, rows))) {
-        val stud = size.width / plate.gridW
-        val rowPx = stud * BrickArt.ROW_RATIO
+    // Height measured from the width rather than left to `aspectRatio`.
+    //
+    // Inside a LazyColumn item the incoming height constraint is unbounded, and
+    // aspectRatio could resolve to nothing while the canvas still drew at full
+    // size -- so the sculpture printed straight over the caption beneath it.
+    // BoxWithConstraints gives a real width to divide, and clipToBounds means a
+    // miscalculation can never again reach a neighbour.
+    BoxWithConstraints(modifier) {
+        val height = maxWidth / BrickArt.aspectWithNub(plate.gridW, rows)
 
-        plate.placed
-            .sortedBy { it.y }
-            .forEach { p ->
-                val block = plate.block(p.blockId) ?: return@forEach
-                drawBrick(
-                    block = block,
-                    atlas = atlas,
-                    left = p.x * stud,
-                    bottom = size.height - p.y * rowPx,
-                    studPx = stud,
-                    alpha = alpha,
-                )
-            }
+        Canvas(
+            Modifier
+                .fillMaxWidth()
+                .height(height)
+                .clipToBounds(),
+        ) {
+            val stud = size.width / plate.gridW
+            val rowPx = stud * BrickArt.ROW_RATIO
+
+            plate.placed
+                .sortedBy { it.y }
+                .forEach { p ->
+                    val block = plate.block(p.blockId) ?: return@forEach
+                    drawBrick(
+                        block = block,
+                        atlas = atlas,
+                        left = p.x * stud,
+                        bottom = size.height - p.y * rowPx,
+                        studPx = stud,
+                        alpha = alpha,
+                    )
+                }
+        }
     }
 }

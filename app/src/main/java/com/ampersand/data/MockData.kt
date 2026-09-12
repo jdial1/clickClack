@@ -245,14 +245,6 @@ object MockCouple {
     private const val GridW = 12
     private const val GridH = 14
 
-    /** No slopes and no characters: those are earned, not filler. */
-    private val ShelfShapes = listOf(
-        BrickShape(2, BrickHeight.LOW),
-        BrickShape(4, BrickHeight.LOW),
-        BrickShape(6, BrickHeight.LOW),
-        BrickShape(2, BrickHeight.MEDIUM),
-        BrickShape(4, BrickHeight.MEDIUM),
-    )
 
     /** Today starts unanswered, so the app opens on the state worth designing. */
     fun freshToday(today: LocalDate = LocalDate.now()): DayEntry =
@@ -436,23 +428,45 @@ object MockCouple {
      */
     fun shelf(today: LocalDate = LocalDate.now()): List<BuildPlate> =
         listOf(
-            sculpture("plate_w1", today.minusDays(11), seed = 4021),
-            sculpture("plate_w2", today.minusDays(18), seed = 1177),
-            sculpture("plate_w3", today.minusDays(25), seed = 8830),
+            // Three different weeks on purpose, because the shelf is where the
+            // shape of a week is supposed to be legible at a glance:
+            // an even one, a lopsided one, and a rough one built out of stubs.
+            sculpture("plate_w1", today.minusDays(11), seed = 4021, yourShare = 0.5f, hitRate = 0.7f),
+            sculpture("plate_w2", today.minusDays(18), seed = 1177, yourShare = 0.78f, hitRate = 0.6f),
+            sculpture("plate_w3", today.minusDays(25), seed = 8830, yourShare = 0.45f, hitRate = 0.15f),
         )
 
-    private fun sculpture(id: String, startedOn: LocalDate, seed: Int): BuildPlate {
+    /**
+     * [yourShare] is how much of the week was yours, and [hitRate] how often the
+     * guesses landed -- the two things the real [Rewards] now encode. A sample
+     * shelf where every week is an even fifty-fifty of identical bricks would
+     * make the feature look like it does nothing.
+     */
+    private fun sculpture(
+        id: String,
+        startedOn: LocalDate,
+        seed: Int,
+        yourShare: Float,
+        hitRate: Float,
+    ): BuildPlate {
         val random = Random(seed)
         val blocks = mutableListOf<Block>()
         val placed = mutableListOf<Placement>()
 
         fun current() = BuildPlate(id, startedOn, PeriodDays, GridW, GridH, blocks, placed)
 
-        // Two bricks a day for a week: one each, which is exactly what a
-        // completed week pays out.
         repeat(PeriodDays * 2) { i ->
-            val owner = if (i % 2 == 0) you else them
-            val shape = ShelfShapes[random.nextInt(ShelfShapes.size)]
+            val owner = if (random.nextFloat() < yourShare) you else them
+            // Wide when the guess landed, a stub when it did not.
+            val shape = if (random.nextFloat() < hitRate) {
+                if (random.nextFloat() < 0.55f) {
+                    BrickShape(6, BrickHeight.LOW)
+                } else {
+                    BrickShape(4, BrickHeight.MEDIUM)
+                }
+            } else {
+                BrickShape(2, BrickHeight.LOW)
+            }
             val plate = current()
             val occupied = plate.occupied()
             val (x, y) = bestSpot(plate, shape, occupied, random) ?: return@repeat

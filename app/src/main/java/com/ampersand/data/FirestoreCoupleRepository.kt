@@ -13,6 +13,7 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.Member
 import com.ampersand.model.Placement
+import com.ampersand.model.QuizResult
 import com.ampersand.model.QuizRun
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
@@ -206,7 +207,7 @@ class FirestoreCoupleRepository(
             sealPlate()
         }
 
-        _state.value = current.copy(
+        val next = current.copy(
             you = you,
             them = partner,
             today = todayEntry,
@@ -319,11 +320,37 @@ class FirestoreCoupleRepository(
         val s = _state.value
         val plate = s.plate
         val fresh = (
-            Rewards.forDay(s.today, s.you, s.streak) +
-                Rewards.forDay(s.today, s.them, s.streak)
+            Rewards.forDay(s.today, s.you, s.them, s.streak) +
+                Rewards.forDay(s.today, s.them, s.you, s.streak)
             ).filter { b -> plate.blocks.none { it.id == b.id } }
         if (fresh.isEmpty()) return
 
+        plateRef(plate).set(
+            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            SetOptions.merge(),
+        )
+    }
+
+    /**
+     * Both people earn for a finished deck, each sized by their own accuracy.
+     *
+     * Called from recompose, because a deck reveals when the *partner* submits
+     * and this phone finds out through a listener rather than through an action
+     * it took.
+     */
+    private fun awardForQuizzes(s: CoupleState) {
+        val plate = s.plate
+        if (plate.isSealed) return
+
+        val fresh = pool.decks.flatMap { quiz ->
+            val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
+            val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
+            val result = QuizResult.of(quiz, mine, theirs)
+            Rewards.forQuiz(result, s.you, result.youKnewThem, today) +
+                Rewards.forQuiz(result, s.them, result.theyKnewYou, today)
+        }.filter { b -> plate.blocks.none { it.id == b.id } }
+
+        if (fresh.isEmpty()) return
         plateRef(plate).set(
             plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
             SetOptions.merge(),

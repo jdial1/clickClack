@@ -198,8 +198,8 @@ class FakeCoupleRepository(
         if (!s.today.isRevealed) return s
         val existing = s.plate.blocks.mapTo(mutableSetOf()) { it.id }
         val fresh = (
-            Rewards.forDay(s.today, s.you, s.streak) +
-                Rewards.forDay(s.today, s.them, s.streak)
+            Rewards.forDay(s.today, s.you, s.them, s.streak) +
+                Rewards.forDay(s.today, s.them, s.you, s.streak)
             ).filter { it.id !in existing }
         if (fresh.isEmpty()) return s
         return s.copy(plate = s.plate.copy(blocks = s.plate.blocks + fresh))
