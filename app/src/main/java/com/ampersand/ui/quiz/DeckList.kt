@@ -254,7 +254,7 @@ private fun SortBricks(
  * same idea.
  */
 @Composable
-private fun BrickChip(
+internal fun BrickChip(
     label: String,
     on: Boolean,
     color: BrickColor?,

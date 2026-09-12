@@ -11,6 +11,7 @@ import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
 import com.ampersand.model.Wildcard
 import com.ampersand.model.Rewards
+import com.ampersand.model.Turns
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -128,6 +129,12 @@ interface CoupleRepository {
      * after all" worth building a control for.
      */
     fun markTalkedAbout(date: LocalDate)
+
+    /**
+     * Pick what tomorrow's question is about. Only works on your turn, once
+     * today is open, and only once. See [com.ampersand.model.Turns].
+     */
+    fun pickTomorrow(theme: String)
 }
 
 /**
@@ -373,6 +380,11 @@ class FakeCoupleRepository(
                 Rewards.forTalk(day, marked.them, marked.you, marked.today.date)
             ).filter { it.id !in laid }
         marked.copy(plate = marked.plate.copy(blocks = marked.plate.blocks + fresh))
+    }
+
+    override fun pickTomorrow(theme: String) = mutate { current ->
+        if (!Turns.canPick(current.today, current.you.uid, current.them.uid)) return@mutate current
+        current.copy(today = current.today.copy(nextTheme = theme, nextThemeBy = current.you.uid))
     }
 
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) =

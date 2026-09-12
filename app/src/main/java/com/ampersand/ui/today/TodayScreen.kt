@@ -51,6 +51,10 @@ import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.Quiz
+import com.ampersand.model.QuizTheme
+import com.ampersand.model.Turns
+import com.ampersand.ui.quiz.BrickChip
+import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -110,6 +114,8 @@ fun TodayScreen(
     onOpenDeck: (String) -> Unit = {},
     onWrite: () -> Unit = {},
     onTalkedAbout: (LocalDate) -> Unit = {},
+    themes: List<QuizTheme> = emptyList(),
+    onPickTomorrow: (String) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -143,6 +149,7 @@ fun TodayScreen(
         Spacer(Modifier.height(18.dp))
         QuestionHero(
             askedBefore = state.capsule?.date,
+            pickedBy = pickedBy(state),
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -180,6 +187,11 @@ fun TodayScreen(
             ) {
                 SealedPanel(state, you, them, onOpenReveal)
             }
+        }
+
+        if (day.isRevealed && themes.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
+            TomorrowPick(state, themes, onPickTomorrow)
         }
 
         Spacer(Modifier.height(32.dp))
@@ -224,6 +236,8 @@ private fun QuestionHero(
     them: BrickColor,
     /** Set when the two of you answered this exact question once before. */
     askedBefore: LocalDate? = null,
+    /** Set when somebody picked today's theme last night: "You" or their name. */
+    pickedBy: String? = null,
 ) {
     // One line of text crosses both halves of the wall, so the ink has to suit
     // the paler of the two. White over pack yellow is unreadable.
@@ -261,6 +275,15 @@ private fun QuestionHero(
         // Said before the question rather than after it. Knowing this one is
         // coming back changes how you answer it, and finding out afterwards
         // would make the app feel like it had kept something from you.
+        pickedBy?.let { who ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "$who picked this one's theme last night.",
+                style = MaterialTheme.typography.labelSmall,
+                color = ink,
+            )
+        }
+
         askedBefore?.let { then ->
             Spacer(Modifier.height(8.dp))
             Text(
@@ -403,6 +426,71 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
             style = MaterialTheme.typography.titleSmall,
             color = Color(you.argb),
         )
+    }
+}
+
+/**
+ * Who picked today, when somebody did and the question actually honours it.
+ *
+ * Checked against the question's category rather than trusted: a wildcard, a
+ * capsule or an occasion outranks the pick, and crediting somebody with a
+ * Christmas question they did not choose would be a small lie.
+ */
+private fun pickedBy(state: CoupleState): String? {
+    val theme = Turns.themeFor(state.today.date, state.history, state.you.uid, state.them.uid)
+        ?: return null
+    if (state.today.question.category != theme) return null
+    val yesterday = state.history.first { it.date == state.today.date.minusDays(1) }
+    return if (yesterday.nextThemeBy == state.you.uid) "You" else state.them.name
+}
+
+/**
+ * The one thing today that is only one of yours to do.
+ *
+ * Shown once the day is open, to both of you: the chooser gets the themes, and
+ * the other person is told whose turn it is and, once it is done, only that it
+ * is done. Tomorrow's theme is the surprise, so it stays off the second phone
+ * until the question itself arrives.
+ */
+@Composable
+private fun TomorrowPick(
+    state: CoupleState,
+    themes: List<QuizTheme>,
+    onPick: (String) -> Unit,
+) {
+    val day = state.today
+    val yours = Turns.chooser(day.date, state.you.uid, state.them.uid) == state.you.uid
+    val picked = day.nextTheme
+
+    Column(Modifier.fillMaxWidth()) {
+        SectionLabel("Tomorrow")
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = when {
+                yours && picked == null -> "Your turn to pick what tomorrow is about."
+                yours -> "Tomorrow is ${picked!!.lowercase()}. ${state.them.name} finds out in the morning."
+                picked == null -> "${state.them.name} picks what tomorrow is about."
+                else -> "${state.them.name} picked tomorrow. You find out in the morning."
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        if (yours && picked == null) {
+            Spacer(Modifier.height(10.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                themes.forEach { theme ->
+                    BrickChip(
+                        label = theme.label,
+                        on = true,
+                        color = theme.brick,
+                        onClick = { onPick(theme.label) },
+                    )
+                }
+            }
+        }
     }
 }
 

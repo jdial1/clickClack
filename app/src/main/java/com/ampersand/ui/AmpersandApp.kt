@@ -70,6 +70,7 @@ import com.ampersand.auth.createPairingRepository
 import com.ampersand.auth.hasFirebaseConfigFor
 import com.ampersand.auth.findActivity
 import com.ampersand.model.CoupleState
+import com.ampersand.model.QuizTheme
 import com.ampersand.ui.auth.PairingScreen
 import com.ampersand.ui.auth.SignInScreen
 import com.ampersand.model.BrickColor
@@ -584,6 +585,8 @@ private fun SignedInApp(
                             onOpenDeck = { openDeck = it },
                             onWrite = { writing = true },
                             onTalkedAbout = vm.repo::markTalkedAbout,
+                            themes = QuizTheme.entries.filter { it.label in pool.themes },
+                            onPickTomorrow = vm.repo::pickTomorrow,
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(

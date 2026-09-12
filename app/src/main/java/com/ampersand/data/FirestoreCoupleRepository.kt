@@ -25,6 +25,7 @@ import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
 import com.ampersand.model.Streaks
+import com.ampersand.model.Turns
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -284,14 +285,15 @@ class FirestoreCoupleRepository(
         // question and the pin outranks everything below.
         val taste = Profiles.of(current)
         val recent = recentlyAsked(current)
+        val picked = Turns.themeFor(today, current.history, myUid, partnerUid)
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked)
             // A question one of you wrote outranks one a stranger wrote.
             waiting.isNotEmpty() -> waiting.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent)
+            else -> pool.daily(today, anniversary, taste, recent, picked)
         }
 
         val todayEntry = DayEntry(
@@ -300,6 +302,9 @@ class FirestoreCoupleRepository(
             answers = todayAnswers,
             reactions = todayDoc.toReactions(),
             talkedAbout = todayDoc.toTalkedAbout(),
+            opened = todayDoc?.getBoolean("revealed") == true,
+            nextTheme = todayDoc?.getString("nextTheme"),
+            nextThemeBy = todayDoc?.getString("nextThemeBy"),
         )
 
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
@@ -862,6 +867,20 @@ class FirestoreCoupleRepository(
         )
     }
 
+    /**
+     * Tonight's pick for tomorrow. Written once: the phone checks it is your
+     * turn and nothing is picked, and tomorrow ignores a pick by the wrong
+     * person, so a race between two phones cannot change what the day is.
+     */
+    override fun pickTomorrow(theme: String) {
+        val day = _state.value.today
+        if (!Turns.canPick(day, myUid, partnerUid)) return
+        dayRef.set(
+            mapOf("nextTheme" to theme, "nextThemeBy" to myUid),
+            SetOptions.merge(),
+        )
+    }
+
     override fun sealPlate() {
         val plate = _state.value.plate
         if (plate.isSealed || plate.placed.isEmpty()) return
@@ -1050,6 +1069,8 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
         reactions = toReactions(),
         talkedAbout = toTalkedAbout(),
         opened = getBoolean("revealed") == true,
+        nextTheme = getString("nextTheme"),
+        nextThemeBy = getString("nextThemeBy"),
     )
 }
 

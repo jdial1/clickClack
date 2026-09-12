@@ -186,6 +186,15 @@ data class DayEntry(
      * true once both answer documents exist, so it is safe to trust.
      */
     val opened: Boolean = false,
+    /**
+     * What tomorrow is about, picked tonight by whoever's turn it was.
+     *
+     * Not sealed: it is a small surprise rather than an answer, and the screen
+     * keeps it from the other person until the morning instead of a rule doing
+     * so. See [Turns].
+     */
+    val nextTheme: String? = null,
+    val nextThemeBy: String? = null,
 ) {
     /** Either of you marked it. One person remembering is the whole event. */
     val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()

@@ -70,6 +70,15 @@ class QuestionPool(
          * share, so skipping keeps the two landing on the same question.
          */
         recent: Set<String> = emptySet(),
+        /**
+         * The category one of you picked for today last night, if anybody did.
+         *
+         * Narrows the draw to that theme. Depth still holds on a weekday where
+         * the theme has anything shallow enough; if everything in the theme was
+         * asked lately, the pick gives way to the whole pool rather than
+         * repeating a question to honour it.
+         */
+        theme: String? = null,
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
 
@@ -82,19 +91,44 @@ class QuestionPool(
         }
 
         val weekend = date.dayOfWeek in setOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-        val candidates = all.filter { weekend || it.depth.level <= 2 }.ifEmpty { all }
+        fun fits(q: Question) = weekend || q.depth.level <= 2
 
-        val draw = if (taste.isEmpty) candidates else tilted(candidates, taste)
-        val start = (sameKindDay(date, weekend) * strideFor(draw.size)).mod(draw.size)
+        theme?.let { t ->
+            val themed = all.filter { it.category == t }
+            val picked = themed.filter(::fits).ifEmpty { themed }
+            if (picked.isNotEmpty()) walk(picked, date, weekend, taste, recent)?.let { return it }
+        }
 
-        // Walk on from the day's own slot to the first question not asked
-        // lately. Every candidate is tried once; if all of them were recent the
-        // day's own slot stands rather than asking nothing.
+        val candidates = all.filter(::fits).ifEmpty { all }
+        return walk(candidates, date, weekend, taste, recent)
+            ?: slot(tiltedOrNot(candidates, taste), date, weekend).let { (draw, start) -> draw[start] }
+    }
+
+    /** Every category a daily question can come from, in the order the pool holds them. */
+    val themes: List<String> get() = all.map { it.category }.distinct()
+
+    /**
+     * Walk on from the day's own slot to the first question not asked lately.
+     * Every candidate is tried once; null when all of them were recent.
+     */
+    private fun walk(
+        candidates: List<Question>,
+        date: LocalDate,
+        weekend: Boolean,
+        taste: Taste,
+        recent: Set<String>,
+    ): Question? {
+        val (draw, start) = slot(tiltedOrNot(candidates, taste), date, weekend)
         return draw.indices.asSequence()
             .map { draw[(start + it).mod(draw.size)] }
             .firstOrNull { it.id !in recent }
-            ?: draw[start]
     }
+
+    private fun tiltedOrNot(candidates: List<Question>, taste: Taste) =
+        if (taste.isEmpty) candidates else tilted(candidates, taste)
+
+    private fun slot(draw: List<Question>, date: LocalDate, weekend: Boolean): Pair<List<Question>, Int> =
+        draw to (sameKindDay(date, weekend) * strideFor(draw.size)).mod(draw.size.toLong()).toInt()
 
     /**
      * A day number that counts only days of the same kind.
