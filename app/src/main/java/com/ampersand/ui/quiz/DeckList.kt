@@ -1,21 +1,30 @@
 package com.ampersand.ui.quiz
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
@@ -24,13 +33,27 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DeckState
+import com.ampersand.model.QuestionType
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
+import com.ampersand.model.QuizTheme
+import com.ampersand.model.label
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.components.brickFace
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
+import com.ampersand.ui.theme.Duo
+import com.ampersand.ui.theme.Motion
+import com.ampersand.ui.theme.Radius
 
 /**
  * The whole pool, grouped by what it wants from you.
@@ -53,14 +76,50 @@ fun DeckList(
     onOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Deliberately not saveable. A filter is a way of looking at the shelf for a
+    // minute, not a setting: coming back to Today to find two thirds of the pool
+    // hidden, with no memory of having hidden it, is worse than picking the
+    // bricks again.
+    var themes by remember { mutableStateOf(emptySet<QuizTheme>()) }
+    var types by remember { mutableStateOf(emptySet<QuestionType>()) }
+    var sorting by remember { mutableStateOf(false) }
+
+    // A deck matches a type if it *contains* one, because a type belongs to a
+    // question and the thing being filtered is a deck. "Decks with something to
+    // drag in them" is the question someone is actually asking.
+    val shown = remember(decks, themes, types) {
+        decks.filter { deck ->
+            (themes.isEmpty() || deck.theme in themes) &&
+                (types.isEmpty() || deck.questions.any { it.type in types })
+        }
+    }
+
     // Grouped and ordered once per change rather than filtered four times in
     // the layout.
-    val grouped = remember(decks, state.quizRuns) {
-        decks.groupBy { state.deckState(it.id) }
+    val grouped = remember(shown, state.quizRuns) {
+        shown.groupBy { state.deckState(it.id) }
             .mapValues { (group, inGroup) -> inGroup.sortedWith(order(group, state)) }
     }
 
     Column(modifier.fillMaxWidth()) {
+        SortBricks(
+            themes = themes,
+            types = types,
+            open = sorting,
+            matching = shown.size,
+            total = decks.size,
+            onToggleOpen = { sorting = !sorting },
+            onTheme = { themes = themes.toggle(it) },
+            onType = { types = types.toggle(it) },
+            onClear = { themes = emptySet(); types = emptySet() },
+        )
+
+        if (shown.isEmpty()) {
+            Spacer(Modifier.height(20.dp))
+            QuietNote("No deck has all of that in it. Try fewer bricks.")
+            return@Column
+        }
+
         DeckState.entries.forEach { group ->
             val inGroup = grouped[group].orEmpty()
             if (inGroup.isEmpty()) return@forEach
@@ -84,6 +143,155 @@ fun DeckList(
             }
         }
     }
+}
+
+private fun <T> Set<T>.toggle(value: T): Set<T> =
+    if (value in this) this - value else this + value
+
+/**
+ * Two rows of bricks, for two different questions about a deck.
+ *
+ * Categories wear the app's own colours, because here a category *is* a
+ * colour: the deck rows below are already yellow for everyday and blue for
+ * deep, so the brick you press is the brick you are looking for. Question types
+ * have no colour of their own and get the plain one instead -- they are a fact
+ * about the shape of a deck rather than its subject, and dressing them like
+ * categories would imply a choice between the two rows when they actually
+ * stack: spicy *and* something to put in order.
+ *
+ * Folded away until asked for. Sixteen bricks above the list is a control
+ * panel, and the list is the point -- most days nobody wants to sort anything.
+ */
+@Composable
+private fun SortBricks(
+    themes: Set<QuizTheme>,
+    types: Set<QuestionType>,
+    open: Boolean,
+    matching: Int,
+    total: Int,
+    onToggleOpen: () -> Unit,
+    onTheme: (QuizTheme) -> Unit,
+    onType: (QuestionType) -> Unit,
+    onClear: () -> Unit,
+) {
+    val active = themes.size + types.size
+
+    Spacer(Modifier.height(10.dp))
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BrickChip(
+            label = if (active == 0) "Sort" else "Sort  ·  $active",
+            on = open || active > 0,
+            color = null,
+            onClick = onToggleOpen,
+        )
+        if (active > 0) {
+            // The count doubles as the way out. A separate "clear" brick would
+            // be a seventeenth brick to say the thing this already says.
+            Text(
+                text = "$matching of $total  ·  clear",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClear,
+                ),
+            )
+        }
+    }
+
+    if (!open) return
+
+    Spacer(Modifier.height(16.dp))
+    SectionLabel("Category")
+    Spacer(Modifier.height(8.dp))
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        QuizTheme.entries.forEach { theme ->
+            BrickChip(
+                label = theme.label,
+                on = theme in themes,
+                color = theme.brick,
+                onClick = { onTheme(theme) },
+            )
+        }
+    }
+
+    Spacer(Modifier.height(18.dp))
+    SectionLabel("What it asks of you")
+    Spacer(Modifier.height(8.dp))
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        QuestionType.entries.forEach { type ->
+            BrickChip(
+                label = type.label,
+                on = type in types,
+                color = null,
+                onClick = { onType(type) },
+            )
+        }
+    }
+}
+
+/**
+ * One brick you can press in.
+ *
+ * Drawn with [brickFace] rather than laid with pack art: these are labelled in
+ * words of wildly different lengths and the real bricks only come in 1, 2, 4
+ * and 6 studs, so a run of them would either clip or lie about its width.
+ *
+ * Pressed-in is the selected state, which is already what a chosen answer looks
+ * like in a question. A chip that lit up instead would be a second word for the
+ * same idea.
+ */
+@Composable
+private fun BrickChip(
+    label: String,
+    on: Boolean,
+    color: BrickColor?,
+    onClick: () -> Unit,
+) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    val lit = color?.let { Color(it.argb) } ?: MaterialTheme.colorScheme.secondaryContainer
+    // Unpressed, a category still carries a third of its colour. Without it the
+    // two rows are sixteen identical grey bricks and the whole point -- that
+    // the brick you press is the brick you are looking for further down -- only
+    // arrives after you have already found it.
+    val off = if (color != null) {
+        lerp(MaterialTheme.colorScheme.surfaceVariant, lit, 0.32f)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val bg by animateColorAsState(if (on) lit else off, label = "chipBg")
+    val down by animateFloatAsState(if (on) 1f else 0f, Motion.settle, label = "chipPress")
+
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelLarge,
+        // Against whatever the brick currently is, pressed or not.
+        color = Duo.inkOn(bg),
+        modifier = Modifier
+            .clip(Radius.chip)
+            .brickFace(bg, corner = 14.dp, studded = false, pressed = down, lip = 5.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+                feel.play(if (on) Feel.DESELECT else Feel.SELECT)
+                onClick()
+            }
+            .padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 13.dp),
+    )
 }
 
 /**
