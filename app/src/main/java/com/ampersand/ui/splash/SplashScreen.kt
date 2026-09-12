@@ -37,6 +37,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
+import com.ampersand.ui.brick.BrickMark
 import com.ampersand.ui.brick.BrickAtlas
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
@@ -133,53 +134,16 @@ fun SplashScreen(
             BuildingWall(you = you, them = them)
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val stud = StudSize
-                    val course = stud * Tile.h * BrickArt.ROW_RATIO
-                    val nub = stud * BrickArt.NUB_RATIO
-
-                    Canvas(Modifier.size(stud * Tile.w * 2, course * 2 + nub)) {
-                        val studPx = size.width / (Tile.w * 2f)
-                        val coursePx = studPx * Tile.h * BrickArt.ROW_RATIO
-                        val span = studPx * Tile.w
-
-                        // Offsets are in courses, so a brick starts five of its
-                        // own heights up and the two falls read as the same
-                        // speed regardless of screen size.
-                        drawBrickArt(
-                            atlas = atlas,
-                            asset = lower,
-                            studs = Tile.w,
-                            rows = Tile.h,
-                            left = span * 0.25f,
-                            bottom = size.height + lowerY.value * coursePx,
-                            studPx = studPx,
-                        )
-                        drawBrickArt(
-                            atlas = atlas,
-                            asset = upper,
-                            studs = Tile.w,
-                            rows = Tile.h,
-                            // Offset by a stud, so they land in running bond.
-                            left = span * 0.75f,
-                            bottom = size.height - coursePx + upperY.value * coursePx,
-                            studPx = studPx,
-                        )
-                    }
-
-                    Spacer(Modifier.height(28.dp))
-                    Text(
-                        text = "Click Clack",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontFamily = Wordmark,
-                            // The face is already heavy; letting the letters
-                            // touch is what makes it read as one moulded object
-                            // rather than as a word.
-                            letterSpacing = (-0.5).sp,
-                        ),
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = fade.value),
-                    )
-                }
+                BrickMark(
+                    you = you,
+                    them = them,
+                    upperCourses = upperY.value,
+                    lowerCourses = lowerY.value,
+                    // The words arrive after the bricks have, so the mark reads
+                    // as two objects landing and then being named rather than
+                    // as a logo dropped in whole.
+                    textAlpha = fade.value,
+                )
             }
         }
     }

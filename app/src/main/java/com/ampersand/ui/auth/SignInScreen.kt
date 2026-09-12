@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
+import com.ampersand.ui.brick.BrickMark
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.components.AmpButton
@@ -98,24 +99,10 @@ fun SignInScreen(
 /** The name, in the two colours it is named after. */
 @Composable
 private fun Wordmark() {
-    val you = BrickColor.RED
-    val them = BrickColor.BLUE
-    BrickSlab(
-        slugs = listOf(you.slug, them.slug),
-        studs = 12,
-        height = BrickHeight.MEDIUM,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = "Click Clack",
-            style = MaterialTheme.typography.displaySmall,
-            color = inkOnBricks(you.slug, them.slug),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp, bottom = 28.dp),
-        )
-    }
+    // The same mark as the splash, still. The two screens used to disagree
+    // about what the app was called: a falling pair of bricks on one and a
+    // twelve-stud slab with a line of type across it on the other.
+    BrickMark(you = BrickColor.RED, them = BrickColor.BLUE, stud = 38.dp)
 }
 
 @Preview(name = "Sign in", showBackground = true, heightDp = 760)
