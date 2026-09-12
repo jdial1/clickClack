@@ -100,7 +100,7 @@ who says "you two should talk about that" and then leaves.
 | Instead of | Say |
 |---|---|
 | "Waiting for partner…" | "Maya has not answered yet." |
-| "Congratulations! Streak extended 🎉" | "7 day streak" |
+| "Congratulations! Streak extended" plus a party popper | "7 day streak" |
 | "You're 84% compatible!" | "84% of guesses landed" |
 | "Tap to reveal your results!" | "Open it" |
 | "No entries found" | "Nothing sealed yet. Your first sculpture lands at the end of the week." |
@@ -124,6 +124,14 @@ Three more that follow:
 - **Never draw a brick from above.** Nothing else in the app is seen from above,
   so a top-down stud reads as a different object at every size. The 1-stud
   `BrickDot` replaced every drawn circle for exactly this reason.
+- **No emoji. Anywhere.** An emoji is somebody else's art direction rendered by
+  somebody else's font: it looks different on each phone the couple owns, it
+  cannot be tinted, and it will never match a brick. Where a picture genuinely
+  helps, use pack art -- Kenney's Emotes for the reactions, Game Icons for the
+  hit and miss marks. Where no honest icon exists, use none: twenty holidays
+  illustrated by whatever happened to be closest is worse than twenty named
+  plainly. A deck is identified by its brick colour, which is already the app's
+  identity system.
 - **Geometry comes from the art, not from a grid.** A stud is 64px and a brick
   row is 28px, so the cell is 64 × 28. Inventing a square grid and stretching
   the art onto it is the obvious move and it looks wrong.
