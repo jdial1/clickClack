@@ -54,6 +54,9 @@ import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.today.QuestionInput
 import com.ampersand.ui.today.rememberDraft
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import com.ampersand.model.ProgressFloor
 
 /**
  * Playing one deck: a question at a time, then the cross-answer chart.
@@ -117,31 +120,37 @@ private fun DeckPlayer(
     val mine = rememberDraft(question)
     val guess = rememberDraft(question)
 
-    Column(
-        modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
-    ) {
-        Spacer(Modifier.height(12.dp))
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val sounds = LocalSounds.current
-            val feel = LocalFeel.current
-            TextButton(
-                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+    // A deck is already one question a page. What it lacked was somewhere to
+    // look that stays put: the count and the progress row sat inside the scroll
+    // and left the screen the moment you reached the answer field, which is
+    // exactly when "how many left" becomes the question. Short decks keep it
+    // inline -- five questions is a thing you can hold in your head.
+    val sticky = quiz.size > ProgressFloor
+
+    Column(modifier.fillMaxSize()) {
+        if (sticky) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 10.dp, bottom = 12.dp),
             ) {
-                Text("Leave")
+                DeckHeader(quiz, index, you, onBack)
             }
-            SectionLabel("${index + 1} of ${quiz.size}")
         }
 
-        Spacer(Modifier.height(10.dp))
-        Progress(done = index, total = quiz.size, color = you)
+        Column(
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
+        ) {
+        if (!sticky) {
+            Spacer(Modifier.height(12.dp))
+            DeckHeader(quiz, index, you, onBack)
+        }
 
         Spacer(Modifier.height(20.dp))
         BrickSlab(
@@ -214,7 +223,30 @@ private fun DeckPlayer(
         }
 
         Spacer(Modifier.height(40.dp))
+        }
     }
+}
+
+/** The way out, the count, and the run of studs -- wherever it is put. */
+@Composable
+private fun DeckHeader(quiz: Quiz, index: Int, you: BrickColor, onBack: () -> Unit) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TextButton(
+            onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        ) {
+            Text("Leave")
+        }
+        SectionLabel("${index + 1} of ${quiz.size}", panel = false)
+    }
+    Spacer(Modifier.height(10.dp))
+    Progress(done = index, total = quiz.size, color = you)
 }
 
 /** Your side is in; theirs is not. The seal, applied to a whole deck. */

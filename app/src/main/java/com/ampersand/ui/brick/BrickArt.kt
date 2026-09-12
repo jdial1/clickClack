@@ -175,6 +175,15 @@ fun BrickDot(
     modifier: Modifier = Modifier,
     studSize: Dp = 14.dp,
     filled: Boolean = true,
+    /**
+     * What an unfilled marker fades to.
+     *
+     * 0.28 is right for a marker that is *absent* -- an unearned depth pip, a
+     * score that was not reached. It is too faint for one that is merely
+     * unchosen: a row of coloured stops has to still read as a ramp before
+     * anybody picks one, and yellow at 28% on a pale panel is not a colour.
+     */
+    dimAlpha: Float = 0.28f,
 ) {
     val asset = BrickArt.assetFor(slug, DotShape)
     val atlas = rememberBricks(listOf(asset))
@@ -188,7 +197,7 @@ fun BrickDot(
             left = 0f,
             bottom = size.height,
             studPx = size.width,
-            alpha = if (filled) 1f else 0.28f,
+            alpha = if (filled) 1f else dimAlpha,
         )
     }
 }

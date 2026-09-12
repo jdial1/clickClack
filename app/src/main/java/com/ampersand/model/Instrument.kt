@@ -151,12 +151,76 @@ data class Instrument(
 
     val shown: List<Subscale> get() = subscales.filterNot { it.id in hidden }
 
+    /**
+     * Whether this is long enough to be worth showing progress against.
+     *
+     * A form you can see all of at once does not need a header telling you how
+     * far down it you are; that is chrome on a thing with no distance in it.
+     */
+    val needsProgress: Boolean get() = length > ProgressFloor
+
+    /**
+     * The sitting, cut into pages.
+     *
+     * Thirty-two rated items on one scroll is a wall of identical rows with no
+     * landmark in it -- you cannot tell whether you are a third of the way down
+     * or two thirds, and there is nowhere to stop. Ten is long enough to be
+     * worth a page and short enough to see the end of from the top.
+     *
+     * A page never spans two passes. The stem changes between them ("what makes
+     * me feel loved" becomes "what I tend to do") and a page carrying half of
+     * each would be asking two different questions under one heading.
+     */
+    fun pages(perPage: Int = PageSize): List<InstrumentPage> {
+        require(perPage > 0) { "a page needs at least one item" }
+        val out = mutableListOf<InstrumentPage>()
+        passes.indices.forEach { pass ->
+            var from = 0
+            while (from < items.size) {
+                val end = minOf(from + perPage, items.size)
+                val base = pass * items.size
+                out += InstrumentPage(
+                    index = out.size,
+                    pass = pass,
+                    items = from..(end - 1),
+                    slots = (base + from)..(base + end - 1),
+                )
+                from = end
+            }
+        }
+        return out
+    }
+
     /** [responses] is the whole run; this slices out one pass. */
     fun readings(responses: List<Int>, pass: Int = 0): List<Reading> {
         val from = pass * items.size
         val slice = responses.drop(from).take(items.size)
         return subscales.map { Reading(it, it.scoreOf(slice), pass) }
     }
+}
+
+/** Ten. Long enough to be worth a page, short enough to see the end of. */
+const val PageSize = 10
+
+/** At or below this, a sitting is one screen and progress is noise on it. */
+const val ProgressFloor = 5
+
+/**
+ * One screenful of a sitting.
+ *
+ * [items] indexes into `Instrument.items` and so is relative to the pass;
+ * [slots] indexes into the flat response list, which runs every pass end to
+ * end. Both are carried because the UI needs the first to draw and the second
+ * to read and write, and deriving one from the other at each call site is how
+ * an off-by-one gets in.
+ */
+data class InstrumentPage(
+    val index: Int,
+    val pass: Int,
+    val items: IntRange,
+    val slots: IntRange,
+) {
+    val size: Int get() = items.count()
 }
 
 /** One subscale's number, once someone has answered. */

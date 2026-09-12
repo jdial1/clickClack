@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.ampersand.R
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Asset name to drawable id.
@@ -194,11 +195,28 @@ internal val BrickDrawables: Map<String, Int> = mapOf(
 typealias BrickAtlas = Map<String, ImageBitmap>
 
 /**
- * Decodes only the bricks a screen actually asks for.
+ * Every brick decoded so far, for the life of the process.
+ *
+ * The cache has to be per *asset*, not per caller. [rememberBricks] keys its
+ * `remember` on the set of names it was handed, which means a red twelve-stud
+ * slab and a blue one share nothing, and a screen holding eight slabs decoded
+ * eight overlapping sets from scratch -- synchronously, in composition, on the
+ * frame they first appeared. That is what put an ANR on the Us page: not the
+ * number of bricks, but the same PNGs being decoded over and over because no
+ * two callers asked for quite the same list.
+ *
+ * Bounded by the pack, which is 145 files. A session touches perhaps a third of
+ * them, and those are bitmaps the live composables were holding anyway -- this
+ * only stops them being held several times over.
+ */
+private val decoded = ConcurrentHashMap<String, ImageBitmap>()
+
+/**
+ * Decodes only the bricks a screen actually asks for, and only once ever.
  *
  * The pack is 145 files across five colourways. Decoding them all up front
  * would be roughly 14MB of bitmaps for a screen that shows a dozen, so the
- * caller passes the asset names it needs and they are cached against that set.
+ * caller passes the asset names it needs.
  */
 @Composable
 fun rememberBricks(names: Collection<String>): BrickAtlas {
@@ -206,10 +224,13 @@ fun rememberBricks(names: Collection<String>): BrickAtlas {
     val wanted = names.toSortedSet()
     return remember(wanted) {
         wanted.mapNotNull { name ->
+            val cached = decoded[name]
+            if (cached != null) return@mapNotNull name to cached
             val id = BrickDrawables[name] ?: return@mapNotNull null
             val bitmap = BitmapFactory.decodeResource(context.resources, id)
-                ?: return@mapNotNull null
-            name to bitmap.asImageBitmap()
+                ?.asImageBitmap() ?: return@mapNotNull null
+            decoded[name] = bitmap
+            name to bitmap
         }.toMap()
     }
 }

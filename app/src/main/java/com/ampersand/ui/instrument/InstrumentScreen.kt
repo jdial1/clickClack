@@ -52,6 +52,14 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Stud
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.ampersand.model.BrickHeight
+import com.ampersand.model.InstrumentPage
+import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.theme.Motion
 
 /**
  * One sitting with one whole instrument.
@@ -89,101 +97,126 @@ fun InstrumentScreen(
     val responses = remember(instrument.id) {
         mutableStateListOf<Int>().apply { repeat(instrument.length) { add(0) } }
     }
-    var pass by remember(instrument.id) { mutableStateOf(0) }
+    val pages = remember(instrument.id) { instrument.pages() }
+    var page by rememberSaveable(instrument.id) { mutableStateOf(0) }
+    val here = pages[page.coerceIn(pages.indices)]
 
-    val from = pass * instrument.items.size
-    val thisPass = responses.subList(from, from + instrument.items.size)
-    val done = thisPass.count { it > 0 }
-    val ready = done == instrument.items.size
-    val last = pass == instrument.passCount - 1
+    val pageDone = here.slots.count { responses[it] > 0 }
+    val ready = pageDone == here.size
+    val last = here.index == pages.lastIndex
+    val endsPass = last || pages[here.index + 1].pass != here.pass
+    val answered = responses.count { it > 0 }
 
-    Column(
-        modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
-    ) {
-        Spacer(Modifier.height(12.dp))
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TextButton(
-                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            ) { Text("Back") }
-            SectionLabel("$done of ${instrument.items.size}")
-        }
+    val scroll = rememberScrollState()
+    // Each page opens at its own top. Carrying the previous page's scroll into
+    // a fresh set of ten rows lands you in the middle of questions you have not
+    // seen, which reads as having skipped some.
+    LaunchedEffect(page) { scroll.scrollTo(0) }
 
-        Spacer(Modifier.height(14.dp))
-        Text(
-            text = instrument.passes[pass].ifBlank { instrument.title },
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = if (instrument.passCount > 1) {
-                "Round ${pass + 1} of ${instrument.passCount}. ${instrument.blurb}"
-            } else {
-                instrument.blurb
+    Column(modifier.fillMaxSize()) {
+        // Fixed, outside the scroll. The point of a progress header is that it
+        // is there while you are working, and one that scrolls off the top is
+        // only ever visible at the moment you did not need it.
+        StickyHeader(
+            instrument = instrument,
+            page = here,
+            pages = pages.size,
+            answered = answered,
+            pageDone = pageDone,
+            you = you,
+            onBack = {
+                sounds.play(Sfx.NAV)
+                feel.play(Feel.NAV)
+                // Back means the previous page while there is one. Leaving from
+                // page three and losing twenty answers is not what anybody
+                // reaching for that word intends.
+                if (here.index > 0) page-- else onBack()
             },
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        // Said once, at the top, rather than repeated under thirty-two rows.
-        // Two anchors and five identical bricks do not explain themselves: the
-        // ends are obvious and the middle is not, and on a pole pair the middle
-        // is the only stop with an instruction attached to it.
-        Spacer(Modifier.height(14.dp))
-        QuietNote(scaleNote(instrument))
+        Column(
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(scroll)
+                .padding(horizontal = 24.dp),
+        ) {
+            // Only where the framing actually changes: at the top of the
+            // sitting, and again when a second pass re-asks the same items
+            // under a different stem.
+            if (here.items.first == 0) {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = if (instrument.passCount > 1) {
+                        "Round ${here.pass + 1} of ${instrument.passCount}. ${instrument.blurb}"
+                    } else {
+                        instrument.blurb
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(14.dp))
+                QuietNote(scaleNote(instrument))
+            }
 
-        Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(18.dp))
 
-        instrument.items.forEachIndexed { i, item ->
-            ItemRow(
-                item = item,
-                value = thisPass[i],
-                accent = you,
-                onPick = { v ->
-                    sounds.play(Sfx.CLICK)
-                    feel.play(Feel.TICK)
-                    responses[from + i] = v
+            here.items.forEachIndexed { i, item ->
+                val slot = here.slots.first + i
+                ItemRow(
+                    item = instrument.items[item],
+                    value = responses[slot],
+                    accent = you,
+                    onPick = { v ->
+                        sounds.play(Sfx.CLICK)
+                        feel.play(Feel.TICK)
+                        responses[slot] = v
+                    },
+                )
+                if (i < here.size - 1) Spacer(Modifier.height(4.dp))
+            }
+
+            Spacer(Modifier.height(26.dp))
+            AmpButton(
+                label = when {
+                    last -> "Seal it"
+                    endsPass -> "Next round"
+                    else -> "Next"
+                },
+                slug = you.slug,
+                enabled = ready,
+                sfx = if (last) Sfx.SEAL else Sfx.PRESS,
+                feelOnClick = if (last) Feel.SEAL else Feel.PRESS,
+            ) {
+                if (last) onSeal(responses.toList()) else page++
+            }
+
+            Spacer(Modifier.height(12.dp))
+            QuietNote(
+                when {
+                    !ready -> "Every one of them, or the arithmetic behind it means nothing."
+                    last -> "Nothing opens until you have both finished."
+                    else -> "Answered. ${pages.size - here.index - 1} more to go."
                 },
             )
-            if (i < instrument.items.lastIndex) Spacer(Modifier.height(4.dp))
-        }
 
-        Spacer(Modifier.height(26.dp))
-        AmpButton(
-            label = if (last) "Seal it" else "Next round",
-            slug = you.slug,
-            enabled = ready,
-            sfx = if (last) Sfx.SEAL else Sfx.PRESS,
-            feelOnClick = if (last) Feel.SEAL else Feel.PRESS,
-        ) {
-            if (last) onSeal(responses.toList()) else pass++
-        }
+            // Only on the last page. A credit line under every page of a
+            // four-page sitting is the same sentence printed four times.
+            if (last) {
+                Sources[instrument.sourceId]?.let { source ->
+                    Spacer(Modifier.height(18.dp))
+                    Text(
+                        text = "${source.credit}. ${source.venue}. ${source.licence}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
 
-        Spacer(Modifier.height(12.dp))
-        QuietNote(
-            if (ready) "Nothing opens until you have both finished."
-            else "Every one of them, or the arithmetic behind it means nothing.",
-        )
-
-        Sources[instrument.sourceId]?.let { source ->
-            Spacer(Modifier.height(18.dp))
-            Text(
-                text = "${source.credit}. ${source.venue}.\n${source.licence}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Spacer(Modifier.height(40.dp))
         }
-        Spacer(Modifier.height(40.dp))
     }
 }
 
@@ -259,14 +292,14 @@ private fun ItemRow(
                         ) { onPick(stop) }
                         .padding(horizontal = 6.dp, vertical = 7.dp),
                 ) {
-                    // The quiet brick, not the neutral one: a `null` slug draws
-                    // the pack's near-white brick, which on a pale wall is an
-                    // invisible control. This is the same call the depth pips
-                    // and score markers make.
                     BrickDot(
-                        slug = if (value == stop) accent.slug else quietSlug(),
+                        slug = stopSlug(item, stop, value, accent),
                         studSize = Stud.small,
                         filled = value == stop,
+                        // A ramp has to be visible before it is chosen from --
+                        // that is the whole point of colouring it. A pole
+                        // pair's unchosen stops are just markers and stay faint.
+                        dimAlpha = if (item.isPolePair) 0.28f else 0.6f,
                     )
                 }
             }
@@ -287,6 +320,132 @@ private fun ItemRow(
         }
     }
 }
+
+/**
+ * The bar that does not scroll away.
+ *
+ * Three things, in the order you need them: the way out, where you are in the
+ * whole sitting, and what this page is even asking. The last matters most on a
+ * two-pass instrument, where the same twenty items come round again under a
+ * different stem -- answering round two while reading round one's heading
+ * would produce a valid-looking set of numbers that measures nothing.
+ *
+ * The studs are one per item on *this* page rather than on the whole sitting.
+ * Thirty-two studs across a phone is a texture, not a count, and the number
+ * beside it already carries the total. What the row is for is the near
+ * question: how many more before this page will let you on.
+ */
+@Composable
+private fun StickyHeader(
+    instrument: Instrument,
+    page: InstrumentPage,
+    pages: Int,
+    answered: Int,
+    pageDone: Int,
+    you: BrickColor,
+    onBack: () -> Unit,
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
+            .padding(horizontal = 24.dp)
+            .padding(top = 10.dp, bottom = 12.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextButton(
+                onClick = onBack,
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+            ) { Text(if (page.index > 0) "Back" else "Leave") }
+
+            if (instrument.needsProgress) {
+                SectionLabel("$answered of ${instrument.length}", panel = false)
+            }
+        }
+
+        Text(
+            text = instrument.passes[page.pass].ifBlank { instrument.title },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        if (instrument.needsProgress) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Page ${page.index + 1} of $pages",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            PageStuds(done = pageDone, of = page.size, you = you)
+        }
+    }
+}
+
+/**
+ * One stud per item on the page, lit as you answer.
+ *
+ * The same object the deck screen counts questions with, so a sitting and a
+ * deck report progress in the same language rather than each inventing one.
+ */
+@Composable
+private fun PageStuds(done: Int, of: Int, you: BrickColor) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        repeat(of) { i ->
+            val lit = i < done
+            // Glide, not a bouncy spring: an overshoot above 1.0 goes straight
+            // into drawImage as an alpha and is a documented trap in this repo.
+            val alpha by animateFloatAsState(
+                if (lit) 1f else 0.22f, Motion.glide, label = "pageStud",
+            )
+            BrickSlab(
+                slugs = listOf(you.slug),
+                studs = 1,
+                height = BrickHeight.LOW,
+                alpha = alpha,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/**
+ * What colour a stop is drawn in.
+ *
+ * On a statement the five stops are a ramp -- how much of this is you -- so
+ * they run cool to hot and stay coloured whether or not they are picked. A row
+ * of five identical grey bricks gives no clue which way it counts; a row that
+ * visibly warms from left to right explains the scale before anybody reads the
+ * anchors. `filled` does the rest: 28% for the four you did not choose, full
+ * for the one you did.
+ *
+ * The first stop is [quietSlug] rather than a palette colour because it means
+ * *none of this*, and because a fixed neutral is the pack's near-white brick,
+ * which vanishes on a pale panel. The remaining four are every colour the pack
+ * ships, in the only order that reads as increasing.
+ *
+ * A pole pair gets none of this. Its five stops are a position between two
+ * descriptions, not an amount, and the middle means half and half -- so warming
+ * toward one end would assert that one of the two is *more*, which is the one
+ * thing the item is careful not to say.
+ */
+@Composable
+private fun stopSlug(item: InstrumentItem, stop: Int, value: Int, accent: BrickColor): String? =
+    if (item.isPolePair) {
+        if (value == stop) accent.slug else quietSlug()
+    } else {
+        when (stop) {
+            1 -> quietSlug()
+            2 -> "blue"
+            3 -> "green"
+            4 -> "yellow"
+            else -> "red"
+        }
+    }
 
 /** How to read the five stops on this instrument, said once at the top. */
 private fun scaleNote(instrument: Instrument): String =
