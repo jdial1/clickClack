@@ -1,0 +1,71 @@
+{
+  "id": "everyday-who",
+  "title": "Who does what",
+  "theme": "EVERYDAY",
+  "blurb": "The washing up, the bins, and the split nobody writes down.",
+  "questions": [
+    {
+      "id": "ev1",
+      "text": "The washing up gets done:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Straight away",
+        "In the morning"
+      ]
+    },
+    {
+      "id": "ev2",
+      "text": "Which chore do I secretly not mind?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "ev3",
+      "text": "Which one of these is most likely to start an argument?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "The bins",
+        "Being late",
+        "Money",
+        "The thermostat"
+      ]
+    },
+    {
+      "id": "ev5",
+      "text": "Order these from most to least worth paying someone else to do.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Cleaning",
+        "Cooking",
+        "Laundry",
+        "Admin and forms"
+      ]
+    },
+    {
+      "id": "ev6",
+      "text": "How fairly is the invisible work split at the moment?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Down the middle"
+    },
+    {
+      "id": "ev11",
+      "text": "Which day of the week is hardest?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    }
+  ]
+}

@@ -107,6 +107,22 @@ data class BuildPlate(
      */
     val completedOn: LocalDate? = null,
 ) {
+    companion object {
+        /** Width in studs. A brick is up to 6 wide, so this fits two side by side. */
+        const val GRID_W = 12
+
+        /**
+         * Height in rows, at 4 rows to a tall brick.
+         *
+         * Deliberately far more than a fortnight of bricks can fill. The plate
+         * is the room the sculpture gets to grow into, and a board sized to the
+         * expected number of bricks makes every week end the same shape --
+         * spread wide along the floor, because there was nowhere else to go.
+         * Headroom is what lets a tower be a choice.
+         */
+        const val GRID_H = 28
+    }
+
     private val byId: Map<String, Block> get() = blocks.associateBy { it.id }
 
     fun block(id: String): Block? = byId[id]
@@ -253,8 +269,9 @@ object Rewards {
      * A brick for finishing a deck, sized by the share of your guesses that
      * landed.
      *
-     * A deck is ten questions rather than one, so it pays a taller brick than a
-     * day: the height says how much you did, the width says how well.
+     * A deck is five or six questions rather than one, so it pays a taller
+     * brick than a day: the height says how much you did, the width says how
+     * well.
      */
     fun forQuiz(
         result: QuizResult,

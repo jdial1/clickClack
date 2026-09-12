@@ -48,16 +48,17 @@ import com.ampersand.ui.today.rememberDraft
 /**
  * Playing one deck: a question at a time, then the cross-answer chart.
  *
- * One question per screen rather than a scrolling list. A deck is ten questions
- * each asked twice -- your answer and your guess at theirs -- and twenty inputs
- * on one page is a form to be endured. One at a time also means the answer you
- * just gave is off screen before you answer the next, which is the point: you
- * are supposed to say the first thing, not tune a set of responses against each
- * other.
+ * One question per screen rather than a scrolling list. A deck is five or six
+ * questions each asked twice -- your answer and your guess at theirs -- and a
+ * dozen inputs on one page is a form to be endured. One at a time also means
+ * the answer you just gave is off screen before you answer the next, which is
+ * the point: you are supposed to say the first thing, not tune a set of
+ * responses against each other.
  *
- * There is no back step. The seal already says answers cannot be edited after
- * submitting, and letting you revise question three while looking at question
- * four is the same thing in miniature.
+ * There is no back step *within* a deck, and the system back leaves the deck
+ * rather than rewinding it. The seal already says answers cannot be edited
+ * after submitting, and letting you revise question three while looking at
+ * question four is the same thing in miniature.
  */
 @Composable
 fun DeckScreen(

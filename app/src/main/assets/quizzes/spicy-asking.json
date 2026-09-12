@@ -1,0 +1,66 @@
+{
+  "id": "spicy-asking",
+  "title": "The asking part",
+  "theme": "SPICY",
+  "blurb": "Timing, nerve, and the thing you have not said yet.",
+  "questions": [
+    {
+      "id": "sx7",
+      "text": "When is the right time?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "First thing",
+        "Mid-morning",
+        "Afternoon",
+        "After dinner",
+        "Late",
+        "The middle of the night"
+      ]
+    },
+    {
+      "id": "sx8",
+      "text": "What is something you have wanted to ask for and have not?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "sx9",
+      "text": "Flirting over text is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Excellent",
+        "Excruciating"
+      ]
+    },
+    {
+      "id": "sx10",
+      "text": "How adventurous are you feeling these days?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Happy as we are",
+      "highLabel": "Try me"
+    },
+    {
+      "id": "sx11",
+      "text": "Pick the ones that genuinely set the mood.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "A clean room",
+        "A drink",
+        "Music",
+        "Nobody due home",
+        "Being told to stop working"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "sx12",
+      "text": "What did I find most attractive about you at the start?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

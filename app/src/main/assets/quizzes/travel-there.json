@@ -1,0 +1,64 @@
+{
+  "id": "travel-there",
+  "title": "Getting there and back",
+  "theme": "TRAVEL",
+  "blurb": "Packing, early flights, and the bit you look forward to at the end.",
+  "questions": [
+    {
+      "id": "tr5",
+      "text": "What is the bit you look forward to about coming home?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "tr7",
+      "text": "How much do I enjoy the travelling part itself?",
+      "type": "SCALE",
+      "depth": 1,
+      "lowLabel": "Endure it",
+      "highLabel": "Half the fun"
+    },
+    {
+      "id": "tr8",
+      "text": "Which month should we take the big one?",
+      "type": "DROPDOWN",
+      "depth": 1,
+      "options": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
+    },
+    {
+      "id": "tr9",
+      "text": "Packing is:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Days in advance",
+        "The night before"
+      ]
+    },
+    {
+      "id": "tr10",
+      "text": "Which of these would I refuse outright?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "A very early flight",
+        "A long drive",
+        "Camping",
+        "A group tour"
+      ]
+    }
+  ]
+}

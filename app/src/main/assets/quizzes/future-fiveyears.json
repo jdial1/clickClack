@@ -1,0 +1,70 @@
+{
+  "id": "future-fiveyears",
+  "title": "Five years out",
+  "theme": "FUTURE",
+  "blurb": "Where we live, what we do, and what you would regret skipping.",
+  "questions": [
+    {
+      "id": "fu1",
+      "text": "Order these by what should come first.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "Somewhere better to live",
+        "Money put away",
+        "More time off",
+        "Something learned properly"
+      ]
+    },
+    {
+      "id": "fu2",
+      "text": "Five years out, the bigger change is:",
+      "type": "THIS_OR_THAT",
+      "depth": 3,
+      "options": [
+        "Where we live",
+        "What we do all day"
+      ]
+    },
+    {
+      "id": "fu3",
+      "text": "Which would you regret not doing?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "Living somewhere else for a year",
+        "Starting something of our own",
+        "Taking a long break",
+        "Getting properly good at one thing"
+      ]
+    },
+    {
+      "id": "fu5",
+      "text": "How settled do you feel about where we are heading?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Not at all",
+      "highLabel": "Completely"
+    },
+    {
+      "id": "fu6",
+      "text": "When I picture us in ten years, what is the first thing I see?",
+      "type": "GUESS_ME",
+      "depth": 3
+    },
+    {
+      "id": "fu8",
+      "text": "Where should we be living in five years?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "Right here",
+        "Same town, bigger place",
+        "A city",
+        "The countryside",
+        "By the sea",
+        "Another country"
+      ]
+    }
+  ]
+}

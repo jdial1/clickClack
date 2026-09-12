@@ -1,0 +1,54 @@
+{
+  "id": "knowme-basics",
+  "title": "Do you know me",
+  "theme": "KNOW_ME",
+  "blurb": "The basics, and whether you actually have them right.",
+  "questions": [
+    {
+      "id": "km1",
+      "text": "What do I complain about most, that I would deny complaining about?",
+      "type": "GUESS_ME",
+      "depth": 2
+    },
+    {
+      "id": "km2",
+      "text": "Which of these would ruin my day fastest?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "options": [
+        "Being late",
+        "Being interrupted",
+        "Being cold",
+        "Being hungry"
+      ]
+    },
+    {
+      "id": "km3",
+      "text": "In an argument I go:",
+      "type": "THIS_OR_THAT",
+      "depth": 2,
+      "options": [
+        "Quiet",
+        "Loud"
+      ]
+    },
+    {
+      "id": "km5",
+      "text": "Order these by how much I need them.",
+      "type": "RANK",
+      "depth": 2,
+      "options": [
+        "Time on my own",
+        "Being told I did well",
+        "Being left to do it my way",
+        "Someone to talk it through with"
+      ]
+    },
+    {
+      "id": "km10",
+      "text": "Describe me to someone who has never met me, in one sentence.",
+      "type": "REFLECT",
+      "depth": 3
+    }
+  ]
+}

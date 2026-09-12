@@ -243,8 +243,8 @@ object MockCouple {
 
     /** A sculpture is a week. Short enough that you finish one and start again. */
     const val PeriodDays = 7
-    private const val GridW = 12
-    private const val GridH = 14
+    private const val GridW = BuildPlate.GRID_W
+    private const val GridH = BuildPlate.GRID_H
 
 
     /** Today starts unanswered, so the app opens on the state worth designing. */
@@ -538,27 +538,27 @@ object MockCouple {
     fun runs(): List<QuizRun> = listOf(
         // Maya has played this one and is waiting on you.
         QuizRun(
-            quizId = "food",
+            quizId = "food-dinner",
             uid = them.uid,
             answers = mapOf("fd2" to listOf("Takeaway on the sofa"), "fd3" to listOf("Ramen")),
             guesses = mapOf("fd2" to listOf("Cook it together"), "fd3" to listOf("Ramen")),
         ),
         // You have played this one; nothing opens until she does.
         QuizRun(
-            quizId = "travel",
+            quizId = "travel-where",
             uid = you.uid,
             answers = mapOf("tr2" to listOf("Decide at breakfast")),
             guesses = mapOf("tr2" to listOf("Plan every day")),
         ),
         // Both in: there is a result sitting in this one.
         QuizRun(
-            quizId = "playful",
+            quizId = "playful-fast",
             uid = you.uid,
             answers = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Coffee")),
             guesses = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("Coffee")),
         ),
         QuizRun(
-            quizId = "playful",
+            quizId = "playful-fast",
             uid = them.uid,
             answers = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("My phone")),
             guesses = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Sitting down")),

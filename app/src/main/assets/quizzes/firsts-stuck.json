@@ -1,0 +1,54 @@
+{
+  "id": "firsts-stuck",
+  "title": "What stuck",
+  "theme": "KNOW_ME",
+  "blurb": "The bits that turned into habits.",
+  "questions": [
+    {
+      "id": "fs6",
+      "text": "Order these by how often I bring them up.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "How we met",
+        "A holiday",
+        "Something you said once",
+        "An old job"
+      ]
+    },
+    {
+      "id": "fs7",
+      "text": "How much do I look back, honestly?",
+      "type": "SCALE",
+      "depth": 2,
+      "lowLabel": "Never",
+      "highLabel": "Constantly"
+    },
+    {
+      "id": "fs8",
+      "text": "Which year has been the best one so far?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "The first one",
+        "The second",
+        "The third",
+        "A later one",
+        "This one",
+        "Still coming"
+      ]
+    },
+    {
+      "id": "fs9",
+      "text": "Which small ritual of ours would you miss most?",
+      "type": "REFLECT",
+      "depth": 2
+    },
+    {
+      "id": "fs10",
+      "text": "What is the first thing you would tell someone about me?",
+      "type": "GUESS_ME",
+      "depth": 2
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "playful-fast",
+  "title": "Not serious",
+  "theme": "PLAYFUL",
+  "blurb": "Nothing here matters. Answer fast.",
+  "questions": [
+    {
+      "id": "pl1",
+      "text": "If I had to win a competition tomorrow, what would I pick?",
+      "type": "GUESS_ME",
+      "depth": 1
+    },
+    {
+      "id": "pl2",
+      "text": "Which would I survive longest without?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "options": [
+        "My phone",
+        "Coffee",
+        "Music",
+        "Sitting down"
+      ]
+    },
+    {
+      "id": "pl3",
+      "text": "Superpower:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "options": [
+        "Fly",
+        "Be invisible"
+      ]
+    },
+    {
+      "id": "pl4",
+      "text": "Pick the ones I would genuinely enjoy.",
+      "type": "MULTI_SELECT",
+      "depth": 1,
+      "options": [
+        "Karaoke",
+        "A pub quiz",
+        "A very long walk",
+        "Board games",
+        "Doing absolutely nothing"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "pl5",
+      "text": "Order these by how badly I would do at them.",
+      "type": "RANK",
+      "depth": 1,
+      "options": [
+        "Dancing",
+        "Keeping a secret",
+        "Parallel parking",
+        "Small talk with strangers"
+      ]
+    },
+    {
+      "id": "pl10",
+      "text": "What would you put on a t-shirt to embarrass me?",
+      "type": "REFLECT",
+      "depth": 1
+    }
+  ]
+}

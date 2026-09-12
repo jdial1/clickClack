@@ -1,0 +1,60 @@
+{
+  "id": "deep-needed",
+  "title": "What you needed",
+  "theme": "DEEP",
+  "blurb": "The week you had, and the part of it you did not mention.",
+  "questions": [
+    {
+      "id": "dp1",
+      "text": "What did you need this week that you did not ask for?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "dp3",
+      "text": "When I go quiet, what is usually going on?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "I am working something out",
+        "I am tired",
+        "I am upset with you",
+        "Nothing at all"
+      ]
+    },
+    {
+      "id": "dp5",
+      "text": "Order these by what you need most right now.",
+      "type": "RANK",
+      "depth": 3,
+      "options": [
+        "To be listened to",
+        "To be left alone",
+        "To be helped",
+        "To be told it is fine"
+      ]
+    },
+    {
+      "id": "dp6",
+      "text": "How close have you felt to me this month?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Distant",
+      "highLabel": "Very close"
+    },
+    {
+      "id": "dp11",
+      "text": "Pick what you would want from me on a genuinely bad day.",
+      "type": "MULTI_SELECT",
+      "depth": 3,
+      "options": [
+        "Be left alone",
+        "Be sat with",
+        "Be fed",
+        "Be told it will pass",
+        "Be taken out of the house"
+      ],
+      "maxChoices": 2
+    }
+  ]
+}

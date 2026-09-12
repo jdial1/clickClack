@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -379,6 +380,21 @@ private fun SignedInApp(
         // the screen re-resolves it and a deck that gains a question mid-play
         // does not leave a stale copy on screen.
         var openDeck by remember { mutableStateOf<String?>(null) }
+
+        // Back walks back through the app rather than out of it.
+        //
+        // Everything here is one composable swapping its contents, so there was
+        // no back stack for the system to pop: a press from four screens deep
+        // closed the app. Out of a deck or a reveal first, then off whichever
+        // tab you are on, and only from Today does the press fall through and
+        // leave -- which is where leaving should mean leaving.
+        BackHandler(enabled = openDeck != null || openDate != null || tab != Tab.TODAY) {
+            when {
+                openDeck != null -> openDeck = null
+                openDate != null -> openDate = null
+                else -> tab = Tab.TODAY
+            }
+        }
 
         Surface(color = MaterialTheme.colorScheme.background) {
             Scaffold(

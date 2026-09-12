@@ -1,0 +1,72 @@
+{
+  "id": "future-postponed",
+  "title": "The one we keep postponing",
+  "theme": "FUTURE",
+  "blurb": "The decision that never quite makes it to a Tuesday.",
+  "questions": [
+    {
+      "id": "fu4",
+      "text": "Pick what would make next year a good one.",
+      "type": "MULTI_SELECT",
+      "depth": 2,
+      "options": [
+        "A trip somewhere new",
+        "Moving",
+        "More time with friends",
+        "Getting fit",
+        "Less work"
+      ],
+      "maxChoices": 3
+    },
+    {
+      "id": "fu7",
+      "text": "What would you want said about the two of us, later?",
+      "type": "REFLECT",
+      "depth": 3
+    },
+    {
+      "id": "fu9",
+      "text": "Money, honestly:",
+      "type": "THIS_OR_THAT",
+      "depth": 3,
+      "options": [
+        "Spend it now",
+        "Put it away"
+      ]
+    },
+    {
+      "id": "fu10",
+      "text": "What is the decision we keep postponing?",
+      "type": "PICK_ONE",
+      "depth": 3,
+      "options": [
+        "Where to live",
+        "Work",
+        "Family",
+        "Nothing, we are fine"
+      ]
+    },
+    {
+      "id": "fu11",
+      "text": "Which season should we plan the big change for?",
+      "type": "DROPDOWN",
+      "depth": 2,
+      "options": [
+        "This spring",
+        "This summer",
+        "This autumn",
+        "This winter",
+        "Next year",
+        "When it happens"
+      ]
+    },
+    {
+      "id": "fu12",
+      "text": "How much do you want things to stay roughly as they are?",
+      "type": "SCALE",
+      "depth": 3,
+      "lowLabel": "Change it all",
+      "highLabel": "Do not touch it"
+    }
+  ]
+}

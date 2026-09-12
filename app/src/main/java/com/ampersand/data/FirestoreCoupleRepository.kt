@@ -450,8 +450,8 @@ class FirestoreCoupleRepository(
         id = "plate_${from}",
         startedOn = from,
         periodDays = PeriodDays,
-        gridW = 12,
-        gridH = 14,
+        gridW = BuildPlate.GRID_W,
+        gridH = BuildPlate.GRID_H,
     )
 }
 
@@ -514,8 +514,8 @@ private fun DocumentSnapshot.toPlate(): BuildPlate? {
         id = id,
         startedOn = started,
         periodDays = (getLong("periodDays") ?: 7L).toInt(),
-        gridW = (getLong("gridW") ?: 12L).toInt(),
-        gridH = (getLong("gridH") ?: 14L).toInt(),
+        gridW = (getLong("gridW") ?: BuildPlate.GRID_W.toLong()).toInt(),
+        gridH = (getLong("gridH") ?: BuildPlate.GRID_H.toLong()).toInt(),
         blocks = blocks,
         placed = placed,
         completedOn = getString("completedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
