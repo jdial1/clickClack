@@ -33,6 +33,16 @@ private const val KEY_PARTNER = "partnerName"
  * Stored per device in SharedPreferences rather than on the couple. It is a
  * property of the phone in your pocket, not a fact about the pair: you and your
  * partner should be able to want reminding at different times, or not at all.
+ *
+ * To watch one land, move the clock rather than sending the broadcast: the
+ * receiver is not exported, so `adb shell am broadcast` is dropped in silence
+ * and looks exactly like a reminder that decided it had nothing to say.
+ *
+ * ```
+ * adb shell cmd alarm set-time <millis just before the chosen hour>
+ * adb shell dumpsys notification --noredact | grep -A20 ampersand
+ * adb shell settings put global auto_time 1
+ * ```
  */
 object Reminder {
 
