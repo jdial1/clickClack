@@ -1,6 +1,7 @@
 package com.ampersand.ui.splash
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -17,9 +18,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,31 +31,37 @@ import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 private val Tile = BrickShape(2, BrickHeight.MEDIUM)
 private const val StudSize = 46
 
+/** Accelerating, because things fall faster the longer they have been falling. */
+private val Gravity = CubicBezierEasing(0.5f, 0f, 1f, 0.5f)
+
+/** How far above its resting place a brick starts, as a fraction of the drop. */
+private const val DropFrom = -5f
+
 /**
- * Two bricks arriving from opposite sides and locking together.
+ * Two bricks dropped from above, landing one on the other.
  *
- * The launcher icon, animated, and the name acted out rather than typed: one
- * brick comes in and lands -- *click* -- and the second lands on it -- *clack*.
- * The sounds are fired by the animation rather than played as a fixed cue, so
- * each one hits on contact and not a frame either side of it.
+ * The name, acted out: the first brick hits the ground -- *click* -- and the
+ * second lands on top of it -- *clack*.
  *
- * Each brick settles on a spring with a little bounce, because a brick dropped
- * onto another brick does not stop dead, and the overshoot is most of what
- * sells it as a physical object rather than a fading graphic.
+ * The fall is a tween on an accelerating curve rather than a spring, because a
+ * spring is symmetrical and a falling object is not: it should arrive fast and
+ * stop dead. Stopping dead is also what lets the sound be exact. Each clip is
+ * fired the instant its `animateTo` returns, which is the frame of contact, so
+ * the audio cannot drift out of step with the picture the way a fixed cue does.
  *
- * [onDone] fires once the pair has settled. It is read through
- * [rememberUpdatedState] so the sequence, which outlives a recomposition, calls
- * the current one rather than the one captured when it started.
+ * The small recoil afterwards is the only springy part. A brick landing on a
+ * brick does bounce a little, and without it the whole thing reads as a graphic
+ * sliding into place rather than an object arriving.
  */
 @Composable
 fun SplashScreen(
@@ -66,8 +73,9 @@ fun SplashScreen(
     val sounds = LocalSounds.current
     val finish by rememberUpdatedState(onDone)
 
-    val bottom = remember { Animatable(-1.6f) }
-    val top = remember { Animatable(1.6f) }
+    // 0 is resting; negative is above it.
+    val lowerY = remember { Animatable(DropFrom) }
+    val upperY = remember { Animatable(DropFrom) }
     val fade = remember { Animatable(0f) }
 
     val lower = them.asset(Tile)
@@ -75,67 +83,69 @@ fun SplashScreen(
     val atlas = rememberBricks(listOf(lower, upper))
 
     LaunchedEffect(Unit) {
-        launch {
-            bottom.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow))
-        }
-        // The gap between the two arrivals *is* the gap between the two sounds.
-        // Tuned together: much shorter and the pair fuses into one thud.
-        delay(120)
+        delay(180)
+
+        lowerY.animateTo(0f, tween(420, easing = Gravity))
         sounds.play(Sfx.CLICK)
+        lowerY.animateTo(-0.10f, tween(80))
+        lowerY.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh))
 
-        delay(130)
-        launch {
-            top.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow))
-        }
-        delay(120)
+        upperY.animateTo(0f, tween(380, easing = Gravity))
         sounds.play(Sfx.CLACK)
+        upperY.animateTo(-0.09f, tween(75))
+        upperY.animateTo(0f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessHigh))
 
-        fade.animateTo(1f, tween(320, easing = FastOutSlowInEasing))
-        delay(420)
+        fade.animateTo(1f, tween(300, easing = FastOutSlowInEasing))
+        delay(380)
         finish()
     }
 
     Surface(color = MaterialTheme.colorScheme.background) {
-        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val stud = StudSize.dp
-                val course = stud * Tile.h * BrickArt.ROW_RATIO
-                val nub = stud * BrickArt.NUB_RATIO
+        Box(modifier.fillMaxSize()) {
+            BrickWall(you = you, them = them, alpha = 0.10f)
 
-                Canvas(Modifier.size(stud * Tile.w * 2, course * 2 + nub)) {
-                    val studPx = size.width / (Tile.w * 2f)
-                    val coursePx = studPx * Tile.h * BrickArt.ROW_RATIO
-                    val nubPx = studPx * BrickArt.NUB_RATIO
-                    val span = studPx * Tile.w
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    val stud = StudSize.dp
+                    val course = stud * Tile.h * BrickArt.ROW_RATIO
+                    val nub = stud * BrickArt.NUB_RATIO
 
-                    // Lower brick, in from the left; upper brick, in from the
-                    // right and offset a stud, so they land in running bond.
-                    drawBrickArt(
-                        atlas = atlas,
-                        asset = lower,
-                        studs = Tile.w,
-                        rows = Tile.h,
-                        left = bottom.value * size.width,
-                        bottom = size.height,
-                        studPx = studPx,
-                    )
-                    drawBrickArt(
-                        atlas = atlas,
-                        asset = upper,
-                        studs = Tile.w,
-                        rows = Tile.h,
-                        left = span * 0.5f + top.value * size.width,
-                        bottom = size.height - coursePx,
-                        studPx = studPx,
+                    Canvas(Modifier.size(stud * Tile.w * 2, course * 2 + nub)) {
+                        val studPx = size.width / (Tile.w * 2f)
+                        val coursePx = studPx * Tile.h * BrickArt.ROW_RATIO
+                        val span = studPx * Tile.w
+
+                        // Offsets are in courses, so a brick starts five of its
+                        // own heights up and the two falls read as the same
+                        // speed regardless of screen size.
+                        drawBrickArt(
+                            atlas = atlas,
+                            asset = lower,
+                            studs = Tile.w,
+                            rows = Tile.h,
+                            left = span * 0.25f,
+                            bottom = size.height + lowerY.value * coursePx,
+                            studPx = studPx,
+                        )
+                        drawBrickArt(
+                            atlas = atlas,
+                            asset = upper,
+                            studs = Tile.w,
+                            rows = Tile.h,
+                            // Offset by a stud, so they land in running bond.
+                            left = span * 0.75f,
+                            bottom = size.height - coursePx + upperY.value * coursePx,
+                            studPx = studPx,
+                        )
+                    }
+
+                    Spacer(Modifier.height(28.dp))
+                    Text(
+                        text = "Click Clack",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = fade.value),
                     )
                 }
-
-                Spacer(Modifier.height(28.dp))
-                Text(
-                    text = "Click Clack",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = fade.value),
-                )
             }
         }
     }

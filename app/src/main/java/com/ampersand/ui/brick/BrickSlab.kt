@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.Layout
 import com.ampersand.model.BrickHeight
@@ -32,6 +34,29 @@ fun inkOnBrick(slug: String?): Color =
  */
 fun inkOnBricks(a: String?, b: String?): Color =
     if (inkOnBrick(a) == Color.White && inkOnBrick(b) == Color.White) Color.White else DarkInk
+
+/**
+ * The brick that reads as *quiet* against the current ground.
+ *
+ * The pack's neutral brick is `#DBDBDB`, so a marker drawn in it disappears
+ * against a pale background and reads perfectly on a dark one. Black is the
+ * exact opposite. Neither is "the neutral brick" in any absolute sense, and
+ * hard-coding either is why depth pips, score pips and list bullets all
+ * vanished in light mode.
+ */
+@Composable
+fun quietSlug(): String? =
+    if (MaterialTheme.colorScheme.background.luminance() < 0.5f) null else "black"
+
+/**
+ * The brick that reads as *structure* against the current ground: the inverse.
+ *
+ * Used for the nav bar joiners, which have to separate the tabs rather than
+ * recede into the wall behind them.
+ */
+@Composable
+fun structureSlug(): String? =
+    if (MaterialTheme.colorScheme.background.luminance() < 0.5f) "black" else null
 
 /**
  * A wide surface built out of real bricks.

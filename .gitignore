@@ -13,3 +13,5 @@ google-services.json
 
 # The testing build, rebuilt on demand.
 clickclack-debug.apk
+
+clickclack.apk

@@ -31,6 +31,7 @@ import com.ampersand.model.CoupleState
 import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.ColorChip
@@ -276,7 +277,7 @@ private fun Upcoming(title: String, detail: String) {
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        BrickDot(slug = null, studSize = 13.dp, modifier = Modifier.padding(top = 3.dp))
+        BrickDot(slug = quietSlug(), studSize = 13.dp, modifier = Modifier.padding(top = 3.dp))
         Spacer(Modifier.size(14.dp))
         Column {
             Text(title, style = MaterialTheme.typography.titleSmall)

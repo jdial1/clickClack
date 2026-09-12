@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.Dp
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.BrickTile
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
@@ -643,10 +644,19 @@ fun AmpButton(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
 
+    // Disabled is a real brick, and the *quiet* brick for whichever ground it
+    // sits on: black on navy, neutral on a pale background. Two wrong answers
+    // were tried first. A faded slab became a ghost that bled into the control
+    // above it. A neutral brick in both themes made the disabled button the
+    // brightest thing on a dark screen.
+    //
+    // The label is drawn at full opacity, not faded. Fading it is what produces
+    // grey text on a black brick, and the brick is already saying the control is
+    // off -- the words do not have to be hard to read as well.
+    val offSlug = structureSlug()
+
     BrickSlab(
-        // Disabled is a black brick, not a faded pale one: at low alpha the
-        // slab turned into a ghost that bled into the control above it.
-        slugs = listOf(if (enabled) slug else "black"),
+        slugs = listOf(if (enabled) slug else offSlug),
         studs = 12,
         height = BrickHeight.HIGH,
         alpha = if (pressed) 0.82f else 1f,
@@ -661,7 +671,7 @@ fun AmpButton(
         Text(
             label,
             style = MaterialTheme.typography.titleMedium,
-            color = if (enabled) inkOnBrick(slug) else Color.White.copy(alpha = 0.4f),
+            color = inkOnBrick(if (enabled) slug else offSlug),
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(top = 14.dp, bottom = 22.dp),

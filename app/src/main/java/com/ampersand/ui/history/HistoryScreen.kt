@@ -46,6 +46,7 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.Sculpture
 import com.ampersand.ui.brick.drawBrickArt
@@ -378,7 +379,7 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
         if (score != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 repeat(2) { i ->
-                    BrickDot(slug = null, studSize = 12.dp, filled = i < score)
+                    BrickDot(slug = quietSlug(), studSize = 12.dp, filled = i < score)
                 }
             }
         }

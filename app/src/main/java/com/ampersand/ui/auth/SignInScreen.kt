@@ -1,6 +1,7 @@
 package com.ampersand.ui.auth
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +23,21 @@ import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 
 /**
  * The only screen you can reach signed out.
  *
- * Deliberately almost empty. There is nothing to explore before you are in, no
- * feature tour and no carousel: the app is one question a day for two people,
- * and it cannot say anything at all until it knows which two.
+ * Sits on the same brick wall as the rest of the app. Without it this was a
+ * wordmark floating in an empty field, which reads as a placeholder rather than
+ * the front of something -- and in light mode, where the ground is pale rather
+ * than deep navy, there was nothing on screen at all between the button and the
+ * bottom edge.
+ *
+ * One sentence of copy, not two. There is nothing to explore before you are in,
+ * and the seal is the only thing worth saying up front.
  *
  * The wordmark is laid in brick, one colour each, because that is the product
  * in one image -- and it is the same two pieces as the launcher icon, so the
@@ -43,8 +50,11 @@ fun SignInScreen(
     onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
+    Box(modifier.fillMaxSize()) {
+      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
+
+      Column(
+        Modifier
             .fillMaxSize()
             .systemBarsPadding()
             .padding(horizontal = 28.dp),
@@ -53,15 +63,15 @@ fun SignInScreen(
     ) {
         Wordmark()
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(22.dp))
         Text(
-            text = "A question a day, for two people.\nNeither answer opens until both are in.",
+            text = "Neither answer opens until both are in.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
 
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(36.dp))
         AmpButton(
             label = if (busy) "Signing in" else "Continue with Google",
             slug = BrickColor.RED.slug,
@@ -79,8 +89,9 @@ fun SignInScreen(
             )
         }
 
-        Spacer(Modifier.height(24.dp))
-        SectionLabel("Your answers are visible to one person")
+        Spacer(Modifier.height(20.dp))
+        SectionLabel("One question a day, for two people")
+      }
     }
 }
 
@@ -110,6 +121,14 @@ private fun Wordmark() {
 @Preview(name = "Sign in", showBackground = true, heightDp = 760)
 @Composable
 private fun PreviewSignIn() = AmpersandTheme {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        SignInScreen(busy = false, error = null, onSignIn = {})
+    }
+}
+
+@Preview(name = "Sign in - light", showBackground = true, heightDp = 760)
+@Composable
+private fun PreviewSignInLight() = AmpersandTheme(darkTheme = false) {
     Surface(color = MaterialTheme.colorScheme.background) {
         SignInScreen(busy = false, error = null, onSignIn = {})
     }

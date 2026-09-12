@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ampersand.model.Depth
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.theme.Duo
 
 /** Small, letter-spaced, uppercase. Used for every section heading in the app. */
@@ -52,7 +53,7 @@ fun DepthDots(depth: Depth, modifier: Modifier = Modifier, tint: Color? = null) 
     // would disappear into the background it is drawn on.
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         repeat(3) { i ->
-            BrickDot(slug = null, studSize = 13.dp, filled = i < depth.level)
+            BrickDot(slug = quietSlug(), studSize = 13.dp, filled = i < depth.level)
         }
     }
 }

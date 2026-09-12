@@ -32,7 +32,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 plus resource shrinking. Worth doing before shipping anything:
+            // a debug APK of this project is ~19MB and **92% of that is dex**,
+            // not art -- Firebase, Firestore, Play Services and Compose, none
+            // of it shrunk. The brick pack is under 100KB.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            // Debug-signed on purpose: this is a build for testing on real
+            // phones, and the debug key is the one registered with Firebase.
+            // A release key would need its own SHA-1 adding before Google
+            // sign-in would work at all.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

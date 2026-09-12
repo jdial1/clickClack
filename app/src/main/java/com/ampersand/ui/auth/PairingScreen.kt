@@ -1,6 +1,7 @@
 package com.ampersand.ui.auth
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
@@ -40,8 +42,12 @@ import com.ampersand.ui.theme.AmpersandTheme
  * Signed in, but on your own.
  *
  * Both directions on one screen, because there is no way for the app to know
- * which of you will move first and asking ("do you have a code?") is a question
- * neither person can answer until one of them has acted.
+ * which of you will move first, and asking ("do you have a code?") is a
+ * question neither person can answer until one of them has acted.
+ *
+ * On the same brick wall as everything else. A pale empty screen with two
+ * controls stranded at the top reads as unfinished, and in light mode there was
+ * nothing at all below the button.
  */
 @Composable
 fun PairingScreen(
@@ -55,8 +61,11 @@ fun PairingScreen(
 ) {
     var entered by remember { mutableStateOf("") }
 
-    Column(
-        modifier
+    Box(modifier.fillMaxSize()) {
+      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
+
+      Column(
+        Modifier
             // fillMaxSize, not fillMaxWidth: a scrolling column sized to its
             // content leaves the window background showing below it, as a hard
             // horizontal edge across the screen.
@@ -65,22 +74,23 @@ fun PairingScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(32.dp))
         Text(
             text = "Hello $name.",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         Text(
-            text = "Click Clack needs two people. Pair with yours to start.",
+            text = "Click Clack takes two.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
 
-        Spacer(Modifier.height(36.dp))
+        Spacer(Modifier.height(30.dp))
         SectionLabel("Invite them")
         Spacer(Modifier.height(12.dp))
 
@@ -93,18 +103,20 @@ fun PairingScreen(
             )
         } else {
             CodePlate(code)
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             Text(
-                text = "Read it to them, or send it. It works once.",
+                // The expiry is the useful half. "It works once" is a rule you
+                // find out by trying; an hour is a thing you can plan around.
+                text = "Works once, for an hour.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }
 
-        Spacer(Modifier.height(36.dp))
+        Spacer(Modifier.height(30.dp))
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(24.dp))
 
         SectionLabel("Or type theirs")
         Spacer(Modifier.height(12.dp))
@@ -132,7 +144,8 @@ fun PairingScreen(
             )
         }
 
-        Spacer(Modifier.height(48.dp))
+        Spacer(Modifier.height(32.dp))
+      }
     }
 }
 
@@ -180,6 +193,14 @@ private fun PreviewPairing() = AmpersandTheme {
 private fun PreviewPairingCode() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
         PairingScreen("Justin", "KX7PQ4MB", false, null, {}, {})
+    }
+}
+
+@Preview(name = "Pairing - light", showBackground = true, heightDp = 900)
+@Composable
+private fun PreviewPairingLight() = AmpersandTheme(darkTheme = false) {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        PairingScreen("J D", "Y6CTDU6X", false, null, {}, {})
     }
 }
 

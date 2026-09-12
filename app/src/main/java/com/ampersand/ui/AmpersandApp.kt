@@ -68,6 +68,7 @@ import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
+import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.build.BuildScreen
 import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
@@ -145,9 +146,6 @@ class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
         }
     }
 }
-
-/** The pack has no "black" in [BrickColor]; it is structure, not a choice. */
-private const val JoinerSlug = "black"
 
 private enum class Tab(val label: String) {
     TODAY("Today"),
@@ -476,7 +474,10 @@ private fun BottomBar(
     val sounds = LocalSounds.current
     val tabShape = BrickShape(2, BrickHeight.MEDIUM)
     val joinShape = BrickShape(1, BrickHeight.MEDIUM)
-    val joinAsset = BrickArt.assetFor(JoinerSlug, joinShape)
+    // Structure, not a choice -- and which brick counts as structure depends on
+    // the ground. Black joins the bar on navy and punches holes in it on a pale
+    // one, where the neutral brick does the same job.
+    val joinAsset = BrickArt.assetFor(structureSlug(), joinShape)
     val atlas = rememberBricks(listOf(color.asset(tabShape), joinAsset))
 
     BoxWithConstraints(

@@ -41,6 +41,7 @@ import com.ampersand.ui.components.PartnerReaction
 import com.ampersand.ui.components.PersonDot
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
@@ -226,7 +227,7 @@ private fun HitBadge(hit: Boolean) {
 private fun ScoreBanner(score: Int) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         repeat(2) { i ->
-            BrickDot(slug = null, studSize = 14.dp, filled = i < score)
+            BrickDot(slug = quietSlug(), studSize = 14.dp, filled = i < score)
             Spacer(Modifier.size(6.dp))
         }
         Spacer(Modifier.size(4.dp))
