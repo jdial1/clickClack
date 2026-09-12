@@ -14,6 +14,7 @@ import com.ampersand.model.Depth
 import com.ampersand.model.Member
 import com.ampersand.model.Placement
 import com.ampersand.model.Question
+import com.ampersand.model.QuizRun
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
 import java.time.LocalDate
@@ -525,6 +526,45 @@ object MockCouple {
         return best
     }
 
+    /**
+     * Deck runs in three different states, so the grouped list has something to
+     * group. All-unplayed is the one arrangement that makes the sections look
+     * like they do nothing.
+     *
+     * Question ids match the real deck files, because the result is built by
+     * pairing runs against the loaded quiz -- ids that do not exist would score
+     * a confident zero.
+     */
+    fun runs(): List<QuizRun> = listOf(
+        // Maya has played this one and is waiting on you.
+        QuizRun(
+            quizId = "food",
+            uid = them.uid,
+            answers = mapOf("fd2" to listOf("Takeaway on the sofa"), "fd3" to listOf("Ramen")),
+            guesses = mapOf("fd2" to listOf("Cook it together"), "fd3" to listOf("Ramen")),
+        ),
+        // You have played this one; nothing opens until she does.
+        QuizRun(
+            quizId = "travel",
+            uid = you.uid,
+            answers = mapOf("tr2" to listOf("Decide at breakfast")),
+            guesses = mapOf("tr2" to listOf("Plan every day")),
+        ),
+        // Both in: there is a result sitting in this one.
+        QuizRun(
+            quizId = "playful",
+            uid = you.uid,
+            answers = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Coffee")),
+            guesses = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("Coffee")),
+        ),
+        QuizRun(
+            quizId = "playful",
+            uid = them.uid,
+            answers = mapOf("pl3" to listOf("Be invisible"), "pl2" to listOf("My phone")),
+            guesses = mapOf("pl3" to listOf("Fly"), "pl2" to listOf("Sitting down")),
+        ),
+    )
+
     fun state(today: LocalDate = LocalDate.now()) = CoupleState(
         you = you,
         them = them,
@@ -532,6 +572,7 @@ object MockCouple {
         plate = plate(today),
         shelf = shelf(today),
         history = history(today),
+        quizRuns = runs(),
         streak = 7,
         freezesLeft = 0,
     )

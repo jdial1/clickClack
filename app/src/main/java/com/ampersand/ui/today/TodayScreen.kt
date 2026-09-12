@@ -72,6 +72,7 @@ import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.SectionLabel
+import com.ampersand.ui.quiz.DeckList
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Duo
@@ -131,16 +132,21 @@ fun TodayScreen(
             Spacer(Modifier.height(40.dp))
             SectionLabel("Decks")
             Spacer(Modifier.height(4.dp))
+
+            val waiting = state.decksAwaitingYou(decks.map { it.id })
             Text(
-                "One question a day is the habit. These are for when you have an evening.",
+                text = if (waiting > 0) {
+                    // The only line here that is asking for something, so it is
+                    // the only one that gets to be specific.
+                    "${state.them.name} has finished $waiting, waiting on you."
+                } else {
+                    "One question a day is the habit. These are for an evening."
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(14.dp))
-            decks.forEach { deck ->
-                DeckRow(deck, state, onOpenDeck)
-                Spacer(Modifier.height(10.dp))
-            }
+
+            DeckList(decks = decks, state = state, onOpen = onOpenDeck)
         }
 
         Spacer(Modifier.height(48.dp))
@@ -652,54 +658,3 @@ internal fun QuestionInput(
 }
 
 
-/**
- * One deck, with where the two of you are in it.
- *
- * The status is the whole point of the row. "Played" is not a state worth
- * showing on its own -- what you want to know before tapping is whether this is
- * a fresh one, one you are waiting on them for, or one with a result sitting in
- * it.
- */
-@Composable
-private fun DeckRow(deck: Quiz, state: CoupleState, onOpen: (String) -> Unit) {
-    val mine = state.myRun(deck.id)
-    val theirs = state.theirRun(deck.id)
-    val status = when {
-        mine != null && theirs != null -> "Open the result"
-        mine != null -> "Waiting on ${state.them.name}"
-        theirs != null -> "${state.them.name} has played this"
-        else -> "${deck.size} questions  ·  about ${deck.minutes} min"
-    }
-
-    BrickSlab(
-        slugs = listOf(deck.theme.brick.slug),
-        studs = 12,
-        height = BrickHeight.MEDIUM,
-        alpha = if (mine != null && theirs == null) 0.55f else 1f,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onOpen(deck.id) },
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 14.dp, end = 14.dp, top = 24.dp, bottom = 16.dp)
-                .glassOn(deck.theme.brick.slug, corner = 14.dp)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = deck.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = inkOnBrick(deck.theme.brick.slug),
-                )
-                Text(
-                    text = "${deck.theme.label.uppercase()}  ·  $status",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = inkOnBrick(deck.theme.brick.slug).copy(alpha = 0.85f),
-                )
-            }
-        }
-    }
-}

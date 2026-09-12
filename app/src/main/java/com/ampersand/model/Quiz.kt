@@ -99,6 +99,28 @@ val QuestionType.weight: Int
     }
 
 /**
+ * Where a deck has got to, for these two people.
+ *
+ * Declaration order is the order it belongs in a list, and that order is the
+ * whole feature. A pool of decks sorted by filename makes the one your partner
+ * is waiting on you for look exactly like the six you have never opened, so the
+ * only thing either of you can do is remember. Sorted by state, the list tells
+ * you what to do next without being asked.
+ */
+enum class DeckState(val heading: String) {
+    /** They played it and you have not. The only one with a deadline attached. */
+    WAITING_ON_YOU("Waiting on you"),
+
+    /** You played it; nothing opens until they do. */
+    WAITING_ON_THEM("Waiting on them"),
+
+    /** Both in. There is a result sitting in it. */
+    FINISHED("Finished"),
+
+    NOT_STARTED("Not started yet"),
+}
+
+/**
  * One person's run through a quiz.
  *
  * Keyed by question id rather than positional, because a deck can gain or lose

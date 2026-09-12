@@ -213,6 +213,22 @@ data class CoupleState(
         it.quizId == quizId && it.uid == them.uid
     }
 
+    /** Where [quizId] has got to between the two of you. */
+    fun deckState(quizId: String): DeckState {
+        val mine = myRun(quizId)
+        val theirs = theirRun(quizId)
+        return when {
+            mine != null && theirs != null -> DeckState.FINISHED
+            mine != null -> DeckState.WAITING_ON_THEM
+            theirs != null -> DeckState.WAITING_ON_YOU
+            else -> DeckState.NOT_STARTED
+        }
+    }
+
+    /** How many decks are sitting waiting for you specifically. */
+    fun decksAwaitingYou(quizIds: List<String>): Int =
+        quizIds.count { deckState(it) == DeckState.WAITING_ON_YOU }
+
     /** Predictions landed vs. possible, across scoreable revealed days. */
     val syncPercent: Int
         get() {
