@@ -24,6 +24,7 @@ import com.ampersand.model.Wildcard
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
+import com.ampersand.model.Milestones
 import com.ampersand.model.Streaks
 import com.ampersand.model.Turns
 import com.google.firebase.firestore.DocumentSnapshot
@@ -286,14 +287,15 @@ class FirestoreCoupleRepository(
         val taste = Profiles.of(current)
         val recent = recentlyAsked(current)
         val picked = Turns.themeFor(today, current.history, myUid, partnerUid)
+        val milestone = Milestones.on(today, current.history) != null
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
             // A question one of you wrote outranks one a stranger wrote.
             waiting.isNotEmpty() -> waiting.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked)
+            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
         }
 
         val todayEntry = DayEntry(
@@ -628,7 +630,11 @@ class FirestoreCoupleRepository(
         // Nothing to ask for until I am actually in.
         if (todayAnswers[myUid] == null) return
 
-        dayRef.set(mapOf("revealed" to true), SetOptions.merge())
+        // The run goes down with the seal, so a streak past the ten weeks of
+        // history the phones load still has something to count from.
+        val s = _state.value
+        val run = Streaks.run(s.history, s.today)
+        dayRef.set(mapOf("revealed" to true, "run" to run), SetOptions.merge())
             .addOnFailureListener { Log.d(TAG, "day not ready to open yet", it) }
     }
 
@@ -1071,6 +1077,7 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
         opened = getBoolean("revealed") == true,
         nextTheme = getString("nextTheme"),
         nextThemeBy = getString("nextThemeBy"),
+        recordedRun = getLong("run")?.toInt() ?: 0,
     )
 }
 

@@ -195,6 +195,11 @@ data class DayEntry(
      */
     val nextTheme: String? = null,
     val nextThemeBy: String? = null,
+    /**
+     * The run this day made, written by whichever phone opened it. Zero when
+     * nothing was written, which is every day before this existed. See [Streaks].
+     */
+    val recordedRun: Int = 0,
 ) {
     /** Either of you marked it. One person remembering is the whole event. */
     val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()

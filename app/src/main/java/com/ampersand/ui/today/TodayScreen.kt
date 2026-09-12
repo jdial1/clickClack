@@ -53,6 +53,7 @@ import com.ampersand.model.Answer
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
+import com.ampersand.model.Milestones
 import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
@@ -143,6 +144,13 @@ fun TodayScreen(
         // Yesterday, asked about this morning. Above the question rather than
         // below it, because it is about the day that has finished and the one
         // below has not started.
+        // The morning after a run ends, said once and without a sad face.
+        val ended = remember(state.history, day.date) { Milestones.ended(day.date, state.history) }
+        ended?.let { run ->
+            Spacer(Modifier.height(14.dp))
+            QuietNote("The run stopped at $run days. Today starts the next one.")
+        }
+
         Spacer(Modifier.height(14.dp))
         DidYouTalk(state, onTalkedAbout)
 
@@ -150,6 +158,7 @@ fun TodayScreen(
         QuestionHero(
             askedBefore = state.capsule?.date,
             pickedBy = pickedBy(state),
+            milestone = remember(state.history, day.date) { Milestones.on(day.date, state.history) },
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -238,6 +247,8 @@ private fun QuestionHero(
     askedBefore: LocalDate? = null,
     /** Set when somebody picked today's theme last night: "You" or their name. */
     pickedBy: String? = null,
+    /** The run today makes, when that is one of [Milestones.Runs]. */
+    milestone: Int? = null,
 ) {
     // One line of text crosses both halves of the wall, so the ink has to suit
     // the paler of the two. White over pack yellow is unreadable.
@@ -272,9 +283,18 @@ private fun QuestionHero(
             DepthDots(question.depth, tint = ink)
         }
 
-        // Said before the question rather than after it. Knowing this one is
-        // coming back changes how you answer it, and finding out afterwards
-        // would make the app feel like it had kept something from you.
+        // Said before the question, like everything else about the day: a
+        // hundredth day is answered differently from a Tuesday.
+        milestone?.let { run ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = Milestones.headline(run) +
+                    if (question.depth.level >= 3) " Today's is one of the deep ones." else "",
+                style = MaterialTheme.typography.titleSmall,
+                color = ink,
+            )
+        }
+
         pickedBy?.let { who ->
             Spacer(Modifier.height(8.dp))
             Text(
@@ -284,6 +304,9 @@ private fun QuestionHero(
             )
         }
 
+        // Said before the question rather than after it. Knowing this one is
+        // coming back changes how you answer it, and finding out afterwards
+        // would make the app feel like it had kept something from you.
         askedBefore?.let { then ->
             Spacer(Modifier.height(8.dp))
             Text(

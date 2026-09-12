@@ -79,6 +79,12 @@ class QuestionPool(
          * repeating a question to honour it.
          */
         theme: String? = null,
+        /**
+         * A day worth more than a Tuesday -- see [com.ampersand.model.Milestones].
+         * Draws from the deepest questions whatever the weekday, falling back
+         * to the ordinary rules when none are left.
+         */
+        deeper: Boolean = false,
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
 
@@ -92,12 +98,16 @@ class QuestionPool(
 
         val weekend = date.dayOfWeek in setOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         fun fits(q: Question) = weekend || q.depth.level <= 2
+        fun deep(q: Question) = q.depth.level >= 3
 
         theme?.let { t ->
             val themed = all.filter { it.category == t }
+            if (deeper) walk(themed.filter(::deep), date, weekend, taste, recent)?.let { return it }
             val picked = themed.filter(::fits).ifEmpty { themed }
             if (picked.isNotEmpty()) walk(picked, date, weekend, taste, recent)?.let { return it }
         }
+
+        if (deeper) walk(all.filter(::deep), date, weekend, taste, recent)?.let { return it }
 
         val candidates = all.filter(::fits).ifEmpty { all }
         return walk(candidates, date, weekend, taste, recent)
@@ -118,6 +128,7 @@ class QuestionPool(
         taste: Taste,
         recent: Set<String>,
     ): Question? {
+        if (candidates.isEmpty()) return null
         val (draw, start) = slot(tiltedOrNot(candidates, taste), date, weekend)
         return draw.indices.asSequence()
             .map { draw[(start + it).mod(draw.size)] }
