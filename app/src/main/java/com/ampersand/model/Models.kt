@@ -166,12 +166,23 @@ data class DayEntry(
      * about, and either of you saying so is enough.
      */
     val talkedAbout: Set<String> = emptySet(),
+    /**
+     * The day document says both answers are in, whether or not they are loaded.
+     *
+     * Past days are read without their answers -- the answers live in a
+     * subcollection that would cost a read per day -- so counting [answers] on
+     * a past day always came to zero. Every past day looked unopened, which
+     * kept the next-morning prompt from ever appearing and made the streak
+     * count reactions instead of answering. The rules only let `revealed` turn
+     * true once both answer documents exist, so it is safe to trust.
+     */
+    val opened: Boolean = false,
 ) {
     /** Either of you marked it. One person remembering is the whole event. */
     val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()
 
     /** The seal only lifts once both have submitted. */
-    val isRevealed: Boolean get() = answers.size >= 2
+    val isRevealed: Boolean get() = opened || answers.size >= 2
 
     fun answerFor(uid: String): Answer? = answers[uid]
 

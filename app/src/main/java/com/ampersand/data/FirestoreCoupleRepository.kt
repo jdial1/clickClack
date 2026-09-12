@@ -24,6 +24,7 @@ import com.ampersand.model.Wildcard
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
+import com.ampersand.model.Streaks
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -319,7 +320,7 @@ class FirestoreCoupleRepository(
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
             quizRuns = runs.values.flatMap { it.values },
             anniversary = anniversary,
-            streak = streakOf(history, todayEntry),
+            streak = Streaks.run(history, todayEntry),
             // Only a capsule if today really is asking the old question again.
             // The ladder can find a day whose question the pin then overrode.
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
@@ -993,6 +994,7 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
         question = question,
         reactions = toReactions(),
         talkedAbout = toTalkedAbout(),
+        opened = getBoolean("revealed") == true,
     )
 }
 
@@ -1077,22 +1079,3 @@ private fun BuildPlate.toMap(): Map<String, Any?> = mapOf(
     "completedOn" to completedOn?.toString(),
 )
 
-/**
- * Consecutive answered days ending today, or yesterday.
- *
- * Yesterday counts so that the streak does not read as broken all morning
- * before you have answered.
- */
-private fun streakOf(history: List<DayEntry>, today: DayEntry): Int {
-    val answered = history.filter { it.answers.isNotEmpty() || it.reactions.isNotEmpty() }
-        .mapTo(mutableSetOf()) { it.date }
-    if (today.answers.isNotEmpty()) answered += today.date
-
-    var day = if (today.date in answered) today.date else today.date.minusDays(1)
-    var count = 0
-    while (day in answered) {
-        count++
-        day = day.minusDays(1)
-    }
-    return count
-}
