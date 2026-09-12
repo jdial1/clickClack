@@ -33,6 +33,7 @@ import com.ampersand.model.BrickColor
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.ColorChip
 import com.ampersand.ui.components.AmpButton
@@ -162,7 +163,9 @@ private fun StatCard(
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 22.dp, bottom = 18.dp),
+            .padding(start = 12.dp, end = 12.dp, top = 20.dp, bottom = 12.dp)
+            .glassOn(null, corner = 14.dp)
+            .padding(horizontal = 12.dp, vertical = 12.dp),
     ) {
         Text(
             value,
@@ -239,7 +242,9 @@ private fun SoundToggle(you: BrickColor) {
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(start = 18.dp, end = 18.dp, top = 22.dp, bottom = 18.dp),
+            .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+            .glassOn(if (on) accent else null, corner = 14.dp)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {

@@ -46,6 +46,7 @@ import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.Quiz
+import com.ampersand.model.label
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.unit.sp
 import com.ampersand.model.CoupleState
@@ -65,7 +66,9 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.SectionLabel
@@ -169,7 +172,9 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(start = 22.dp, end = 22.dp, top = 30.dp, bottom = 26.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
+            .glassOn(you.slug)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -177,7 +182,7 @@ private fun QuestionHero(question: Question, you: BrickColor, them: BrickColor) 
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = question.category.uppercase(),
+                text = "${question.type.label.uppercase()}  ·  ${question.category.uppercase()}",
                 style = MaterialTheme.typography.labelSmall,
                 color = ink.copy(alpha = 0.85f),
             )
@@ -678,7 +683,9 @@ private fun DeckRow(deck: Quiz, state: CoupleState, onOpen: (String) -> Unit) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, top = 26.dp, bottom = 20.dp),
+                .padding(start = 14.dp, end = 14.dp, top = 24.dp, bottom = 16.dp)
+                .glassOn(deck.theme.brick.slug, corner = 14.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(deck.theme.glyph, fontSize = 20.sp)

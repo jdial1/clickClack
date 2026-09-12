@@ -34,6 +34,7 @@ import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.awaitReady
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import kotlinx.coroutines.delay
@@ -83,7 +84,13 @@ fun SplashScreen(
     val atlas = rememberBricks(listOf(lower, upper))
 
     LaunchedEffect(Unit) {
-        delay(180)
+        // Hold the curtain until the clips are decoded. SoundPool drops a play
+        // that arrives before its sample is ready, and on a cold start it is
+        // still working through a dozen of them when the first brick would
+        // land -- which is why the launch was silent.
+        sounds.awaitReady(Sfx.CLICK)
+        sounds.awaitReady(Sfx.CLACK)
+        delay(120)
 
         lowerY.animateTo(0f, tween(420, easing = Gravity))
         sounds.play(Sfx.CLICK)

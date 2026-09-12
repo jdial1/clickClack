@@ -34,7 +34,9 @@ import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
+import com.ampersand.model.label
 import com.ampersand.ui.brick.BrickSlab
+import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.SectionLabel
@@ -131,12 +133,29 @@ private fun DeckPlayer(
             height = BrickHeight.MEDIUM,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(
-                text = question.text,
-                style = MaterialTheme.typography.headlineSmall,
-                color = inkOnBrick(quiz.theme.brick.slug),
-                modifier = Modifier.padding(start = 22.dp, end = 22.dp, top = 30.dp, bottom = 26.dp),
-            )
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
+                    .glassOn(quiz.theme.brick.slug)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+            ) {
+                // What kind of question this is, and what it is about. Both
+                // change how you answer: "put in order" is a different job from
+                // "pick one", and knowing the category stops a light question
+                // reading as a loaded one.
+                Text(
+                    text = "${question.type.label.uppercase()}  ·  ${question.category.uppercase()}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = inkOnBrick(quiz.theme.brick.slug).copy(alpha = 0.8f),
+                )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = question.text,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = inkOnBrick(quiz.theme.brick.slug),
+                )
+            }
         }
 
         Spacer(Modifier.height(24.dp))

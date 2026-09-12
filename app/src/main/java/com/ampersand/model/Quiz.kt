@@ -51,6 +51,24 @@ enum class QuizTheme(
 }
 
 /**
+ * What to call a question type on screen.
+ *
+ * The enum name is for the code. THIS_OR_THAT shouted at someone mid-deck is a
+ * database field, not a label.
+ */
+val QuestionType.label: String
+    get() = when (this) {
+        QuestionType.REFLECT -> "Reflect"
+        QuestionType.GUESS_ME -> "Guess me"
+        QuestionType.THIS_OR_THAT -> "This or that"
+        QuestionType.PICK_ONE -> "Pick one"
+        QuestionType.MULTI_SELECT -> "Pick a few"
+        QuestionType.RANK -> "Put in order"
+        QuestionType.SCALE -> "How much"
+        QuestionType.DROPDOWN -> "Choose"
+    }
+
+/**
  * How much of a question each type is, in seconds, for the estimate above.
  *
  * Typing costs far more than tapping, and ordering costs more than either

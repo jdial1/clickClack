@@ -104,6 +104,26 @@ class SoundKit(context: Context) {
     }
 
     /**
+     * Wait for a clip to finish decoding, up to [timeoutMs].
+     *
+     * [play] drops anything not yet loaded, which is right for a tap -- a click
+     * that arrives late is worse than one that never arrives -- and wrong for
+     * the splash, where the sound *is* the thing and the animation can afford
+     * to wait. On a cold start the pool is still decoding a dozen clips when
+     * the first brick lands, so the launch was silent every time.
+     *
+     * Returns false on timeout rather than blocking the splash forever.
+     */
+    suspend fun awaitReady(sfx: Sfx, timeoutMs: Long = 2000): Boolean {
+        val id = loaded[sfx] ?: return false
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (id !in ready && System.currentTimeMillis() < deadline) {
+            kotlinx.coroutines.delay(16)
+        }
+        return id in ready
+    }
+
+    /**
      * Click, then clack: two bricks meeting.
      *
      * [gapMs] is the beat between them. Below about 50ms the pair fuses into
@@ -144,4 +164,8 @@ fun SoundKit?.play(sfx: Sfx) {
 
 suspend fun SoundKit?.clickClack(gapMs: Long = 90) {
     this?.clickClack(gapMs)
+}
+
+suspend fun SoundKit?.awaitReady(sfx: Sfx, timeoutMs: Long = 2000) {
+    this?.awaitReady(sfx, timeoutMs)
 }

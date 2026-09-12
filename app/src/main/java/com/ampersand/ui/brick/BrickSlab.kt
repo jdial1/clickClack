@@ -1,11 +1,19 @@
 package com.ampersand.ui.brick
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -57,6 +65,43 @@ fun quietSlug(): String? =
 @Composable
 fun structureSlug(): String? =
     if (MaterialTheme.colorScheme.background.luminance() < 0.5f) "black" else null
+
+/**
+ * A frosted panel to sit text on, when the text is on brick.
+ *
+ * Brick art is not a flat colour: every course has a seam and a shadow, and a
+ * line of type that crosses one gets a stripe through it. On the stat cards it
+ * read as a strikethrough.
+ *
+ * This is a scrim rather than a true backdrop blur. Compose's `Modifier.blur`
+ * blurs the composable it is applied to, not what is behind it, and there is no
+ * backdrop filter short of a `RuntimeShader` on API 33+. What a scrim does get
+ * is the part that matters: it flattens the seams under the text and lifts
+ * contrast, with a hairline top edge so it still reads as a pane laid on the
+ * brick rather than a painted rectangle.
+ *
+ * Tinted from the ink it is carrying -- dark ink wants a light pane, white ink
+ * a dark one -- so it works on any colour brick in either theme.
+ */
+@Composable
+fun Modifier.glass(
+    ink: Color,
+    corner: Dp = 16.dp,
+    strength: Float = 1f,
+): Modifier {
+    val dark = ink == DarkInk
+    val pane = if (dark) Color.White else Color.Black
+    val shape = RoundedCornerShape(corner)
+    return this
+        .clip(shape)
+        .background(pane.copy(alpha = (if (dark) 0.34f else 0.26f) * strength))
+        .border(1.dp, (if (dark) Color.White else Color.White).copy(alpha = 0.18f * strength), shape)
+}
+
+/** As [glass], for a surface whose ink is decided by its brick colour. */
+@Composable
+fun Modifier.glassOn(slug: String?, corner: Dp = 16.dp): Modifier =
+    glass(inkOnBrick(slug), corner)
 
 /**
  * A wide surface built out of real bricks.

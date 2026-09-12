@@ -50,7 +50,9 @@ import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.Sculpture
 import com.ampersand.ui.brick.drawBrickArt
+import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.brick.rememberBricks
 import com.ampersand.ui.components.SectionLabel
@@ -144,7 +146,13 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
             onClick = onClick,
         ),
     ) {
-        Column(Modifier.padding(start = 20.dp, end = 20.dp, top = 26.dp, bottom = 22.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
+                .glass(ink)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
             Text(
                 text = ago(entry.date, state.today.date),
                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
