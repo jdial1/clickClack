@@ -274,6 +274,14 @@ data class CoupleState(
     val region: UsRegion? = null,
     /** The nearest baseball and football teams, said as "Pirates and Steelers". */
     val localTeams: String? = null,
+    /** Leagues either of you follows. Sports questions stay out until there is one. */
+    val following: Set<League> = emptySet(),
+    val yourFollowing: Set<League> = emptySet(),
+    /**
+     * Whether you have been through the interests questions. Null until your
+     * profile has loaded, so nobody is shown them again while it loads.
+     */
+    val interestsAsked: Boolean? = null,
     /** The home ZIP's state, for holidays that belong to a place. */
     val homeState: String? = null,
     /** Sunrise and sunset at home today. */

@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.Following
 import com.ampersand.model.Sun
 import com.ampersand.model.League
 import com.ampersand.model.Teams
@@ -378,12 +379,16 @@ class FirestoreCoupleRepository(
         val picked = Turns.themeFor(today, history, myUid, partnerUid)
         val milestone = Milestones.on(today, history) != null
         val hiddenByUid = coupleDoc.topicsByUid("hiddenTopics")
-        val hidden = hiddenByUid.values.flatten().toSet()
         val interestsByUid = coupleDoc.topicsByUid("interests")
+        val followingByUid = coupleDoc.leaguesByUid()
+        val following = followingByUid.values.flatten().toSet()
+        val interests = interestsByUid.values.flatten().toSet()
+        val hidden = hiddenByUid.values.flatten().toSet() +
+            (if (Following.hideSports(following, interests)) setOf(Topic.SPORTS) else emptySet())
         val weather = todayDoc.toWeather()
         val daylight = place?.let { Sun.daylight(today, it.lat, it.lon) }
         val sunKind = daylight?.let { Sun.kind(today, it) }
-        val leagues = place?.let { Teams.activeLeagues(it, today) }.orEmpty()
+        val leagues = Following.leagues(place?.let { Teams.activeLeagues(it, today) }.orEmpty(), following)
         maybeFetchWeather(place, weather)
 
         val pinned = todayDoc?.getString("questionId")
@@ -434,7 +439,10 @@ class FirestoreCoupleRepository(
             yourHiddenTopics = hiddenByUid[myUid].orEmpty(),
             hiddenTopics = hidden,
             yourInterests = interestsByUid[myUid].orEmpty(),
-            interests = interestsByUid.values.flatten().toSet(),
+            interests = interests,
+            following = following,
+            yourFollowing = followingByUid[myUid].orEmpty(),
+            interestsAsked = me?.let { it.getBoolean("interestsAsked") == true },
             homeZip = homeZip,
             region = place?.region,
             homeState = place?.state,
@@ -993,6 +1001,11 @@ class FirestoreCoupleRepository(
         couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
     }
 
+    override fun setFollowing(leagues: Set<League>) {
+        couple.set(mapOf("following" to mapOf(myUid to leagues.map { it.name })), SetOptions.merge())
+        db.collection(USERS).document(myUid).set(mapOf("interestsAsked" to true), SetOptions.merge())
+    }
+
     override fun setTopicInterest(topic: Topic, interested: Boolean) {
         val mine = _state.value.yourInterests.let { if (interested) it + topic else it - topic }
         couple.set(mapOf("interests" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
@@ -1246,6 +1259,12 @@ private fun DocumentSnapshot?.toWeather(): DayWeather? {
         precipChance = (w["precipChance"] as? Number)?.toInt(),
     )
 }
+
+private fun DocumentSnapshot?.leaguesByUid(): Map<String, Set<League>> =
+    (this?.get("following") as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
+        val key = uid as? String ?: return@mapNotNull null
+        key to (names as? List<*>).orEmpty().mapNotNull { n -> League.entries.firstOrNull { it.name == n } }.toSet()
+    }.toMap()
 
 private fun DocumentSnapshot?.topicsByUid(field: String): Map<String, Set<Topic>> =
     (this?.get(field) as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->

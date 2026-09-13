@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.us.InterestsSetupScreen
 import com.ampersand.ui.quiz.DecksScreen
 import com.ampersand.ui.us.SettingsScreen
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -431,6 +432,17 @@ private fun SignedInApp(
             Push.register(appContext, account.uid)
         }
 
+        // What the daily question may be about, asked once. Waits for your
+        // profile to load (null), so it never flashes up for someone who has
+        // already answered.
+        if (state.interestsAsked == false) {
+            InterestsSetupScreen(color = BrickColor.of(state.you.colorArgb), onDone = { following, leaveOut ->
+                leaveOut.forEach { vm.repo.setTopicHidden(it, true) }
+                vm.repo.setFollowing(following)
+            })
+            return
+        }
+
         // Leave the receiver a note about what is actually outstanding. It
         // fires with no app process and cannot go and ask Firestore, so the
         // alternative is a reminder that says the same thing whether or not
@@ -661,6 +673,7 @@ private fun SignedInApp(
                             onSetRelationship = vm.repo::setRelationship,
                             onSetTopicHidden = vm.repo::setTopicHidden,
                             onSetTopicInterest = vm.repo::setTopicInterest,
+                            onSetFollowing = vm.repo::setFollowing,
                             onSetHomeZip = vm.repo::setHomeZip,
                             onAddSpecialDate = vm.repo::addSpecialDate,
                             onRemoveSpecialDate = vm.repo::removeSpecialDate,

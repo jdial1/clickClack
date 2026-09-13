@@ -24,6 +24,30 @@ enum class League(val token: String, val months: Set<Int>) {
     fun inSeason(date: java.time.LocalDate): Boolean = date.monthValue in months
 }
 
+/** What a person would tick: "Hockey (NHL)". */
+val League.label: String
+    get() = when (this) {
+        League.MLB -> "Baseball (MLB)"
+        League.NFL -> "Pro football (NFL)"
+        League.COLLEGE -> "College football"
+        League.NBA -> "Basketball (NBA)"
+        League.NHL -> "Hockey (NHL)"
+        League.MLS -> "Soccer (MLS)"
+    }
+
+/**
+ * Which sport questions the draw may use: leagues one of you follows, that have
+ * a local team in season. And whether sports belongs in the daily question at
+ * all -- not by default: only once one of you follows something, or asked for
+ * more sports outright.
+ */
+object Following {
+    fun leagues(active: Set<League>, followed: Set<League>): Set<League> = active intersect followed
+
+    fun hideSports(followed: Set<League>, interests: Set<Topic>): Boolean =
+        followed.isEmpty() && Topic.SPORTS !in interests
+}
+
 /** A team and where its home field is. [nickname] is what a question says: "the Pirates". */
 data class Team(val nickname: String, val city: String, val league: League, val lat: Double, val lon: Double)
 

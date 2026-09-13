@@ -1,5 +1,8 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.AmpCheckboxGroup
+import com.ampersand.model.label
+import com.ampersand.model.League
 import com.ampersand.model.GenderChoices
 import com.ampersand.model.Dates
 import com.ampersand.model.Topic
@@ -102,6 +105,7 @@ fun UsScreen(
     onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
     onSetTopicHidden: (Topic, Boolean) -> Unit = { _, _ -> },
     onSetTopicInterest: (Topic, Boolean) -> Unit = { _, _ -> },
+    onSetFollowing: (Set<League>) -> Unit = {},
     onSetHomeZip: (String) -> Boolean = { true },
     onAddSpecialDate: (String, java.time.LocalDate) -> Unit = { _, _ -> },
     onRemoveSpecialDate: (String) -> Unit = {},
@@ -128,6 +132,7 @@ fun UsScreen(
         Spacer(Modifier.height(32.dp))
         RelationshipProfile(
             state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden, onSetTopicInterest, onSetHomeZip,
+            onSetFollowing,
         )
 
         Spacer(Modifier.height(32.dp))
@@ -924,6 +929,7 @@ private fun RelationshipProfile(
     onSetTopicHidden: (Topic, Boolean) -> Unit,
     onSetTopicInterest: (Topic, Boolean) -> Unit,
     onSetHomeZip: (String) -> Boolean,
+    onSetFollowing: (Set<League>) -> Unit,
 ) {
     var open by rememberSaveable { mutableStateOf<String?>(null) }
     fun toggle(key: String) { open = if (open == key) null else key }
@@ -1045,6 +1051,8 @@ private fun RelationshipProfile(
                 val hidden = topic in state.yourHiddenTopics
                 val more = topic in state.yourInterests
                 val theirs = when {
+                    topic == Topic.SPORTS && state.following.isEmpty() && !more ->
+                        "Out until one of you follows a sport, below."
                     topic in state.hiddenTopics && !hidden -> "${state.them.name} left this out."
                     topic in state.interests && !more -> "${state.them.name} asked for more of this."
                     else -> null
@@ -1072,6 +1080,25 @@ private fun RelationshipProfile(
                 }
                 Spacer(Modifier.height(16.dp))
             }
+
+            SectionLabel("Sports you follow")
+            Spacer(Modifier.height(6.dp))
+            Text(
+                if (state.following.isEmpty()) "Nothing yet, so there are no sports questions."
+                else "Between you: ${state.following.joinToString(", ") { it.label }}.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(10.dp))
+            AmpCheckboxGroup(
+                options = League.entries.map { it.label },
+                selected = state.yourFollowing.map { it.label }.toSet(),
+                accent = Color(you.argb),
+                onToggle = { label ->
+                    val league = League.entries.first { it.label == label }
+                    onSetFollowing(if (league in state.yourFollowing) state.yourFollowing - league else state.yourFollowing + league)
+                },
+            )
         }
     }
 }

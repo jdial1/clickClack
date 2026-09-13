@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.League
 import com.ampersand.model.SpecialDate
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
@@ -65,6 +66,9 @@ interface CoupleRepository {
 
     /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
     fun setTopicHidden(topic: Topic, hidden: Boolean)
+
+    /** The sports you follow, and that you have been asked. Empty means none. */
+    fun setFollowing(leagues: Set<League>)
 
     /** Ask for more of a topic, or stop asking. Yours; the draw uses both. */
     fun setTopicInterest(topic: Topic, interested: Boolean)
@@ -388,6 +392,10 @@ class FakeCoupleRepository(
     override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
         val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun setFollowing(leagues: Set<League>) = mutate {
+        it.copy(yourFollowing = leagues, following = leagues, interestsAsked = true)
     }
 
     override fun setTopicInterest(topic: Topic, interested: Boolean) = mutate {
