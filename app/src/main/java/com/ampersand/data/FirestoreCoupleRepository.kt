@@ -295,6 +295,10 @@ class FirestoreCoupleRepository(
         // History is mapped here (not in its listener) so past wildcard days resolve once wildcards load.
         val homeZip = coupleDoc?.getString("homeZip")
         val place = homeZip?.let { pool.places.lookup(it) }
+        // Backfill the time zone for ZIPs saved before it was stored.
+        place?.timeZone?.takeIf { coupleDoc?.getString("timeZone") != it }?.let {
+            couple.set(mapOf("timeZone" to it), SetOptions.merge())
+        }
         history = historyDocs
             .mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
             .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day }
@@ -933,8 +937,9 @@ class FirestoreCoupleRepository(
     }
 
     override fun setHomeZip(zip: String): Boolean {
-        pool.places.lookup(zip) ?: return false
-        couple.set(mapOf("homeZip" to zip.trim()), SetOptions.merge())
+        val place = pool.places.lookup(zip) ?: return false
+        // Saved beside the ZIP so the morning date push runs at 8am local time.
+        couple.set(mapOf("homeZip" to zip.trim(), "timeZone" to place.timeZone), SetOptions.merge())
         // Allow a new fetch if today's weather is not saved yet.
         weatherTried = false
         return true

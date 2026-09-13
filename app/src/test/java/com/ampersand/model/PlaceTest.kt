@@ -59,4 +59,15 @@ class PlaceTest {
     fun `the line reads like a person wrote it`() {
         assertEquals("84°  ·  Partly sunny  ·  Pittsburgh", DayWeather(84, "Partly Sunny", "Pittsburgh").line)
     }
+
+    @Test
+    fun `a ZIP knows its time zone, including the states split by a zone line`() {
+        assertEquals("America/Chicago", Place("64012", 38.8, -94.5, "MO").timeZone)
+        assertEquals("America/New_York", Place("15213", 40.44, -79.95, "PA").timeZone)
+        assertEquals("America/Denver", Place("79901", 31.76, -106.48, "TX").timeZone)
+        assertEquals("America/Chicago", Place("75201", 32.78, -96.8, "TX").timeZone)
+        assertEquals("America/Chicago", Place("32501", 30.42, -87.21, "FL").timeZone)
+        assertEquals("America/Phoenix", Place("85001", 33.45, -112.07, "AZ").timeZone)
+        assertEquals("America/Los_Angeles", Place("83501", 46.4, -117.0, "ID").timeZone)
+    }
 }

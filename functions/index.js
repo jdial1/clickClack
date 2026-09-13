@@ -181,14 +181,19 @@ exports.onPlateUpdate = onDocumentUpdated(
   },
 );
 
-/** Every morning: birthdays, anniversaries and your own dates that fall today, to both of you. */
-exports.specialDates = onSchedule({ schedule: "0 8 * * *", timeZone: "America/Chicago" }, async () => {
-  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  const md = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  const onToday = (iso) => typeof iso === "string" && iso.slice(5, 10) === md;
-
+/**
+ * Hourly: at 8am in each couple's own time zone (saved from their home ZIP,
+ * Central when none is set), push birthdays, anniversaries and dates that fall today.
+ */
+exports.specialDates = onSchedule({ schedule: "0 * * * *", timeZone: "UTC" }, async () => {
   const couples = await db.collection("couples").where("endedAt", "==", null).get();
   for (const couple of couples.docs) {
+    const zone = couple.get("timeZone") || "America/Chicago";
+    const local = new Date(new Date().toLocaleString("en-US", { timeZone: zone }));
+    if (local.getHours() !== 8) continue;
+    const md = `${String(local.getMonth() + 1).padStart(2, "0")}-${String(local.getDate()).padStart(2, "0")}`;
+    const onToday = (iso) => typeof iso === "string" && iso.slice(5, 10) === md;
+
     const members = couple.get("members") || [];
     const users = await Promise.all(members.map((m) => db.doc(`users/${m}`).get()));
     const events = [];
