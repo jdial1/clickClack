@@ -39,6 +39,20 @@ class PoolTest {
     }
 
     @Test
+    fun `daily-only questions are also playable, eight to a pack`() {
+        val pool = QuestionPool(
+            decks = listOf(deck("d", listOf(q("deck1")))),
+            dailyOnly = listOf(deck("big", (1..20).map { q("b$it") }), deck("small", listOf(q("s1")))),
+        )
+        assertEquals(listOf("d", "big-1", "big-2", "big-3", "small-1"), pool.playable.map { it.id })
+        assertEquals(listOf(8, 8, 4, 1), pool.packs.map { it.questions.size })
+        assertEquals(listOf("big 1", "big 2", "big 3", "small"), pool.packs.map { it.title })
+        assertEquals("b9", pool.deck("big-2")?.questions?.first()?.id)
+        // The daily pool is unchanged: packs are a second way in, not a copy.
+        assertEquals(22, pool.all.size)
+    }
+
+    @Test
     fun `a question asked lately is passed over`() {
         val pool = QuestionPool(decks = listOf(deck("d", (1..9).map { q("q$it") })))
         val natural = pool.daily(day)

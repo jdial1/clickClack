@@ -436,7 +436,7 @@ private fun SignedInApp(
         // alternative is a reminder that says the same thing whether or not
         // there is anything to do.
         val context = LocalContext.current
-        val waiting = state.decksAwaitingYou(pool.decks.map { it.id })
+        val waiting = state.decksAwaitingYou(pool.playable.map { it.id })
         val unanswered = state.today.answerFor(account.uid) == null
         LaunchedEffect(waiting, unanswered, state.them.name) {
             Reminder.cacheOutstanding(
@@ -615,7 +615,7 @@ private fun SignedInApp(
 
                         screen.tab == Tab.TODAY -> TodayScreen(
                             state = state,
-                            decks = pool.decks,
+                            decks = pool.playable,
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
                             onOpenDeck = { openDeck = it },
@@ -629,7 +629,7 @@ private fun SignedInApp(
 
                         screen.tab == Tab.DECKS -> DecksScreen(
                             state = state,
-                            decks = pool.decks,
+                            decks = pool.playable,
                             onOpenDeck = { openDeck = it },
                             onTakeInstrument = { sitting = it },
                         )

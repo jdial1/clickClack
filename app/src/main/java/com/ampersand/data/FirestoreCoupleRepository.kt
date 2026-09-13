@@ -422,7 +422,7 @@ class FirestoreCoupleRepository(
         val since = today.minusDays(QuestionPool.RecentDays)
         val fromDays = history.filter { it.date >= since }.map { it.question.id }
         val cutoff = since.toEpochDay() * 86_400_000L
-        val fromDecks = pool.decks.filter { quiz ->
+        val fromDecks = pool.playable.filter { quiz ->
             val mine = s.myRun(quiz.id)
             val theirs = s.theirRun(quiz.id)
             mine != null && theirs != null &&
@@ -737,7 +737,7 @@ class FirestoreCoupleRepository(
         // plate meant that when a week sealed, every deck the two of you had
         // ever finished was paid out again on the new one.
         val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = pool.decks.flatMap { quiz ->
+        val fresh = pool.playable.flatMap { quiz ->
             val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
             val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
             val result = QuizResult.of(quiz, mine, theirs)

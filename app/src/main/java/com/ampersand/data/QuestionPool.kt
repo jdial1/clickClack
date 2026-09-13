@@ -39,12 +39,39 @@ class QuestionPool(
 
     val all: List<Question> = decks.flatMap { it.questions } + dailyOnly.flatMap { it.questions }
 
+    /**
+     * The daily-only questions cut into packs of [PackSize], so they can be
+     * played in an evening too.
+     *
+     * They were only ever reachable one a day, which left the Decks tab showing
+     * 99 questions out of six hundred. A pack that the two of you both finish
+     * is skipped by the daily draw for six weeks (see `recentlyAsked`), so
+     * playing one spends its questions exactly the way a deck always did.
+     *
+     * Cut in file order, so a pack's id and contents stay put between builds
+     * as long as the question files do.
+     */
+    val packs: List<Quiz> = dailyOnly.flatMap { source ->
+        val chunks = source.questions.chunked(PackSize)
+        chunks.mapIndexed { i, questions ->
+            source.copy(
+                id = "${source.id}-${i + 1}",
+                title = if (chunks.size == 1) source.title else "${source.title} ${i + 1}",
+                blurb = source.blurb.takeUnless { it == "Daily only." }.orEmpty(),
+                questions = questions,
+            )
+        }
+    }
+
+    /** Everything that can be sat down and played: the decks, then the packs. */
+    val playable: List<Quiz> = decks + packs
+
     private val byId: Map<String, Question> =
         (all + occasions.values.flatMap { it.questions }).associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
 
-    fun deck(id: String?): Quiz? = decks.firstOrNull { it.id == id }
+    fun deck(id: String?): Quiz? = playable.firstOrNull { it.id == id }
 
     /**
      * Today's question, chosen by date.
@@ -201,6 +228,9 @@ class QuestionPool(
 
         /** Primes to try as a stride, smallest first. One always fits: no list is that long. */
         private val Strides = listOf(7, 11, 13, 17, 19, 23)
+
+        /** Questions to a pack: an evening's worth, like the hand-written decks. */
+        const val PackSize = 8
 
         /** How far back "asked lately" reaches: six weeks. */
         const val RecentDays = 42L
