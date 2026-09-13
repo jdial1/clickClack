@@ -901,9 +901,9 @@ private fun MomentsCard(
             Text(
                 when (m) {
                     is Moment.Missed -> if (m.partnerAnswered) {
-                        "You missed ${day.date.format(MomentDay)}. ${state.them.name} answered."
+                        "You missed ${day.date.format(MomentDay)}'s question. ${state.them.name} answered."
                     } else {
-                        "You missed ${day.date.format(MomentDay)}."
+                        "You missed ${day.date.format(MomentDay)}'s question."
                     }
                     is Moment.Recall -> "Remember ${day.date.format(MomentDate)}?"
                 },
@@ -920,7 +920,7 @@ private fun MomentsCard(
     }
 }
 
-private val MomentDay = DateTimeFormatter.ofPattern("EEEE's question")
+private val MomentDay = DateTimeFormatter.ofPattern("EEEE")
 private val MomentDate = DateTimeFormatter.ofPattern("d MMMM")
 
 /** Answer a past day you missed. */
