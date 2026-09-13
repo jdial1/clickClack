@@ -46,18 +46,20 @@ fun MoodArt(mood: Mood, color: BrickColor, modifier: Modifier = Modifier, size: 
                 Tile(two, Modifier.offset(y = -course / 2))
             }
             Mood.BUILDING -> {
-                Tile(one, Modifier.offset(x = -stud, y = course))
+                // Kept inside the box: the picker does not clip, so a step that
+                // climbs out of it lands on the next mood over.
+                Tile(one, Modifier.offset(x = -stud * 0.9f, y = course * 0.7f))
                 Tile(one, Modifier.offset(x = 0.dp, y = 0.dp))
-                Tile(one, Modifier.offset(x = stud, y = -course))
+                Tile(one, Modifier.offset(x = stud * 0.9f, y = -course * 0.7f))
             }
             Mood.NEW_SET -> Crate(R.drawable.extra_box_exclamation, size)
             Mood.STILL_IN_THE_BOX -> Crate(R.drawable.extra_crate, size)
             Mood.HANDLE_WITH_CARE -> Crate(R.drawable.extra_crate_explosive, size)
             Mood.SORTING -> {
-                Tile(one, Modifier.offset(x = -stud, y = -course / 2).rotate(-18f))
-                Tile(one, Modifier.offset(x = stud * 0.8f, y = -course * 0.8f).rotate(22f))
-                Tile(one, Modifier.offset(x = -stud * 0.4f, y = course * 0.9f).rotate(8f))
-                Tile(one, Modifier.offset(x = stud, y = course * 0.6f).rotate(-30f))
+                Tile(one, Modifier.offset(x = -stud * 0.7f, y = -course * 0.4f).rotate(-18f))
+                Tile(one, Modifier.offset(x = stud * 0.6f, y = -course * 0.6f).rotate(22f))
+                Tile(one, Modifier.offset(x = -stud * 0.3f, y = course * 0.7f).rotate(8f))
+                Tile(one, Modifier.offset(x = stud * 0.7f, y = course * 0.5f).rotate(-30f))
             }
             Mood.LOOSE -> Tile(two, Modifier.rotate(14f))
             Mood.MISSING_A_PIECE -> {
@@ -65,7 +67,8 @@ fun MoodArt(mood: Mood, color: BrickColor, modifier: Modifier = Modifier, size: 
                 Tile(one, Modifier.offset(x = stud))
             }
             Mood.KNOCKED_OVER -> Tile(two, Modifier.rotate(90f))
-            Mood.STEPPED_ON_ONE -> Tile(one, Modifier.rotate(180f))
+            // Two studs, not one: a single upside-down stud is too small to read.
+            Mood.STEPPED_ON_ONE -> Tile(two, Modifier.rotate(180f))
         }
     }
 }
