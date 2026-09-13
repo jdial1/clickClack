@@ -1,5 +1,7 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.MoodArt
+import com.ampersand.model.Mood
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
@@ -119,6 +121,7 @@ fun TodayScreen(
     onPickTomorrow: (String) -> Unit = {},
     sittings: List<Instrument> = emptyList(),
     onTakeInstrument: (String) -> Unit = {},
+    onSetMood: (Mood?) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -156,6 +159,9 @@ fun TodayScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+
+        Spacer(Modifier.height(12.dp))
+        Moods(state, onSetMood)
 
         // Yesterday, asked about this morning. Above the question rather than
         // below it, because it is about the day that has finished and the one
@@ -940,6 +946,108 @@ private fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxIt
                     BrickDot(slug = if (item.themDone) them.slug else quietSlug(), studSize = Stud.pip, filled = item.themDone)
                 }
             }
+        }
+    }
+}
+
+/**
+ * How each of you is today, in bricks, and the way to say yours.
+ *
+ * Yours opens a picker of ten; tapping one sets it and closes. Theirs is shown
+ * as they left it, and nothing when they have not said -- no "Tasia has not set
+ * a mood", because not saying is an answer too.
+ */
+@Composable
+private fun Moods(state: CoupleState, onSet: (Mood?) -> Unit) {
+    val today = state.today.date
+    val you = BrickColor.of(state.you.colorArgb)
+    val them = BrickColor.of(state.them.colorArgb)
+    val mine = state.you.mood?.current(today)
+    val theirs = state.them.mood?.current(today)
+    var picking by rememberSaveable { mutableStateOf(false) }
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        MoodChip(
+            modifier = Modifier.weight(1f),
+            who = "You",
+            mood = mine,
+            color = you,
+            empty = "How are you, in bricks?",
+        ) { picking = !picking }
+        theirs?.let {
+            MoodChip(modifier = Modifier.weight(1f), who = state.them.name, mood = it, color = them, empty = "", onClick = null)
+        }
+    }
+    AnimatedVisibility(visible = picking) {
+        FlowRow(
+            Modifier.fillMaxWidth().padding(top = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Mood.entries.forEach { mood ->
+                Column(
+                    Modifier
+                        .width(96.dp)
+                        .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                            sounds.play(Sfx.PLACE)
+                            feel.play(Feel.PLACE)
+                            onSet(if (mood == mine) null else mood)
+                            picking = false
+                        }
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    MoodArt(mood, you)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        mood.label,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        mood.plain,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MoodChip(
+    modifier: Modifier,
+    who: String,
+    mood: Mood?,
+    color: BrickColor,
+    empty: String,
+    onClick: (() -> Unit)?,
+) {
+    Row(
+        modifier
+            .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+            .then(
+                if (onClick == null) Modifier
+                else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
+            )
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (mood != null) {
+            MoodArt(mood, color, size = 34.dp)
+            Spacer(Modifier.width(8.dp))
+            Column {
+                Text(who, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(mood.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+            }
+        } else {
+            Text(empty, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }

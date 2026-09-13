@@ -1,5 +1,7 @@
 package com.ampersand.data
 
+import com.ampersand.model.MoodEntry
+import com.ampersand.model.Mood
 import com.ampersand.model.League
 import com.ampersand.model.SpecialDate
 import com.ampersand.model.Topic
@@ -66,6 +68,9 @@ interface CoupleRepository {
 
     /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
     fun setTopicHidden(topic: Topic, hidden: Boolean)
+
+    /** How you are today. Null clears it. */
+    fun setMood(mood: Mood?)
 
     /** The sports you follow, and that you have been asked. Empty means none. */
     fun setFollowing(leagues: Set<League>)
@@ -392,6 +397,10 @@ class FakeCoupleRepository(
     override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
         val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun setMood(mood: Mood?) = mutate {
+        it.copy(you = it.you.copy(mood = mood?.let { m -> MoodEntry(m, it.today.date) }))
     }
 
     override fun setFollowing(leagues: Set<League>) = mutate {

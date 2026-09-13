@@ -1,5 +1,7 @@
 package com.ampersand.data
 
+import com.ampersand.model.MoodEntry
+import com.ampersand.model.Mood
 import com.ampersand.model.Following
 import com.ampersand.model.Sun
 import com.ampersand.model.League
@@ -1001,6 +1003,14 @@ class FirestoreCoupleRepository(
         couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
     }
 
+    override fun setMood(mood: Mood?) {
+        // Your own document, which only you may write and your partner may read.
+        db.collection(USERS).document(myUid).set(
+            mapOf("mood" to mood?.let { mapOf("id" to it.name, "on" to today.toString()) }),
+            SetOptions.merge(),
+        )
+    }
+
     override fun setFollowing(leagues: Set<League>) {
         couple.set(mapOf("following" to mapOf(myUid to leagues.map { it.name })), SetOptions.merge())
         db.collection(USERS).document(myUid).set(mapOf("interestsAsked" to true), SetOptions.merge())
@@ -1244,6 +1254,11 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     colorArgb = this?.getLong("colorArgb") ?: fallback.colorArgb,
     gender = this?.getString("gender"),
     birthday = this?.getString("birthday")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    mood = (this?.get("mood") as? Map<*, *>)?.let { m ->
+        val mood = Mood.entries.firstOrNull { it.name == m["id"] } ?: return@let null
+        val on = (m["on"] as? String)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@let null
+        MoodEntry(mood, on)
+    },
 )
 
 private fun DayWeather.toMap(): Map<String, Any?> =

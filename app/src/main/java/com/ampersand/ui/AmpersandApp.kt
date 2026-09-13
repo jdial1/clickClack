@@ -637,6 +637,7 @@ private fun SignedInApp(
                             onPickTomorrow = vm.repo::pickTomorrow,
                             sittings = Instruments.all,
                             onTakeInstrument = { sitting = it },
+                            onSetMood = vm.repo::setMood,
                         )
 
                         screen.tab == Tab.DECKS -> DecksScreen(

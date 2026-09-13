@@ -582,7 +582,7 @@ about 3:1.
 ## Firestore model
 
 ```
-users/{uid}                        displayName, colorArgb, gender, birthday, interestsAsked,
+users/{uid}                        displayName, colorArgb, gender, birthday, interestsAsked, mood{id, on},
                                    coupleId, inviteCode,
                                    inviteExpiresAt, fcmToken
 invites/{code}                     fromUid, fromName, createdAt, expiresAt

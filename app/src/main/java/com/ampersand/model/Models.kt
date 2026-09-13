@@ -121,6 +121,8 @@ data class Member(
     /** One of [GenderChoices], if they said. Shown, never used to choose questions. */
     val gender: String? = null,
     val birthday: LocalDate? = null,
+    /** How they said they are, and when. See [MoodEntry.current]. */
+    val mood: MoodEntry? = null,
 )
 
 /**
