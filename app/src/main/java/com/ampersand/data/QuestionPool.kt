@@ -43,6 +43,8 @@ class QuestionPool(
     val weather: Map<WeatherKind, List<Question>> = emptyMap(),
     /** Questions that join the daily pool only for couples living in that region. */
     val regional: Map<UsRegion, List<Question>> = emptyMap(),
+    /** Questions naming the local teams, drawn only once a home ZIP is set. */
+    val localTeams: List<Question> = emptyList(),
     /** Every ZIP, for turning a home ZIP into a forecast and a region. */
     val places: ZipTable = ZipTable.empty,
 ) {
@@ -77,7 +79,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten())
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams)
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -136,7 +138,7 @@ class QuestionPool(
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
-        val everything = all + region?.let { regional[it] }.orEmpty()
+        val everything = all + region?.let { regional[it].orEmpty() + localTeams }.orEmpty()
         val open = everything.filter(::shown).ifEmpty { everything }
 
         // A day that is not like the others gets its own question. Rotated by
@@ -258,6 +260,7 @@ class QuestionPool(
             regional = QuizJson.loadFolder(context, "regions").mapNotNull { deck ->
                 UsRegion.entries.firstOrNull { "region-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
             }.toMap(),
+            localTeams = QuizJson.loadFolder(context, "local").flatMap { it.questions },
             // ponytail: parsed on first launch of the screen, about 34k lines;
             // index lazily or by prefix if it ever shows up in a startup trace.
             places = context.assets.open("zips.csv").bufferedReader().useLines { ZipTable.parse(it) },

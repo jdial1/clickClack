@@ -142,9 +142,22 @@ REGIONS = {
     ]),
 }
 
+# Filled in with the nearest MLB and NFL teams to the home ZIP (see Teams.kt).
+# Only drawn once a home ZIP is set, so the braces are never shown.
+LOCAL_TEAMS = [
+    T("rlt1", "Opening day for {mlb}:", "Worth a long lunch", "What is opening day", 1, ["sports", "fun"], "Playful"),
+    S("rlt2", "How much do I care whether {nfl} win on Sunday?", 1, ["sports"], "Playful", "Not at all", "It ruins my week"),
+    P("rlt3", "How would I most like to see {mlb} play?", ["In the stands with a hot dog", "On TV at home", "The radio in the car", "I would rather not"], 1, ["sports", "fun"], "Playful"),
+    G("rlt4", "What is my honest opinion of {nfl}?", 1, ["sports", "words"], "Playful"),
+    M("rlt5", "Pick what I would do for a {nfl} home game.", ["Tailgate", "Wear the jersey", "Watch at a bar", "Enjoy the empty stores", "Have people over"], 1, ["sports", "friends"], "Playful", 3),
+    R("rlt6", "What is a game day you still think about, ours or from growing up?", 1, ["sports", "past"], "Playful"),
+    K("rlt7", "Put these in order of what I enjoy most at a {mlb} game.", ["The food", "The game", "The people watching", "The seventh-inning stretch"], 1, ["sports", "fun"], "Playful"),
+    D("rlt8", "If {nfl} made the Super Bowl, where would I watch it?", ["At home, just us", "A big party", "A sports bar", "At the game, somehow", "I would not watch", "Wherever the snacks are"], 1, ["sports", "friends"], "Playful"),
+]
+
 existing_ids = set()
 for f in glob.glob(os.path.join(ASSETS, "*", "*.json")):
-    if os.path.basename(os.path.dirname(f)) in ("weather", "regions"):
+    if os.path.basename(os.path.dirname(f)) in ("weather", "regions", "local"):
         continue
     for q in json.load(open(f, encoding="utf-8"))["questions"]:
         existing_ids.add(q["id"])
@@ -180,4 +193,6 @@ for kind, (title, theme, qs) in WEATHER.items():
 for region, (title, qs) in REGIONS.items():
     write("regions", f"region-{region.lower()}", title, "KNOW_ME", qs, "Written for Click Clack")
     n += len(qs)
+write("local", "local-teams", "Local teams", "PLAYFUL", LOCAL_TEAMS, "Written for Click Clack")
+n += len(LOCAL_TEAMS)
 print("wrote", n, "questions")

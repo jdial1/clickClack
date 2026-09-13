@@ -272,6 +272,8 @@ data class CoupleState(
     /** The couple's home ZIP, and where that is. */
     val homeZip: String? = null,
     val region: UsRegion? = null,
+    /** The nearest baseball and football teams, said as "Pirates and Steelers". */
+    val localTeams: String? = null,
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */
     val weather: DayWeather? = null,
     /**

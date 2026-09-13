@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.League
+import com.ampersand.model.Teams
+import com.ampersand.model.forPlace
 import com.ampersand.model.Place
 import com.ampersand.model.DayWeather
 import com.ampersand.model.SpecialDate
@@ -324,8 +327,10 @@ class FirestoreCoupleRepository(
         // Mapped here rather than in the history listener, so a past wildcard
         // day resolves once the wildcards arrive instead of showing whatever
         // pool question happened to fall on that date.
+        val homeZip = coupleDoc?.getString("homeZip")
+        val place = homeZip?.let { pool.places.lookup(it) }
         history = historyDocs
-            .mapNotNull { it.toDayEntry(pool, ::resolveQuestion) }
+            .mapNotNull { it.toDayEntry(pool) { id -> resolveQuestion(id)?.forPlace(place) } }
             .filter { it.date != today }
             .sortedByDescending { it.date }
 
@@ -374,8 +379,6 @@ class FirestoreCoupleRepository(
         val hiddenByUid = coupleDoc.topicsByUid("hiddenTopics")
         val hidden = hiddenByUid.values.flatten().toSet()
         val interestsByUid = coupleDoc.topicsByUid("interests")
-        val homeZip = coupleDoc?.getString("homeZip")
-        val place = homeZip?.let { pool.places.lookup(it) }
         val weather = todayDoc.toWeather()
         maybeFetchWeather(place, weather)
 
@@ -386,7 +389,7 @@ class FirestoreCoupleRepository(
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
             else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region)
-        }
+        }.forPlace(place)
 
         val todayEntry = DayEntry(
             date = today,
@@ -430,6 +433,7 @@ class FirestoreCoupleRepository(
             interests = interestsByUid.values.flatten().toSet(),
             homeZip = homeZip,
             region = place?.region,
+            localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
         )
@@ -955,7 +959,9 @@ class FirestoreCoupleRepository(
         id == null -> null
         Wildcard.isWildcard(id) ->
             allWildcards.firstOrNull { it.id == Wildcard.idOf(id) }?.asQuestion()
-        else -> pool.question(id)
+        // Team questions are filled in wherever a question is looked up, so a
+        // past day opened on the reveal names the teams too.
+        else -> pool.question(id)?.forPlace(coupleDoc?.getString("homeZip")?.let { pool.places.lookup(it) })
     }
 
     override fun setProfile(gender: String?, birthday: LocalDate?) {

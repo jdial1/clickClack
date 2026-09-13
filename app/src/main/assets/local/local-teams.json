@@ -1,0 +1,130 @@
+{
+  "id": "local-teams",
+  "title": "Local teams",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rlt1",
+      "text": "Opening day for {mlb}:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Worth a long lunch",
+        "What is opening day"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt2",
+      "text": "How much do I care whether {nfl} win on Sunday?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "It ruins my week",
+      "depth": 1,
+      "tags": [
+        "sports"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt3",
+      "text": "How would I most like to see {mlb} play?",
+      "type": "PICK_ONE",
+      "options": [
+        "In the stands with a hot dog",
+        "On TV at home",
+        "The radio in the car",
+        "I would rather not"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt4",
+      "text": "What is my honest opinion of {nfl}?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "words"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt5",
+      "text": "Pick what I would do for a {nfl} home game.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Tailgate",
+        "Wear the jersey",
+        "Watch at a bar",
+        "Enjoy the empty stores",
+        "Have people over"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "sports",
+        "friends"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt6",
+      "text": "What is a game day you still think about, ours or from growing up?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt7",
+      "text": "Put these in order of what I enjoy most at a {mlb} game.",
+      "type": "RANK",
+      "options": [
+        "The food",
+        "The game",
+        "The people watching",
+        "The seventh-inning stretch"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt8",
+      "text": "If {nfl} made the Super Bowl, where would I watch it?",
+      "type": "DROPDOWN",
+      "options": [
+        "At home, just us",
+        "A big party",
+        "A sports bar",
+        "At the game, somehow",
+        "I would not watch",
+        "Wherever the snacks are"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "friends"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

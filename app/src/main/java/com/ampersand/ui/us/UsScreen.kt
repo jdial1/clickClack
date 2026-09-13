@@ -967,7 +967,9 @@ private fun RelationshipProfile(
         status = listOfNotNull(
             state.relationship?.label,
             state.anniversary?.let { "since ${it.format(LongDay)}" },
-            state.homeZip?.let { zip -> "home $zip" + (state.region?.let { " (${it.label})" } ?: "") },
+            state.homeZip?.let { zip ->
+                "home $zip" + listOfNotNull(state.region?.label, state.localTeams).joinToString(", ").let { if (it.isEmpty()) "" else " ($it)" }
+            },
         ).joinToString(", ").replaceFirstChar { it.uppercase() }.ifEmpty { "Not added" },
         done = state.relationship != null && state.anniversary != null,
         open = open == "us",
