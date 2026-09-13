@@ -221,56 +221,6 @@ class InstrumentScoringTest {
     }
 
     /**
-     * The gap is reported against the person actually going short.
-     *
-     * Both halves of this used to be one absolute difference, which meant that
-     * giving somebody far more of a thing than they wanted was reported as
-     * neglecting them. Here you lavish words nobody asked for and Sam quietly
-     * wants time -- the sentence has to name time.
-     */
-    @Test
-    fun `over-giving is not a shortfall`() {
-        //                  words time gifts acts touch
-        val yourFelt = listOf(3, 3, 3, 5, 4)
-        val yourGiven = listOf(5, 3, 3, 3, 4)
-        val theirFelt = listOf(3, 5, 3, 3, 4)
-        val theirGiven = listOf(3, 3, 3, 3, 4)
-
-        val run = InstrumentRun(
-            instrumentId = Instruments.LOVE_LANGUAGES.id,
-            answers = mapOf(
-                you.uid to expand(yourFelt, yourGiven),
-                them.uid to expand(theirFelt, theirGiven),
-            ),
-        )
-
-        val fit = fitBadge(run)
-
-        assertNotNull(fit.result)
-        assertEquals(5, fit.detail.size)
-
-        val note = requireNotNull(fit.note) { "a measured gap must say something" }
-        assertTrue("should name the shortfall, not the surplus: $note", note.contains("time"))
-        assertTrue("Sam is the one going short: $note", note.startsWith("Sam"))
-    }
-
-    @Test
-    fun `a couple who match are told so`() {
-        val same = listOf(4, 4, 4, 4, 4)
-        val run = InstrumentRun(
-            instrumentId = Instruments.LOVE_LANGUAGES.id,
-            answers = mapOf(
-                you.uid to expand(same, same),
-                them.uid to expand(same, same),
-            ),
-        )
-        val fit = fitBadge(run)
-
-        assertEquals("Lines up on 5 of 5", fit.result)
-        assertEquals(100, BadgeWall.fitPercent(run, you, them))
-    }
-
-    /**
      * Every course a test produces sits under that test's own heading.
      *
      * Love languages yields three, and they were siblings of the type row until
@@ -287,7 +237,7 @@ class InstrumentScoringTest {
         assertEquals("a lone course needs no sub-heading", "", type.rows.single().label)
 
         val language = groups.first { it.instrumentId == Instruments.LOVE_LANGUAGES.id }
-        assertEquals("wanted, given, and the gap", 3, language.rows.size)
+        assertEquals("wanted and given", 2, language.rows.size)
         assertTrue("every course is labelled", language.rows.all { it.label.isNotBlank() })
 
         // The heading has to carry the explanation: a badge on its own is a
@@ -297,12 +247,6 @@ class InstrumentScoringTest {
             assertTrue("${it.title} says how long", it.minutes > 0)
         }
     }
-
-    private fun fitBadge(run: InstrumentRun) =
-        BadgeWall.groups(listOf(run), you, them)
-            .first { it.instrumentId == Instruments.LOVE_LANGUAGES.id }
-            .rows.last()
-            .badges.single()
 
     /** Five per-language levels to the four items each one covers, twice. */
     private fun expand(felt: List<Int>, given: List<Int>): List<Int> =

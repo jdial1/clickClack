@@ -1,5 +1,8 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.IconAction
+import com.ampersand.model.Moments
+import com.ampersand.model.Moment
 import com.ampersand.ui.components.ThemeIcon
 import com.ampersand.ui.components.UiIcon
 import com.ampersand.model.DayEntry
@@ -106,6 +109,9 @@ fun TodayScreen(
     onOpenReveal: () -> Unit,
     modifier: Modifier = Modifier,
     onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
+    onReplyToMood: (String) -> Unit = {},
+    onOpenDay: (LocalDate) -> Unit = {},
+    onAnswerDay: (LocalDate) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -135,7 +141,7 @@ fun TodayScreen(
         }
 
         Spacer(Modifier.height(8.dp))
-        Moods(state, onSetMood)
+        Moods(state, onSetMood, onReplyToMood)
 
         Spacer(Modifier.height(18.dp))
         QuestionHero(
@@ -186,6 +192,12 @@ fun TodayScreen(
             ) {
                 SealedPanel(state, you, them, onOpenReveal)
             }
+        }
+
+        val moments = remember(state.history, state.today.date) { Moments.of(state) }
+        if (moments.isNotEmpty()) {
+            Spacer(Modifier.height(28.dp))
+            MomentsCard(state, moments, onOpenDay, onAnswerDay)
         }
 
 
@@ -548,9 +560,9 @@ private fun AnswerForm(
     state: CoupleState,
     youColor: Color,
     themColor: Color,
+    question: Question = state.today.question,
     onSubmit: (List<String>, List<String>?) -> Unit,
 ) {
-    val question = state.today.question
     // Keyed on the question so switching questions clears both drafts.
     var mine by remember(question.id) { mutableStateOf(Draft.forQuestion(question)) }
     var theirs by remember(question.id) { mutableStateOf(Draft.forQuestion(question)) }
@@ -724,13 +736,16 @@ private fun SealedPanel(
  * picking sets it and closes. Theirs is hidden when unset.
  */
 @Composable
-private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
+private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onReply: (String) -> Unit) {
     val today = state.today.date
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
     val mine = state.you.mood?.takeIf { it.current(today) != null }
     val theirs = state.them.mood?.takeIf { it.current(today) != null }
     var picking by rememberSaveable { mutableStateOf(false) }
+    var replying by rememberSaveable { mutableStateOf(false) }
+    val theirReply = state.today.moodReplies[state.them.uid]
+    val myReply = state.today.moodReplies[state.you.uid]
     // The default face colour is set in Settings.
     val faceColor = LocalAppearance.current?.moodFace
     val sounds = LocalSounds.current
@@ -744,14 +759,14 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
         picking = false
     }
 
-    // One strip: the weather on the left, both moods on the right.
-    Row(
+    // One strip: the weather on the left, both moods on the right, replies underneath.
+    Column(
         Modifier
             .fillMaxWidth()
             .glass(inkOnBrick(structureSlug()), corner = 12.dp)
             .padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
             state.weather?.let { weather ->
                 weather.brick?.let { WeatherBrickArt(it, Modifier.size(30.dp)) }
@@ -762,7 +777,34 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
         MoodChip(who = "You", entry = mine, color = you, empty = "Set mood") { picking = !picking }
         theirs?.let {
             Spacer(Modifier.width(10.dp))
-            MoodChip(who = state.them.name, entry = it, color = them, empty = "", onClick = null)
+            // Tap theirs to reply.
+            MoodChip(who = state.them.name, entry = it, color = them, empty = "") { replying = !replying; picking = false }
+        }
+    }
+    theirReply?.takeIf { mine != null }?.let {
+        Text("${state.them.name}: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+    }
+    myReply?.takeIf { theirs != null }?.let {
+        Text("You sent: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+    }
+    }
+    AnimatedVisibility(visible = replying && theirs != null) {
+        Column(Modifier.fillMaxWidth().padding(top = 10.dp)) {
+            var note by rememberSaveable { mutableStateOf("") }
+            fun send(text: String) {
+                sounds.play(Sfx.PLACE)
+                feel.play(Feel.PLACE)
+                onReply(text)
+                note = ""
+                replying = false
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                MoodReplies.forEach { r -> BrickChip(label = r, on = r == myReply, color = null, onClick = { send(r) }) }
+            }
+            Spacer(Modifier.height(10.dp))
+            AmpField(value = note, onValueChange = { note = it.take(80) }, color = you, placeholder = "Or a short note")
+            Spacer(Modifier.height(8.dp))
+            AmpButton(label = "Send", slug = you.slug, enabled = note.isNotBlank(), icon = UiIcon.DONE) { send(note.trim()) }
         }
     }
     AnimatedVisibility(visible = picking) {
@@ -824,6 +866,87 @@ private fun MoodChip(
         } else {
             Text(empty, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
         }
+    }
+}
+
+/** One-tap replies to your partner's mood. */
+private val MoodReplies = listOf("Thinking of you", "Here if you need me", "Proud of you", "Sending a hug", "Call you later")
+
+/** A missed day to answer late, and an old day to remember. */
+@Composable
+private fun MomentsCard(
+    state: CoupleState,
+    moments: List<Moment>,
+    onOpenDay: (LocalDate) -> Unit,
+    onAnswerDay: (LocalDate) -> Unit,
+) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    SectionLabel("Moments")
+    Spacer(Modifier.height(10.dp))
+    moments.forEach { m ->
+        val day = m.day
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                    sounds.play(Sfx.NAV)
+                    feel.play(Feel.NAV)
+                    if (m is Moment.Missed) onAnswerDay(day.date) else onOpenDay(day.date)
+                }
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+        ) {
+            Text(
+                when (m) {
+                    is Moment.Missed -> if (m.partnerAnswered) {
+                        "You missed ${day.date.format(MomentDay)}. ${state.them.name} answered."
+                    } else {
+                        "You missed ${day.date.format(MomentDay)}."
+                    }
+                    is Moment.Recall -> "Remember ${day.date.format(MomentDate)}?"
+                },
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(day.question.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(Modifier.height(6.dp))
+            IconAction(
+                if (m is Moment.Missed) UiIcon.WRITE else UiIcon.DETAILS,
+                if (m is Moment.Missed) "Answer it now" else "See what you both said",
+            )
+        }
+    }
+}
+
+private val MomentDay = DateTimeFormatter.ofPattern("EEEE's question")
+private val MomentDate = DateTimeFormatter.ofPattern("d MMMM")
+
+/** Answer a past day you missed. */
+@Composable
+fun PastAnswerScreen(
+    state: CoupleState,
+    day: DayEntry,
+    onBack: () -> Unit,
+    onSubmit: (List<String>, List<String>?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
+    ) {
+        Spacer(Modifier.height(12.dp))
+        IconAction(UiIcon.BACK, "Back", onClick = onBack)
+        Spacer(Modifier.height(8.dp))
+        SectionLabel(day.date.format(DayFormat))
+        Spacer(Modifier.height(10.dp))
+        Text(day.question.text, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(Modifier.height(20.dp))
+        AnswerForm(state, Color(state.you.colorArgb), Color(state.them.colorArgb), question = day.question, onSubmit = onSubmit)
+        Spacer(Modifier.height(48.dp))
     }
 }
 

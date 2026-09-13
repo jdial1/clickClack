@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.today.PastAnswerScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import com.ampersand.ui.quiz.BrickChip
@@ -370,6 +371,7 @@ private sealed interface Screen {
     data class Deck(val id: String) : Screen
     data class Sitting(val instrumentId: String) : Screen
     data class Reveal(val date: LocalDate) : Screen
+    data class Past(val date: LocalDate) : Screen
     data object Wildcard : Screen
     data object Settings : Screen
     data class Main(val tab: Tab) : Screen
@@ -424,6 +426,10 @@ private fun SignedInApp(
         // Day whose reveal animation already played. Hoisted so it doesn't replay on return.
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
         var writing by rememberSaveable { mutableStateOf(false) }
+        // A missed past day being answered late.
+        var answering by rememberSaveable { mutableStateOf<LocalDate?>(null) }
+        // Past days load their answers when opened.
+        LaunchedEffect(openDate) { openDate?.let { vm.repo.loadAnswers(it) } }
         var sitting by rememberSaveable { mutableStateOf<String?>(null) }
         var settings by rememberSaveable { mutableStateOf(false) }
 
@@ -433,13 +439,14 @@ private fun SignedInApp(
         // No nav back stack, so handle back manually: close overlays, then return to Today.
         // Disabled on Today so back exits the app.
         BackHandler(
-            enabled = settings || writing || openDeck != null || openDate != null || tab != Tab.TODAY,
+            enabled = settings || writing || openDeck != null || openDate != null || answering != null || tab != Tab.TODAY,
         ) {
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
             when {
                 settings -> settings = false
                 writing -> writing = false
+                answering != null -> answering = null
                 openDeck != null -> openDeck = null
                 openDate != null -> openDate = null
                 else -> tab = Tab.TODAY
@@ -453,7 +460,7 @@ private fun SignedInApp(
                     BottomBar(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
-                        enabled = openDate == null && openDeck == null && !writing &&
+                        enabled = openDate == null && openDeck == null && !writing && answering == null &&
                             sitting == null && !settings,
                         onSelect = { tab = it; openDate = null; openDeck = null },
                     )
@@ -475,6 +482,7 @@ private fun SignedInApp(
                         sitting != null -> Screen.Sitting(sitting!!)
                         settings -> Screen.Settings
                         writing -> Screen.Wildcard
+                        answering != null -> Screen.Past(answering!!)
                         openDeck != null -> Screen.Deck(openDeck!!)
                         openDate != null -> Screen.Reveal(openDate!!)
                         else -> Screen.Main(tab)
@@ -500,6 +508,7 @@ private fun SignedInApp(
                     }
 
                     val deck = (screen as? Screen.Deck)?.id?.let { pool.deck(it) }
+                    val past = (screen as? Screen.Past)?.date?.let { date -> state.history.firstOrNull { it.date == date } }
 
                     val kit = (screen as? Screen.Sitting)?.instrumentId?.let { Instruments[it] }
 
@@ -516,6 +525,16 @@ private fun SignedInApp(
                                 .lastOrNull { it.instrumentId == kit.id }
                                 ?.draft.orEmpty(),
                             onSaveDraft = { vm.repo.saveInstrumentDraft(kit.id, it) },
+                        )
+
+                        past != null -> PastAnswerScreen(
+                            state = state,
+                            day = past,
+                            onBack = { answering = null },
+                            onSubmit = { values, guess ->
+                                vm.repo.answerPast(past.date, past.question.id, values, guess)
+                                answering = null
+                            },
                         )
 
                         deck != null -> DeckScreen(
@@ -535,6 +554,7 @@ private fun SignedInApp(
                             animateIn = openedReveal != day.date.toString(),
                             onOpened = { openedReveal = day.date.toString() },
                             onTalkedAbout = vm.repo::markTalkedAbout,
+                            onNote = { vm.repo.noteDay(day.date, it) },
                             themes = QuizTheme.entries.filter { it.label in pool.themes },
                             onPickTomorrow = vm.repo::pickTomorrow,
                             onWrite = { writing = true },
@@ -571,6 +591,9 @@ private fun SignedInApp(
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
                             onSetMood = vm.repo::setMood,
+                            onReplyToMood = vm.repo::replyToMood,
+                            onOpenDay = { openDate = it },
+                            onAnswerDay = { answering = it },
                         )
 
                         screen.tab == Tab.DECKS -> DecksScreen(

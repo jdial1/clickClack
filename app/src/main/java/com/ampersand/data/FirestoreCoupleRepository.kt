@@ -132,6 +132,9 @@ class FirestoreCoupleRepository(
     /** The past day today's question repeats, on a capsule day. */
     private var capsuleSource: DayEntry? = null
 
+    /** Answers read for past days on demand (see [loadAnswers]). */
+    private var pastAnswers: Map<LocalDate, Map<String, Answer>> = emptyMap()
+
     /** Monthly guess-hit rollups. */
     private var knowing: Knowing = Knowing()
 
@@ -290,6 +293,7 @@ class FirestoreCoupleRepository(
         val place = homeZip?.let { pool.places.lookup(it) }
         history = historyDocs
             .mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
+            .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day }
             .filter { it.date != today }
             .sortedByDescending { it.date }
 
@@ -352,6 +356,8 @@ class FirestoreCoupleRepository(
             question = question,
             answers = todayAnswers,
             reactions = todayDoc.toReactions(),
+            notes = todayDoc.stringMap("notes"),
+            moodReplies = todayDoc.stringMap("moodReplies"),
             talkedAbout = todayDoc.toTalkedAbout(),
             opened = todayDoc?.getBoolean("revealed") == true,
             submitted = todayDoc.toSubmitted(),
@@ -408,6 +414,7 @@ class FirestoreCoupleRepository(
             awardForQuizzes(next)
             awardForTalks(next)
             awardForBucket(next)
+            awardForMoods(next)
         }
     }
 
@@ -438,6 +445,20 @@ class FirestoreCoupleRepository(
         }.filter { it.id !in laid }
         if (fresh.isEmpty()) return
 
+        plateRef(plate).set(
+            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            SetOptions.merge(),
+        )
+    }
+
+    /** A one-stud mood brick each for the last day either of you set a mood, once that day is over. */
+    private fun awardForMoods(s: CoupleState) {
+        val plate = s.plate
+        if (plate.isSealed) return
+        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
+        val fresh = listOf(s.you, s.them).mapNotNull { m -> m.mood?.takeIf { it.on < today }?.block(m) }
+            .filter { it.id !in laid }
+        if (fresh.isEmpty()) return
         plateRef(plate).set(
             plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
             SetOptions.merge(),
@@ -872,8 +893,21 @@ class FirestoreCoupleRepository(
     }
 
     override fun setMood(mood: Mood?, color: BrickColor?) {
+        val now = System.currentTimeMillis()
+        // Carry today's time in the previous mood, so the day's brick is the mood held longest.
+        val prev = _state.value.you.mood?.takeIf { it.on == today }
+        val spans = prev?.let { p ->
+            p.spans + (p.mood to ((p.spans[p.mood] ?: 0) + (now - p.atMillis).coerceAtLeast(0)))
+        }.orEmpty()
         db.collection(USERS).document(myUid).set(
-            mapOf("mood" to mood?.let { mapOf("id" to it.name, "on" to today.toString(), "color" to color?.slug) }),
+            mapOf(
+                "mood" to mood?.let {
+                    mapOf(
+                        "id" to it.name, "on" to today.toString(), "color" to color?.slug, "at" to now,
+                        "spans" to spans.mapKeys { (k, _) -> k.name },
+                    )
+                },
+            ),
             SetOptions.merge(),
         )
     }
@@ -953,6 +987,41 @@ class FirestoreCoupleRepository(
             plate.toMap() + ("placed" to placed.map { it.toMap() }),
             SetOptions.merge(),
         )
+    }
+
+    override fun noteDay(date: LocalDate, text: String) {
+        couple.collection(DAYS).document(date.toString())
+            .set(mapOf("notes" to mapOf(myUid to text.take(140))), SetOptions.merge())
+    }
+
+    override fun replyToMood(text: String) {
+        dayRef.set(mapOf("moodReplies" to mapOf(myUid to text.take(80))), SetOptions.merge())
+    }
+
+    override fun loadAnswers(date: LocalDate) {
+        if (date == today) return
+        val answers = couple.collection(DAYS).document(date.toString()).collection(ANSWERS)
+        answers.document(myUid).get().addOnSuccessListener { mine ->
+            // Theirs is only readable once the day is open; a refusal just leaves yours.
+            answers.document(partnerUid).get()
+                .addOnCompleteListener { theirs ->
+                    val found = listOfNotNull(mine.toAnswer(), theirs.result?.takeIf { theirs.isSuccessful }?.toAnswer())
+                    pastAnswers = pastAnswers + (date to found.associateBy { it.uid })
+                    recompose()
+                }
+        }
+    }
+
+    override fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?) {
+        if (date >= today) return
+        val ref = couple.collection(DAYS).document(date.toString())
+        ref.set(mapOf("questionId" to questionId, "submitted" to FieldValue.arrayUnion(myUid)), SetOptions.merge())
+        ref.collection(ANSWERS).document(myUid)
+            .set(mapOf("values" to values, "guess" to guess, "submittedAt" to FieldValue.serverTimestamp()))
+            .addOnSuccessListener {
+                openSeal(ref)
+                loadAnswers(date)
+            }
     }
 
     override fun react(date: LocalDate, reaction: Reaction?) {
@@ -1101,7 +1170,14 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     mood = (this?.get("mood") as? Map<*, *>)?.let { m ->
         val mood = Mood.entries.firstOrNull { it.name == m["id"] } ?: return@let null
         val on = (m["on"] as? String)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@let null
-        MoodEntry(mood, on, BrickColor.entries.firstOrNull { it.slug == m["color"] })
+        MoodEntry(
+            mood, on, BrickColor.entries.firstOrNull { it.slug == m["color"] },
+            atMillis = (m["at"] as? Number)?.toLong() ?: 0,
+            spans = (m["spans"] as? Map<*, *>).orEmpty().entries.mapNotNull { (k, v) ->
+                val key = Mood.entries.firstOrNull { it.name == k } ?: return@mapNotNull null
+                (v as? Number)?.let { key to it.toLong() }
+            }.toMap(),
+        )
     },
 )
 
@@ -1143,6 +1219,11 @@ private fun DocumentSnapshot?.toReactions(): Map<String, Reaction> {
         Reaction.entries.firstOrNull { it.name == name }?.let { uid to it }
     }.toMap()
 }
+
+private fun DocumentSnapshot?.stringMap(field: String): Map<String, String> =
+    (this?.get(field) as? Map<*, *>).orEmpty().entries
+        .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
+        .toMap()
 
 private fun DocumentSnapshot?.toTalkedAbout(): Set<String> {
     @Suppress("UNCHECKED_CAST")
@@ -1212,6 +1293,8 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?, L
         date = date,
         question = question,
         reactions = toReactions(),
+        notes = stringMap("notes"),
+        moodReplies = stringMap("moodReplies"),
         talkedAbout = toTalkedAbout(),
         opened = getBoolean("revealed") == true,
         submitted = toSubmitted(),
@@ -1278,6 +1361,7 @@ private fun Map<String, Any?>.toBlock(): Block? {
         earnedOn = runCatching { LocalDate.parse(this["earnedOn"] as? String) }.getOrNull()
             ?: LocalDate.now(),
         face = BlockFace.entries.firstOrNull { it.name == this["face"] },
+        moodGlyph = this["moodGlyph"] as? String,
     )
 }
 
@@ -1299,6 +1383,7 @@ private fun Block.toMap(): Map<String, Any?> = mapOf(
     "ownerUid" to ownerUid,
     "earnedOn" to earnedOn.toString(),
     "face" to face?.name,
+    "moodGlyph" to moodGlyph,
 )
 
 private fun Placement.toMap(): Map<String, Any?> = mapOf("blockId" to blockId, "x" to x, "y" to y)

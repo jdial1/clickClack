@@ -1,5 +1,12 @@
 package com.ampersand.ui.reveal
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.AmpField
+import com.ampersand.ui.components.IconAction
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
@@ -70,6 +77,7 @@ fun RevealScreen(
     animateIn: Boolean = true,
     onOpened: () -> Unit = {},
     onTalkedAbout: (java.time.LocalDate) -> Unit = {},
+    onNote: (String) -> Unit = {},
     themes: List<QuizTheme> = emptyList(),
     onPickTomorrow: (String) -> Unit = {},
     onWrite: () -> Unit = {},
@@ -211,6 +219,29 @@ fun RevealScreen(
             )
         } else {
             QuietNote("${state.them.name} hasn't reacted yet.")
+        }
+
+        if (day.isRevealed) {
+            Spacer(Modifier.height(24.dp))
+            SectionLabel("A line back")
+            Spacer(Modifier.height(8.dp))
+            day.notes[state.them.uid]?.let {
+                Text("${state.them.name}: $it", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(8.dp))
+            }
+            val mine = day.notes[state.you.uid]
+            var editing by remember(day.date) { mutableStateOf(mine == null) }
+            var draft by remember(day.date) { mutableStateOf(mine.orEmpty()) }
+            if (!editing && mine != null) {
+                IconAction(UiIcon.WRITE, "You: $mine", onClick = { editing = true })
+            } else {
+                AmpField(value = draft, onValueChange = { draft = it.take(140) }, color = BrickColor.of(state.you.colorArgb), placeholder = "Say one thing back")
+                Spacer(Modifier.height(8.dp))
+                AmpButton(label = "Send", slug = null, enabled = draft.isNotBlank(), icon = UiIcon.DONE) {
+                    onNote(draft.trim())
+                    editing = false
+                }
+            }
         }
 
         Spacer(Modifier.height(24.dp))

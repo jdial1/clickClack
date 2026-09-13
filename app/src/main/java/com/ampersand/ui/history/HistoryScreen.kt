@@ -224,46 +224,6 @@ private fun ago(then: LocalDate, now: LocalDate): String {
     }
 }
 
-/**
- * One stud per brick each person earned, weighted by count so studs match width in both halves.
- * Don't set a height here: BrickSlab rounds up to whole courses and overdraws the caption.
- */
-@Composable
-private fun Contribution(plate: BuildPlate, state: CoupleState) {
-    val mine = plate.earnedBy(state.you.uid)
-    val theirs = plate.earnedBy(state.them.uid)
-    if (mine + theirs == 0) return
-
-    val you = BrickColor.of(state.you.colorArgb)
-    val them = BrickColor.of(state.them.colorArgb)
-
-    Column(Modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth()) {
-            if (mine > 0) {
-                BrickSlab(
-                    slugs = listOf(you.slug),
-                    studs = mine,
-                    height = BrickHeight.LOW,
-                    modifier = Modifier.weight(mine.toFloat()),
-                )
-            }
-            if (theirs > 0) {
-                BrickSlab(
-                    slugs = listOf(them.slug),
-                    studs = theirs,
-                    height = BrickHeight.LOW,
-                    modifier = Modifier.weight(theirs.toFloat()),
-                )
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        SectionLabel(
-            "${state.you.name} $mine  ·  ${state.them.name} $theirs  ·  " +
-                "${plate.placed.size} placed",
-        )
-    }
-}
-
 /** Finished sculptures, newest first: the selected one large, the rest in a strip below. */
 @Composable
 private fun Shelf(
@@ -307,8 +267,6 @@ private fun Shelf(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(10.dp))
-        Contribution(selected, state)
 
         Spacer(Modifier.height(14.dp))
         NameWeek(selected, state, onNameWeek)

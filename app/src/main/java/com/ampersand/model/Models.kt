@@ -145,6 +145,10 @@ data class DayEntry(
      * nothing was written (older days). See [Streaks].
      */
     val recordedRun: Int = 0,
+    /** A line each after the reveal, keyed by uid. */
+    val notes: Map<String, String> = emptyMap(),
+    /** A reply to the other person's mood that day, keyed by the uid who sent it. */
+    val moodReplies: Map<String, String> = emptyMap(),
 ) {
     /** Either of you marked it. */
     val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()

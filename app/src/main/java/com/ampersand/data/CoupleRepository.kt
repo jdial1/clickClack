@@ -81,6 +81,18 @@ interface CoupleRepository {
     /** Sets or clears your reaction to a revealed day. Unlike answers, reactions can change. */
     fun react(date: LocalDate, reaction: Reaction?)
 
+    /** Your one line back on a revealed day. */
+    fun noteDay(date: LocalDate, text: String)
+
+    /** Reply to your partner's mood today, with a preset or a short note. */
+    fun replyToMood(text: String)
+
+    /** Load both answers for a past day, so it can be shown or recalled. */
+    fun loadAnswers(date: LocalDate)
+
+    /** Answer a past day you missed. Opens it if your partner already answered. */
+    fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?)
+
     /** Seals the current plate and starts the next. Firestore calls this itself when the period ends. */
     fun sealPlate()
 
@@ -311,6 +323,20 @@ class FakeCoupleRepository(
     override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
         val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun noteDay(date: LocalDate, text: String) = mutate { current ->
+        current.withDay(date) { it.copy(notes = it.notes + (current.you.uid to text)) }
+    }
+
+    override fun replyToMood(text: String) = mutate { current ->
+        current.copy(today = current.today.copy(moodReplies = current.today.moodReplies + (current.you.uid to text)))
+    }
+
+    override fun loadAnswers(date: LocalDate) = Unit
+
+    override fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?) = mutate { current ->
+        current.withDay(date) { it.copy(answers = it.answers + (current.you.uid to Answer(current.you.uid, values, guess))) }
     }
 
     override fun setMood(mood: Mood?, color: BrickColor?) = mutate {

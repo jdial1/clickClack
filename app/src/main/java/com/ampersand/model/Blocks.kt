@@ -65,9 +65,14 @@ data class Block(
     val ownerUid: String,
     val earnedOn: LocalDate,
     val face: BlockFace? = null,
+    /** Set on a day's mood brick: which face it wears. See [MoodEntry.block]. */
+    val moodGlyph: String? = null,
 ) {
-    /** Faces have their own art; every other brick exists in the owner's color. */
-    val asset: String get() = face?.asset ?: BrickColor.of(colorArgb).asset(shape)
+    /** Faces and mood bricks have their own art; every other brick exists in the owner's color. */
+    val asset: String
+        get() = face?.asset
+            ?: moodGlyph?.let { "mood_${it}_${BrickColor.of(colorArgb).slug}" }
+            ?: BrickColor.of(colorArgb).asset(shape)
 }
 
 /** Bottom-left corner of a block, in grid cells. y = 0 is the baseplate. */

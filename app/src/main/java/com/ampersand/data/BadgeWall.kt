@@ -30,7 +30,6 @@ object BadgeWall {
                     "What makes you feel loved", "wanted"),
                 languageRow(it, you, them, Instruments.GIVEN,
                     "What you each tend to do", "given"),
-                fitRow(it, you, them),
             )
         },
     )
@@ -232,71 +231,7 @@ object BadgeWall {
 
     // ---- the gap ---------------------------------------------------------
 
-    /**
-     * The fit between what each of you wants and what the other gives (Mostova et al.),
-     * measured in both directions. [ALIGNED] is our own cut-off; the research has none.
-     */
-    private fun fitRow(run: InstrumentRun?, you: Member, them: Member): BadgeRow {
-        val kit = Instruments.LOVE_LANGUAGES
-        val open = run?.isOpen == true
-
-        val yourFelt = readings(run, you.uid, Instruments.FELT)
-        val yourGiven = readings(run, you.uid, Instruments.GIVEN)
-        val theirFelt = readings(run, them.uid, Instruments.FELT)
-        val theirGiven = readings(run, them.uid, Instruments.GIVEN)
-
-        val bars = mutableListOf<BadgeBar>()
-        var alignedCount = 0
-        // (label, shortfall, theyAreShort). Bars use the absolute gap; the note only
-        // counts shortfalls, so over-giving is not reported as neglect.
-        var worst: Triple<String, Int, Boolean>? = null
-
-        if (open && yourFelt.isNotEmpty()) {
-            kit.subscales.forEachIndexed { i, scale ->
-                val toYou = abs(yourFelt[i].value - theirGiven[i].value)
-                val toThem = abs(theirFelt[i].value - yourGiven[i].value)
-                val gap = maxOf(toYou, toThem)
-                if (gap <= ALIGNED) alignedCount++
-                bars += BadgeBar(
-                    label = scale.label,
-                    // Full bar = perfect match, empty = widest possible gap.
-                    fraction = 1f - (gap / SPAN.toFloat()).coerceIn(0f, 1f),
-                    value = if (gap <= ALIGNED) "lines up" else "off by $gap",
-                )
-
-                // Floored at zero: getting more than you want is not a shortfall.
-                val youShort = (yourFelt[i].value - theirGiven[i].value).coerceAtLeast(0)
-                val theyShort = (theirFelt[i].value - yourGiven[i].value).coerceAtLeast(0)
-                val short = maxOf(youShort, theyShort)
-                if (short > ALIGNED && (worst == null || short > worst!!.second)) {
-                    worst = Triple(scale.label, short, theyShort >= youShort)
-                }
-            }
-        }
-
-        val badge = Badge(
-            slotId = "language.fit",
-            owner = Owner.BOTH,
-            who = "Together",
-            result = if (open && bars.isNotEmpty()) "Lines up on $alignedCount of ${kit.subscales.size}" else null,
-            detail = bars,
-            note = when {
-                !open || bars.isEmpty() -> null
-                worst == null ->
-                    "You are both getting what you need. Keep it up."
-                worst!!.third ->
-                    "${them.name} wants ${worst!!.first.lowercase()} more than you tend to give it."
-                else ->
-                    "You want ${worst!!.first.lowercase()} more than ${them.name} tends to give it."
-            },
-            instrumentId = kit.id,
-            minutes = kit.minutes,
-            waitingOnThem = run != null && !open,
-        )
-        return BadgeRow("How well you match", listOf(badge))
-    }
-
-    private fun readings(run: InstrumentRun?, uid: String, pass: Int): List<Reading> =
+        private fun readings(run: InstrumentRun?, uid: String, pass: Int): List<Reading> =
         if (run?.isOpen != true) emptyList()
         else run.responsesFor(uid)?.let { Instruments.LOVE_LANGUAGES.readings(it, pass) }.orEmpty()
 

@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
-import androidx.compose.ui.text.style.TextAlign
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
 import com.ampersand.data.Sources
@@ -122,10 +121,8 @@ fun UsScreen(
         BlendStrip(you = you, them = them)
 
         Spacer(Modifier.height(32.dp))
-        SideBySideTable(state)
-        Spacer(Modifier.height(10.dp))
-        Knowing(state)
-        Spacer(Modifier.height(16.dp))
+        YouTwo(state)
+        Spacer(Modifier.height(12.dp))
         val byDate = remember(state.history) { state.history.associateBy { it.date } }
         com.ampersand.ui.history.StudPlate(state, byDate, onOpenDay)
 
@@ -322,53 +319,22 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
     }
 }
 
-/** Three counts per partner, one row each, in their color. */
+/** One line for the last ten weeks: days each of you showed up, and right guesses. */
 @Composable
-private fun SideBySideTable(state: CoupleState) {
-    val rows = listOf(state.you, state.them).map { it to SideBySide.of(state, it.uid) }
-    val headers = listOf("Days", "Right guesses", "Decks")
-
+private fun YouTwo(state: CoupleState) {
+    val you = SideBySide.of(state, state.you.uid)
+    val them = SideBySide.of(state, state.them.uid)
     SectionLabel("You two")
-    Spacer(Modifier.height(10.dp))
-    Row(Modifier.fillMaxWidth()) {
-        Spacer(Modifier.width(NameColumn))
-        headers.forEach { label ->
-            Text(
-                label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f),
-            )
-        }
-    }
     Spacer(Modifier.height(8.dp))
-    rows.forEach { (member, tally) ->
-        val brick = BrickColor.of(member.colorArgb)
-        Row(
-            Modifier.fillMaxWidth().padding(bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Row(Modifier.width(NameColumn), verticalAlignment = Alignment.CenterVertically) {
-                PersonDot(member.name, Color(member.colorArgb), size = 26)
-            }
-            listOf(tally.daysShowedUp, tally.guessesLanded, tally.decksFinished).forEach { n ->
-                Box(Modifier.weight(1f).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
-                    BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.MEDIUM) {
-                        Text(
-                            n.toString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = inkOnBrick(brick.slug),
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
-                        )
-                    }
-                }
-            }
-        }
-    }
+    Text(
+        "Last 10 weeks: you ${you.daysShowedUp} days, ${state.them.name} ${them.daysShowedUp}. " +
+            "Right guesses: you ${you.guessesLanded}, ${state.them.name} ${them.guessesLanded}.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier.glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(horizontal = 12.dp, vertical = 8.dp),
+    )
 }
 
-private val NameColumn = 44.dp
 
 /** Settings, opened from the Us header. Sign out and unpair sit in a collapsed Advanced section. */
 @Composable
@@ -661,40 +627,6 @@ private fun ColorRow(
     }
 }
 
-/** Guess accuracy over time: totals, a one-line verdict, and a stud bar per partner for recent months. */
-@Composable
-private fun Knowing(state: CoupleState) {
-    val knowing = state.knowing
-    if (knowing.isEmpty) return
-    val month = knowing.recent.firstOrNull()
-    Text(
-        text = "Right guesses: ${state.you.name} ${knowing.youHits}, ${state.them.name} ${knowing.theyHits} of ${knowing.scored}. " +
-            verdict(state, knowing),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onBackground,
-    )
-    month?.let {
-        Text(
-            "${it.month.format(MonthLabel)}: ${state.you.name} ${it.youHits}, ${state.them.name} ${it.theyHits} of ${it.scored}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-    }
-}
-
-/** One-line summary of who guesses right more; "even" when within 10%. */
-@Composable
-private fun verdict(state: CoupleState, knowing: com.ampersand.model.Knowing): String {
-    val gap = knowing.youHits - knowing.theyHits
-    val share = knowing.scored.takeIf { it > 0 } ?: return ""
-    return when {
-        kotlin.math.abs(gap) <= share / 10 -> "You're about even."
-        gap > 0 -> "${state.you.name} guesses right more often."
-        else -> "${state.them.name} guesses right more often."
-    }
-}
-
-private val MonthLabel: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")
 
 /** Separate sound and vibration toggles; each confirms itself with the other channel when needed. */
 @Composable
