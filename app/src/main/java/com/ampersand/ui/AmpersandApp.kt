@@ -644,6 +644,9 @@ private fun SignedInApp(
                             onSetAnniversary = vm.repo::setAnniversary,
                             onTakeInstrument = { sitting = it },
                             onOpenSettings = { settings = true },
+                            onAddToBucket = vm.repo::addToBucket,
+                            onTickBucket = vm.repo::tickBucket,
+                            onRemoveFromBucket = vm.repo::removeFromBucket,
                         )
                     }
                     }

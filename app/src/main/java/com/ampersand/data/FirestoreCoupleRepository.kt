@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.BucketList
+import com.ampersand.model.BucketItem
+import com.ampersand.model.BucketGroup
 import com.ampersand.model.BrickColor
 import android.util.Log
 import com.ampersand.auth.COUPLES
@@ -47,6 +50,7 @@ private const val PLATES = "plates"
 private const val QUIZZES = "quizzes"
 private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
+private const val BUCKET = "bucket"
 private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
 private const val DRAFTS = "drafts"
@@ -122,6 +126,9 @@ class FirestoreCoupleRepository(
 
     /** Every wildcard either of you has written, used or not. */
     private var allWildcards: List<Wildcard> = emptyList()
+
+    /** The shared bucket list. */
+    private var bucket: List<BucketItem> = emptyList()
 
     /** The day today's question came back from, on a capsule day. */
     private var capsuleSource: DayEntry? = null
@@ -229,6 +236,16 @@ class FirestoreCoupleRepository(
                     return@addSnapshotListener
                 }
                 allWildcards = snap?.documents.orEmpty().mapNotNull { it.toWildcard() }
+                recompose()
+            }
+
+        regs += couple.collection(BUCKET)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "bucket listener failed", error)
+                    return@addSnapshotListener
+                }
+                bucket = snap?.documents.orEmpty().mapNotNull { it.toBucketItem() }
                 recompose()
             }
 
@@ -369,6 +386,7 @@ class FirestoreCoupleRepository(
             // The ladder can find a day whose question the pin then overrode.
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
+            bucket = bucket,
         )
 
         // The assignment. Without it every listener in this class computed the
@@ -387,6 +405,7 @@ class FirestoreCoupleRepository(
         if (platesLoaded) {
             awardForQuizzes(next)
             awardForTalks(next)
+            awardForBucket(next)
         }
     }
 
@@ -428,6 +447,24 @@ class FirestoreCoupleRepository(
         }.filter { it.id !in laid }
         if (fresh.isEmpty()) return
 
+        plateRef(plate).set(
+            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            SetOptions.merge(),
+        )
+    }
+
+    /**
+     * A brick each for anything ticked off the list. By id, and checked against
+     * every plate, so a tick is paid once however many phones see it.
+     */
+    private fun awardForBucket(s: CoupleState) {
+        val plate = s.plate
+        if (plate.isSealed) return
+        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
+        val fresh = s.bucket.flatMap { item ->
+            listOfNotNull(BucketList.reward(item, s.you), BucketList.reward(item, s.them))
+        }.filter { it.id !in laid }
+        if (fresh.isEmpty()) return
         plateRef(plate).set(
             plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
             SetOptions.merge(),
@@ -718,6 +755,27 @@ class FirestoreCoupleRepository(
             plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
             SetOptions.merge(),
         )
+    }
+
+    override fun addToBucket(text: String, group: BucketGroup) {
+        couple.collection(BUCKET).add(
+            mapOf(
+                "text" to text,
+                "group" to group.name,
+                "byUid" to myUid,
+                "createdAt" to FieldValue.serverTimestamp(),
+                "doneOn" to null,
+            ),
+        )
+    }
+
+    override fun tickBucket(id: String) {
+        couple.collection(BUCKET).document(id)
+            .update(mapOf("doneOn" to today.toString(), "doneBy" to myUid))
+    }
+
+    override fun removeFromBucket(id: String) {
+        couple.collection(BUCKET).document(id).delete()
     }
 
     override fun addWildcard(text: String, type: QuestionType, options: List<String>) {
@@ -1070,6 +1128,18 @@ private fun DocumentSnapshot.toWildcard(): Wildcard? {
         byName = getString("byName").orEmpty(),
         createdAtMillis = getTimestamp("createdAt")?.toDate()?.time ?: 0L,
         usedOn = getString("usedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    )
+}
+
+private fun DocumentSnapshot.toBucketItem(): BucketItem? {
+    val text = getString("text")?.takeIf { it.isNotBlank() } ?: return null
+    return BucketItem(
+        id = id,
+        text = text,
+        group = BucketGroup.entries.firstOrNull { it.name == getString("group") } ?: BucketGroup.GOALS,
+        byUid = getString("byUid").orEmpty(),
+        createdAtMillis = getTimestamp("createdAt")?.toDate()?.time ?: 0L,
+        doneOn = getString("doneOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
     )
 }
 

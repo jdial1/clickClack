@@ -252,6 +252,8 @@ data class CoupleState(
     val capsule: DayEntry? = null,
     /** Questions the two of you wrote, oldest first, none of them asked yet. */
     val wildcards: List<Wildcard> = emptyList(),
+    /** The shared bucket list, done and not. */
+    val bucket: List<BucketItem> = emptyList(),
     /**
      * Sittings with the whole-instrument tests, oldest first.
      *

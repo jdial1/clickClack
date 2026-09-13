@@ -219,6 +219,27 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // The shared bucket list. Either of you adds and ticks; nobody rewrites
+      // what an item says or who added it, a ticked item stays ticked, and
+      // only the person who added something may take it off, before it is done.
+      match /bucket/{id} {
+        allow read: if isMember(cid);
+        allow create: if isLive(cid)
+          && request.resource.data.byUid == me()
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 200
+          && request.resource.data.get('doneOn', null) == null;
+        allow update: if isLive(cid)
+          && request.resource.data.text == resource.data.text
+          && request.resource.data.byUid == resource.data.byUid
+          && request.resource.data.group == resource.data.group
+          && resource.data.get('doneOn', null) == null;
+        allow delete: if isLive(cid)
+          && resource.data.byUid == me()
+          && resource.data.get('doneOn', null) == null;
+      }
+
       // One document per month, holding a map keyed by day. Both phones write
       // it and both write the same values, so there is nothing to protect
       // beyond membership -- and nothing a bad write could inflate, because

@@ -1,5 +1,11 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.AmpField
+import com.ampersand.ui.quiz.BrickChip
+import androidx.compose.foundation.layout.FlowRow
+import com.ampersand.model.BucketList
+import com.ampersand.model.BucketItem
+import com.ampersand.model.BucketGroup
 import androidx.compose.ui.text.style.TextAlign
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
@@ -85,6 +91,9 @@ fun UsScreen(
     /** Open a whole-instrument sitting. Null in previews. */
     onTakeInstrument: ((String) -> Unit)? = null,
     onOpenSettings: () -> Unit = {},
+    onAddToBucket: (String, BucketGroup) -> Unit = { _, _ -> },
+    onTickBucket: (String) -> Unit = {},
+    onRemoveFromBucket: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -109,6 +118,9 @@ fun UsScreen(
         Anniversary(state, onSetAnniversary)
 
         Spacer(Modifier.height(32.dp))
+        BucketSection(state, onAddToBucket, onTickBucket, onRemoveFromBucket)
+
+        Spacer(Modifier.height(32.dp))
         Knowing(state)
 
         Spacer(Modifier.height(32.dp))
@@ -117,6 +129,144 @@ fun UsScreen(
         Spacer(Modifier.height(48.dp))
     }
 }
+
+/**
+ * The list of things the two of you want to do someday.
+ *
+ * Add in one line, tick off with one tap. Ticking lays a brick for each of you
+ * on this week's plate, which is the point: the list is the one place in the
+ * app where something you said turns into something you did.
+ */
+@Composable
+private fun BucketSection(
+    state: CoupleState,
+    onAdd: (String, BucketGroup) -> Unit,
+    onTick: (String) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    var group by rememberSaveable { mutableStateOf(BucketGroup.GOALS) }
+    var draft by rememberSaveable { mutableStateOf("") }
+    val (todo, done) = remember(state.bucket) { BucketList.ordered(state.bucket) }
+
+    SectionLabel("Someday")
+    Spacer(Modifier.height(6.dp))
+    Text(
+        "Things to do together. Ticking one off lays a brick for each of you.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(12.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        BucketGroup.entries.forEach { g ->
+            BrickChip(label = g.label, on = g == group, color = you, onClick = { group = g })
+        }
+    }
+    Spacer(Modifier.height(10.dp))
+    AmpField(
+        value = draft,
+        onValueChange = { draft = it.take(200) },
+        color = you,
+        placeholder = "Something to do together",
+    )
+    Spacer(Modifier.height(10.dp))
+    AmpButton(label = "Add to the list", slug = you.slug, enabled = draft.isNotBlank()) {
+        onAdd(draft.trim(), group)
+        draft = ""
+    }
+
+    Spacer(Modifier.height(16.dp))
+    if (todo.isEmpty() && done.isEmpty()) {
+        QuietNote("Nothing on it yet.")
+        return
+    }
+    todo.forEach { item ->
+        BucketRow(
+            item = item,
+            byName = if (item.byUid == state.you.uid) "you" else state.them.name,
+            action = "Done",
+            onAction = {
+                sounds.play(Sfx.SEAL)
+                feel.play(Feel.SEAL)
+                onTick(item.id)
+            },
+            onRemove = if (item.byUid == state.you.uid) ({ onRemove(item.id) }) else null,
+        )
+    }
+    if (done.isNotEmpty()) {
+        Spacer(Modifier.height(12.dp))
+        SectionLabel("Done")
+        Spacer(Modifier.height(8.dp))
+        done.forEach { item ->
+            BucketRow(item = item, byName = null, action = null, onAction = {}, onRemove = null)
+        }
+    }
+}
+
+@Composable
+private fun BucketRow(
+    item: BucketItem,
+    byName: String?,
+    action: String?,
+    onAction: () -> Unit,
+    onRemove: (() -> Unit)?,
+) {
+    val slug = structureSlug()
+    val ink = inkOnBrick(slug)
+    BrickSlab(slugs = listOf(slug), studs = 12, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+                .glassOn(slug, corner = 14.dp)
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(item.group.label.uppercase(), style = MaterialTheme.typography.labelSmall, color = ink)
+                Text(item.text, style = MaterialTheme.typography.titleMedium, color = ink)
+                Text(
+                    item.doneOn?.let { "Done ${it.format(DoneDate)}" } ?: "Added by $byName",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = ink,
+                )
+            }
+            if (onRemove != null) {
+                Text(
+                    "Remove",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = ink,
+                    modifier = Modifier
+                        .clickable(onClick = onRemove)
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                )
+            }
+            if (action != null) {
+                BrickPill(
+                    slug = "green",
+                    studSize = Stud.chip,
+                    height = BrickHeight.MEDIUM,
+                    modifier = Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onAction,
+                    ),
+                ) {
+                    Text(
+                        action,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = inkOnBrick("green"),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private val DoneDate: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
 /** Both names, how long, and the way to the settings. */
 @Composable

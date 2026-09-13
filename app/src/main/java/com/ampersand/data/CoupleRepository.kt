@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.BucketList
+import com.ampersand.model.BucketItem
+import com.ampersand.model.BucketGroup
 import com.ampersand.model.BrickColor
 import com.ampersand.model.Answer
 import com.ampersand.model.BuildPlate
@@ -126,6 +129,15 @@ interface CoupleRepository {
      * after all" worth building a control for.
      */
     fun markTalkedAbout(date: LocalDate)
+
+    /** Put something on the list the two of you share. */
+    fun addToBucket(text: String, group: BucketGroup)
+
+    /** Tick it off. Earns a brick each; un-ticking is not a thing. */
+    fun tickBucket(id: String)
+
+    /** Take it off again. Only what you added, and only while it is not done. */
+    fun removeFromBucket(id: String)
 
     /**
      * Pick what tomorrow's question is about. Only works on your turn, once
@@ -351,6 +363,34 @@ class FakeCoupleRepository(
                 ),
             )
         }
+
+    override fun addToBucket(text: String, group: BucketGroup) = mutate { current ->
+        current.copy(
+            bucket = current.bucket + BucketItem(
+                id = "b${current.bucket.size + 1}",
+                text = text,
+                group = group,
+                byUid = current.you.uid,
+                createdAtMillis = System.currentTimeMillis(),
+            ),
+        )
+    }
+
+    override fun tickBucket(id: String) = mutate { current ->
+        val item = current.bucket.firstOrNull { it.id == id && !it.isDone } ?: return@mutate current
+        val ticked = item.copy(doneOn = current.today.date)
+        val laid = (current.shelf.flatMap { it.blocks } + current.plate.blocks).mapTo(mutableSetOf()) { it.id }
+        val fresh = listOfNotNull(BucketList.reward(ticked, current.you), BucketList.reward(ticked, current.them))
+            .filter { it.id !in laid }
+        current.copy(
+            bucket = current.bucket.map { if (it.id == id) ticked else it },
+            plate = if (current.plate.isSealed) current.plate else current.plate.copy(blocks = current.plate.blocks + fresh),
+        )
+    }
+
+    override fun removeFromBucket(id: String) = mutate { current ->
+        current.copy(bucket = current.bucket.filterNot { it.id == id && it.byUid == current.you.uid && !it.isDone })
+    }
 
     override fun markTalkedAbout(date: LocalDate) = mutate { current ->
         fun DayEntry.mark() =

@@ -596,6 +596,7 @@ couples/{cid}                      members[2], createdAt, endedAt, anniversary
     drafts/{uid}                   responses[]                      <- owner only
   wildcards/{id}                   text, type, options[], byUid, byName, createdAt, usedOn
   knowing/{yyyy-mm}                per-day hit maps
+  bucket/{id}                      text, group, byUid, createdAt, doneOn, doneBy
   plates/{yyyy-mm-dd start}        startedOn, periodDays, gridW, gridH,
                                    completedOn, blocks[], placed[]
 ```
