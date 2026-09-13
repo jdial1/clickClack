@@ -106,3 +106,105 @@ exports.onWildcard = onDocumentCreated(
     );
   },
 );
+
+// ---- Pushes added for replies, moods, week names and special dates --------
+
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+
+/** Keys of [field] whose value changed to something non-empty between two snapshots. */
+function changedKeys(before, after, field) {
+  const a = before.get(field) || {};
+  const b = after.get(field) || {};
+  return Object.keys(b).filter((k) => b[k] && JSON.stringify(a[k]) !== JSON.stringify(b[k]));
+}
+
+/** A reaction, a line back or a mood reply on a day. */
+exports.onDayUpdate = onDocumentUpdated(
+  "couples/{coupleId}/days/{day}",
+  async (event) => {
+    const { coupleId } = event.params;
+    const before = event.data.before;
+    const after = event.data.after;
+
+    for (const uid of changedKeys(before, after, "reactions")) {
+      const target = await partnerOf(coupleId, uid);
+      if (target) await push(target, `${target.senderName} reacted`, "See it on the day you both answered.");
+    }
+    for (const uid of changedKeys(before, after, "notes")) {
+      const target = await partnerOf(coupleId, uid);
+      if (target) await push(target, `${target.senderName} wrote a line back`, after.get("notes")[uid]);
+    }
+    for (const uid of changedKeys(before, after, "moodReplies")) {
+      const target = await partnerOf(coupleId, uid);
+      if (target) await push(target, `${target.senderName} replied to your mood`, after.get("moodReplies")[uid]);
+    }
+  },
+);
+
+const MOOD_LABELS = {
+  SNAPPED_IN: "Happy", CLICKED: "Content", PLAYING_IT_COOL: "Fine", NEW_SET: "Excited", FLAT_PLATE: "Meh",
+  SOMETHING_TO_TELL: "Got news", RARE_PIECE: "Grateful", SOLID_GROUND: "Steady", STILL_IN_THE_BOX: "Tired",
+  HEAVY: "Down", HANDLE_WITH_CARE: "Stressed", MISSING_A_PIECE: "Missing you", KNOCKED_OVER: "Overwhelmed",
+  STEPPED_ON_ONE: "Annoyed",
+};
+
+/** Your partner set a new mood. */
+exports.onMoodUpdate = onDocumentUpdated("users/{uid}", async (event) => {
+  const { uid } = event.params;
+  const before = event.data.before.get("mood") || {};
+  const after = event.data.after.get("mood");
+  if (!after || (before.id === after.id && before.on === after.on)) return;
+  const coupleId = event.data.after.get("coupleId");
+  if (!coupleId) return;
+  const target = await partnerOf(coupleId, uid);
+  if (!target) return;
+  const label = MOOD_LABELS[after.id] || "a new mood";
+  await push(target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.");
+});
+
+/** Words picked toward a finished week's name, and the name once both are in. */
+exports.onPlateUpdate = onDocumentUpdated(
+  "couples/{coupleId}/plates/{plateId}",
+  async (event) => {
+    const { coupleId } = event.params;
+    const picked = changedKeys(event.data.before, event.data.after, "words");
+    if (picked.length === 0) return;
+    const words = event.data.after.get("words") || {};
+    const both = Object.keys(words).length >= 2;
+    for (const uid of picked) {
+      const target = await partnerOf(coupleId, uid);
+      if (!target) continue;
+      if (both) await push(target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`);
+      else await push(target, `${target.senderName} picked words for the week`, "Pick yours to see its name.");
+    }
+  },
+);
+
+/** Every morning: birthdays, anniversaries and your own dates that fall today, to both of you. */
+exports.specialDates = onSchedule({ schedule: "0 8 * * *", timeZone: "America/Chicago" }, async () => {
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  const md = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const onToday = (iso) => typeof iso === "string" && iso.slice(5, 10) === md;
+
+  const couples = await db.collection("couples").where("endedAt", "==", null).get();
+  for (const couple of couples.docs) {
+    const members = couple.get("members") || [];
+    const users = await Promise.all(members.map((m) => db.doc(`users/${m}`).get()));
+    const events = [];
+    if (onToday(couple.get("anniversary"))) events.push("It's your anniversary");
+    if (onToday(couple.get("marriedOn"))) events.push("It's your wedding anniversary");
+    users.forEach((u) => {
+      if (onToday(u.get("birthday"))) events.push(`It's ${u.get("displayName") || "a"}'s birthday`);
+    });
+    const dates = await couple.ref.collection("dates").get();
+    dates.docs.forEach((d) => { if (onToday(d.get("date"))) events.push(`Today: ${d.get("label")}`); });
+    if (events.length === 0) continue;
+
+    for (const u of users) {
+      const token = u.get("fcmToken");
+      if (!token) continue;
+      await push({ token }, events[0], events.length > 1 ? events.slice(1).join(". ") : "Today's question is about it.");
+    }
+  }
+});
