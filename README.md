@@ -597,7 +597,7 @@ couples/{cid}                      members[2], createdAt, endedAt, anniversary
   wildcards/{id}                   text, type, options[], byUid, byName, createdAt, usedOn
   knowing/{yyyy-mm}                per-day hit maps
   bucket/{id}                      text, group, byUid, createdAt, doneOn, doneBy
-  plates/{yyyy-mm-dd start}        startedOn, periodDays, gridW, gridH,
+  plates/{yyyy-mm-dd start}        startedOn, periodDays, gridW, gridH, notes{uid},
                                    completedOn, blocks[], placed[]
 ```
 

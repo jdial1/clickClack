@@ -637,6 +637,7 @@ private fun SignedInApp(
                             // reveal; opening it showed an empty half and
                             // offered reactions to a day that never opened.
                             onOpenDay = { if (it.isRevealed) openDate = it.date },
+                            onNoteWeek = vm.repo::noteWeek,
                         )
 
                         else -> UsScreen(

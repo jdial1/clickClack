@@ -1,5 +1,7 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.components.AmpButton
+import com.ampersand.ui.components.AmpField
 import com.ampersand.model.DayPips
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
@@ -93,6 +95,7 @@ private const val DaysPerWeek = 7
 fun HistoryScreen(
     state: CoupleState,
     onOpenDay: (DayEntry) -> Unit,
+    onNoteWeek: (plateId: String, text: String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     val byDate = remember(state.history) { state.history.associateBy { it.date } }
@@ -117,7 +120,7 @@ fun HistoryScreen(
         item {
             SectionLabel("The shelf")
             Spacer(Modifier.height(12.dp))
-            Shelf(state.shelf, state)
+            Shelf(state.shelf, state, onNoteWeek)
             Spacer(Modifier.height(32.dp))
 
             SectionLabel("The last ten weeks")
@@ -299,7 +302,7 @@ private fun Contribution(plate: BuildPlate, state: CoupleState) {
 }
 
 @Composable
-private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
+private fun Shelf(shelf: List<BuildPlate>, state: CoupleState, onNoteWeek: (String, String) -> Unit) {
     if (shelf.isEmpty()) {
         Text(
             text = "Nothing sealed yet. Your first sculpture lands at the end of the week.",
@@ -309,7 +312,10 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
         return
     }
 
-    var selected by remember(shelf) { mutableStateOf(shelf.first()) }
+    // By id, so a note landing (which replaces the plate) keeps the same week
+    // selected instead of jumping back to the newest.
+    var selectedId by remember { mutableStateOf(shelf.first().id) }
+    val selected = shelf.firstOrNull { it.id == selectedId } ?: shelf.first()
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
@@ -337,6 +343,9 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
         Spacer(Modifier.height(10.dp))
         Contribution(selected, state)
 
+        Spacer(Modifier.height(14.dp))
+        WeekNotes(selected, state, onNoteWeek)
+
         Spacer(Modifier.height(16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(shelf, key = { it.id }) { plate ->
@@ -349,7 +358,7 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
                             if (!on) {
                                 sounds.play(Sfx.TAP)
                                 feel.play(Feel.TAP)
-                                selected = plate
+                                selectedId = plate.id
                             }
                         }
                         .padding(6.dp),
@@ -361,6 +370,55 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
                 }
             }
         }
+    }
+}
+
+/**
+ * A line from each of you about the week: "the week we...".
+ *
+ * Yours can be written or rewritten; theirs is shown once they have written it,
+ * and nudged at by name until then. Nothing is sealed here -- the week already
+ * is, and this is what you each remember of it.
+ */
+@Composable
+private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, String) -> Unit) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val mine = plate.notes[state.you.uid]
+    val theirs = plate.notes[state.them.uid]
+    var editing by remember(plate.id) { mutableStateOf(mine == null) }
+    var draft by remember(plate.id) { mutableStateOf(mine.orEmpty()) }
+
+    theirs?.let {
+        Text("${state.them.name}: $it", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(Modifier.height(6.dp))
+    }
+    if (!editing && mine != null) {
+        Text(
+            "You: $mine",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.clickable { editing = true },
+        )
+    } else {
+        AmpField(
+            value = draft,
+            onValueChange = { draft = it.take(140) },
+            color = you,
+            placeholder = "The week we...",
+        )
+        Spacer(Modifier.height(8.dp))
+        AmpButton(label = "Keep this line", slug = you.slug, enabled = draft.isNotBlank()) {
+            onNote(plate.id, draft.trim())
+            editing = false
+        }
+    }
+    if (theirs == null) {
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "${state.them.name} has not written theirs yet.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

@@ -255,7 +255,17 @@ service cloud.firestore {
       match /plates/{pid} {
         allow read: if isMember(cid);
         allow create: if isLive(cid);
-        allow update: if isLive(cid) && resource.data.completedOn == null;
+        // Open plates take bricks. A sealed one takes only a line from each of
+        // you about the week, and only your own line.
+        allow update: if isLive(cid) && (
+          resource.data.completedOn == null ||
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notes']) &&
+            request.resource.data.notes.diff(resource.data.get('notes', {})).affectedKeys().hasOnly([me()]) &&
+            request.resource.data.notes[me()] is string &&
+            request.resource.data.notes[me()].size() <= 140
+          )
+        );
         allow delete: if false;
       }
     }

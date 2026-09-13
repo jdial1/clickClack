@@ -130,6 +130,9 @@ interface CoupleRepository {
      */
     fun markTalkedAbout(date: LocalDate)
 
+    /** Your one line about a sealed week. Rewritable until you are happy with it. */
+    fun noteWeek(plateId: String, text: String)
+
     /** Put something on the list the two of you share. */
     fun addToBucket(text: String, group: BucketGroup)
 
@@ -363,6 +366,14 @@ class FakeCoupleRepository(
                 ),
             )
         }
+
+    override fun noteWeek(plateId: String, text: String) = mutate { current ->
+        current.copy(
+            shelf = current.shelf.map {
+                if (it.id == plateId && it.isSealed) it.copy(notes = it.notes + (current.you.uid to text)) else it
+            },
+        )
+    }
 
     override fun addToBucket(text: String, group: BucketGroup) = mutate { current ->
         current.copy(

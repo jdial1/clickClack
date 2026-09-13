@@ -101,6 +101,14 @@ data class BuildPlate(
      * individual blocks stay anonymous and the plate carries the date.
      */
     val completedOn: LocalDate? = null,
+    /**
+     * One line each about the week, keyed by uid: "the week we...".
+     *
+     * Written after the plate seals, which is the only thing a sealed plate
+     * still accepts. It is what turns the shelf from a row of objects into a
+     * row of weeks somebody remembers.
+     */
+    val notes: Map<String, String> = emptyMap(),
 ) {
     companion object {
         /** Width in studs. A brick is up to 6 wide, so this fits two side by side. */

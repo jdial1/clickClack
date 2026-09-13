@@ -757,6 +757,12 @@ class FirestoreCoupleRepository(
         )
     }
 
+    override fun noteWeek(plateId: String, text: String) {
+        // Merged into the map, so writing yours never touches theirs.
+        couple.collection(PLATES).document(plateId)
+            .set(mapOf("notes" to mapOf(myUid to text)), SetOptions.merge())
+    }
+
     override fun addToBucket(text: String, group: BucketGroup) {
         couple.collection(BUCKET).add(
             mapOf(
@@ -1214,6 +1220,9 @@ private fun DocumentSnapshot.toPlate(): BuildPlate? {
         blocks = blocks,
         placed = placed,
         completedOn = getString("completedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+        notes = (get("notes") as? Map<*, *>).orEmpty().entries
+            .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
+            .toMap(),
     )
 }
 
