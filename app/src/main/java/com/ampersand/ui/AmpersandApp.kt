@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.us.SettingsScreen
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -403,6 +404,7 @@ private sealed interface Screen {
     data class Sitting(val instrumentId: String) : Screen
     data class Reveal(val date: LocalDate) : Screen
     data object Wildcard : Screen
+    data object Settings : Screen
     data class Main(val tab: Tab) : Screen
 }
 
@@ -461,6 +463,7 @@ private fun SignedInApp(
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
         var writing by rememberSaveable { mutableStateOf(false) }
         var sitting by rememberSaveable { mutableStateOf<String?>(null) }
+        var settings by rememberSaveable { mutableStateOf(false) }
 
         val sounds = LocalSounds.current
         val feel = LocalFeel.current
@@ -473,7 +476,7 @@ private fun SignedInApp(
         // tab you are on, and only from Today does the press fall through and
         // leave -- which is where leaving should mean leaving.
         BackHandler(
-            enabled = writing || openDeck != null || openDate != null || tab != Tab.TODAY,
+            enabled = settings || writing || openDeck != null || openDate != null || tab != Tab.TODAY,
         ) {
             // Going back is a navigation, and only the forward direction ever
             // said so. Note the handler is disabled on Today, so leaving the
@@ -482,6 +485,7 @@ private fun SignedInApp(
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
             when {
+                settings -> settings = false
                 writing -> writing = false
                 openDeck != null -> openDeck = null
                 openDate != null -> openDate = null
@@ -497,7 +501,7 @@ private fun SignedInApp(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
                         enabled = openDate == null && openDeck == null && !writing &&
-                            sitting == null,
+                            sitting == null && !settings,
                         onSelect = { tab = it; openDate = null; openDeck = null },
                     )
                 },
@@ -518,6 +522,7 @@ private fun SignedInApp(
                 ) {
                     val here: Screen = when {
                         sitting != null -> Screen.Sitting(sitting!!)
+                        settings -> Screen.Settings
                         writing -> Screen.Wildcard
                         openDeck != null -> Screen.Deck(openDeck!!)
                         openDate != null -> Screen.Reveal(openDate!!)
@@ -595,6 +600,15 @@ private fun SignedInApp(
                             onSubmit = vm.repo::addWildcard,
                         )
 
+                        screen is Screen.Settings -> SettingsScreen(
+                            state = state,
+                            onPickColor = vm.repo::setColor,
+                            onBack = { settings = false },
+                            account = account.email ?: account.displayName,
+                            onSignOut = onSignOut,
+                            onUnpair = onUnpair,
+                        )
+
                         screen !is Screen.Main -> Unit
 
                         screen.tab == Tab.TODAY -> TodayScreen(
@@ -625,12 +639,9 @@ private fun SignedInApp(
 
                         else -> UsScreen(
                             state = state,
-                            onPickColor = vm.repo::setColor,
                             onSetAnniversary = vm.repo::setAnniversary,
                             onTakeInstrument = { sitting = it },
-                            account = account.email ?: account.displayName,
-                            onSignOut = onSignOut,
-                            onUnpair = onUnpair,
+                            onOpenSettings = { settings = true },
                         )
                     }
                     }

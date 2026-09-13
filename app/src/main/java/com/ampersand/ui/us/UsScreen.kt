@@ -1,5 +1,9 @@
 package com.ampersand.ui.us
 
+import androidx.compose.ui.text.style.TextAlign
+import com.ampersand.model.until
+import com.ampersand.model.SideBySide
+import com.ampersand.data.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
@@ -66,45 +70,211 @@ import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.theme.Stud
 import java.time.format.DateTimeFormatter
 
+/**
+ * The two of you: who, how long, what each of you has put in, and what is
+ * coming up.
+ *
+ * Everything that is a setting rather than a fact about the couple -- colours,
+ * sound, appearance, credits, signing out -- is one tap away behind Settings,
+ * so this screen is about the people and not the phone.
+ */
 @Composable
 fun UsScreen(
     state: CoupleState,
-    onPickColor: (colorArgb: Long) -> Unit,
     onSetAnniversary: ((java.time.LocalDate) -> Unit)? = null,
     /** Open a whole-instrument sitting. Null in previews. */
     onTakeInstrument: ((String) -> Unit)? = null,
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
-    account: String? = null,
-    onSignOut: (() -> Unit)? = null,
-    onUnpair: (() -> Unit)? = null,
 ) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val them = BrickColor.of(state.them.colorArgb)
+
     Column(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
     ) {
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
+        CoupleHeader(state, onOpenSettings)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(
-                value = state.streak.toString(),
-                label = "Day streak",
-                caption = "Days in a row either of you answered",
-                modifier = Modifier.weight(1f),
-            )
-            StatCard(
-                value = "${state.syncPercent}%",
-                label = "In sync",
-                caption = "Guesses you both landed",
-                modifier = Modifier.weight(1f),
-            )
-        }
+        Spacer(Modifier.height(16.dp))
+        BlendStrip(you = you, them = them)
+
+        Spacer(Modifier.height(32.dp))
+        SideBySideTable(state)
+
+        Spacer(Modifier.height(32.dp))
+        Anniversary(state, onSetAnniversary)
+
+        Spacer(Modifier.height(32.dp))
+        Knowing(state)
 
         Spacer(Modifier.height(32.dp))
         ProfileBadges(state = state, onTake = { onTakeInstrument?.invoke(it) })
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(48.dp))
+    }
+}
+
+/** Both names, how long, and the way to the settings. */
+@Composable
+private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                "${state.you.name} & ${state.them.name}",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                state.anniversary?.let { "Together ${timeTogether(it, state.today.date).lowercase()}" }
+                    ?: "Add the day you started, below.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        BrickPill(
+            slug = structureSlug(),
+            studSize = Stud.chip,
+            height = BrickHeight.MEDIUM,
+            modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                sounds.play(Sfx.NAV)
+                feel.play(Feel.NAV)
+                onOpenSettings()
+            },
+        ) {
+            Text(
+                "Settings",
+                style = MaterialTheme.typography.labelLarge,
+                color = inkOnBrick(structureSlug()),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            )
+        }
+    }
+}
+
+/**
+ * The same three counts for each of you, one row each, in your own colour.
+ *
+ * Counts of what you each did. There is no "won" column: the app does not keep
+ * score of one of you against the other.
+ */
+@Composable
+private fun SideBySideTable(state: CoupleState) {
+    val rows = listOf(state.you, state.them).map { it to SideBySide.of(state, it.uid) }
+    val headers = listOf("Days", "Guesses landed", "Decks")
+
+    SectionLabel("Side by side")
+    Spacer(Modifier.height(10.dp))
+    Row(Modifier.fillMaxWidth()) {
+        Spacer(Modifier.width(NameColumn))
+        headers.forEach { label ->
+            Text(
+                label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+    rows.forEach { (member, tally) ->
+        val brick = BrickColor.of(member.colorArgb)
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(Modifier.width(NameColumn), verticalAlignment = Alignment.CenterVertically) {
+                PersonDot(member.name, Color(member.colorArgb), size = 26)
+            }
+            listOf(tally.daysShowedUp, tally.guessesLanded, tally.decksFinished).forEach { n ->
+                Box(Modifier.weight(1f).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
+                    BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.MEDIUM) {
+                        Text(
+                            n.toString(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = inkOnBrick(brick.slug),
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
+    Text(
+        "Days either of you answered or finished a deck, out of the last ten weeks.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+private val NameColumn = 44.dp
+
+/**
+ * Everything on the phone rather than about the two of you.
+ *
+ * Reached from the Us header. Leaving (sign out, unpair) stays folded away at
+ * the bottom, closed by default.
+ */
+@Composable
+fun SettingsScreen(
+    state: CoupleState,
+    onPickColor: (colorArgb: Long) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    account: String? = null,
+    onSignOut: (() -> Unit)? = null,
+    onUnpair: (() -> Unit)? = null,
+) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    Column(
+        modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp),
+    ) {
+        Spacer(Modifier.height(16.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            BrickPill(
+                slug = structureSlug(),
+                studSize = Stud.chip,
+                height = BrickHeight.MEDIUM,
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    sounds.play(Sfx.NAV)
+                    feel.play(Feel.NAV)
+                    onBack()
+                },
+            ) {
+                Text(
+                    "Back",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = inkOnBrick(structureSlug()),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                )
+            }
+            Spacer(Modifier.width(14.dp))
+            Text(
+                "Settings",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+        }
+
+        Spacer(Modifier.height(28.dp))
         SectionLabel("Your colors")
         Spacer(Modifier.height(6.dp))
         Text(
@@ -113,7 +283,6 @@ fun UsScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(16.dp))
-
         ColorRow(
             name = state.you.name,
             current = Color(state.you.colorArgb),
@@ -127,18 +296,6 @@ fun UsScreen(
         // anyway -- so a picker here was a control that could only fail.
         PartnerColor(name = state.them.name, current = Color(state.them.colorArgb))
 
-        Spacer(Modifier.height(20.dp))
-        BlendStrip(
-            you = BrickColor.of(state.you.colorArgb),
-            them = BrickColor.of(state.them.colorArgb),
-        )
-
-        Spacer(Modifier.height(32.dp))
-        Knowing(state)
-
-        Spacer(Modifier.height(32.dp))
-        Anniversary(state, onSetAnniversary)
-
         Spacer(Modifier.height(32.dp))
         FeedbackToggles(you = BrickColor.of(state.you.colorArgb))
 
@@ -147,6 +304,8 @@ fun UsScreen(
         Spacer(Modifier.height(10.dp))
         ThemeBricks(you = BrickColor.of(state.you.colorArgb))
 
+        Spacer(Modifier.height(32.dp))
+        Credits()
 
         if (onSignOut != null) {
             Spacer(Modifier.height(32.dp))
@@ -209,39 +368,40 @@ fun UsScreen(
     }
 }
 
+/**
+ * Where the questions and tests came from.
+ *
+ * Required, not decoration: the CC BY and MIT sources need their credit where
+ * the people using the app can see it, and the rest are named because they
+ * earned it.
+ */
 @Composable
-private fun StatCard(
-    value: String,
-    label: String,
-    caption: String,
-    modifier: Modifier = Modifier,
-) {
-    BrickSlab(
-        slugs = listOf(null),
-        studs = 6,
-        modifier = modifier,
-    ) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(start = 12.dp, end = 12.dp, top = 20.dp, bottom = 12.dp)
-            .glassOn(null, corner = 14.dp)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
-    ) {
-        Text(
-            value,
-            style = MaterialTheme.typography.displaySmall,
-            color = inkOnBrick(null),
-        )
-        Spacer(Modifier.height(4.dp))
-        SectionLabel(label, color = inkOnBrick(null).copy(alpha = 0.7f))
-        Spacer(Modifier.height(6.dp))
-        Text(
-            caption,
-            style = MaterialTheme.typography.bodySmall,
-            color = inkOnBrick(null).copy(alpha = 0.62f),
-        )
-    }
+private fun Credits() {
+    SectionLabel("Where the questions come from")
+    Spacer(Modifier.height(10.dp))
+    Sources.all.forEach { source ->
+        Column(Modifier.fillMaxWidth().padding(bottom = 14.dp)) {
+            Text(
+                "${source.authors} (${source.year})",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                source.title,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                source.licence,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                source.url,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -548,7 +708,7 @@ private fun BlendStrip(you: BrickColor, them: BrickColor) {
 @Composable
 private fun PreviewUs() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
-        UsScreen(MockCouple.state(), {}, {})
+        UsScreen(MockCouple.state())
     }
 }
 
@@ -556,7 +716,7 @@ private fun PreviewUs() = AmpersandTheme {
 @Composable
 private fun PreviewUsDark() = AmpersandTheme(darkTheme = true) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        UsScreen(MockCouple.state(), {}, {})
+        UsScreen(MockCouple.state())
     }
 }
 
@@ -596,31 +756,32 @@ private fun PartnerColor(name: String, current: Color) {
 private fun Anniversary(state: CoupleState, onSet: ((java.time.LocalDate) -> Unit)?) {
     val since = state.anniversary
 
-    SectionLabel("Time together")
-    Spacer(Modifier.height(6.dp))
+    SectionLabel("Dates")
+    Spacer(Modifier.height(10.dp))
 
     if (since != null) {
-        Text(
-            text = timeTogether(since, state.today.date),
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = "Since ${since.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Occasion.next(state.today.date.plusDays(1), since)?.let { (occasion, day) ->
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = "Next up: ${occasion.label}, " +
-                    day.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM")),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        val nextAnniversary = since.withYear(state.today.date.year).let {
+            if (it < state.today.date) it.plusYears(1) else it
         }
+        DateCard(
+            day = nextAnniversary,
+            title = "Your anniversary",
+            detail = "Since ${since.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
+            countdown = until(state.today.date, nextAnniversary),
+            brick = BrickColor.of(state.you.colorArgb),
+        )
+        Occasion.next(state.today.date.plusDays(1), since)
+            ?.takeIf { (_, day) -> day != nextAnniversary }
+            ?.let { (occasion, day) ->
+                Spacer(Modifier.height(10.dp))
+                DateCard(
+                    day = day,
+                    title = occasion.label,
+                    detail = "It gets its own question that day.",
+                    countdown = until(state.today.date, day),
+                    brick = BrickColor.of(state.them.colorArgb),
+                )
+            }
         return
     }
 
@@ -692,3 +853,43 @@ private fun Anniversary(state: CoupleState, onSet: ((java.time.LocalDate) -> Uni
         )
     }
 }
+
+/** A date as a brick: the day and month on the left, what it is and how far off. */
+@Composable
+private fun DateCard(
+    day: java.time.LocalDate,
+    title: String,
+    detail: String,
+    countdown: String,
+    brick: BrickColor,
+) {
+    BrickSlab(slugs = listOf(structureSlug()), studs = 12, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+                .glassOn(structureSlug(), corner = 14.dp)
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.HIGH) {
+                Column(
+                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(day.dayOfMonth.toString(), style = MaterialTheme.typography.titleLarge, color = inkOnBrick(brick.slug))
+                    Text(day.format(ShortMonth), style = MaterialTheme.typography.labelMedium, color = inkOnBrick(brick.slug))
+                }
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = inkOnBrick(structureSlug()))
+                Text(detail, style = MaterialTheme.typography.bodySmall, color = inkOnBrick(structureSlug()))
+                Spacer(Modifier.height(4.dp))
+                Text(countdown, style = MaterialTheme.typography.labelLarge, color = inkOnBrick(structureSlug()))
+            }
+        }
+    }
+}
+
+private val ShortMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")
