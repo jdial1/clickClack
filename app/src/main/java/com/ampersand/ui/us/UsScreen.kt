@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.brick.glass
 import com.ampersand.ui.components.AmpCheckboxGroup
 import com.ampersand.model.label
 import com.ampersand.model.League
@@ -101,12 +102,6 @@ fun UsScreen(
     onAddToBucket: (String, BucketGroup) -> Unit = { _, _ -> },
     onTickBucket: (String) -> Unit = {},
     onRemoveFromBucket: (String) -> Unit = {},
-    onSetProfile: (String?, java.time.LocalDate?) -> Unit = { _, _ -> },
-    onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
-    onSetTopicHidden: (Topic, Boolean) -> Unit = { _, _ -> },
-    onSetTopicInterest: (Topic, Boolean) -> Unit = { _, _ -> },
-    onSetFollowing: (Set<League>) -> Unit = {},
-    onSetHomeZip: (String) -> Boolean = { true },
     onAddSpecialDate: (String, java.time.LocalDate) -> Unit = { _, _ -> },
     onRemoveSpecialDate: (String) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -130,10 +125,7 @@ fun UsScreen(
         SideBySideTable(state)
 
         Spacer(Modifier.height(32.dp))
-        RelationshipProfile(
-            state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden, onSetTopicInterest, onSetHomeZip,
-            onSetFollowing,
-        )
+        ProfileBadges(state = state, onTake = { onTakeInstrument?.invoke(it) })
 
         Spacer(Modifier.height(32.dp))
         DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
@@ -404,6 +396,13 @@ fun SettingsScreen(
     account: String? = null,
     onSignOut: (() -> Unit)? = null,
     onUnpair: (() -> Unit)? = null,
+    onSetAnniversary: ((java.time.LocalDate) -> Unit)? = null,
+    onSetProfile: (String?, java.time.LocalDate?) -> Unit = { _, _ -> },
+    onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
+    onSetTopicHidden: (Topic, Boolean) -> Unit = { _, _ -> },
+    onSetTopicInterest: (Topic, Boolean) -> Unit = { _, _ -> },
+    onSetFollowing: (Set<League>) -> Unit = {},
+    onSetHomeZip: (String) -> Boolean = { true },
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
@@ -444,6 +443,12 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(28.dp))
+        RelationshipProfile(
+            state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden, onSetTopicInterest, onSetHomeZip,
+            onSetFollowing,
+        )
+
+        Spacer(Modifier.height(22.dp))
         SectionLabel("Your colors")
         Spacer(Modifier.height(6.dp))
         Text(
@@ -1162,7 +1167,8 @@ private fun DatesSection(
     if (upcoming.isEmpty()) {
         QuietNote("No dates yet. Add the day you started above, or any date below.")
     }
-    upcoming.forEach { d ->
+    upcoming.forEachIndexed { i, d ->
+        if (i > 0) Spacer(Modifier.height(8.dp))
         val added = state.specialDates.firstOrNull { it.label == d.label && it.date == d.since }
         DateCard(
             day = d.next,
@@ -1179,8 +1185,8 @@ private fun DatesSection(
                 modifier = Modifier.clickable { onRemove(added.id) }.padding(vertical = 6.dp),
             )
         }
-        Spacer(Modifier.height(10.dp))
     }
+    if (upcoming.isNotEmpty()) Spacer(Modifier.height(12.dp))
 
     Occasion.next(state.today.date.plusDays(1), state.anniversary, state.homeState)?.let { (occasion, day) ->
         Text(
@@ -1258,7 +1264,10 @@ private fun DateFields(
 private val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 private val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM")
 
-/** A date as a brick: the day and month on the left, what it is and how far off. */
+/**
+ * A date as one flat row: a low brick with the day on it, what it is, and how
+ * far off. Flat because a list of dates is read down, not admired one by one.
+ */
 @Composable
 private fun DateCard(
     day: java.time.LocalDate,
@@ -1267,32 +1276,29 @@ private fun DateCard(
     countdown: String,
     brick: BrickColor,
 ) {
-    BrickSlab(slugs = listOf(structureSlug()), studs = 12, modifier = Modifier.fillMaxWidth()) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
-                .glassOn(structureSlug(), corner = 14.dp)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.HIGH) {
-                Column(
-                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(day.dayOfMonth.toString(), style = MaterialTheme.typography.titleLarge, color = inkOnBrick(brick.slug))
-                    Text(day.format(ShortMonth), style = MaterialTheme.typography.labelMedium, color = inkOnBrick(brick.slug))
-                }
-            }
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, color = inkOnBrick(structureSlug()))
-                Text(detail, style = MaterialTheme.typography.bodySmall, color = inkOnBrick(structureSlug()))
-                Spacer(Modifier.height(4.dp))
-                Text(countdown, style = MaterialTheme.typography.labelLarge, color = inkOnBrick(structureSlug()))
-            }
+    val ink = MaterialTheme.colorScheme.onBackground
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.LOW) {
+            Text(
+                "${day.dayOfMonth} ${day.format(ShortMonth)}",
+                style = MaterialTheme.typography.labelLarge,
+                color = inkOnBrick(brick.slug),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+            )
         }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = ink)
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = ink)
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(countdown, style = MaterialTheme.typography.labelLarge, color = ink)
     }
 }
 

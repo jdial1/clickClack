@@ -621,6 +621,13 @@ private fun SignedInApp(
                             account = account.email ?: account.displayName,
                             onSignOut = onSignOut,
                             onUnpair = onUnpair,
+                            onSetAnniversary = vm.repo::setAnniversary,
+                            onSetProfile = vm.repo::setProfile,
+                            onSetRelationship = vm.repo::setRelationship,
+                            onSetTopicHidden = vm.repo::setTopicHidden,
+                            onSetTopicInterest = vm.repo::setTopicInterest,
+                            onSetFollowing = vm.repo::setFollowing,
+                            onSetHomeZip = vm.repo::setHomeZip,
                         )
 
                         screen !is Screen.Main -> Unit
@@ -644,7 +651,6 @@ private fun SignedInApp(
                             state = state,
                             decks = pool.playable,
                             onOpenDeck = { openDeck = it },
-                            onTakeInstrument = { sitting = it },
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(
@@ -670,12 +676,6 @@ private fun SignedInApp(
                             onAddToBucket = vm.repo::addToBucket,
                             onTickBucket = vm.repo::tickBucket,
                             onRemoveFromBucket = vm.repo::removeFromBucket,
-                            onSetProfile = vm.repo::setProfile,
-                            onSetRelationship = vm.repo::setRelationship,
-                            onSetTopicHidden = vm.repo::setTopicHidden,
-                            onSetTopicInterest = vm.repo::setTopicInterest,
-                            onSetFollowing = vm.repo::setFollowing,
-                            onSetHomeZip = vm.repo::setHomeZip,
                             onAddSpecialDate = vm.repo::addSpecialDate,
                             onRemoveSpecialDate = vm.repo::removeSpecialDate,
                         )

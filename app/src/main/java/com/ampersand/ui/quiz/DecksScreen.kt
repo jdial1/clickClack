@@ -37,22 +37,19 @@ import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Stud
-import com.ampersand.ui.us.ProfileBadges
 
 /**
- * Everything you sit down and play: the decks, and the three longer tests.
+ * Every deck you can sit down and play.
  *
- * It used to sit at the bottom of Today, under the day's question, which made
- * the day's question feel like the top of a long page. Here a row of themes
- * comes first -- each brick says how many decks it holds and how many are
- * waiting on you -- then the tests, then every deck grouped by whose turn.
+ * A row of themes comes first -- each brick says how many decks it holds and
+ * how many are waiting on you -- then every deck grouped by whose turn. The
+ * three longer tests and their results live on Us.
  */
 @Composable
 fun DecksScreen(
     state: CoupleState,
     decks: List<Quiz>,
     onOpenDeck: (String) -> Unit,
-    onTakeInstrument: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sounds = LocalSounds.current
@@ -108,8 +105,6 @@ fun DecksScreen(
             }
         }
 
-        Spacer(Modifier.height(28.dp))
-        ProfileBadges(state = state, onTake = onTakeInstrument)
 
         Spacer(Modifier.height(28.dp))
         SectionLabel(theme?.let { "${it.label} decks" } ?: "Every deck")

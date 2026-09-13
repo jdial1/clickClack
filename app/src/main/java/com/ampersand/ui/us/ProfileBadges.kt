@@ -254,8 +254,8 @@ private fun WallGroup(
         //
         // Rendering the unclaimed state slot by slot put six "Take it" bricks
         // under Love language -- two people times three courses -- for a
-        // single six-minute sitting that neither of them can take twice. The
-        // courses only exist once there is something to put in them.
+        // single six-minute sitting. The courses only exist once there is
+        // something to put in them.
         if (group.isEarned) {
             group.rows.forEachIndexed { i, row ->
                 if (i > 0) Spacer(Modifier.height(12.dp))
@@ -269,6 +269,24 @@ private fun WallGroup(
             }
         } else {
             TakeIt(group = group, onTake = onTake)
+        }
+
+        // Once your half is in, you can always sit it again. Answers drift,
+        // and a result from a bad week should not be the one that sticks.
+        if (!group.yourTurn) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Take it again",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                        sounds.play(Sfx.PRESS)
+                        feel.play(Feel.PRESS)
+                        onTake(group.instrumentId)
+                    }
+                    .onWall(corner = 12.dp),
+            )
         }
     }
 }

@@ -110,11 +110,15 @@ await check('revealed may be set once both runs exist', async () => {
   await assertSucceeds(setDoc(kitRef(as('alice')), { revealed: true }, { merge: true }))
 })
 
-// A sitting is a statement made under seal. Editing it after the fact would
-// let somebody read their partner's answers and then change their own.
-await check('a submitted run cannot be edited', async () => {
-  await seed({ kitDoc: { revealed: true }, given: { alice: { responses: THIRTY_TWO } } })
-  await assertFails(setDoc(runRef(as('alice'), 'alice'), { responses: Array(32).fill(5) }))
+// Retakes: your own run may be replaced at any time, theirs never.
+await check('you may retake your own sitting', async () => {
+  await seed({ kitDoc: { revealed: true }, given: { alice: { responses: THIRTY_TWO }, bob: { responses: THIRTY_TWO } } })
+  await assertSucceeds(submit(as('alice'), 'alice', Array(32).fill(5)))
+})
+
+await check('nobody may rewrite their partner\'s run', async () => {
+  await seed({ kitDoc: { revealed: true }, given: { alice: { responses: THIRTY_TWO }, bob: { responses: THIRTY_TWO } } })
+  await assertFails(setDoc(runRef(as('alice'), 'bob'), { responses: Array(32).fill(5) }))
 })
 
 await check('a sitting cannot be created already open', async () => {

@@ -129,7 +129,8 @@ interface CoupleRepository {
     fun addWildcard(text: String, type: QuestionType, options: List<String>)
 
     /**
-     * Submit a whole sitting with one instrument. Irreversible, like a day.
+     * Submit a whole sitting with one instrument. Submitting again is a retake
+     * and replaces your earlier answers.
      *
      * [responses] is every item, in the published order, every pass
      * concatenated -- `Instrument.length` of them, each 1..5. Positional rather

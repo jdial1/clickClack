@@ -186,8 +186,9 @@ service cloud.firestore {
             get(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)).data.revealed == true
           );
           allow create: if isLive(cid) && uid == me();
-          // No edits. A retake is a new sitting, not a correction to an old one.
-          allow update, delete: if false;
+          // A retake replaces your own run, whenever you like. Never theirs.
+          allow update: if isLive(cid) && uid == me();
+          allow delete: if false;
         }
 
         // A half-finished sitting, kept so that leaving does not throw it

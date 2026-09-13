@@ -1181,7 +1181,6 @@ class FirestoreCoupleRepository(
     }
 
     override fun submitInstrument(instrumentId: String, responses: List<Int>) {
-        if (instrumentResponses[instrumentId]?.get(myUid) != null) return
         val doc = couple.collection(INSTRUMENTS).document(instrumentId)
 
         doc.set(
@@ -1204,7 +1203,6 @@ class FirestoreCoupleRepository(
     }
 
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) {
-        if (instrumentResponses[instrumentId]?.get(myUid) != null) return
         val doc = couple.collection(INSTRUMENTS).document(instrumentId)
 
         doc.set(
