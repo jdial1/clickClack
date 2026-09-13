@@ -1,0 +1,612 @@
+{
+  "id": "daily-us-spicy",
+  "title": "Turned up",
+  "theme": "SPICY",
+  "blurb": "Daily only.",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "hot1",
+      "text": "The best kind of kiss is:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Slow and unhurried",
+        "Stolen in a hurry"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot2",
+      "text": "I find it more attractive when you:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Take the lead",
+        "Let me take the lead"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot3",
+      "text": "Flirting across a crowded room is:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Thrilling",
+        "Too much pressure"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot4",
+      "text": "A little jealousy is:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Kind of flattering",
+        "Not for me at all"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot5",
+      "text": "I would rather be seduced with:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Words",
+        "Touch"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot6",
+      "text": "Morning or night, when am I most in the mood?",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Morning",
+        "Night"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot7",
+      "text": "How much do I like being teased a little?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "A lot",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot8",
+      "text": "How often would I like a real kiss, not a quick one?",
+      "type": "SCALE",
+      "lowLabel": "Now and then",
+      "highLabel": "Every day",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot9",
+      "text": "How adventurous do I feel about trying something new together?",
+      "type": "SCALE",
+      "lowLabel": "Keep it familiar",
+      "highLabel": "Very curious",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "fun"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot10",
+      "text": "How much does it matter to me that you make the first move?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "A lot",
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot11",
+      "text": "How confident do I feel in my own skin these days?",
+      "type": "SCALE",
+      "lowLabel": "Not very",
+      "highLabel": "Very",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot12",
+      "text": "What is the most attractive thing you can wear, to me?",
+      "type": "PICK_ONE",
+      "options": [
+        "Something dressed up",
+        "Nothing fancy, just you",
+        "Something of mine",
+        "Whatever you wear when you feel good"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot13",
+      "text": "Where would I most like to be kissed right now?",
+      "type": "PICK_ONE",
+      "options": [
+        "The neck",
+        "The forehead",
+        "The hand",
+        "Wherever you choose"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot14",
+      "text": "What sets the mood for me fastest?",
+      "type": "PICK_ONE",
+      "options": [
+        "A compliment",
+        "A slow song",
+        "Candles and quiet",
+        "Being made to laugh"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot15",
+      "text": "What is my favorite way to be pulled close?",
+      "type": "PICK_ONE",
+      "options": [
+        "A hand on my waist",
+        "A hug from behind",
+        "A hand in my hair",
+        "Being pulled in to dance"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot16",
+      "text": "Which flirt would work best on me?",
+      "type": "PICK_ONE",
+      "options": [
+        "A long look",
+        "A whispered compliment",
+        "A secret joke",
+        "A note left somewhere I will find it"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot17",
+      "text": "Pick the ones that make me feel wanted.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "You looking at me across a room",
+        "A kiss that lasts",
+        "You saying so",
+        "You reaching for my hand",
+        "You clearing an evening for us"
+      ],
+      "maxChoices": 3,
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot18",
+      "text": "Which of these would I find attractive in you tonight?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Confidence",
+        "A nice shirt",
+        "Cooking for me",
+        "Laughing at my jokes",
+        "Taking charge of the evening"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot19",
+      "text": "Pick the settings I find romantic in a spicy way.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A hotel room",
+        "A thunderstorm",
+        "A late-night drive",
+        "A hot tub",
+        "A cabin with a fireplace"
+      ],
+      "maxChoices": 2,
+      "depth": 2,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot20",
+      "text": "Which of these would I like more of?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Kisses that go nowhere in a hurry",
+        "Compliments about how I look",
+        "Spontaneous moments",
+        "Planned nights",
+        "Massages"
+      ],
+      "maxChoices": 2,
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot21",
+      "text": "Pick the ways I like to flirt back.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A look",
+        "Teasing",
+        "A touch on the arm",
+        "A text",
+        "Pretending not to notice"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot22",
+      "text": "Rank these by how much they get my attention.",
+      "type": "RANK",
+      "options": [
+        "Your voice low",
+        "A kiss on the neck",
+        "A look that lasts",
+        "Your hand on my back"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot23",
+      "text": "Put these in order of how romantic they would feel to me.",
+      "type": "RANK",
+      "options": [
+        "A bath for two",
+        "Dancing in the dark",
+        "Breakfast in bed",
+        "Falling asleep tangled up"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot24",
+      "text": "Order these by how much I would like them on a night away.",
+      "type": "RANK",
+      "options": [
+        "A great dinner",
+        "A long bath",
+        "No alarms",
+        "A room with a view"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot25",
+      "text": "Rank these by how much they make me want to pull you close.",
+      "type": "RANK",
+      "options": [
+        "You dressed up",
+        "You laughing",
+        "You being kind to someone",
+        "You confident about something"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot26",
+      "text": "Which would I pick for a weekend with no one else around?",
+      "type": "DROPDOWN",
+      "options": [
+        "A cabin in the woods",
+        "A beach hotel",
+        "A city apartment",
+        "Our place with the phones off",
+        "A bed and breakfast",
+        "A tent under the stars"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot27",
+      "text": "What is my idea of the perfect lazy morning with you?",
+      "type": "DROPDOWN",
+      "options": [
+        "Coffee in bed",
+        "Staying under the covers",
+        "A slow breakfast",
+        "A shower that takes too long",
+        "Reading side by side",
+        "Talking until noon"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot28",
+      "text": "What kind of compliment makes me blush?",
+      "type": "DROPDOWN",
+      "options": [
+        "About how I look",
+        "About how I think",
+        "About how I make you feel",
+        "About something specific I did",
+        "Anything whispered",
+        "Anything said in front of friends"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot29",
+      "text": "Which song would I put on to set the mood?",
+      "type": "DROPDOWN",
+      "options": [
+        "Something slow and old",
+        "Something with a heavy beat",
+        "Jazz",
+        "Something from when we met",
+        "Something in another language",
+        "Silence works"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot30",
+      "text": "Where would I most like to be kissed, of these places we have been?",
+      "type": "DROPDOWN",
+      "options": [
+        "In the rain",
+        "At a concert",
+        "On a beach",
+        "In the kitchen",
+        "At the top of a hill",
+        "In the car before going inside"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot31",
+      "text": "What is one thing you do that I find attractive and have never told you?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot32",
+      "text": "What is my favorite part of you to look at?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot33",
+      "text": "What kind of date would get me in the mood fastest?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot34",
+      "text": "What is something I have always wanted to try with you, but not said?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot35",
+      "text": "When did I last feel really desired by you?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot36",
+      "text": "What is the most attractive thing about me that I probably do not notice?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot37",
+      "text": "What is a moment between us you still think about?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot38",
+      "text": "What would make you feel more wanted by me?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "words",
+        "touch"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot39",
+      "text": "What is a fantasy date, with no budget, that you would plan for us?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Spicy"
+    },
+    {
+      "id": "hot40",
+      "text": "What is one thing you would like me to do more often when we are alone?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Spicy"
+    }
+  ]
+}

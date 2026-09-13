@@ -1,0 +1,606 @@
+{
+  "id": "daily-us-deep",
+  "title": "Further in",
+  "theme": "DEEP",
+  "blurb": "Daily only.",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "deep1",
+      "text": "When we fight, I need:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Space first",
+        "To talk it through right away"
+      ],
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep2",
+      "text": "I feel most secure in us when:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "We are together",
+        "We are apart and still fine"
+      ],
+      "depth": 3,
+      "tags": [
+        "words",
+        "time"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep3",
+      "text": "It is harder for me to say:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "I am sorry",
+        "I need help"
+      ],
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep4",
+      "text": "When something is wrong, I would rather you:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Ask me",
+        "Wait until I bring it up"
+      ],
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep5",
+      "text": "In ten years, I most want us to be:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Settled and steady",
+        "Still having adventures"
+      ],
+      "depth": 2,
+      "tags": [
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep6",
+      "text": "I show love more by:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Doing things",
+        "Saying things"
+      ],
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep7",
+      "text": "How easy is it for me to ask you for what I need?",
+      "type": "SCALE",
+      "lowLabel": "Very hard",
+      "highLabel": "Very easy",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep8",
+      "text": "How understood have I felt by you lately?",
+      "type": "SCALE",
+      "lowLabel": "Not much",
+      "highLabel": "Completely",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep9",
+      "text": "How much do I worry about the future?",
+      "type": "SCALE",
+      "lowLabel": "Hardly ever",
+      "highLabel": "All the time",
+      "depth": 2,
+      "tags": [
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep10",
+      "text": "How much has being with you changed me?",
+      "type": "SCALE",
+      "lowLabel": "Not much",
+      "highLabel": "Profoundly",
+      "depth": 3,
+      "tags": [
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep11",
+      "text": "How safe do I feel telling you something embarrassing?",
+      "type": "SCALE",
+      "lowLabel": "Not very",
+      "highLabel": "Completely",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep12",
+      "text": "What do I need most when I am having a hard week?",
+      "type": "PICK_ONE",
+      "options": [
+        "Someone to listen",
+        "A distraction",
+        "Practical help",
+        "Time alone, then a hug"
+      ],
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words",
+        "touch",
+        "time"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep13",
+      "text": "What am I most proud of about us?",
+      "type": "PICK_ONE",
+      "options": [
+        "How we handle hard things",
+        "How we laugh",
+        "What we have built",
+        "That we still choose each other"
+      ],
+      "depth": 3,
+      "tags": [
+        "past",
+        "home"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep14",
+      "text": "Which of these do I find hardest to talk about?",
+      "type": "PICK_ONE",
+      "options": [
+        "Money",
+        "Family",
+        "The future",
+        "What I feel"
+      ],
+      "depth": 3,
+      "tags": [
+        "money",
+        "family",
+        "planning",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep15",
+      "text": "What do I think we are best at as a couple?",
+      "type": "PICK_ONE",
+      "options": [
+        "Making each other laugh",
+        "Getting through hard times",
+        "Planning ahead",
+        "Taking care of each other"
+      ],
+      "depth": 2,
+      "tags": [
+        "acts",
+        "fun",
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep16",
+      "text": "What would I say keeps us close on busy weeks?",
+      "type": "PICK_ONE",
+      "options": [
+        "Small texts",
+        "Eating together",
+        "A hug before sleep",
+        "Talking before bed"
+      ],
+      "depth": 2,
+      "tags": [
+        "time",
+        "touch",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep17",
+      "text": "Pick the things I am quietly worried about right now.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Work",
+        "Money",
+        "Family",
+        "Health",
+        "Us"
+      ],
+      "maxChoices": 2,
+      "depth": 3,
+      "tags": [
+        "work",
+        "money",
+        "family"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep18",
+      "text": "Which of these did I learn from how my family did things?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "How to argue",
+        "How to show love",
+        "How to handle money",
+        "How to celebrate",
+        "How to apologize"
+      ],
+      "maxChoices": 3,
+      "depth": 3,
+      "tags": [
+        "family",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep19",
+      "text": "Pick what I would want you to know if I could not say it.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "I am proud of you",
+        "I am scared sometimes",
+        "I need more time with you",
+        "I am happy",
+        "I am tired"
+      ],
+      "maxChoices": 2,
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep20",
+      "text": "Which of these would I want our home to always feel like?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Calm",
+        "Full of people",
+        "Safe",
+        "Playful",
+        "A little messy and lived in"
+      ],
+      "maxChoices": 2,
+      "depth": 2,
+      "tags": [
+        "home"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep21",
+      "text": "Pick the moments I felt closest to you this year.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A hard day",
+        "A trip",
+        "A normal Tuesday",
+        "A celebration",
+        "A long talk"
+      ],
+      "maxChoices": 2,
+      "depth": 3,
+      "tags": [
+        "past",
+        "time"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep22",
+      "text": "Put these in order of what I need most from you right now.",
+      "type": "RANK",
+      "options": [
+        "Patience",
+        "Encouragement",
+        "Honesty",
+        "Affection"
+      ],
+      "depth": 3,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep23",
+      "text": "Rank these by how much they matter to me in a long life together.",
+      "type": "RANK",
+      "options": [
+        "Trust",
+        "Laughter",
+        "Growth",
+        "Shared goals"
+      ],
+      "depth": 3,
+      "tags": [
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep24",
+      "text": "Order these by what I find hardest to forgive.",
+      "type": "RANK",
+      "options": [
+        "Being ignored",
+        "Being lied to",
+        "Being embarrassed in public",
+        "A broken promise"
+      ],
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep25",
+      "text": "Rank these by what I would most want to be remembered for.",
+      "type": "RANK",
+      "options": [
+        "Kindness",
+        "Courage",
+        "Humor",
+        "Loyalty"
+      ],
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep26",
+      "text": "What is the biggest thing I want to change about myself?",
+      "type": "DROPDOWN",
+      "options": [
+        "How I handle stress",
+        "How I spend my time",
+        "How I talk to myself",
+        "How I show up for people",
+        "How I handle money",
+        "Nothing right now"
+      ],
+      "depth": 3,
+      "tags": [
+        "words",
+        "time",
+        "money"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep27",
+      "text": "What do I most want our life to be about?",
+      "type": "DROPDOWN",
+      "options": [
+        "Family",
+        "Adventure",
+        "Comfort and peace",
+        "Making something together",
+        "Helping other people",
+        "Each other, mostly"
+      ],
+      "depth": 3,
+      "tags": [
+        "family",
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep28",
+      "text": "Which of these would I say I am still healing from?",
+      "type": "DROPDOWN",
+      "options": [
+        "Something from childhood",
+        "An old relationship",
+        "A loss",
+        "A disappointment",
+        "A friendship ending",
+        "Nothing I would name"
+      ],
+      "depth": 3,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep29",
+      "text": "What is my biggest fear about growing older?",
+      "type": "DROPDOWN",
+      "options": [
+        "Losing people",
+        "Losing my health",
+        "Regret",
+        "Being bored",
+        "Money",
+        "I am not afraid of it"
+      ],
+      "depth": 3,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep30",
+      "text": "When do I feel most like myself?",
+      "type": "DROPDOWN",
+      "options": [
+        "Outdoors",
+        "With friends",
+        "Working on something",
+        "Alone",
+        "With you",
+        "Traveling"
+      ],
+      "depth": 2,
+      "tags": [
+        "time",
+        "friends"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep31",
+      "text": "What is something I have never fully forgiven myself for?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep32",
+      "text": "What would I say is the hardest thing we have been through together?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep33",
+      "text": "What do I wish more people knew about me?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep34",
+      "text": "What dream have I quietly let go of?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "planning",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep35",
+      "text": "What do I think makes us work, when so many couples do not?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep36",
+      "text": "What is something you have never told me because you were not sure how I would react?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep37",
+      "text": "When did you feel most supported by me?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "acts",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep38",
+      "text": "What is one thing you want us to be braver about?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "planning"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep39",
+      "text": "What part of your childhood do you want our home to have, and what part should it never have?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "family",
+        "home",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "deep40",
+      "text": "What is a good thing that happened to you this week that you have not really told me about?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

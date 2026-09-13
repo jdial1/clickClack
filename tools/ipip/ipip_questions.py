@@ -186,13 +186,10 @@ for n, (key, ids, category, tags, depth, guess, reflect, rdepth) in enumerate(GR
 
     stem = lambda t: STEMS[t][n % len(STEMS[t])]
     low, high = SCALE_LABELS[n % len(SCALE_LABELS)]
+    # Only the two prompts written for each trait. The statement lists read
+    # like a personality test and were about one person, not two; the trait
+    # survives as the idea behind a question asked in the app's own voice.
     questions = [
-        q("t", "THIS_OR_THAT", stem("THIS_OR_THAT"), depth, options=[plus[0], minus[0]]),
-        q("s", "SCALE", f"{stem('SCALE')} “{plus[1]}.”", depth, lowLabel=low, highLabel=high),
-        q("p", "PICK_ONE", stem("PICK_ONE"), depth, options=across(key, 4, 2)),
-        q("m", "MULTI_SELECT", stem("MULTI_SELECT"), depth, options=across(key, 5, 3), maxChoices=3),
-        q("r", "RANK", stem("RANK"), depth, options=across(key, 4, 4)),
-        q("d", "DROPDOWN", stem("DROPDOWN"), depth, options=across(key, 6, 1)),
         q("g", "GUESS_ME", guess, depth),
         q("f", "REFLECT", reflect, rdepth),
     ]

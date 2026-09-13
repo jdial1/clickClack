@@ -51,6 +51,7 @@ enum class QuizTheme(
     DEEP("Deep", BrickColor.BLUE),
     FOOD("Food", BrickColor.YELLOW),
     TRAVEL("Travel", BrickColor.GREEN),
+    ROMANTIC("Romantic", BrickColor.RED),
 
     /**
      * Warm, not explicit. The brief is playful: this is a couple on a sofa, and

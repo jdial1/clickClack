@@ -14,7 +14,8 @@ files the app uses are in `app/src/main/res`.
 
 # Personality statements
 
-`app/src/main/assets/daily/daily-ipip-*.json` adapt 216 statements from the
+`app/src/main/assets/daily/daily-ipip-*.json` hold questions written around the traits
+in the
 **International Personality Item Pool** IPIP-NEO facet scales
 (<https://ipip.ori.org/>), which are **public domain**: the site states they may
 be copied, edited, translated or used for any purpose without permission or fee.
@@ -32,6 +33,11 @@ come from the same pool: IPIP-VIA, Barchard's (2001) emotional-intelligence
 components, IPIP-HEXACO (Ashton, Lee & Goldberg, 2007), and the Oregon
 Vocational (Pozzebon et al., 2010) and Avocational (Goldberg, 2010) Interest
 Scales. All public domain.
+
+# Written for the app
+
+`daily-us-*.json` (funny, romantic, spicy, deep) are original. Regenerate with
+`python tools/questions/couples.py`.
 
 # Government sources
 

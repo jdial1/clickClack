@@ -562,7 +562,7 @@ STEMS = {
         "SCALE": ["How much do I mind {x}?", "How much do I actually enjoy {x}?"],
         "PICK_ONE": ["Which of these would I hand off first?", "Which of these do I secretly not mind?"],
         "MULTI_SELECT": ["Which of these do I usually take care of?", "Which of these did I do this week?"],
-        "RANK": ["Rank these from least to most dreaded, for me.", "Order these by how much I would rather skip them."],
+        "RANK": ["Put these in order, from the one I mind least to the one I dread.", "Order these by how much I would rather skip them."],
         "DROPDOWN": ["Which of these would I do happily every day?", "Which of these do I think I am best at?"],
         "GUESS_ME": ["How do I feel about {x}, honestly?"],
     },
@@ -660,6 +660,16 @@ def build(prefix, family, groups, deck_id, title, theme, source):
                 questions.append(dict(id=f"{prefix}{g.key}{LETTER[t]}{r}",
                                       text=text, type=t, category=g.category, depth=d, tags=g.tags, **extra))
 
+            # Traits, jobs and pastimes keep only the prompts written for them.
+            # Their statement lists read as a personality test about one
+            # person; the prompts are questions two people ask each other.
+            # The list questions already draw from every group, so one set per
+            # source is enough; more was the same stems over and over.
+            if family in ("trait", "jobs", "activities") or gi > 0:
+                q("GUESS_ME", g.guess, g.depth)
+                q("REFLECT", g.reflect, g.rdepth)
+                break
+
             lead = queue[r % len(queue)]
             # this or that: a + keyed and a - keyed statement, or two groups' activities
             if family == "trait" and r < len(pairs):
@@ -700,9 +710,9 @@ def build(prefix, family, groups, deck_id, title, theme, source):
                 x = text_of(item, "base" if family in ("activities", "jobs") else "ing")
                 q("GUESS_ME", stem("GUESS_ME").format(x=x[0].lower() + x[1:]), g.depth)
 
-            r += 1
-            if r * 4 >= len(queue):  # each round leads with four statements
-                break
+            # One round. Chores, free time and the week are about the two of
+            # you, but a second pass over the same list is the same question.
+            break
 
     for x in questions:
         x["source"] = source

@@ -1,0 +1,625 @@
+{
+  "id": "daily-us-romantic",
+  "title": "Still falling",
+  "theme": "ROMANTIC",
+  "blurb": "Daily only.",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rom1",
+      "text": "A perfect evening for us is:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Dressed up and out",
+        "Blanket, takeout, no plans"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom2",
+      "text": "I would rather get:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "A love letter",
+        "A surprise trip"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "gifts"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom3",
+      "text": "The most romantic time of day is:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Early morning",
+        "Late at night"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom4",
+      "text": "I fall for you more when you are:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Being silly",
+        "Being serious about something you love"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom5",
+      "text": "An anniversary should be:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "The same tradition every year",
+        "Something new every year"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom6",
+      "text": "I would rather slow dance:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "In the kitchen",
+        "At a wedding"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom7",
+      "text": "How much do I still get butterflies around you?",
+      "type": "SCALE",
+      "lowLabel": "Rarely",
+      "highLabel": "All the time",
+      "depth": 2,
+      "tags": [
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom8",
+      "text": "How much do I love little notes and texts from you during the day?",
+      "type": "SCALE",
+      "lowLabel": "Not my thing",
+      "highLabel": "Keep them coming",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom9",
+      "text": "How important is a real date night to me?",
+      "type": "SCALE",
+      "lowLabel": "Nice to have",
+      "highLabel": "Essential",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom10",
+      "text": "How much do I like being surprised by you?",
+      "type": "SCALE",
+      "lowLabel": "Please warn me",
+      "highLabel": "Surprise me always",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "gifts"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom11",
+      "text": "How sure was I about us in the first month?",
+      "type": "SCALE",
+      "lowLabel": "Not sure at all",
+      "highLabel": "Completely sure",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom12",
+      "text": "When did I first feel something real for you?",
+      "type": "PICK_ONE",
+      "options": [
+        "The first date",
+        "A long conversation",
+        "Meeting your friends",
+        "Much later than you would think"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom13",
+      "text": "Which would make me feel most loved this week?",
+      "type": "PICK_ONE",
+      "options": [
+        "A long hug",
+        "Hearing why you love me",
+        "You handling something for me",
+        "An evening with no phones"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words",
+        "touch",
+        "acts",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom14",
+      "text": "Which place would I pick for our next date?",
+      "type": "PICK_ONE",
+      "options": [
+        "Somewhere with a view",
+        "Our favorite restaurant",
+        "Somewhere we have never been",
+        "Home, with the lights low"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom15",
+      "text": "What song would I pick for our first dance, if we did it again?",
+      "type": "PICK_ONE",
+      "options": [
+        "Something old and slow",
+        "Something we can laugh to",
+        "Whatever was playing when we met",
+        "Something nobody else would pick"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom16",
+      "text": "Which of these would I most like to recreate?",
+      "type": "PICK_ONE",
+      "options": [
+        "Our first date",
+        "Our first trip",
+        "A night we stayed up talking",
+        "The day we knew"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom17",
+      "text": "Pick the small things that make me feel loved.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "You making my coffee",
+        "A kiss hello",
+        "You remembering something I said",
+        "Holding hands in public",
+        "You saving me the last bite"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "acts",
+        "touch"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom18",
+      "text": "Which of these would I love for a surprise date?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A picnic",
+        "Stargazing",
+        "A cooking class",
+        "A drive with no destination",
+        "A concert"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time",
+        "fun"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom19",
+      "text": "Pick what I noticed first about you.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Your smile",
+        "Your voice",
+        "Your laugh",
+        "Your eyes",
+        "How you talked to other people"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom20",
+      "text": "Which of these would I keep forever, if you gave it to me?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A handwritten letter",
+        "A photo of us",
+        "A song you wrote or picked",
+        "A small piece of jewelry",
+        "A drawing"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "gifts"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom21",
+      "text": "Pick the moments I find romantic, even if nobody else would.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Doing chores together",
+        "You falling asleep on me",
+        "Grocery shopping side by side",
+        "You singing badly",
+        "A rainy day indoors"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "romance",
+        "home"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom22",
+      "text": "Put these in order of what makes me feel closest to you.",
+      "type": "RANK",
+      "options": [
+        "A long talk",
+        "A long hug",
+        "Laughing together",
+        "Doing something new together"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words",
+        "touch",
+        "fun"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom23",
+      "text": "Rank these dates from most to least my kind of thing.",
+      "type": "RANK",
+      "options": [
+        "Candlelit dinner",
+        "A hike and a view",
+        "A movie night in",
+        "A road trip"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom24",
+      "text": "Order these by how much I would want them on my birthday.",
+      "type": "RANK",
+      "options": [
+        "A thoughtful gift",
+        "A day planned around me",
+        "Kind words from you",
+        "Quiet time together"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "gifts",
+        "words",
+        "time"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom25",
+      "text": "Rank these by how often I think about them.",
+      "type": "RANK",
+      "options": [
+        "How we met",
+        "Our first kiss",
+        "Our first trip",
+        "A hard time we got through"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom26",
+      "text": "Which season feels most like us?",
+      "type": "DROPDOWN",
+      "options": [
+        "Early spring",
+        "Long summer evenings",
+        "Crisp fall",
+        "Snowy winter",
+        "The first warm day",
+        "The last day of vacation"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom27",
+      "text": "What would I say is our love song, if we had to pick one?",
+      "type": "DROPDOWN",
+      "options": [
+        "Something from when we met",
+        "Something from a road trip",
+        "Something from a wedding",
+        "Something from a movie",
+        "Something we sing badly together",
+        "We do not have one yet"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom28",
+      "text": "Where would I want to renew our vows, or say them?",
+      "type": "DROPDOWN",
+      "options": [
+        "A beach",
+        "A small chapel",
+        "Our backyard",
+        "The place we met",
+        "A mountain top",
+        "A courthouse, then a great dinner"
+      ],
+      "depth": 2,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom29",
+      "text": "What kind of love letter would I write?",
+      "type": "DROPDOWN",
+      "options": [
+        "Short and sweet",
+        "Pages long",
+        "Funny",
+        "A list of reasons",
+        "A poem, badly",
+        "I would say it out loud instead"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom30",
+      "text": "Which of these would I call the most romantic gesture?",
+      "type": "DROPDOWN",
+      "options": [
+        "Remembering a tiny detail",
+        "Planning a whole day",
+        "Writing something by hand",
+        "Showing up when it counts",
+        "A long, slow kiss",
+        "Carrying the bags without asking"
+      ],
+      "depth": 1,
+      "tags": [
+        "romance",
+        "acts",
+        "words"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom31",
+      "text": "What is my favorite memory of the two of us?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom32",
+      "text": "What is one thing you do that makes me feel completely at home?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "home"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom33",
+      "text": "What did I think the first time I saw you?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom34",
+      "text": "What is a date I would love to go on that we have never tried?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time",
+        "planning"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom35",
+      "text": "What would I say is your most attractive quality that has nothing to do with looks?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom36",
+      "text": "When did you realize you were falling for me?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom37",
+      "text": "What is one small thing I did recently that made you feel loved?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "acts"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom38",
+      "text": "What is a romantic tradition you would like us to start?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "planning"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom39",
+      "text": "What do you love about us now that you did not expect at the start?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "rom40",
+      "text": "Where would you take me for a perfect day, and why there?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "time"
+      ],
+      "category": "Romantic"
+    }
+  ]
+}

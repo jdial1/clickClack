@@ -1,0 +1,599 @@
+{
+  "id": "daily-us-funny",
+  "title": "Just for laughs",
+  "theme": "PLAYFUL",
+  "blurb": "Daily only.",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "fun1",
+      "text": "If we were in a heist movie, I would be:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "The mastermind",
+        "The one who trips the alarm"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun2",
+      "text": "Stuck in an elevator together, I would:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Tell stories until help comes",
+        "Press every button twice"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun3",
+      "text": "My dance moves are:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Better than I let on",
+        "Exactly as bad as you think"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun4",
+      "text": "In a zombie outbreak, we would last:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Longer than anyone expects",
+        "About eleven minutes"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun5",
+      "text": "When I lose at a board game, I:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Shake hands like an adult",
+        "Ask for a rematch immediately"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun6",
+      "text": "If our pet could talk, it would mostly complain about:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Me",
+        "You"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun7",
+      "text": "How likely am I to talk to the TV during a show?",
+      "type": "SCALE",
+      "lowLabel": "Never",
+      "highLabel": "Every scene",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun8",
+      "text": "How good would I be at keeping a surprise party secret?",
+      "type": "SCALE",
+      "lowLabel": "Hopeless",
+      "highLabel": "Vault",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "words"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun9",
+      "text": "How dramatic am I when I have a small cold?",
+      "type": "SCALE",
+      "lowLabel": "Barely notice",
+      "highLabel": "Write my will",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun10",
+      "text": "How competitive do I get at mini golf?",
+      "type": "SCALE",
+      "lowLabel": "Just here for fun",
+      "highLabel": "Keeping score in ink",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun11",
+      "text": "How long could I survive without my phone?",
+      "type": "SCALE",
+      "lowLabel": "An hour",
+      "highLabel": "A whole week",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun12",
+      "text": "What would my reality show be called?",
+      "type": "PICK_ONE",
+      "options": [
+        "Snacks and Opinions",
+        "Lost Again",
+        "Five More Minutes",
+        "Technically Correct"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun13",
+      "text": "Which job would I be secretly great at?",
+      "type": "PICK_ONE",
+      "options": [
+        "Game show host",
+        "Lifeguard",
+        "Detective",
+        "Wedding planner"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun14",
+      "text": "What would I name our boat?",
+      "type": "PICK_ONE",
+      "options": [
+        "Knot Tonight",
+        "The Second Mortgage",
+        "Sea You Later",
+        "Just One More Trip"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun15",
+      "text": "If I were a kitchen appliance, I would be:",
+      "type": "PICK_ONE",
+      "options": [
+        "A blender, loud and useful",
+        "A toaster, reliable",
+        "A slow cooker, worth the wait",
+        "A microwave, done in a minute"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun16",
+      "text": "What is my most likely reason for being late?",
+      "type": "PICK_ONE",
+      "options": [
+        "Could not find my keys",
+        "Got talking to someone",
+        "Changed outfits",
+        "Lost track of time"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun17",
+      "text": "Pick the things I would definitely do on a free Saturday with no plans.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Sleep in",
+        "Start a project I will not finish",
+        "Eat breakfast for lunch",
+        "Rearrange something",
+        "Watch an entire season of something"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun18",
+      "text": "Which of these would I be banned from at a party?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "The karaoke machine",
+        "The snack table",
+        "The music",
+        "The board games",
+        "Telling that one story again"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun19",
+      "text": "Pick the ones I pretend to be good at.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Parallel parking",
+        "Remembering names",
+        "Cooking without a recipe",
+        "Directions",
+        "Assembling furniture"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun20",
+      "text": "Which of these could I talk about for an hour?",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A show I just finished",
+        "Something at work",
+        "Food",
+        "A random fact I learned",
+        "Why I was right about something"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "words"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun21",
+      "text": "Pick my superpowers, if I could only have two.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Never getting lost",
+        "Always finding parking",
+        "Instant naps",
+        "Remembering every birthday",
+        "Knowing what is for dinner"
+      ],
+      "maxChoices": 2,
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun22",
+      "text": "Put these in order of how fast I would get distracted.",
+      "type": "RANK",
+      "options": [
+        "A dog walking by",
+        "A snack",
+        "My phone",
+        "A good song"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun23",
+      "text": "Rank these by how likely I am to cry during them.",
+      "type": "RANK",
+      "options": [
+        "A dog movie",
+        "A wedding",
+        "A commercial",
+        "Finishing a long book"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun24",
+      "text": "Order these by how much I would complain about them.",
+      "type": "RANK",
+      "options": [
+        "A long line",
+        "Cold coffee",
+        "Slow wifi",
+        "Wet socks"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun25",
+      "text": "Put these in order of what I would save first in a flood.",
+      "type": "RANK",
+      "options": [
+        "The good pillows",
+        "Snacks",
+        "The photos",
+        "My phone charger"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun26",
+      "text": "Rank these by how badly I would do on a survival show.",
+      "type": "RANK",
+      "options": [
+        "Building a fire",
+        "Finding food",
+        "Keeping calm",
+        "Sleeping outside"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun27",
+      "text": "What would my theme song be?",
+      "type": "DROPDOWN",
+      "options": [
+        "Something with a big drum solo",
+        "A soft piano ballad",
+        "A cartoon opening",
+        "Elevator music",
+        "A marching band",
+        "An old country song"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun28",
+      "text": "What animal am I most like before coffee?",
+      "type": "DROPDOWN",
+      "options": [
+        "A bear",
+        "A sloth",
+        "A startled cat",
+        "A goldfish",
+        "A grumpy owl",
+        "A puppy, somehow"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun29",
+      "text": "Which decade would I thrive in?",
+      "type": "DROPDOWN",
+      "options": [
+        "The twenties",
+        "The fifties",
+        "The seventies",
+        "The eighties",
+        "The nineties",
+        "Right now, thank you"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun30",
+      "text": "If I opened a restaurant, what would it serve?",
+      "type": "DROPDOWN",
+      "options": [
+        "Only breakfast",
+        "Only desserts",
+        "Soup, all kinds",
+        "Whatever I feel like that day",
+        "Grilled cheese, perfected",
+        "Snacks, as a meal"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun31",
+      "text": "What is the silliest thing I have ever gotten really upset about?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun32",
+      "text": "What would I do with a completely free day and a hundred dollars?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time",
+        "money"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun33",
+      "text": "What is the worst gift I have ever been given?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "gifts",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun34",
+      "text": "What would I bring to a desert island if I could only bring one thing?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun35",
+      "text": "What is a weird food combination I secretly love?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun36",
+      "text": "What is the funniest thing that has happened to the two of us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun37",
+      "text": "What is a habit of mine that used to annoy you and now makes you smile?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun38",
+      "text": "If we swapped lives for a day, what would you do first?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun39",
+      "text": "What is a story about us that you love telling other people?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past",
+        "friends"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "fun40",
+      "text": "What is the most ridiculous argument we have ever had?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "past"
+      ],
+      "category": "Playful"
+    }
+  ]
+}
