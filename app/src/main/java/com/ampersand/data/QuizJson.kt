@@ -55,9 +55,6 @@ import org.json.JSONObject
  */
 object QuizJson {
 
-    /** Every deck bundled in `assets/quizzes/`. */
-    fun loadBundled(context: Context): List<Quiz> = loadFolder(context, "quizzes")
-
     /** Every deck in an asset folder, in file order. */
     fun loadFolder(context: Context, folder: String): List<Quiz> {
         val names = context.assets.list(folder).orEmpty().filter { it.endsWith(".json") }
@@ -71,16 +68,6 @@ object QuizJson {
     }
 
     fun parse(json: String): Quiz = fromObject(JSONObject(json))
-
-    /** A file holding a bare array is read as several decks. */
-    fun parseAll(json: String): List<Quiz> {
-        val trimmed = json.trimStart()
-        return if (trimmed.startsWith("[")) {
-            JSONArray(trimmed).let { arr -> (0 until arr.length()).map { fromObject(arr.getJSONObject(it)) } }
-        } else {
-            listOf(parse(json))
-        }
-    }
 
     private fun fromObject(o: JSONObject): Quiz {
         val theme = o.optString("theme").ifBlank { "EVERYDAY" }.let { name ->

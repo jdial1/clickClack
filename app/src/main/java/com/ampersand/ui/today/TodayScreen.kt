@@ -72,10 +72,8 @@ import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
-import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
-import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
@@ -378,7 +376,6 @@ internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
     }
 }
 
-/** Small filled capsule, used for metadata that should not compete. */
 /**
  * Did yesterday's question come up again?
  *
@@ -508,18 +505,6 @@ private fun TomorrowPick(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun Pill(text: String) {
-    BrickPill(slug = quietSlug(), studSize = Stud.small, height = BrickHeight.LOW) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
-            color = inkOnBrick(quietSlug()),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-        )
     }
 }
 

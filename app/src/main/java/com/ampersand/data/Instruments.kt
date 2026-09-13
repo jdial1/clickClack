@@ -1,6 +1,5 @@
 package com.ampersand.data
 
-import com.ampersand.model.Cadence
 import com.ampersand.model.Fidelity
 import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentItem
@@ -196,7 +195,6 @@ object Instruments {
         blurb = "Thirty-two either-ors: makes lists or relies on memory, " +
             "energetic or mellow. Eight of them on each of four axes, and where " +
             "you land on all four is the four letters.",
-        cadence = Cadence.ONCE,
         minutes = 4,
         items = listOf(
             InstrumentItem("makes lists", "relies on memory"),                                  // 1
@@ -298,7 +296,6 @@ object Instruments {
         blurb = "Twenty small things, rated twice: once for what makes you feel " +
             "loved, once for what you tend to do for them. The part that matters " +
             "is the gap between what one of you wants and what the other gives.",
-        cadence = Cadence.YEARLY,
         minutes = 6,
         passes = listOf(
             "This is what makes me feel loved",
@@ -365,7 +362,6 @@ object Instruments {
         blurb = "Twenty-eight statements about how you love rather than how " +
             "much. Four styles: the immediate kind, the kind that grew out of " +
             "friendship, the kind that thinks ahead, and the kind that gives way.",
-        cadence = Cadence.YEARLY,
         minutes = 5,
         items = listOf(
             // Eros -- passionate, immediate, physical. Original items 1-7.

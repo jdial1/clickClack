@@ -194,7 +194,7 @@ class QuestionPool(
 
     companion object {
         fun load(context: Context): QuestionPool = QuestionPool(
-            decks = QuizJson.loadBundled(context),
+            decks = QuizJson.loadFolder(context, "quizzes"),
             occasions = QuizJson.loadFolder(context, "occasions").associateBy { it.id },
             dailyOnly = QuizJson.loadFolder(context, "daily"),
         )

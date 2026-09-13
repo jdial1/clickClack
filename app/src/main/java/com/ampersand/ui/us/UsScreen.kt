@@ -485,12 +485,7 @@ private fun SwitchSlab(
     }
 }
 
-/**
- * Shows the two colours meeting. Painted with the theme's own [DuoColors.sweep]
- * rather than a local gradient, so it shows the *actual* blend the rest of the
- * app is using -- an RGB lerp here would draw a duller midpoint than the one on
- * the hero card and quietly make the screen a liar.
- */
+/** Shows the two colours meeting: one course of both. */
 @Composable
 private fun BlendStrip(you: BrickColor, them: BrickColor) {
     // Was a rounded gradient bar. A real course of both colours says the same
@@ -501,28 +496,6 @@ private fun BlendStrip(you: BrickColor, them: BrickColor) {
         studs = 12,
         modifier = Modifier.height(34.dp),
     )
-}
-
-@Composable
-private fun Upcoming(title: String, detail: String) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        BrickDot(slug = quietSlug(), studSize = Stud.pip, modifier = Modifier.padding(top = 3.dp))
-        Spacer(Modifier.size(14.dp))
-        Column {
-            Text(title, style = MaterialTheme.typography.titleSmall)
-            Spacer(Modifier.height(2.dp))
-            Text(
-                detail,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
 }
 
 @Preview(name = "Us", showBackground = true, heightDp = 900)

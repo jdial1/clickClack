@@ -681,7 +681,6 @@ object MockCouple {
     private fun instrumentRuns(today: LocalDate) = listOf(
         InstrumentRun(
             instrumentId = Instruments.LOVE_LANGUAGES.id,
-            takenOn = today.minusDays(31),
             answers = mapOf(
                 //                        words time gifts acts touch
                 you.uid to language(felt = listOf(3, 3, 3, 5, 4),

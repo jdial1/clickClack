@@ -207,9 +207,6 @@ class FirestoreCoupleRepository(
                 }
                 snap?.documents.orEmpty().forEach { doc ->
                     instrumentDocs = instrumentDocs + (doc.id to doc)
-                    doc.getString("takenOn")?.let { d ->
-                        instrumentDates = instrumentDates + (doc.id to LocalDate.parse(d))
-                    }
                     @Suppress("UNCHECKED_CAST")
                     val counts = doc.get("progress") as? Map<String, Long>
                     if (counts != null) {
@@ -340,7 +337,6 @@ class FirestoreCoupleRepository(
                 instrumentDrafts.keys).map { id ->
                 InstrumentRun(
                     instrumentId = id,
-                    takenOn = instrumentDates[id] ?: today,
                     answers = instrumentResponses[id].orEmpty(),
                     progress = instrumentProgress[id].orEmpty(),
                     draft = instrumentDrafts[id].orEmpty(),
@@ -423,7 +419,6 @@ class FirestoreCoupleRepository(
     /** instrument id -> uid -> responses, in published order, passes concatenated. */
     private var instrumentResponses: Map<String, Map<String, List<Int>>> = emptyMap()
     private var instrumentDocs: Map<String, DocumentSnapshot> = emptyMap()
-    private var instrumentDates: Map<String, LocalDate> = emptyMap()
 
     /** instrument id -> uid -> how many answered, sealed or not. */
     private var instrumentProgress: Map<String, Map<String, Int>> = emptyMap()
@@ -561,7 +556,6 @@ class FirestoreCoupleRepository(
         )
     }
 
-    override fun bindPartner(uid: String, displayName: String) = Unit
 
     override fun submitToday(values: List<String>, guess: List<String>?) {
         if (_state.value.today.answerFor(myUid) != null) return
@@ -939,7 +933,6 @@ class FirestoreCoupleRepository(
         doc.set(
             mapOf(
                 "revealed" to false,
-                "takenOn" to today.toString(),
                 "submitted" to FieldValue.arrayUnion(myUid),
                 "progress" to mapOf(myUid to responses.size),
             ),
@@ -963,7 +956,6 @@ class FirestoreCoupleRepository(
         doc.set(
             mapOf(
                 "revealed" to false,
-                "takenOn" to today.toString(),
                 // A count, not the answers. This is the half that is meant to
                 // be visible to the other person.
                 "progress" to mapOf(myUid to responses.count { it > 0 }),

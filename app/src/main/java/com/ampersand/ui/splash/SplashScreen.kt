@@ -44,12 +44,9 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.awaitReady
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
-import com.ampersand.ui.theme.Stud
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
-private val Tile = BrickShape(2, BrickHeight.MEDIUM)
-private val StudSize = Stud.hero
 
 /** Accelerating, because things fall faster the longer they have been falling. */
 private val Gravity = CubicBezierEasing(0.5f, 0f, 1f, 0.5f)
@@ -88,10 +85,6 @@ fun SplashScreen(
     val lowerY = remember { Animatable(DropFrom) }
     val upperY = remember { Animatable(DropFrom) }
     val fade = remember { Animatable(0f) }
-
-    val lower = them.asset(Tile)
-    val upper = you.asset(Tile)
-    val atlas = rememberBricks(listOf(lower, upper))
 
     LaunchedEffect(Unit) {
         // Hold the curtain until the clips are decoded. SoundPool drops a play

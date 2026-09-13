@@ -15,11 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
@@ -45,9 +41,6 @@ data class DuoColors(
     val them: Color,
 ) {
     val blend: Color = vividBlend(you, them)
-
-    /** The signature gradient: you on one end, them on the other. */
-    val sweep: Brush = Brush.linearGradient(listOf(you, blend, them))
 
     /** Readable ink for text sitting on [color]. */
     fun inkOn(color: Color): Color =
@@ -201,11 +194,8 @@ object Stud {
 }
 
 object Radius {
-    val chip = RoundedCornerShape(14.dp)
     val control = RoundedCornerShape(20.dp)
     val card = RoundedCornerShape(28.dp)
-    val hero = RoundedCornerShape(32.dp)
-    val pill = RoundedCornerShape(100.dp)
 }
 
 /**
@@ -224,7 +214,6 @@ object Radius {
 object Motion {
     /** A key going down is instant; coming back up is allowed to be seen. */
     const val PressMs = 60
-    const val LiftMs = 110
 
     /** One surface replacing another: a screen, a panel, a question. */
     const val SwapMs = 200
@@ -251,27 +240,6 @@ object Motion {
         stiffness = Spring.StiffnessMediumLow,
     )
 }
-
-/**
- * A wide, soft, *coloured* shadow rather than the default black one.
- *
- * This is most of why the reference designs feel like they float: the glow picks
- * up the element's own hue instead of dropping grey underneath it. Coloured
- * shadows need API 28; below that it degrades to the standard black shadow,
- * which still reads fine.
- */
-fun Modifier.glow(
-    color: Color,
-    shape: Shape,
-    elevation: androidx.compose.ui.unit.Dp = 18.dp,
-    alpha: Float = 0.45f,
-): Modifier = shadow(
-    elevation = elevation,
-    shape = shape,
-    clip = false,
-    ambientColor = color.copy(alpha = alpha),
-    spotColor = color.copy(alpha = alpha),
-)
 
 // --- Colour helpers ----------------------------------------------------------
 

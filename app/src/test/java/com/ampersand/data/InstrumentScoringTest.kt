@@ -8,7 +8,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDate
 
 /**
  * The scoring keys, checked against the numbers their own papers print.
@@ -142,7 +141,6 @@ class InstrumentScoringTest {
         assertEquals(28, kit.items.size)
         assertEquals(4, kit.subscales.size)
         assertEquals(1, kit.passCount)
-        assertTrue("nothing is merely hidden", kit.hidden.isEmpty())
 
         kit.subscales.forEach {
             assertEquals("${it.id} is seven items", 7, it.terms.size)
@@ -167,7 +165,6 @@ class InstrumentScoringTest {
 
         val run = InstrumentRun(
             instrumentId = kit.id,
-            takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(you.uid to responses, them.uid to responses),
         )
         val badge = BadgeWall.groups(listOf(run), you, them)
@@ -212,7 +209,6 @@ class InstrumentScoringTest {
     fun `a badge stays unearned until both have finished`() {
         val half = InstrumentRun(
             instrumentId = Instruments.JUNGIAN.id,
-            takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(you.uid to List(32) { 3 }),
         )
         val badge = BadgeWall.groups(listOf(half), you, them)
@@ -242,7 +238,6 @@ class InstrumentScoringTest {
 
         val run = InstrumentRun(
             instrumentId = Instruments.LOVE_LANGUAGES.id,
-            takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(
                 you.uid to expand(yourFelt, yourGiven),
                 them.uid to expand(theirFelt, theirGiven),
@@ -264,7 +259,6 @@ class InstrumentScoringTest {
         val same = listOf(4, 4, 4, 4, 4)
         val run = InstrumentRun(
             instrumentId = Instruments.LOVE_LANGUAGES.id,
-            takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(
                 you.uid to expand(same, same),
                 them.uid to expand(same, same),

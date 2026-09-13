@@ -4,7 +4,6 @@ import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentItem
 import com.ampersand.model.PageSize
 import com.ampersand.model.ProgressFloor
-import com.ampersand.model.Cadence
 import com.ampersand.model.Subscale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -151,7 +150,6 @@ class PaginationTest {
         blurb = "",
         items = List(items) { InstrumentItem("low", "high") },
         subscales = listOf(Subscale("all", "All", terms = (0 until items).associateWith { 1 })),
-        cadence = Cadence.ONCE,
         minutes = 1,
         passes = List(passes) { "pass $it" },
     )

@@ -29,22 +29,6 @@ import kotlin.math.abs
  */
 object Profiles {
 
-    /**
-     * Which tags each love language sends you toward.
-     *
-     * Aimed at tags rather than decks. There is no "acts of service" deck and
-     * there should not be; with tags the lean reaches the questions about who
-     * does what around the house wherever they sit, instead of weighting an
-     * entire Everyday deck of which a third is about chores.
-     */
-    private val languageTags = mapOf(
-        "words" to listOf("words"),
-        "time" to listOf("time"),
-        "gifts" to listOf("gifts"),
-        "acts" to listOf("acts"),
-        "touch" to listOf("touch"),
-    )
-
     /** Which tags each love style leans toward. */
     private val styleTags = mapOf(
         "eros" to listOf("romance", "touch"),
@@ -85,7 +69,9 @@ object Profiles {
         }
 
         shortfall(state)?.let { (language, who, label) ->
-            favourTags(languageTags[language].orEmpty(), by = 2)
+            // Each love language's id is also a question tag, so the lean
+            // reaches every question about it, wherever the question sits.
+            favourTags(listOf(language), by = 2)
             reasons += "$who wants ${label.lowercase()} more than the other of you tends to " +
                 "give it, so there is more about that in the pool."
         }

@@ -51,11 +51,6 @@ data class BrickShape(
             slope.asset?.let { append(it); append('_') }
             append(studs)
         }
-
-    companion object {
-        val FLAT_WIDTHS = listOf(1, 2, 4, 6)
-        val SLOPE_WIDTHS = listOf(2, 4)
-    }
 }
 
 /** The character bricks. Awarded at milestones, never for an ordinary day. */
@@ -137,22 +132,6 @@ data class BuildPlate(
 
     /** How many bricks [uid] earned into this plate, placed or not. */
     fun earnedBy(uid: String): Int = blocks.count { it.ownerUid == uid }
-
-    /**
-     * [uid]'s share of the bricks, 0..1, or null when the plate is empty.
-     *
-     * The sculpture already shows this in colour; this is for saying it out
-     * loud underneath. A week that came out three to one is worth a sentence,
-     * and not everyone reads a silhouette.
-     */
-    fun shareOf(uid: String): Float? {
-        if (blocks.isEmpty()) return null
-        return blocks.count { it.ownerUid == uid }.toFloat() / blocks.size
-    }
-
-    /** Total studs [uid] put in: volume rather than count, so size counts. */
-    fun studsBy(uid: String): Int =
-        blocks.filter { it.ownerUid == uid }.sumOf { it.shape.w * it.shape.h }
 
     /** Bricks earned but not yet on the plate, for [uid]. */
     fun tray(uid: String): List<Block> {

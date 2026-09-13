@@ -24,9 +24,6 @@ data class Quiz(
 
     /** Rough, and deliberately rough: an estimate people can plan around. */
     val minutes: Int get() = (questions.sumOf { it.type.weight } / 60).coerceAtLeast(1)
-
-    /** Whether this deck scores at all. A deck of REFLECTs does not. */
-    val isScored: Boolean get() = questions.any { it.isScored }
 }
 
 /**

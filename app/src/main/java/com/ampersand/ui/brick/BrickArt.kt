@@ -45,9 +45,6 @@ object BrickArt {
      */
     fun aspectWithNub(w: Int, rows: Int): Float = w / (rows * ROW_RATIO + NUB_RATIO)
 
-    /** Full drawn height of a brick [rows] tall, including the nub. */
-    fun heightFor(rows: Int, studPx: Float): Float = rows * studPx * ROW_RATIO + studPx * NUB_RATIO
-
     /**
      * The widths available in the pack, largest first.
      *

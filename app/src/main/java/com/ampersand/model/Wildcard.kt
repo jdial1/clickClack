@@ -86,9 +86,6 @@ data class Knowing(
     /** Newest first, and only months with something in them. */
     val recent: List<KnowingMonth>
         get() = months.filter { it.scored > 0 }.sortedByDescending { it.month }
-
-    fun youShare(): Float = if (scored == 0) 0f else youHits.toFloat() / scored
-    fun theyShare(): Float = if (scored == 0) 0f else theyHits.toFloat() / scored
 }
 
 data class KnowingMonth(

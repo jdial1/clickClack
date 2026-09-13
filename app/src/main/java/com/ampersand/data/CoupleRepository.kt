@@ -38,9 +38,6 @@ interface CoupleRepository {
      */
     fun bindLocalUser(uid: String, displayName: String)
 
-    /** Same, for the person you are paired with. */
-    fun bindPartner(uid: String, displayName: String)
-
     /** Submit your own answer for today. Irreversible, by design. */
     fun submitToday(values: List<String>, guess: List<String>?)
 
@@ -182,13 +179,6 @@ class FakeCoupleRepository(
     override fun bindLocalUser(uid: String, displayName: String) = mutate { current ->
         if (current.you.uid == uid && current.you.name == displayName) return@mutate current
         current.rebind(current.you.uid, uid) { copy(you = you.copy(uid = uid, name = displayName)) }
-    }
-
-    override fun bindPartner(uid: String, displayName: String) = mutate { current ->
-        if (current.them.uid == uid && current.them.name == displayName) return@mutate current
-        current.rebind(current.them.uid, uid) {
-            copy(them = them.copy(uid = uid, name = displayName))
-        }
     }
 
     private fun CoupleState.rebind(
@@ -390,7 +380,7 @@ class FakeCoupleRepository(
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) =
         mutate { current ->
             val existing = current.instrumentRuns.lastOrNull { it.instrumentId == instrumentId }
-            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now())).let {
+            val updated = (existing ?: InstrumentRun(instrumentId)).let {
                 it.copy(
                     draft = responses,
                     progress = it.progress + (current.you.uid to responses.count { v -> v > 0 }),
@@ -404,7 +394,7 @@ class FakeCoupleRepository(
     override fun submitInstrument(instrumentId: String, responses: List<Int>) =
         mutate { current ->
             val existing = current.instrumentRuns.lastOrNull { it.instrumentId == instrumentId }
-            val updated = (existing ?: InstrumentRun(instrumentId, LocalDate.now())).let {
+            val updated = (existing ?: InstrumentRun(instrumentId)).let {
                 it.copy(
                     answers = it.answers + (current.you.uid to responses),
                     progress = it.progress + (current.you.uid to responses.size),

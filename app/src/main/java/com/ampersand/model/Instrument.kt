@@ -1,6 +1,5 @@
 package com.ampersand.model
 
-import java.time.LocalDate
 
 /**
  * How faithfully the app reproduces a source, which decides the credit line.
@@ -99,13 +98,6 @@ data class Subscale(
         constant + terms.entries.sumOf { (i, sign) -> sign * (responses.getOrNull(i) ?: 3) }
 }
 
-/** How often an instrument may be run. Enforced, not documented. */
-enum class Cadence(val label: String, val days: Int) {
-    ONCE("once", Int.MAX_VALUE),
-    YEARLY("once a year", 365),
-    QUARTERLY("every few months", 90),
-}
-
 /**
  * A whole instrument: every item, in the published order, in one sitting.
  *
@@ -129,18 +121,7 @@ data class Instrument(
     val blurb: String,
     val items: List<InstrumentItem>,
     val subscales: List<Subscale>,
-    val cadence: Cadence,
     val minutes: Int,
-    /**
-     * Subscales scored but never shown.
-     *
-     * The Love Attitudes Scale is six subscales and two of them -- concealing
-     * other lovers, and jealousy -- are a bad thing to hand a married couple on
-     * a Tuesday. Dropping the items would make it a different instrument, so
-     * they are answered and simply not rendered. The profile stays valid and
-     * nobody reads the ugly part.
-     */
-    val hidden: Set<String> = emptySet(),
     /** The stem each pass puts in front of every item. One entry = one pass. */
     val passes: List<String> = listOf(""),
 ) {
@@ -148,8 +129,6 @@ data class Instrument(
 
     /** Total responses one person gives: every item, once per pass. */
     val length: Int get() = items.size * passCount
-
-    val shown: List<Subscale> get() = subscales.filterNot { it.id in hidden }
 
     /**
      * How far [answered] responses gets someone through this instrument.
@@ -216,7 +195,7 @@ data class Instrument(
     fun readings(responses: List<Int>, pass: Int = 0): List<Reading> {
         val from = pass * items.size
         val slice = responses.drop(from).take(items.size)
-        return subscales.map { Reading(it, it.scoreOf(slice), pass) }
+        return subscales.map { Reading(it, it.scoreOf(slice)) }
     }
 }
 
@@ -279,7 +258,6 @@ data class InstrumentPage(
 data class Reading(
     val subscale: Subscale,
     val value: Int,
-    val pass: Int = 0,
 ) {
     /** The word this number stands for, on a subscale that has a cut. */
     val letter: String?
@@ -321,7 +299,6 @@ data class Reading(
  */
 data class InstrumentRun(
     val instrumentId: String,
-    val takenOn: LocalDate,
     /** uid to responses, in item order, every pass concatenated. */
     val answers: Map<String, List<Int>> = emptyMap(),
     /**

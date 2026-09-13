@@ -123,19 +123,6 @@ class SoundKit(context: Context) {
         return id in ready
     }
 
-    /**
-     * Click, then clack: two bricks meeting.
-     *
-     * [gapMs] is the beat between them. Below about 50ms the pair fuses into
-     * one thud and the name stops being audible in it; much above 140ms they
-     * read as two separate events rather than one join.
-     */
-    suspend fun clickClack(gapMs: Long = 90) {
-        play(Sfx.CLICK)
-        kotlinx.coroutines.delay(gapMs)
-        play(Sfx.CLACK)
-    }
-
     fun release() {
         pool.release()
         loaded.clear()
@@ -160,10 +147,6 @@ fun rememberSoundKit(): SoundKit {
 /** Convenience so call sites read as `sounds.play(Sfx.TAP)` even when absent. */
 fun SoundKit?.play(sfx: Sfx) {
     this?.play(sfx)
-}
-
-suspend fun SoundKit?.clickClack(gapMs: Long = 90) {
-    this?.clickClack(gapMs)
 }
 
 suspend fun SoundKit?.awaitReady(sfx: Sfx, timeoutMs: Long = 2000) {

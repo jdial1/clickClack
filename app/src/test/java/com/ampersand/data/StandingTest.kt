@@ -7,7 +7,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDate
 
 /**
  * Where each of you has got to, and what the wall says about it.
@@ -26,7 +25,6 @@ class StandingTest {
 
     private fun run(vararg progress: Pair<String, Int>) = InstrumentRun(
         instrumentId = kit.id,
-        takenOn = LocalDate.of(2026, 9, 12),
         progress = progress.toMap(),
     )
 
@@ -69,7 +67,6 @@ class StandingTest {
     fun `a finished run beats a lagging progress number`() {
         val sealed = InstrumentRun(
             instrumentId = kit.id,
-            takenOn = LocalDate.of(2026, 9, 12),
             answers = mapOf(you.uid to List(40) { 3 }),
             progress = mapOf(you.uid to 12),
         )
