@@ -1,5 +1,6 @@
 package com.ampersand.ui.instrument
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -127,6 +128,22 @@ fun InstrumentScreen(
         // Fixed, outside the scroll. The point of a progress header is that it
         // is there while you are working, and one that scrolls off the top is
         // only ever visible at the moment you did not need it.
+        val back: () -> Unit = {
+            sounds.play(Sfx.NAV)
+            feel.play(Feel.NAV)
+            // Back means the previous page while there is one. Leaving from
+            // page three and losing twenty answers is not what anybody
+            // reaching for that word intends.
+            // Saved on the way out too, not only on a page turn. Backing
+            // out of page one after answering six is still six answers.
+            onSaveDraft(responses.toList())
+            if (here.index > 0) page -= 1 else onBack()
+        }
+        // The phone's back does the same as the header's. It used to fall
+        // through to the app shell, which left the sitting on screen and saved
+        // nothing, and the second press closed the app.
+        BackHandler(onBack = back)
+
         StickyHeader(
             instrument = instrument,
             page = here,
@@ -134,17 +151,7 @@ fun InstrumentScreen(
             answered = answered,
             pageDone = pageDone,
             you = you,
-            onBack = {
-                sounds.play(Sfx.NAV)
-                feel.play(Feel.NAV)
-                // Back means the previous page while there is one. Leaving from
-                // page three and losing twenty answers is not what anybody
-                // reaching for that word intends.
-                // Saved on the way out too, not only on a page turn. Backing
-                // out of page one after answering six is still six answers.
-                onSaveDraft(responses.toList())
-                if (here.index > 0) page-- else onBack()
-            },
+            onBack = back,
         )
 
         Column(

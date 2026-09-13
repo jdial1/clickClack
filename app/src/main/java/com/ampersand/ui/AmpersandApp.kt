@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.animation.AnimatedContent
@@ -171,6 +172,23 @@ private enum class Tab(val label: String) {
     US("Us"),
 }
 
+/**
+ * Today's date, checked again every time the app comes back to the front.
+ *
+ * ponytail: yesterday's ViewModel stays in the store until the Activity
+ * finishes, listeners and all; one extra per day the app is left open. Clear
+ * the store on a date change if that ever shows up in battery or read counts.
+ */
+@Composable
+private fun rememberToday(): LocalDate {
+    var today by remember { mutableStateOf(LocalDate.now()) }
+    LifecycleResumeEffect(Unit) {
+        today = LocalDate.now()
+        onPauseOrDispose { }
+    }
+    return today
+}
+
 @Composable
 fun AmpersandApp() {
     val context = LocalContext.current
@@ -304,10 +322,13 @@ private fun PairedGate(
                 return@PairedGate
             }
 
-            // Keyed on the couple: a new pairing gets a new repository and a
-            // new set of listeners rather than the previous couple's.
+            // Keyed on the couple and the day: a new pairing gets a new
+            // repository, and so does a new morning. The repository fixes its
+            // date when it is built, so a process kept alive overnight used to
+            // show yesterday's question and write today's answer to yesterday.
+            val today = rememberToday()
             val vm: AmpersandViewModel = viewModel(
-                key = "couple_${p.coupleId}",
+                key = "couple_${p.coupleId}_$today",
                 factory = AmpersandViewModel.factory(
                     hasFirebase = hasFirebase,
                     coupleId = p.coupleId,
@@ -416,22 +437,24 @@ private fun SignedInApp(
             )
         }
 
-        var tab by remember { mutableStateOf(Tab.TODAY) }
+        // Saveable, all of these: the Activity is recreated on rotation, and
+        // plain remember dropped you back on Today out of whatever was open.
+        var tab by rememberSaveable { mutableStateOf(Tab.TODAY) }
         // The *date* of the open day, not the day itself. Holding the entry
         // would freeze it at the moment it was opened, so a reaction added on
         // the reveal screen would never appear on the reveal screen.
-        var openDate by remember { mutableStateOf<LocalDate?>(null) }
+        var openDate by rememberSaveable { mutableStateOf<LocalDate?>(null) }
         // The deck you are playing, if any. A quiz id rather than the Quiz, so
         // the screen re-resolves it and a deck that gains a question mid-play
         // does not leave a stale copy on screen.
-        var openDeck by remember { mutableStateOf<String?>(null) }
+        var openDeck by rememberSaveable { mutableStateOf<String?>(null) }
         // Which day has already been unpacked. Hoisted above the screen because
         // the screen is disposed every time you leave it, and a flag inside it
         // would let the reveal put on its whole performance again on the way
         // back in. Saveable so a rotation does not do the same.
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
-        var writing by remember { mutableStateOf(false) }
-        var sitting by remember { mutableStateOf<String?>(null) }
+        var writing by rememberSaveable { mutableStateOf(false) }
+        var sitting by rememberSaveable { mutableStateOf<String?>(null) }
 
         val sounds = LocalSounds.current
         val feel = LocalFeel.current
