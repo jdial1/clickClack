@@ -24,14 +24,14 @@ object SideBySide {
     }
 }
 
+private const val DaysPerMonth = 30.44
+
 /**
  * How far off a date is, the way a person would say it.
  *
  * Never a bare day count past a fortnight: "in 243 days" is arithmetic, "in 8
  * months" is a date.
  */
-private const val DaysPerMonth = 30.44
-
 fun until(from: LocalDate, to: LocalDate): String {
     val days = ChronoUnit.DAYS.between(from, to)
     return when {

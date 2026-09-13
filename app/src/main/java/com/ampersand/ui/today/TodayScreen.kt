@@ -153,6 +153,14 @@ fun TodayScreen(
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
+            status = when {
+                yourAnswer == null -> HeroStatus(
+                    "Your turn",
+                    "${state.them.name} will not see what you say until they answer too.",
+                )
+                !day.isRevealed -> HeroStatus("Sealed", "${state.them.name} has not answered yet.")
+                else -> HeroStatus("Both in", "Open it.", onOpenReveal)
+            },
         )
         Spacer(Modifier.height(28.dp))
 
@@ -242,6 +250,8 @@ private fun QuestionHero(
     pickedBy: String? = null,
     /** The run today makes, when that is one of [Milestones.Runs]. */
     milestone: Int? = null,
+    /** Whose move it is, said on the card itself. */
+    status: HeroStatus? = null,
 ) {
     // One line of text crosses both halves of the wall, so the ink has to suit
     // the paler of the two. White over pack yellow is unreadable.
@@ -317,6 +327,34 @@ private fun QuestionHero(
                 style = MaterialTheme.typography.displaySmall,
                 color = ink,
             )
+        }
+
+        // The state of the day lives on the card, not in a panel below it:
+        // one glance at the question says whether it is waiting on you, on
+        // them, or open. Tappable only when there is somewhere to go.
+        status?.let { st ->
+            val sounds = LocalSounds.current
+            val feel = LocalFeel.current
+            Spacer(Modifier.height(16.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .glass(ink, corner = 12.dp, strength = 1.6f)
+                    .then(
+                        if (st.onClick == null) Modifier else Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) {
+                            sounds.play(Sfx.SEAL)
+                            feel.play(Feel.SEAL)
+                            st.onClick()
+                        },
+                    )
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+            ) {
+                Text(st.title, style = MaterialTheme.typography.titleMedium, color = ink)
+                Text(st.detail, style = MaterialTheme.typography.bodySmall, color = ink)
+            }
         }
     }
     }
@@ -809,6 +847,9 @@ private fun SealedPanel(
         )
     }
 }
+
+/** What the question card says about the day, and where tapping it goes. */
+private data class HeroStatus(val title: String, val detail: String, val onClick: (() -> Unit)? = null)
 
 /**
  * The waiting state, said with the app's own name.
