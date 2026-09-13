@@ -37,6 +37,7 @@ object NationalWeatherService {
             city = city,
             precipChance = period.optJSONObject("probabilityOfPrecipitation")
                 ?.takeUnless { it.isNull("value") }?.optInt("value"),
+            daytime = period.optBoolean("isDaytime", true),
         )
     }
 

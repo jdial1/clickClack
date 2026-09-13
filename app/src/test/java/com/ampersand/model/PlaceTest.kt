@@ -42,6 +42,20 @@ class PlaceTest {
     }
 
     @Test
+    fun `the brick reads the sky from the forecast words`() {
+        assertEquals(WeatherBrick.STORMY, DayWeather(84, "Showers And Thunderstorms", precipChance = 70).brick)
+        assertEquals(WeatherBrick.SNOWY, DayWeather(30, "Snow Showers", precipChance = 80).brick)
+        assertEquals(WeatherBrick.RAINY, DayWeather(60, "Rain", precipChance = 90).brick)
+        assertEquals(WeatherBrick.PARTLY_CLOUDY, DayWeather(84, "Partly Sunny then Slight Chance Showers And Thunderstorms", precipChance = 17).brick)
+        assertEquals(WeatherBrick.FOGGY, DayWeather(55, "Patchy Fog then Sunny").brick)
+        assertEquals(WeatherBrick.HOT, DayWeather(96, "Sunny").brick)
+        assertEquals(WeatherBrick.COLD, DayWeather(20, "Clear", daytime = false).brick)
+        assertEquals(WeatherBrick.CLEAR_NIGHT, DayWeather(60, "Mostly Clear", daytime = false).brick)
+        assertEquals(WeatherBrick.CLOUDY, DayWeather(60, "Mostly Cloudy").brick)
+        assertEquals(WeatherBrick.SUNNY, DayWeather(70, "Sunny").brick)
+    }
+
+    @Test
     fun `the line reads like a person wrote it`() {
         assertEquals("84°  ·  Partly sunny  ·  Pittsburgh", DayWeather(84, "Partly Sunny", "Pittsburgh").line)
     }

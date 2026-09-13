@@ -1260,7 +1260,7 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
 )
 
 private fun DayWeather.toMap(): Map<String, Any?> =
-    mapOf("tempF" to tempF, "summary" to summary, "city" to city, "precipChance" to precipChance)
+    mapOf("tempF" to tempF, "summary" to summary, "city" to city, "precipChance" to precipChance, "daytime" to daytime)
 
 private fun DocumentSnapshot?.toWeather(): DayWeather? {
     val w = this?.get("weather") as? Map<*, *> ?: return null
@@ -1270,6 +1270,7 @@ private fun DocumentSnapshot?.toWeather(): DayWeather? {
         summary = w["summary"] as? String ?: "",
         city = w["city"] as? String,
         precipChance = (w["precipChance"] as? Number)?.toInt(),
+        daytime = w["daytime"] as? Boolean,
     )
 }
 

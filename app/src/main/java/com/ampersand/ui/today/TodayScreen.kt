@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.WeatherBrickArt
 import com.ampersand.ui.components.MoodArt
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
@@ -147,18 +148,22 @@ fun TodayScreen(
             StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
         }
 
-        // The forecast both phones saved, in one plain line. Nothing when no
-        // home ZIP is set or the weather service had nothing to say.
-        listOfNotNull(
-            state.weather?.line,
-            state.daylight?.let { "Sunset ${it.sunsetText}" },
-        ).takeIf { it.isNotEmpty() }?.joinToString("  ·  ")?.let { line ->
-            Spacer(Modifier.height(4.dp))
-            Text(
-                line,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        // The forecast both phones saved: a brick for the sky and one plain
+        // line. Nothing when no home ZIP is set or the weather service had
+        // nothing to say.
+        state.weather?.let { weather ->
+            Spacer(Modifier.height(6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                weather.brick?.let {
+                    WeatherBrickArt(it, Modifier.size(28.dp))
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text(
+                    weather.line,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
 
         Spacer(Modifier.height(12.dp))

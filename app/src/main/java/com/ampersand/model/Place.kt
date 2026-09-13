@@ -63,6 +63,12 @@ class ZipTable(private val places: Map<String, Place>) {
     }
 }
 
+/**
+ * The brick shown beside the forecast on Today. Finer than [WeatherKind],
+ * which only picks questions; this is just what the sky looks like.
+ */
+enum class WeatherBrick { SUNNY, PARTLY_CLOUDY, CLOUDY, RAINY, STORMY, SNOWY, WINDY, FOGGY, HOT, COLD, CLEAR_NIGHT }
+
 /** The four kinds of day worth a question of their own. */
 enum class WeatherKind(val label: String) { SNOW("Snow"), RAIN("Rain"), HOT("Hot"), COLD("Cold") }
 
@@ -78,6 +84,8 @@ data class DayWeather(
     val summary: String,
     val city: String? = null,
     val precipChance: Int? = null,
+    /** False when the first forecast period is the night, as it is after dark. */
+    val daytime: Boolean? = null,
 ) {
     val kind: WeatherKind?
         get() {
@@ -89,6 +97,35 @@ data class DayWeather(
                 tempF >= HotF -> WeatherKind.HOT
                 tempF <= ColdF -> WeatherKind.COLD
                 else -> null
+            }
+        }
+
+    /**
+     * Storms, then snow and rain, then what hides the sky, then the
+     * temperature, then the sky itself. A cold clear night is Cold: the
+     * icicles say more than the moon does.
+     */
+    val brick: WeatherBrick?
+        get() {
+            val words = summary.lowercase()
+            val likely = (precipChance ?: 100) >= LikelyPrecip && "slight chance" !in words
+            fun has(vararg w: String) = w.any { it in words }
+            return when {
+                has("thunder", "storm") && likely -> WeatherBrick.STORMY
+                has("snow", "flurr", "sleet", "blizzard", "ice", "freezing") && likely -> WeatherBrick.SNOWY
+                has("rain", "shower", "drizzle") && likely -> WeatherBrick.RAINY
+                has("fog", "haze", "smoke", "mist") -> WeatherBrick.FOGGY
+                has("wind", "breezy", "blustery", "gust") -> WeatherBrick.WINDY
+                tempF >= HotF -> WeatherBrick.HOT
+                tempF <= ColdF -> WeatherBrick.COLD
+                daytime == false && has("clear") -> WeatherBrick.CLEAR_NIGHT
+                has("mostly cloudy", "overcast") -> WeatherBrick.CLOUDY
+                has("partly", "mostly sunny", "mostly clear") -> WeatherBrick.PARTLY_CLOUDY
+                has("cloudy") -> WeatherBrick.CLOUDY
+                has("sunny", "clear", "fair") -> WeatherBrick.SUNNY
+                // "Chance showers" and the like: the sky is doing something,
+                // just not enough to call it rain.
+                else -> WeatherBrick.PARTLY_CLOUDY
             }
         }
 
