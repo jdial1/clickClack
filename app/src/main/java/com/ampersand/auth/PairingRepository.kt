@@ -37,6 +37,7 @@ enum class RedeemError(val message: String) {
     EXPIRED("That code has expired. Ask them for a fresh one."),
     OWN_CODE("That is your own code. Send it to them instead."),
     ALREADY_PAIRED("You are already paired with someone."),
+    THEY_ARE_PAIRED("Whoever made that code is already paired. Ask for a fresh one."),
     FAILED("Could not join. Try again in a moment."),
 }
 

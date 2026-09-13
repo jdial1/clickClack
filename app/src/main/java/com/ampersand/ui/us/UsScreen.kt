@@ -88,11 +88,7 @@ fun UsScreen(
             StatCard(
                 value = state.streak.toString(),
                 label = "Day streak",
-                caption = if (state.freezesLeft > 0) {
-                    "${state.freezesLeft} freeze left this week"
-                } else {
-                    "Freeze used this week"
-                },
+                caption = "Days in a row either of you answered",
                 modifier = Modifier.weight(1f),
             )
             StatCard(
@@ -174,7 +170,14 @@ fun UsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(12.dp))
-                AmpButton(label = "Unpair", slug = "black", onClick = onUnpair)
+                // Two taps. It ends the couple on both phones, and one stray
+                // tap on a settings screen should not be able to do that.
+                var confirming by remember { mutableStateOf(false) }
+                AmpButton(
+                    label = if (confirming) "Tap again to unpair" else "Unpair",
+                    slug = "black",
+                    onClick = { if (confirming) onUnpair() else confirming = true },
+                )
             }
         }
 

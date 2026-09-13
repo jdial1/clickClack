@@ -240,7 +240,6 @@ data class CoupleState(
     /** The day the two of you started, once someone has told the app. */
     val anniversary: LocalDate? = null,
     val streak: Int = 0,
-    val freezesLeft: Int = 1,
     /**
      * The day today's question came back from, when today is a capsule.
      *

@@ -238,7 +238,10 @@ fun AmpersandApp() {
                 val account = auth as AuthState.SignedIn
                 PairedGate(
                     account = account,
-                    onSignOut = authVm.auth::signOut,
+                    onSignOut = {
+                        Reminder.cancel(context)
+                        Push.unregister(context, account.uid) { authVm.auth.signOut() }
+                    },
                 )
             }
         }
@@ -352,7 +355,10 @@ private fun PairedGate(
                     account = account,
                     pool = pool,
                     onSignOut = onSignOut,
-                    onUnpair = { scope.launch { pairVm.pairing.unpair() } },
+                    onUnpair = {
+                        Reminder.cancel(context)
+                        scope.launch { pairVm.pairing.unpair() }
+                    },
                 )
             }
         }
@@ -611,7 +617,10 @@ private fun SignedInApp(
 
                         screen.tab == Tab.SHELF -> HistoryScreen(
                             state = state,
-                            onOpenDay = { openDate = it.date },
+                            // A day only one of you answered has nothing to
+                            // reveal; opening it showed an empty half and
+                            // offered reactions to a day that never opened.
+                            onOpenDay = { if (it.isRevealed) openDate = it.date },
                         )
 
                         else -> UsScreen(

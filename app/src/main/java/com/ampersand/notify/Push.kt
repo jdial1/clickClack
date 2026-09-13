@@ -1,5 +1,6 @@
 package com.ampersand.notify
 
+import com.google.firebase.firestore.FieldValue
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -46,6 +47,22 @@ object Push {
         FirebaseMessaging.getInstance().token
             .addOnSuccessListener { token -> write(uid, token) }
             .addOnFailureListener { Log.w(TAG, "no token", it) }
+    }
+
+    /**
+     * Take this phone's token off the account, then carry on.
+     *
+     * Before sign-out rather than after: the write needs the account's
+     * credentials. [then] runs whether or not it worked, so a phone offline at
+     * the moment of signing out still signs out.
+     */
+    fun unregister(context: Context, uid: String, then: () -> Unit) {
+        if (!hasFirebaseConfigFor(context)) return then()
+        FirebaseMessaging.getInstance().deleteToken()
+        FirebaseFirestore.getInstance()
+            .collection("users").document(uid)
+            .update("fcmToken", FieldValue.delete())
+            .addOnCompleteListener { then() }
     }
 
     internal fun write(uid: String, token: String) {

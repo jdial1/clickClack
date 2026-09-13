@@ -193,15 +193,21 @@ class FirestorePairingRepository(
                     val expiresAt = invite.getTimestamp("expiresAt")
                     if (expiresAt == null || expiresAt.toDate().time <= System.currentTimeMillis()) {
                         // Expired codes are consumed rather than left lying
-                        // around: the only thing a dead invite can do now is
-                        // confuse whoever types it next.
+                        // around. Returned, not thrown: throwing aborts the
+                        // transaction, and the delete with it.
                         txn.delete(inviteRef)
-                        throw RedeemException(RedeemError.EXPIRED)
+                        return@runTransaction RedeemError.EXPIRED
                     }
 
                     val fromUid = invite.getString("fromUid")
                         ?: throw RedeemException(RedeemError.UNKNOWN_CODE)
                     if (fromUid == uid) throw RedeemException(RedeemError.OWN_CODE)
+
+                    // A code made before its owner paired with someone else
+                    // would otherwise pull them out of that couple.
+                    if (txn.get(db.collection(USERS).document(fromUid)).getString("coupleId") != null) {
+                        throw RedeemException(RedeemError.THEY_ARE_PAIRED)
+                    }
 
                     txn.set(
                         coupleRef,
@@ -234,7 +240,7 @@ class FirestorePairingRepository(
                     txn.delete(inviteRef)
                     null
                 },
-            )
+            )?.let { throw RedeemException(it) }
         }.map { }.recoverCatching { e ->
             val reason = e as? RedeemException ?: e.cause as? RedeemException
             Log.w(TAG, "redeem failed", e)

@@ -121,9 +121,15 @@ object Reminder {
         )
     }
 
+    /**
+     * Stop the alarm and forget everything cached about this couple.
+     *
+     * Called on sign-out and unpair. Without it the alarm kept telling someone
+     * with no partner that their partner had finished two decks. The asked
+     * flag goes too, so whoever pairs next on this phone is asked again.
+     */
     fun cancel(context: Context) {
-        prefs(context).edit().remove(KEY_HOUR).remove(KEY_MINUTE)
-            .putBoolean(KEY_ASKED, true).apply()
+        prefs(context).edit().clear().apply()
         context.getSystemService(AlarmManager::class.java)?.cancel(pending(context))
     }
 

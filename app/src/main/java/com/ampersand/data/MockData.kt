@@ -658,7 +658,6 @@ object MockCouple {
         history = history(today),
         quizRuns = runs(),
         streak = 7,
-        freezesLeft = 0,
         capsule = capsule(today),
         wildcards = wildcards(),
         knowing = knowing(today),
