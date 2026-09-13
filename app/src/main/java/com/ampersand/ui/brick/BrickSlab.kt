@@ -1,5 +1,10 @@
 package com.ampersand.ui.brick
 
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -185,6 +190,7 @@ fun BrickSlab(
                 val courses = ((size.height - nubPx) / coursePx).roundToInt().coerceAtLeast(1)
                 var n = 0
 
+                translucent(alpha) {
                 for (course in 0 until courses) {
                     // Reverse alternate courses: [6,4,2] then [2,4,6]. Without
                     // this every seam lines up and the slab reads as tiles.
@@ -203,10 +209,10 @@ fun BrickSlab(
                             // Course 0 is the bottom one.
                             bottom = size.height - course * coursePx,
                             studPx = studPx,
-                            alpha = alpha,
                         )
                         x += w * studPx
                     }
+                }
                 }
             },
         content = { Box(Modifier.fillMaxWidth(), content = content) },
@@ -281,6 +287,7 @@ fun BrickPill(
 
             val courses = ((size.height - nubPx) / coursePx).roundToInt().coerceAtLeast(1)
             val run = BrickArt.runOf(studs)
+            translucent(alpha) {
             for (course in 0 until courses) {
                 val widths = if (course % 2 == 0) run else run.reversed()
                 var x = 0f
@@ -293,10 +300,10 @@ fun BrickPill(
                         left = x,
                         bottom = size.height - course * coursePx,
                         studPx = studPx,
-                        alpha = alpha,
                     )
                     x += w * studPx
                 }
+            }
             }
         },
         // The nub is reserved as padding on the content rather than fixed up
@@ -326,4 +333,17 @@ fun BrickPill(
             )
         }
     }
+}
+
+/**
+ * Draws [block] onto one offscreen layer faded as a whole.
+ *
+ * Fading each brick separately let the nubs of a lower course show through the
+ * course laid over them. The layer is only paid for when something is faded.
+ */
+private inline fun DrawScope.translucent(alpha: Float, block: DrawScope.() -> Unit) {
+    if (alpha >= 1f) return block()
+    drawIntoCanvas { it.saveLayer(Rect(Offset.Zero, size), Paint().apply { this.alpha = alpha }) }
+    block()
+    drawIntoCanvas { it.restore() }
 }

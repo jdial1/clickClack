@@ -1,5 +1,6 @@
 package com.ampersand.ui.components
 
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -282,9 +283,13 @@ fun AmpRadioGroup(
                         indication = null,
                         enabled = enabled,
                     ) {
-                        sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
-                        feel.play(if (on) Feel.DESELECT else Feel.SELECT)
-                        onSelect(option)
+                        // A radio cannot be switched off, so tapping the
+                        // chosen one is not a deselect and says nothing.
+                        if (!on) {
+                            sounds.play(Sfx.SELECT)
+                            feel.play(Feel.SELECT)
+                            onSelect(option)
+                        }
                     },
             ) {
             Row(
@@ -427,6 +432,9 @@ private fun ChoiceRow(
         slugs = listOf(slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
+        // Blocked is said by the brick fading, never by the text: faded ink on
+        // the black brick is grey on black.
+        alpha = if (enabled) 1f else 0.45f,
         modifier = Modifier
             .fillMaxWidth()
             // Blocked rows stay tappable and say no. Leaving them disabled meant
@@ -458,7 +466,7 @@ private fun ChoiceRow(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = if (enabled) ink else ink.copy(alpha = 0.4f),
+            color = ink,
         )
     }
     }
@@ -508,11 +516,7 @@ fun AmpDropdown(
             Text(
                 text = selected ?: placeholder,
                 style = MaterialTheme.typography.bodyLarge,
-                color = when {
-                    open -> inkOnBrick(anchorSlug)
-                    selected == null -> inkOnBrick(anchorSlug).copy(alpha = 0.7f)
-                    else -> inkOnBrick(anchorSlug)
-                },
+                color = inkOnBrick(anchorSlug),
                 modifier = Modifier.weight(1f),
             )
             Caret(
@@ -590,6 +594,9 @@ fun AmpScale(
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
+    // The gesture outlives recompositions; without this a deck moving to the
+    // next scale question kept writing to the previous question's answer.
+    val select by rememberUpdatedState(onSelect)
     val brick = remember(accent) { BrickColor.of(accent.toArgbLong()) }
     val assets = remember(brick) { BrickArt.WIDTHS.map { brick.asset(BrickShape(it, BrickHeight.MEDIUM)) } }
     val atlas = rememberBricks(assets)
@@ -619,7 +626,7 @@ fun AmpScale(
                     // strip rendered correctly but ignored every drag. Handling
                     // press and drag in one place also means a tap is simply a
                     // drag of zero distance.
-                    .pointerInput(enabled, steps) {
+                    .pointerInput(enabled, steps, studPx) {
                         if (!enabled) return@pointerInput
                         awaitEachGesture {
                             val down = awaitFirstDown()
@@ -627,7 +634,7 @@ fun AmpScale(
                             var last = studAt(down.position.x)
                             sounds.play(Sfx.PICK_UP)
                             feel.play(Feel.PICK_UP)
-                            onSelect(last)
+                            select(last)
 
                             while (true) {
                                 val event = awaitPointerEvent()
@@ -642,7 +649,7 @@ fun AmpScale(
                                         sounds.play(Sfx.TAP)
                                         // One notch crossed, not a new choice.
                                         feel.play(Feel.TICK)
-                                        onSelect(next)
+                                        select(next)
                                     }
                                 }
                             }

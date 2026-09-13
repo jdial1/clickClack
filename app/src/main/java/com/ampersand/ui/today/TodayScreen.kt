@@ -74,6 +74,7 @@ import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
+import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
@@ -160,7 +161,7 @@ fun TodayScreen(
         // Whether *this* phone just did it, rather than whether it is done.
         // Coming back to an already-answered day should find the panel sitting
         // there, not watch it arrive again.
-        var justSealed by remember { mutableStateOf(false) }
+        var justSealed by remember(day.date) { mutableStateOf(false) }
 
         if (yourAnswer == null) {
             AnswerForm(state, you, them) { values, guess ->
@@ -170,7 +171,9 @@ fun TodayScreen(
         } else {
             val sounds = LocalSounds.current
             val feel = LocalFeel.current
-            Box(
+            // A Column, not a Box: the panel is several siblings, and a Box
+            // stacked the waiting line on top of what you said.
+            Column(
                 Modifier.arrive(
                     key = Unit,
                     rise = 10.dp,
@@ -259,7 +262,9 @@ private fun QuestionHero(
         Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
-            .glassOn(you.slug)
+            // The glass has to match the ink chosen for both colours, or a
+            // yellow partner gets dark text on a darkened pane.
+            .glass(ink)
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
         Row(
@@ -349,7 +354,7 @@ private fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
         QuietNote(
             when {
                 mine > 0 && theirs > 0 ->
-                    "One of yours and one of ${state.them.name}'s are waiting."
+                    "${count(mine)} of yours and ${count(theirs)} of ${state.them.name}'s are waiting."
                 theirs > 0 ->
                     "${state.them.name} has written one. It is the next question."
                 mine == 1 -> "Yours is waiting. It will be the next question."
@@ -358,6 +363,8 @@ private fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
         )
     }
 }
+
+private fun count(n: Int) = if (n == 1) "One" else n.toString()
 
 /**
  * How long ago, roughly, and never in days.
@@ -438,7 +445,7 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
         Text(
             "It did",
             style = MaterialTheme.typography.titleSmall,
-            color = Color(you.argb),
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
