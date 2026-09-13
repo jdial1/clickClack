@@ -1,0 +1,1881 @@
+{
+  "id": "daily-ipip-feelings",
+  "title": "Feelings",
+  "theme": "DEEP",
+  "blurb": "Daily only.",
+  "source": "IPIP emotional intelligence components, Barchard (2001), public domain",
+  "questions": [
+    {
+      "id": "iegladt0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my affection physically",
+        "I find it difficult showing people that I care about them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieglads0",
+      "text": "How much does this sound like me? “I laugh out loud if something is funny.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my affection physically",
+        "I show my sadness",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I laugh out loud if something is funny",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my happiness in a childlike manner",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I sometimes laugh out loud when reading or watching TV",
+        "I show my fear",
+        "I am usually aware of the way that I'm feeling",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladg0",
+      "text": "How do I show I am happy without saying it?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladf0",
+      "text": "How do you most like to be shown affection when we are out?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladt1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I laugh out loud if something is funny",
+        "I have difficulty showing affection"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieglads1",
+      "text": "How true is this of me? “I keep my happy feelings to myself.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I laugh out loud if something is funny",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my happiness in a childlike manner",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart",
+        "I rarely get caught up in the excitement"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I sometimes laugh out loud when reading or watching TV",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions",
+        "I make decisions based on facts, not feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I hug my close friends",
+        "I show my sadness",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladt2",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my happiness in a childlike manner",
+        "I keep my happy feelings to myself"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieglads2",
+      "text": "Would I say this about myself? “I find it difficult showing people that I care about them.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladp2",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I express my happiness in a childlike manner",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladm2",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I sometimes laugh out loud when reading or watching TV",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions",
+        "I make decisions based on facts, not feelings",
+        "I dislike children's birthday parties"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladk2",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I hug my close friends",
+        "I rarely show my anger",
+        "I am not in touch with my feelings",
+        "I listen to my feelings when making important decisions"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iegladd2",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "words"
+      ],
+      "options": [
+        "I show my feelings when I'm happy",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness",
+        "I am easily moved to tears"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsett0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I can't help but look upset when something bad happens",
+        "I keep my feelings to myself, regardless of how unhappy I am"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsets0",
+      "text": "How true is this of me? “I show my fear.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I can't help but look upset when something bad happens",
+        "I am usually aware of the way that I'm feeling",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetm0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my fear",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetk0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I find it difficult showing people that I'm angry with them",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetd0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my sadness",
+        "I pay a lot of attention to my feelings",
+        "I plan my life based on how I feel",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetg0",
+      "text": "How can you tell I am upset before I say anything?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetf0",
+      "text": "Which is easier for you to show: sadness or anger?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsett1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my fear",
+        "I find it difficult showing people that I'm angry with them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsets1",
+      "text": "Would I say this about myself? “I wish I could more easily show my negative feelings.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my fear",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetm1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I find it difficult showing people that I'm angry with them",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness",
+        "I am easily moved to tears"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetk1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my sadness",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart",
+        "I rarely get caught up in the excitement"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetd1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I am usually aware of the way that I'm feeling",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsett2",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I suspect that my facial expressions give me away when I feel sad",
+        "I keep my feelings to myself, regardless of how scared I am"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsets2",
+      "text": "How well does this describe me? “I keep my feelings to myself, regardless of how scared I am.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetp2",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I find it difficult showing people that I'm angry with them",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetm2",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I show my sadness",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart",
+        "I rarely get caught up in the excitement",
+        "I am upset by the misfortunes of strangers"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetk2",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I rarely analyze my emotions",
+        "I make decisions based on facts, not feelings",
+        "I dislike children's birthday parties"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieupsetd2",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I find it difficult showing people that I'm angry with them",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes",
+        "I have difficulty showing affection"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticet0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I think about the causes of my emotions",
+        "I rarely think about how I feel"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienotices0",
+      "text": "Would I say this about myself? “I pay a lot of attention to my feelings.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticep0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I think about the causes of my emotions",
+        "I plan my life based on how I feel",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticem0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I pay a lot of attention to my feelings",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticek0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am usually aware of the way that I'm feeling",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticed0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I notice my emotions",
+        "I base my goals in life on inspiration, rather than logic",
+        "I feel other people's joy",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticeg0",
+      "text": "What feeling do I have the most trouble putting into words?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticef0",
+      "text": "How are you really feeling today, in one honest sentence?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticet1",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I pay a lot of attention to my feelings",
+        "I rarely analyze my emotions"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienotices1",
+      "text": "How well does this describe me? “I often ignore my feelings.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticep1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I pay a lot of attention to my feelings",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticem1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am usually aware of the way that I'm feeling",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes",
+        "I have difficulty showing affection"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticek1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I notice my emotions",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness",
+        "I am easily moved to tears"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticed1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I often stop to analyze how I'm feeling",
+        "I plan my life based on how I feel",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticet2",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am usually aware of the way that I'm feeling",
+        "I am not in touch with my feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienotices2",
+      "text": "How much does this sound like me? “I rarely analyze my emotions.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticep2",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am usually aware of the way that I'm feeling",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticem2",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I notice my emotions",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness",
+        "I am easily moved to tears",
+        "I keep my happy feelings to myself"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticek2",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I often stop to analyze how I'm feeling",
+        "I listen to my brain rather than my heart",
+        "I rarely get caught up in the excitement",
+        "I am upset by the misfortunes of strangers"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ienoticed2",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I rarely think about how I feel",
+        "I believe emotions give direction to life",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them",
+        "I wish I could more easily show my negative feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartt0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I listen to my feelings when making important decisions",
+        "I plan my life logically"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iehearts0",
+      "text": "How well does this describe me? “I base my goals in life on inspiration, rather than logic.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I listen to my feelings when making important decisions",
+        "I feel other people's joy",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I base my goals in life on inspiration, rather than logic",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I plan my life based on how I feel",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I believe emotions give direction to life",
+        "I usually end up laughing if the people around me are laughing",
+        "I am upset by the misfortunes of strangers",
+        "I sometimes laugh out loud when reading or watching TV",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartg0",
+      "text": "What big decision did I make with my heart instead of my head?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartf0",
+      "text": "When should we trust our gut over the numbers?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "planning"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartt1",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I base my goals in life on inspiration, rather than logic",
+        "I believe important decisions should be based on logical reasoning"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iehearts1",
+      "text": "How much does this sound like me? “I make decisions based on facts, not feelings.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I base my goals in life on inspiration, rather than logic",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I plan my life based on how I feel",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them",
+        "I wish I could more easily show my negative feelings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I believe emotions give direction to life",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes",
+        "I have difficulty showing affection"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I listen to my heart rather than my brain",
+        "I feel other people's joy",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartt2",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I plan my life based on how I feel",
+        "I listen to my brain rather than my heart"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iehearts2",
+      "text": "How true is this of me? “I believe important decisions should be based on logical reasoning.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartp2",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I plan my life based on how I feel",
+        "I am strongly influenced by the good moods of others",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartm2",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I believe emotions give direction to life",
+        "I dislike being around happy people when I'm feeling sad",
+        "I am deeply moved by others' misfortunes",
+        "I have difficulty showing affection",
+        "I can't help but look upset when something bad happens"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartk2",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I listen to my heart rather than my brain",
+        "I am unaffected by other people's happiness",
+        "I am easily moved to tears",
+        "I keep my happy feelings to myself"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "ieheartd2",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "options": [
+        "I plan my life logically",
+        "I get caught up in the excitement when others are celebrating",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger",
+        "I am not in touch with my feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyt0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I like to watch children open presents",
+        "I dislike being around happy people when I'm feeling sad"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoys0",
+      "text": "How much does this sound like me? “I usually end up laughing if the people around me are laughing.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I like to watch children open presents",
+        "I am upset by the misfortunes of strangers",
+        "I sometimes laugh out loud when reading or watching TV",
+        "I find it difficult showing people that I'm angry with them"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoym0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I usually end up laughing if the people around me are laughing",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyk0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I feel other people's joy",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyd0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I get caught up in the excitement when others are celebrating",
+        "I am easily moved to tears",
+        "I express my happiness in a childlike manner",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyg0",
+      "text": "Whose good news makes me happiest?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyf0",
+      "text": "What good news from this week have you not told me yet?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyt1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I usually end up laughing if the people around me are laughing",
+        "I am unaffected by other people's happiness"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoys1",
+      "text": "How true is this of me? “I rarely get caught up in the excitement.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I usually end up laughing if the people around me are laughing",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoym1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I feel other people's joy",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger",
+        "I am not in touch with my feelings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyk1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I get caught up in the excitement when others are celebrating",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them",
+        "I wish I could more easily show my negative feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyd1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I am strongly influenced by the good moods of others",
+        "I am upset by the misfortunes of strangers",
+        "I sometimes laugh out loud when reading or watching TV",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyt2",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I feel other people's joy",
+        "I rarely get caught up in the excitement"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoys2",
+      "text": "Would I say this about myself? “I find it hard to stay in a bad mood if the people around me are happy.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyp2",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I feel other people's joy",
+        "I rarely cry during sad movies",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoym2",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I get caught up in the excitement when others are celebrating",
+        "I remain calm during emergencies",
+        "I find it difficult showing people that I care about them",
+        "I wish I could more easily show my negative feelings",
+        "I often ignore my feelings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyk2",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I am strongly influenced by the good moods of others",
+        "I am deeply moved by others' misfortunes",
+        "I have difficulty showing affection",
+        "I can't help but look upset when something bad happens"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iejoyd2",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "options": [
+        "I get caught up in the excitement when others are celebrating",
+        "I would be upset if I saw an injured animal",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions",
+        "I make decisions based on facts, not feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedt0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am deeply moved by others' misfortunes",
+        "I rarely cry during sad movies"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemoveds0",
+      "text": "How true is this of me? “I am easily moved to tears.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am deeply moved by others' misfortunes",
+        "I express my happiness in a childlike manner",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedm0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am easily moved to tears",
+        "I sometimes laugh out loud when reading or watching TV",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel",
+        "I listen to my brain rather than my heart"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedk0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am upset by the misfortunes of strangers",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedd0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I would be upset if I saw an injured animal",
+        "I laugh out loud if something is funny",
+        "I show my sadness",
+        "I notice my emotions",
+        "I listen to my heart rather than my brain",
+        "I dislike being around happy people when I'm feeling sad"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedg0",
+      "text": "What kind of movie scene always gets to me?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedf0",
+      "text": "What is the best way to comfort you when you are upset?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedt1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am easily moved to tears",
+        "I remain calm during emergencies"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemoveds1",
+      "text": "Would I say this about myself? “I am upset by the misfortunes of strangers.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedp1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am easily moved to tears",
+        "I sometimes laugh out loud when reading or watching TV",
+        "I find it difficult showing people that I'm angry with them",
+        "I rarely think about how I feel"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedm1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am upset by the misfortunes of strangers",
+        "I hug my close friends",
+        "I keep my feelings to myself, regardless of how scared I am",
+        "I rarely analyze my emotions",
+        "I make decisions based on facts, not feelings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedk1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I would be upset if I saw an injured animal",
+        "I show my feelings when I'm happy",
+        "I rarely show my anger",
+        "I am not in touch with my feelings"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    },
+    {
+      "id": "iemovedd1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I rarely cry during sad movies",
+        "I express my happiness in a childlike manner",
+        "I keep my feelings to myself, regardless of how unhappy I am",
+        "I often stop to analyze how I'm feeling",
+        "I plan my life logically",
+        "I am unaffected by other people's happiness"
+      ],
+      "source": "IPIP emotional intelligence components, Barchard (2001), public domain"
+    }
+  ]
+}

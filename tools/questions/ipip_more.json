@@ -1,0 +1,1458 @@
+{
+ "via": [
+  {
+   "name": "Appreciation of Beauty",
+   "plus": [
+    "Feel it's important to live in a world of beauty",
+    "Can become tearful thinking of the goodness of others",
+    "Experience deep emotions when I see beautiful things",
+    "Have been left speechless by the beauty depicted in a movie",
+    "Appreciate all forms of art",
+    "Am in awe of simple things in life that others might take for granted",
+    "Crave the experience of great art"
+   ],
+   "minus": [
+    "Fail to notice beauty until others comment on it"
+   ]
+  },
+  {
+   "name": "Capacity for Love",
+   "plus": [
+    "Am willing to take risks to establish a relationship",
+    "Know that there are people in my life who care as much for me as for themselves",
+    "Know that some others accept my shortcomings",
+    "Am the most important person in someone else's life",
+    "Can express love to someone else",
+    "Know someone whom I really care about as a person"
+   ],
+   "minus": [
+    "Do not easily share my feelings with others",
+    "Feel isolated from other people",
+    "Have difficulty accepting love from anyone"
+   ]
+  },
+  {
+   "name": "Citizenship/Teamwork",
+   "plus": [
+    "Don't miss group meetings or team practices",
+    "Enjoy being part of a group",
+    "Support my teammates or fellow group members",
+    "Feel I must respect the decisions made by my group"
+   ],
+   "minus": [
+    "Am not good at working with a group",
+    "Prefer to do everything alone",
+    "Work best when I am alone",
+    "Keep to myself",
+    "Don't think it's important to socialize with others"
+   ]
+  },
+  {
+   "name": "Curiosity",
+   "plus": [
+    "Find the world a very interesting place",
+    "Am never bored",
+    "Am always busy with something interesting",
+    "Am excited by many different activities",
+    "Can find something of interest in any situation",
+    "Think that my life is extremely interesting",
+    "Love to hear about other countries and cultures"
+   ],
+   "minus": [
+    "Am not all that curious about the world",
+    "Find it difficult to entertain myself",
+    "Have few interests"
+   ]
+  },
+  {
+   "name": "Equity/Fairness",
+   "plus": [
+    "Admit when I am wrong",
+    "Treat all people equally",
+    "Am a good listener",
+    "Believe that everyone's rights are equally important",
+    "Give everyone a chance",
+    "Am committed to principles of justice and equality",
+    "Believe that everyone should have a say"
+   ],
+   "minus": [
+    "Take advantage of others",
+    "Treat others differently if I don't like them"
+   ]
+  },
+  {
+   "name": "Forgiveness/Mercy",
+   "plus": [
+    "Let bygones be bygones",
+    "Never seek vengeance",
+    "Allow others to make a fresh start",
+    "Believe that it is best to forgive and forget",
+    "Don't try to get even",
+    "Hate to see anyone suffer, even my worst enemy",
+    "Try to respond with understanding when someone treats me badly"
+   ],
+   "minus": [
+    "Hold grudges",
+    "Do not give anyone a second chance to hurt me"
+   ]
+  },
+  {
+   "name": "Gratitude",
+   "plus": [
+    "Express my thanks to those who care about me",
+    "Have been richly blessed in my life",
+    "Stop to count my blessings",
+    "Am an extremely grateful person",
+    "Feel thankful for what I have received in life",
+    "Feel a profound sense of appreciation every day"
+   ],
+   "minus": [
+    "Do not see the need to acknowledge others who are good to me",
+    "Find few things in my life to be grateful for"
+   ]
+  },
+  {
+   "name": "Hope/Optimism",
+   "plus": [
+    "Look on the bright side",
+    "Can find the positive in what seems negative to others",
+    "Remain hopeful despite challenges",
+    "Will succeed with the goals I set for myself",
+    "Think about what is good in my life when I feel down"
+   ],
+   "minus": [
+    "Expect the worst",
+    "Have no plan for my life five years from now",
+    "Am not confident that my way of doing things will work out for the best"
+   ]
+  },
+  {
+   "name": "Humor/Playfulness",
+   "plus": [
+    "Try to tease my friends out of their gloomy moods",
+    "Use laughter to brighten the days of others",
+    "Try to have fun in all kinds of situations",
+    "Try to add some humor to whatever I do",
+    "Keep my sense of humor even in gloomy situations",
+    "Have a great sense of humor"
+   ],
+   "minus": [
+    "Am not known for my sense of humor",
+    "Am not fun to be with",
+    "Do not go out of my way to make others smile or laugh"
+   ]
+  },
+  {
+   "name": "Industry/Perseverance/Persistence",
+   "plus": [
+    "Don't quit a task before it is finished",
+    "Am a goal-oriented person",
+    "Finish things despite obstacles in the way",
+    "Am a hard worker",
+    "Don't get sidetracked when I work"
+   ],
+   "minus": [
+    "Don't finish what I start",
+    "Give up easily",
+    "Do not tend to stick with what I decide to do"
+   ]
+  },
+  {
+   "name": "Integrity/Honesty/Authenticity",
+   "plus": [
+    "Am trusted to keep secrets",
+    "Keep my promises",
+    "Believe that honesty is the basis for trust",
+    "Can be trusted to keep my promises",
+    "Am true to my own values"
+   ],
+   "minus": [
+    "Lie to get myself out of trouble",
+    "Am hard to understand",
+    "Feel like an imposter",
+    "Like to exaggerate my troubles"
+   ]
+  },
+  {
+   "name": "Judgment/Open-mindedness",
+   "plus": [
+    "Try to identify the reasons for my actions",
+    "Make decisions only after I have all of the facts",
+    "Am valued by others for my objectivity",
+    "Am a firm believer in thinking things through",
+    "Weigh the pro's and the con's",
+    "Try to have good reasons for my important decisions",
+    "Am valued by my friends for my good judgment"
+   ],
+   "minus": [
+    "Don't think about different possibilities when making decisions",
+    "Don't tend to think things through critically"
+   ]
+  },
+  {
+   "name": "Kindness/Generosity",
+   "plus": [
+    "Am never too busy to help a friend",
+    "Go out of my way to cheer up people who appear down",
+    "Love to make other people happy",
+    "Helped a neighbor in the last month",
+    "Get as excited about the good fortunes of others as I am about my own",
+    "Call my friends when they are sick",
+    "Love to let others share the spotlight"
+   ],
+   "minus": [
+    "Get impatient when others talk to me about their problems",
+    "Try not to do favors for others",
+    "Am only kind to others if they have been kind to me"
+   ]
+  },
+  {
+   "name": "Leadership",
+   "plus": [
+    "Try to make sure everyone in a group feels included",
+    "Am good at helping people work well together",
+    "Am told that I am a strong but fair leader",
+    "Try to make my group members happy"
+   ],
+   "minus": [
+    "Have difficulty getting others to work together",
+    "Am not good at taking charge of a group",
+    "Am not good at planning group activities"
+   ]
+  },
+  {
+   "name": "Love of Learning",
+   "plus": [
+    "Go out of my way to attend educational events",
+    "Am thrilled when I learn something new",
+    "Look forward to the opportunity to learn and grow",
+    "Am a true life-long learner",
+    "Read all the time",
+    "Consult the library or the Internet immediately if I want to know something",
+    "Read a large variety of books"
+   ],
+   "minus": [
+    "Don't like to learn new things",
+    "Do not like to visit museums",
+    "Don't read nonfiction books for fun"
+   ]
+  },
+  {
+   "name": "Modesty/Humility",
+   "plus": [
+    "Am humble about the good things that have happened to me",
+    "Believe that others are drawn to me because I am humble",
+    "Don't act is if I'm a special person",
+    "Don't brag about my accomplishments",
+    "Am proud that I am an ordinary person",
+    "Don't call attention to myself",
+    "Would never be described as arrogant"
+   ],
+   "minus": [
+    "Like to stand out in a crowd",
+    "Like to talk about myself"
+   ]
+  },
+  {
+   "name": "Originality/Creativity",
+   "plus": [
+    "Am able to come up with new and different ideas",
+    "Like to think of new ways to do things",
+    "Come up with new ways to do things",
+    "Am an original thinker",
+    "Have an imagination that stretches beyond that of my friends"
+   ],
+   "minus": [
+    "Don't pride myself on being original",
+    "Am not considered to have new and different ideas",
+    "Have no special urge to do something original"
+   ]
+  },
+  {
+   "name": "Perspective/Wisdom",
+   "plus": [
+    "Have a broad outlook on what is going on",
+    "Have an excellent view of the world",
+    "Have been described as wise beyond my years",
+    "Have a mature view on life",
+    "Consider myself to be a wise person",
+    "Am considered to be a wise person"
+   ],
+   "minus": [
+    "Lose sight of what is most important in life",
+    "Am not good at figuring out what really matters",
+    "Am rarely consulted for advice by others"
+   ]
+  },
+  {
+   "name": "Prudence",
+   "plus": [
+    "Have never deliberately hurt anyone",
+    "Cannot imagine lying or cheating",
+    "Believe it is always better to be safe than sorry",
+    "Think before I speak",
+    "Follow the rules",
+    "Avoid activities that are physically dangerous",
+    "Keep straight right from wrong",
+    "Make careful choices"
+   ],
+   "minus": [
+    "Behave in unusual and strange ways"
+   ]
+  },
+  {
+   "name": "Self-regulation/Self-control",
+   "plus": [
+    "Have no trouble eating healthy foods",
+    "Am a highly disciplined person",
+    "Forego things that are bad for me in the long run even if they make me feel good in the short run",
+    "Can stay on a diet",
+    "Can always say \"enough is enough\""
+   ],
+   "minus": [
+    "Do not exercise on a regular basis",
+    "Can't resist eating candy or cookies if they are around",
+    "Am not very good at getting things done",
+    "Let myself be taken over by urges to spend or eat too much",
+    "Do my tasks only just before they need to be done",
+    "Give in to my urges"
+   ]
+  },
+  {
+   "name": "Social/Personal/Emotional Intelligence",
+   "plus": [
+    "Am able to fit into any situation",
+    "Have the ability to make others feel interesting",
+    "Know what makes others tick",
+    "Get along well with people I have just met",
+    "Am good at sensing what others are feeling",
+    "Know what to say to make people feel good"
+   ],
+   "minus": [
+    "Don't know how to handle myself in a new social situation"
+   ]
+  },
+  {
+   "name": "Spirituality/Religiousness",
+   "plus": [
+    "Believe in a universal power or God",
+    "Am a spiritual person",
+    "Keep my faith even during hard times",
+    "Have spent at least 30 minutes in the last 24 hours in prayer or meditation",
+    "Am who I am because of my faith",
+    "Believe that each person has a purpose in life",
+    "Know that my beliefs make my life important"
+   ],
+   "minus": [
+    "Do not practice any religion",
+    "Do not believe in a universal power or a God"
+   ]
+  },
+  {
+   "name": "Valor/Bravery/Courage",
+   "plus": [
+    "Have taken frequent stands in the face of strong opposition",
+    "Don't hesitate to express an unpopular opinion",
+    "Call for action while others talk",
+    "Can face my fears",
+    "Speak up in protest when I hear someone say mean things",
+    "Am a brave person"
+   ],
+   "minus": [
+    "Avoid dealing with uncomfortable emotions",
+    "Avoid dealing with awkward situations",
+    "Do not stand up for my beliefs",
+    "Don't speak my mind freely when there might be negative results"
+   ]
+  },
+  {
+   "name": "Zest/Enthusiasm/Vitality",
+   "plus": [
+    "Prefer to participate fully rather than view life from the sidelines",
+    "Don't approach things halfheartedly",
+    "Love what I do",
+    "Look forward to each new day",
+    "Can't wait to get started on a project",
+    "Can hardly wait to see what life has in store for me in the years ahead",
+    "Awaken with a sense of excitement about the day's possibilities"
+   ],
+   "minus": [
+    "Dread getting up in the morning",
+    "Don't have much energy"
+   ]
+  }
+ ],
+ "ei": [
+  {
+   "name": "POSITIVE EXPRESSIVITY",
+   "plus": [
+    "Express my affection physically",
+    "Laugh out loud if something is funny",
+    "Express my happiness in a childlike manner",
+    "Sometimes laugh out loud when reading or watching TV",
+    "Hug my close friends",
+    "Show my feelings when I'm happy"
+   ],
+   "minus": [
+    "Find it difficult showing people that I care about them",
+    "Have difficulty showing affection",
+    "Keep my happy feelings to myself"
+   ]
+  },
+  {
+   "name": "NEGATIVE EXPRESSIVITY",
+   "plus": [
+    "Shout or scream when I'm angry",
+    "Can't help but look upset when something bad happens",
+    "Show my fear",
+    "Suspect that my facial expressions give me away when I feel sad",
+    "Show my sadness"
+   ],
+   "minus": [
+    "Keep my feelings to myself, regardless of how unhappy I am",
+    "Find it difficult showing people that I'm angry with them",
+    "Keep my feelings to myself, regardless of how scared I am",
+    "Rarely show my anger",
+    "Wish I could more easily show my negative feelings"
+   ]
+  },
+  {
+   "name": "ATTENDING TO EMOTIONS",
+   "plus": [
+    "Think about the causes of my emotions",
+    "Pay a lot of attention to my feelings",
+    "Am usually aware of the way that I'm feeling",
+    "Notice my emotions",
+    "Often stop to analyze how I'm feeling"
+   ],
+   "minus": [
+    "Rarely think about how I feel",
+    "Rarely analyze my emotions",
+    "Am not in touch with my feelings",
+    "Often ignore my feelings",
+    "Rarely notice my emotional reactions"
+   ]
+  },
+  {
+   "name": "EMOTION-BASED DECISION-MAKING",
+   "plus": [
+    "Listen to my feelings when making important decisions",
+    "Base my goals in life on inspiration, rather than logic",
+    "Plan my life based on how I feel",
+    "Believe emotions give direction to life",
+    "Listen to my heart rather than my brain"
+   ],
+   "minus": [
+    "Plan my life logically",
+    "Believe important decisions should be based on logical reasoning",
+    "Listen to my brain rather than my heart",
+    "Make decisions based on facts, not feelings"
+   ]
+  },
+  {
+   "name": "RESPONSIVE JOY",
+   "plus": [
+    "Like to watch children open presents",
+    "Usually end up laughing if the people around me are laughing",
+    "Feel other people's joy",
+    "Get caught up in the excitement when others are celebrating",
+    "Am strongly influenced by the good moods of others",
+    "Find it hard to stay in a bad mood if the people around me are happy"
+   ],
+   "minus": [
+    "Dislike being around happy people when I'm feeling sad",
+    "Am unaffected by other people's happiness",
+    "Rarely get caught up in the excitement",
+    "Dislike children's birthday parties"
+   ]
+  },
+  {
+   "name": "RESPONSIVE DISTRESS",
+   "plus": [
+    "Am deeply moved by others' misfortunes",
+    "Am easily moved to tears",
+    "Suffer from others' sorrows",
+    "Am upset by the misfortunes of strangers",
+    "Would be upset if I saw an injured animal"
+   ],
+   "minus": [
+    "Am calm even in tense situations",
+    "Am not easily disturbed by events",
+    "Am unaffected by the suffering of others",
+    "Rarely cry during sad movies",
+    "Remain calm during emergencies"
+   ]
+  },
+  {
+   "name": "EMPATHIC CONCERN",
+   "plus": [
+    "Am concerned about others",
+    "Feel sympathy for those who are worse off than myself",
+    "Sympathize with the homeless",
+    "Believe that criminals should receive help rather than punishment",
+    "Believe that the poor deserve our sympathy"
+   ],
+   "minus": [
+    "Feel little concern for others",
+    "Have no sympathy for criminals",
+    "Look down on any weakness",
+    "Don't like to get involved in other people's problems",
+    "Have little sympathy for the unemployed"
+   ]
+  }
+ ],
+ "hexaco": [
+  {
+   "name": "Sincerity",
+   "plus": [
+    "Don't pretend to be more than I am"
+   ],
+   "minus": [
+    "Use flattery to get ahead",
+    "Tell other people what they want to hear so that they will do what I want them to do",
+    "Put on a show to impress people",
+    "Switch my loyalties when I feel like it",
+    "Play a role in order to impress people",
+    "Pretend to be concerned for others",
+    "Act like different people in different situations",
+    "Find it necessary to please the people who have power",
+    "Let people push me around to help them feel important"
+   ]
+  },
+  {
+   "name": "Fairness",
+   "plus": [
+    "Would never take things that aren't mine",
+    "Would never cheat on my taxes",
+    "Return extra change when a cashier makes a mistake",
+    "Would feel very badly for a long time if I were to steal from someone",
+    "Try to follow the rules"
+   ],
+   "minus": [
+    "Admire a really clever scam",
+    "Cheat to get ahead",
+    "Steal things",
+    "Cheat on people who have trusted me",
+    "Would not regret my behavior if I were to take advantage of someone impulsively"
+   ]
+  },
+  {
+   "name": "Greed Avoidance",
+   "plus": [
+    "Would not enjoy being a famous celebrity",
+    "Don't strive for elegance in my appearance"
+   ],
+   "minus": [
+    "Love luxury",
+    "Have a strong need for power",
+    "Seek status",
+    "Am mainly interested in money",
+    "Wish to stay young forever",
+    "Try to impress others",
+    "Prefer to eat at expensive restaurants",
+    "Am out for my own personal gain"
+   ]
+  },
+  {
+   "name": "Modesty",
+   "plus": [
+    "Don't think that I'm better than other people",
+    "See myself as an average person",
+    "Am just an ordinary person",
+    "Consider myself an average person"
+   ],
+   "minus": [
+    "Would like to have more power than other people",
+    "Believe that I am better than others",
+    "Like to attract attention",
+    "Am more capable than most others",
+    "Am likely to show off if I get the chance",
+    "Boast about my virtues"
+   ]
+  },
+  {
+   "name": "Fearfulness",
+   "plus": [
+    "Am a physical coward",
+    "Begin to panic when there is danger",
+    "Would fear walking in a high-crime part of a city",
+    "Tremble in dangerous situations",
+    "Would never go riding down a stretch of rapids in a canoe"
+   ],
+   "minus": [
+    "Like to do frightening things",
+    "Face danger confidently",
+    "Love dangerous situations",
+    "Would be good at rescuing people from a burning building",
+    "Am willing to take risks"
+   ]
+  },
+  {
+   "name": "Anxiety",
+   "plus": [
+    "Often worry about things that turn out to be unimportant",
+    "Worry about things",
+    "Get stressed out easily",
+    "Get upset by unpleasant thoughts that come into my mind",
+    "Panic easily"
+   ],
+   "minus": [
+    "Rarely worry",
+    "Rarely feel depressed",
+    "Am not easily disturbed by events",
+    "Remain calm under pressure",
+    "Don't worry about things that have already happened"
+   ]
+  },
+  {
+   "name": "Dependence",
+   "plus": [
+    "Need reassurance",
+    "Let myself be influenced by others",
+    "Need the approval of others",
+    "Need protection",
+    "Often need help",
+    "Show my sadness",
+    "Suspect that my facial expressions give me away when I feel sad",
+    "Seek support",
+    "Can't do without the company of others",
+    "Want to be liked"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Sentimentality",
+   "plus": [
+    "Feel others' emotions",
+    "Immediately feel sad when hearing of an unhappy event",
+    "Cry during movies",
+    "Am sensitive to the needs of others",
+    "Am deeply moved by others' misfortunes"
+   ],
+   "minus": [
+    "Rarely cry during sad movies",
+    "Seldom feel weepy while reading the sad part of a story",
+    "Am seldom bothered by the apparent suffering of strangers",
+    "Don't understand people who get emotional",
+    "Seldom get emotional"
+   ]
+  },
+  {
+   "name": "Expressiveness",
+   "plus": [
+    "Talk a lot",
+    "Am never at a loss for words",
+    "Am the life of the party",
+    "Tell people about it when I'm irritated",
+    "Have an intense, boisterous laugh"
+   ],
+   "minus": [
+    "Don't talk a lot",
+    "Don't like to draw attention to myself",
+    "Say little",
+    "Bottle up my feelings",
+    "Speak softly"
+   ]
+  },
+  {
+   "name": "Social Boldness",
+   "plus": [
+    "Am good at making impromptu speeches",
+    "Don't mind being the center of attention",
+    "Feel comfortable around people",
+    "Have leadership abilities",
+    "Have a strong personality"
+   ],
+   "minus": [
+    "Would be afraid to give a speech in public",
+    "Keep in the background",
+    "Find it difficult to approach others",
+    "Hate being the center of attention",
+    "Have little to say"
+   ]
+  },
+  {
+   "name": "Sociability",
+   "plus": [
+    "Usually like to spend my free time with people",
+    "Talk to a lot of different people at parties",
+    "Love to chat",
+    "Make friends easily",
+    "Enjoy being part of a group"
+   ],
+   "minus": [
+    "Seem to derive less enjoyment from interacting with people than others do",
+    "Rarely enjoy being with people",
+    "Would not enjoy a job that involves a lot of social interaction",
+    "Am hard to get to know",
+    "Keep others at a distance"
+   ]
+  },
+  {
+   "name": "Liveliness",
+   "plus": [
+    "Maintain high energy throughout the day",
+    "Have great stamina",
+    "Am usually active and full of energy",
+    "Smile a lot",
+    "Feel healthy and vibrant most of the time",
+    "Laugh a lot",
+    "Feel that I have a lot of inner strength",
+    "Have a lot of fun"
+   ],
+   "minus": [
+    "Tire out quickly",
+    "Often feel blue"
+   ]
+  },
+  {
+   "name": "Forgiveness",
+   "plus": [
+    "Love my enemies",
+    "Try to forgive and forget",
+    "Am inclined to forgive others",
+    "Am nice to people I should be angry at"
+   ],
+   "minus": [
+    "Find it hard to forgive others",
+    "Hold a grudge",
+    "Get back at people who insult me",
+    "Get even with others",
+    "Distrust people",
+    "Feel that most people can't be trusted"
+   ]
+  },
+  {
+   "name": "Gentleness",
+   "plus": [
+    "Rarely complain",
+    "Take things as they come",
+    "Accept people as they are",
+    "Have a good word for everyone"
+   ],
+   "minus": [
+    "Become frustrated and angry with people when they don't live up to my expectations",
+    "Am quick to judge others",
+    "Find fault with everything",
+    "Speak ill of others",
+    "Have a sharp tongue",
+    "Criticize others' shortcomings"
+   ]
+  },
+  {
+   "name": "Flexibility",
+   "plus": [
+    "Adjust easily",
+    "Am good at taking advice"
+   ],
+   "minus": [
+    "When interacting with a group of people, am often bothered by at least one of them",
+    "React strongly to criticism",
+    "Get upset if others change the way that I have arranged things",
+    "Am hard to convince",
+    "Am annoyed by others' mistakes",
+    "Can't stand being contradicted",
+    "Am hard to satisfy",
+    "Am hard to reason with"
+   ]
+  },
+  {
+   "name": "Patience",
+   "plus": [
+    "Find that it takes a lot to make me feel angry at someone",
+    "Rarely feel angry with people",
+    "Am usually a patient person",
+    "Rarely get irritated",
+    "Seldom get mad"
+   ],
+   "minus": [
+    "Am easily annoyed",
+    "Get angry easily",
+    "Get irritated easily",
+    "Lose my temper",
+    "Get upset easily"
+   ]
+  },
+  {
+   "name": "Organization",
+   "plus": [
+    "Keep things tidy",
+    "Get chores done right away",
+    "Like order",
+    "Like to tidy up",
+    "Want everything to be \"just right\""
+   ],
+   "minus": [
+    "Leave a mess in my room",
+    "Leave my belongings around",
+    "Don't finish the things that I start",
+    "Often forget to put things back in their proper place",
+    "Am not bothered by disorder"
+   ]
+  },
+  {
+   "name": "Diligence",
+   "plus": [
+    "Push myself very hard to succeed",
+    "Get started quickly on doing a job",
+    "Am exacting in my work",
+    "Work hard",
+    "Complete tasks successfully"
+   ],
+   "minus": [
+    "Do just enough work to get by",
+    "Stop when work becomes too difficult",
+    "Do too little work",
+    "Hang around doing nothing",
+    "Quickly lose interest in the tasks I start"
+   ]
+  },
+  {
+   "name": "Perfectionism",
+   "plus": [
+    "Pay attention to details",
+    "Continue until everything is perfect",
+    "Have an eye for detail",
+    "Want every detail taken care of",
+    "Dislike imperfect work",
+    "Want everything to add up perfectly",
+    "Detect mistakes",
+    "Demand quality"
+   ],
+   "minus": [
+    "Pay too little attention to details",
+    "Prefer to just let things happen"
+   ]
+  },
+  {
+   "name": "Prudence",
+   "plus": [
+    "Avoid mistakes",
+    "Make plans and stick to them",
+    "Do things according to a plan"
+   ],
+   "minus": [
+    "Jump into things without thinking",
+    "Do things without thinking of the consequences",
+    "Make rash decisions",
+    "Act impulsively when something is bothering me",
+    "Make careless mistakes",
+    "Don't know why I do some of the things I do",
+    "Make a fool of myself"
+   ]
+  },
+  {
+   "name": "Aesthetic Appreciation",
+   "plus": [
+    "Believe in the importance of art",
+    "Get deeply immersed in music",
+    "See beauty in things that others might not notice",
+    "Enjoy feeling \"close to the earth\"",
+    "Have read the great literary classics"
+   ],
+   "minus": [
+    "Do not like art",
+    "Seldom notice the emotional aspects of paintings and pictures",
+    "Do not like poetry",
+    "Do not like concerts",
+    "Do not enjoy watching dance performances"
+   ]
+  },
+  {
+   "name": "Inquisitiveness",
+   "plus": [
+    "Am interested in science",
+    "Would love to explore strange places",
+    "Enjoy intellectual games",
+    "Love to read challenging material",
+    "Find political discussions interesting",
+    "Have a rich vocabulary"
+   ],
+   "minus": [
+    "Don't know much about history",
+    "Avoid difficult reading material",
+    "Don't bother worrying about political and social problems",
+    "Will not probe deeply into a subject"
+   ]
+  },
+  {
+   "name": "Creativity",
+   "plus": [
+    "Have a vivid imagination",
+    "Come up with something new",
+    "Carry the conversation to a higher level",
+    "Am full of ideas",
+    "Love to think up new ways of doing things",
+    "Have excellent ideas"
+   ],
+   "minus": [
+    "Do not have a good imagination",
+    "Have difficulty imagining things",
+    "Have trouble guessing how others will react",
+    "Seldom experience sudden intuitive insights"
+   ]
+  },
+  {
+   "name": "Unconventionality",
+   "plus": [
+    "Am considered to be kind of eccentric",
+    "Know that my ideas sometimes surprise people",
+    "Do things that others find strange",
+    "Rebel against authority",
+    "Swim against the current"
+   ],
+   "minus": [
+    "Would hate to be considered odd or strange",
+    "Enjoy being thought of as a normal \"mainstream\" person",
+    "Like to be viewed as proper and conventional",
+    "Like to be thought of as a normal kind of person",
+    "Try to avoid complex people",
+    "Note. Ashton, Lee, and Goldberg (2007) used Lee and Ashton's (2004) version of the HEXACO-PI to construct IPIP representations of the HEXACO-PI constructs. Current versions of the HEXACO-PI are available to researchers at https://hexaco.org/hexaco-inventory",
+    "Ashton, M. C., Lee, K., & Goldberg, L. R. (2007). The IPIP-HEXACO scales: An alternative, public-domain measure of the personality constructs in the HEXACO model. Personality and Individual Differences , 42 , 1515-1526",
+    "Lee, K., & Ashton, M. C. (2004). Psychometric properties of the HEXACO personality inventory. Multivariate Behavioral Research , 39 , 329-358"
+   ]
+  }
+ ],
+ "orvis": [
+  {
+   "name": "Leadership",
+   "plus": [
+    "Make important things happen",
+    "Lead other people",
+    "Be a sales or marketing director",
+    "Be the chief executive of a large company",
+    "Organize a political campaign",
+    "Be the master of ceremonies at a meeting",
+    "Plan an advertising campaign",
+    "Debate topics in a public meeting",
+    "Persuade others to change their views",
+    "Be a state governor or senator",
+    "Run for political office",
+    "Make decisions that affect a lot of people"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Organization",
+   "plus": [
+    "Be the financial officer for a company",
+    "Be an office manager",
+    "Plan budgets",
+    "Prepare financial contracts",
+    "Develop an office filing system",
+    "Supervise the work of others",
+    "Plan investment strategies",
+    "Establish time schedules",
+    "Monitor business expenses",
+    "Be a purchasing agent",
+    "Keep track of a company's inventory",
+    "Manage a computer data base",
+    "Keep detailed records"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Altruism",
+   "plus": [
+    "Help others learn new ideas",
+    "Care for sick people",
+    "Be an elementary-school teacher",
+    "Be a social worker",
+    "Be a minister, priest, rabbi or other",
+    "Counsel persons who need help",
+    "Instruct parents on child care",
+    "Be a doctor or nurse",
+    "Be a physical therapist",
+    "Provide comfort and support to others",
+    "Participate in charity events",
+    "Help people make career decisions",
+    "Be a counselor or therapist"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Creativity",
+   "plus": [
+    "Create works of art",
+    "Create new fashion designs",
+    "Be a professional dancer",
+    "Write short stories or novels",
+    "Play an instrument in a symphony",
+    "Redecorate one's house",
+    "Select art works for a museum",
+    "Sing professionally",
+    "Be an actor or actress",
+    "Be an artist or architect",
+    "Act in a play",
+    "Design Internet web pages",
+    "Write songs",
+    "Paint or draw"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Analysis",
+   "plus": [
+    "Be a chemist",
+    "Design a laboratory experiment",
+    "Be a mathematician",
+    "Explain scientific concepts to others",
+    "Be a physicist",
+    "Carry out medical research",
+    "Be a scientific reporter",
+    "Solve complex puzzles",
+    "Develop a computer program",
+    "Be a statistician"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Production",
+   "plus": [
+    "Care for cattle or horses",
+    "Be a farmer",
+    "Construct new buildings",
+    "Be a forest ranger",
+    "Cultivate plants",
+    "Go on nature walks",
+    "Do woodworking",
+    "Raise flowers",
+    "Repair cars or trucks",
+    "Work with tools and machinery"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Adventure",
+   "plus": [
+    "Be a professional athlete",
+    "Engage in exciting adventures",
+    "Survive in the wilderness",
+    "Be a racing car driver",
+    "Face physical danger",
+    "Be a military officer",
+    "Compete in athletic events",
+    "Be a bounty hunter",
+    "Be a long-distance bicycle rider",
+    "Be a police officer"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Erudition",
+   "plus": [
+    "Be a translator or interpreter",
+    "Be a librarian",
+    "Be a professor of English",
+    "Make up word puzzles",
+    "Edit a newspaper",
+    "Know many languages",
+    "Be a foreign correspondent",
+    "Speak fluently on any subject",
+    "Read many books",
+    "Keep a diary or journal"
+   ],
+   "minus": []
+  }
+ ],
+ "orais": [
+  {
+   "name": "Being Alone",
+   "plus": [
+    "Ate dinner alone",
+    "Went to the movies alone",
+    "Went to a concert or theater alone",
+    "Chose to spend a day by myself",
+    "Went on a trip by myself",
+    "Spent an entire vacation by myself"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Child-Related",
+   "plus": [
+    "Played with a child",
+    "Let a child win a game",
+    "Took a child on an outing",
+    "Served as a baby sitter",
+    "Read a story to a child",
+    "Read the comics to a child"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Collecting",
+   "plus": [
+    "Worked on my collection",
+    "Bought something for my collection",
+    "Traded something in my collection",
+    "Read a book about the things that I collect",
+    "Bought a book about the things that I collect"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Computing",
+   "plus": [
+    "Used a computer",
+    "Sent a message by electronic mail (e-mail)",
+    "Surfed the Internet",
+    "Read news on the Internet",
+    "Played a computer game",
+    "Looked up information on the Internet"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Creativity",
+   "plus": [
+    "Tried something completely new",
+    "Produced a work of art",
+    "Wrote poetry",
+    "Acted in a play",
+    "Painted a picture",
+    "Played a musical instrument",
+    "Sang or played an instrument in public"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Culture",
+   "plus": [
+    "Attended a public lecture",
+    "Visited an art exhibition",
+    "Visited a museum",
+    "Attended a ballet performance",
+    "Attended an opera or a concert",
+    "Attended a stage play or musical"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Drinking",
+   "plus": [
+    "Drank beer or wine",
+    "Drank whiskey, vodka, gin, or other hard liquor",
+    "Drank in a bar or night club",
+    "Became intoxicated",
+    "Had a hangover"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Exercise",
+   "plus": [
+    "Went running or jogging",
+    "Lifted weights",
+    "Used an exercise machine",
+    "Exercised for 40 minutes or longer",
+    "Did aerobic exercise",
+    "Did yoga or other movement exercises",
+    "Participated in an exercise program"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Fashion",
+   "plus": [
+    "Spent more than 10 minutes thinking about what to wear",
+    "Spent more than an hour thinking about what to wear",
+    "Read a fashion-related magazine",
+    "Read a fashion-related book",
+    "Bought a fashionable item of clothing"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Financial",
+   "plus": [
+    "Obtained stock market prices",
+    "Read a book on a financial topic",
+    "Bought or sold stocks or bonds",
+    "Bought or sold real estate",
+    "Purchased a commodity as an investment",
+    "Worked on a retirement plan"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Food-Related",
+   "plus": [
+    "Chewed gum",
+    "Ate candy",
+    "Ate in a restaurant",
+    "Ordered food to be delivered",
+    "Ate food while walking or working",
+    "Ate too much",
+    "Ate or drank while driving"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Gambling",
+   "plus": [
+    "Played bingo for money",
+    "Gambled with cards or dice",
+    "Purchased a scratch ticket",
+    "Gambled on a slot machine or video poker game",
+    "Went to a casino",
+    "Bet money on a sports event"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Game-Playing",
+   "plus": [
+    "Worked on a jigsaw puzzle",
+    "Played cards",
+    "Played a board game",
+    "Played chess or checkers",
+    "Learned a new board or card game"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Gardening",
+   "plus": [
+    "Cared for a potted plant",
+    "Gardened",
+    "Did yard work",
+    "Planted or transplanted a plant",
+    "Bought or picked flowers",
+    "Bought plants for a garden or yard"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Green Activities",
+   "plus": [
+    "Used public transportation",
+    "Composted food scraps or yard waste",
+    "Walked or rode a bicycle to work",
+    "Changed a habit to have less impact on the environment",
+    "Used both sides of a piece of paper before discarding it",
+    "Picked up litter",
+    "Recycled one or more items"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Housekeeping",
+   "plus": [
+    "Washed dishes",
+    "Made a bed",
+    "Cleaned the house",
+    "Ironed linens or clothes",
+    "Cooked a meal",
+    "Baked a cake, pie, cookies, or bread",
+    "Knitted, quilted, sewed, or crocheted"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Music",
+   "plus": [
+    "Listened to music on the radio",
+    "Listened to music while working",
+    "Downloaded music from the Internet",
+    "Traded music with a friend",
+    "Purchased a musical album",
+    "Shopped in a music store",
+    "Read music-related news",
+    "Used an mp3 player or Ipod"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Partying",
+   "plus": [
+    "Had someone over for dinner",
+    "Went to a small party",
+    "Went to a large party",
+    "Planned a party",
+    "Entertained six or more people"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Pets",
+   "plus": [
+    "Played with a pet animal",
+    "Fed a pet animal",
+    "Cared for a pet animal",
+    "Bathed or groomed a pet animal",
+    "Purchased a pet animal"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Political/Organizational",
+   "plus": [
+    "Signed a petition",
+    "Attended a rally or demonstration",
+    "Donated money to charity",
+    "Donated money to a political campaign or cause",
+    "Volunteered for a club or organization",
+    "Attended a town meeting",
+    "Wrote a letter to a newspaper or politician"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Reading",
+   "plus": [
+    "Read a book",
+    "Bought a book",
+    "Read in bed before going to sleep",
+    "Read an entire book in one sitting",
+    "Visited a public library"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Religious/Spiritual Practices",
+   "plus": [
+    "Discussed religion or spirituality",
+    "Prayed (not including blessings at meals)",
+    "Read the Bible or other sacred text",
+    "Gave a blessing at a meal",
+    "Attended a church or religious service",
+    "Listened to a religious program on the radio or TV",
+    "Read a book about religion or spirituality"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Romance",
+   "plus": [
+    "Wrote a love letter",
+    "Went on a date",
+    "Went dancing",
+    "Dined by candle light",
+    "Attended a formal dance",
+    "Wore formal clothing"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Self-Improvement",
+   "plus": [
+    "Read a self-help book",
+    "Bought a self-help book",
+    "Studied some subject",
+    "Learned a new skill",
+    "Enrolled in a course of study"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Shopping",
+   "plus": [
+    "Spent 10 minutes or more in a non-grocery store",
+    "Spent an hour or more in a non-grocery store",
+    "Bought something other than groceries",
+    "Checked the sales ads in a newspaper",
+    "Read newspaper ads for non-grocery items",
+    "Shopped on the web",
+    "Used eBay to buy or sell something"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Social-Networking",
+   "plus": [
+    "Used a computer for social networking",
+    "Read someone's personal web-page",
+    "Made an entry on a personal web-page",
+    "Participated in an online discussion group",
+    "Used instant messaging to chat online"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Sports",
+   "plus": [
+    "Discussed sports",
+    "Watched a televised sports event",
+    "Attended an athletic event",
+    "Played a team sport",
+    "Played basketball",
+    "Played tennis or golf"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Summer Activities",
+   "plus": [
+    "Went on a picnic",
+    "Went on a hike",
+    "Walked on a beach",
+    "Went swimming",
+    "Went backpacking or camping",
+    "Went boating or rafting",
+    "Went fishing or hunting"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Travel",
+   "plus": [
+    "Took a trip",
+    "Went sightseeing",
+    "Took travel photographs",
+    "Stayed in a hotel, motel, or resort",
+    "Traveled by train or plane",
+    "Went on a cruise or tour"
+   ],
+   "minus": []
+  },
+  {
+   "name": "TV",
+   "plus": [
+    "Watched television",
+    "Watched television news",
+    "Watched a television soap opera",
+    "Watched a television talk show",
+    "Watched a television reality show",
+    "Recorded a television program",
+    "Watched too much television"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Understanding",
+   "plus": [
+    "Read a news magazine",
+    "Watched an educational channel on TV",
+    "Looked up a word in a dictionary",
+    "Read the editorial page of a newspaper",
+    "Looked something up in an encyclopedia",
+    "Read poetry"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Vehicles",
+   "plus": [
+    "Rode a motorcycle",
+    "Read a car magazine or book",
+    "Bought a car, truck or motorcycle",
+    "Raced a car, truck or motorcycle"
+   ],
+   "minus": []
+  },
+  {
+   "name": "Writing/Remembering",
+   "plus": [
+    "Made an entry in a diary or journal",
+    "Wrote a postcard",
+    "Wrote a handwritten letter",
+    "Wrote poetry",
+    "Wrote a thank-you note",
+    "Put pictures in a photo album",
+    "Worked on a scrap book"
+   ],
+   "minus": []
+  }
+ ]
+}

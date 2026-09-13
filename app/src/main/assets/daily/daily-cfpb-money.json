@@ -1,0 +1,239 @@
+{
+  "id": "daily-cfpb-money",
+  "title": "Money, gently",
+  "theme": "FUTURE",
+  "blurb": "Daily only.",
+  "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded",
+  "questions": [
+    {
+      "id": "cf1",
+      "type": "SCALE",
+      "text": "How ready would I feel for a big unexpected expense?",
+      "depth": 2,
+      "lowLabel": "Not ready",
+      "highLabel": "Completely ready",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf2",
+      "type": "SCALE",
+      "text": "How much do I feel we are building a secure future?",
+      "depth": 2,
+      "lowLabel": "Not yet",
+      "highLabel": "Very much",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf3",
+      "type": "SCALE",
+      "text": "How often does money keep me from something I want?",
+      "depth": 2,
+      "lowLabel": "Never",
+      "highLabel": "All the time",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf4",
+      "type": "SCALE",
+      "text": "How much does the way we handle money let me enjoy life?",
+      "depth": 2,
+      "lowLabel": "Not much",
+      "highLabel": "A lot",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf5",
+      "type": "THIS_OR_THAT",
+      "text": "Right now, I feel like we are:",
+      "depth": 2,
+      "options": [
+        "Getting ahead",
+        "Just getting by"
+      ],
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf6",
+      "type": "SCALE",
+      "text": "How much do I worry that our savings will not last?",
+      "depth": 2,
+      "lowLabel": "Not at all",
+      "highLabel": "A lot",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf7",
+      "type": "THIS_OR_THAT",
+      "text": "A gift for a friend's wedding is:",
+      "depth": 1,
+      "options": [
+        "Easy to fit in",
+        "Something to plan for"
+      ],
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf8",
+      "type": "PICK_ONE",
+      "text": "At the end of a typical month, I think we have:",
+      "depth": 2,
+      "options": [
+        "Plenty left over",
+        "A little left over",
+        "About nothing left",
+        "Less than we need"
+      ],
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf9",
+      "type": "SCALE",
+      "text": "How on top of our finances do I feel?",
+      "depth": 2,
+      "lowLabel": "Behind",
+      "highLabel": "On top of it",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf10",
+      "type": "SCALE",
+      "text": "How much does money set the pace of my life?",
+      "depth": 2,
+      "lowLabel": "Not at all",
+      "highLabel": "Completely",
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf11",
+      "type": "RANK",
+      "text": "Rank these money goals by how much they matter to me.",
+      "depth": 2,
+      "options": [
+        "Handling a surprise expense",
+        "Saving for the future",
+        "Enjoying life now",
+        "Having money left each month"
+      ],
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf12",
+      "type": "MULTI_SELECT",
+      "text": "Which of these would make me feel better about money?",
+      "depth": 2,
+      "options": [
+        "A bigger emergency fund",
+        "A budget we both use",
+        "Less debt",
+        "A plan for retirement",
+        "A regular money check-in together"
+      ],
+      "maxChoices": 2,
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf13",
+      "type": "GUESS_ME",
+      "text": "What money worry do I carry that I do not talk about much?",
+      "depth": 3,
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf14",
+      "type": "REFLECT",
+      "text": "What would make talking about money easier for us?",
+      "depth": 2,
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    },
+    {
+      "id": "cf15",
+      "type": "DROPDOWN",
+      "text": "What would I do first with an extra $500 a month?",
+      "depth": 1,
+      "options": [
+        "Save it",
+        "Pay down debt",
+        "Put it toward a trip",
+        "Spend it on the house",
+        "Invest it",
+        "Treat us both"
+      ],
+      "category": "Future",
+      "tags": [
+        "money",
+        "planning"
+      ],
+      "source": "CFPB Financial Well-Being Scale, Consumer Financial Protection Bureau, public domain, reworded"
+    }
+  ]
+}

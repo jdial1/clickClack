@@ -93,10 +93,11 @@ object Sources {
     /**
      * The one source whose item text is free for any use.
      *
-     * The daily-ipip decks turn 216 of the IPIP-NEO facet statements into
-     * questions: first person, spread across every question type, with the
-     * accusatory, clinical and political items left out. Public domain needs no
-     * credit; it gets one anyway.
+     * The daily-ipip decks draw on the IPIP-NEO facets, IPIP-VIA character
+     * strengths, IPIP-HEXACO, Barchard's emotional-intelligence components and
+     * the Oregon vocational and avocational interest scales: first person,
+     * spread across every question type, with the accusatory, clinical and
+     * political items left out. Public domain needs no credit; it gets one anyway.
      */
     val IPIP = Source(
         id = "ipip",
@@ -109,7 +110,50 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
-    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP)
+    /**
+     * Everyday activities, from the lexicon the Bureau of Labor Statistics uses
+     * to code the American Time Use Survey. A federal work, so public domain;
+     * the activity names are reworded into things a person would say.
+     */
+    val ATUS = Source(
+        id = "atus",
+        authors = "US Bureau of Labor Statistics",
+        year = 2024,
+        title = "American Time Use Survey Activity Lexicon",
+        venue = "US Department of Labor",
+        url = "https://www.bls.gov/tus/lexicons/lexiconnoex2024.pdf",
+        licence = "Public domain (US federal work). Activity names reworded.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    /**
+     * The one source here that requires credit. The article and its item table
+     * are CC BY 4.0; the items are reworded to speak to your partner, which the
+     * licence allows as long as it says so.
+     */
+    val HAREL = Source(
+        id = "harel2024",
+        authors = "Harel & Koslowsky",
+        year = 2024,
+        title = "Development and validation of the relational behavior interactions scale for couples",
+        venue = "Scientific Reports, 14, 8086",
+        url = "https://doi.org/10.1038/s41598-024-58901-2",
+        licence = "CC BY 4.0. Items adapted to address your partner.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    val CFPB = Source(
+        id = "cfpb",
+        authors = "Consumer Financial Protection Bureau",
+        year = 2015,
+        title = "CFPB Financial Well-Being Scale",
+        venue = "Consumer Financial Protection Bureau",
+        url = "https://www.consumerfinance.gov/data-research/research-reports/financial-well-being-scale/",
+        licence = "Public domain (US federal work). Reworded for a couple.",
+        fidelity = Fidelity.INSPIRED,
+    )
+
+    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP, ATUS, HAREL, CFPB)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }

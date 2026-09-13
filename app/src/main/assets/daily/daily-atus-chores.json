@@ -1,0 +1,983 @@
+{
+  "id": "daily-atus-chores",
+  "title": "Who does what",
+  "theme": "EVERYDAY",
+  "blurb": "Daily only.",
+  "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain",
+  "questions": [
+    {
+      "id": "btinsidet0",
+      "text": "Which would I rather do?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cleaning the house",
+        "Cooking dinner"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsides0",
+      "text": "How much do I mind doing laundry?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Don't mind it",
+      "highLabel": "Dread it",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidep0",
+      "text": "Which of these would I hand off first?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cleaning the house",
+        "Cleaning up the kitchen",
+        "Taking the car in for service",
+        "Keeping the calendar"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidem0",
+      "text": "Which of these do I usually take care of?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Doing laundry",
+        "Grocery shopping",
+        "Running errands",
+        "Locking up at night",
+        "Fixing things around the house"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidek0",
+      "text": "Rank these from least to most dreaded, for me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Doing the dishes",
+        "Packing lunches",
+        "Taking out the trash",
+        "Feeding the pets"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsided0",
+      "text": "Which of these would I do happily every day?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Putting away groceries",
+        "Setting the table",
+        "Washing the car",
+        "Answering messages",
+        "Mending clothes",
+        "Planning meals for the week"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsideg0",
+      "text": "Which chore do I think I do more of than you realize?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidef0",
+      "text": "Which chore should we swap for a month?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidet1",
+      "text": "Given the choice, I would take:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Doing laundry",
+        "Weeding the garden"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsides1",
+      "text": "How much do I actually enjoy cleaning the house?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Really do",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidep1",
+      "text": "Which of these do I secretly not mind?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Doing laundry",
+        "Grocery shopping",
+        "Running errands",
+        "Locking up at night"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidem1",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Doing the dishes",
+        "Packing lunches",
+        "Taking out the trash",
+        "Feeding the pets",
+        "Changing the sheets"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsidek1",
+      "text": "Order these by how much I would rather skip them.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Putting away groceries",
+        "Planning meals for the week",
+        "Shoveling snow",
+        "Walking the dog"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsided1",
+      "text": "Which of these do I think I am best at?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Mending clothes",
+        "Cleaning up the kitchen",
+        "Taking the car in for service",
+        "Keeping the calendar",
+        "Rearranging furniture",
+        "Making breakfast"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btinsideg1",
+      "text": "How do I feel about doing laundry, honestly?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchent0",
+      "text": "Given the choice, I would take:",
+      "type": "THIS_OR_THAT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cooking dinner",
+        "Mowing the lawn"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchens0",
+      "text": "How much do I actually enjoy setting the table?",
+      "type": "SCALE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Really do",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenp0",
+      "text": "Which of these do I secretly not mind?",
+      "type": "PICK_ONE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cooking dinner",
+        "Washing the car",
+        "Answering messages",
+        "Mending clothes"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenm0",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Setting the table",
+        "Taking the car in for service",
+        "Keeping the calendar",
+        "Rearranging furniture",
+        "Making breakfast"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenk0",
+      "text": "Order these by how much I would rather skip them.",
+      "type": "RANK",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cleaning up the kitchen",
+        "Running errands",
+        "Locking up at night",
+        "Fixing things around the house"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchend0",
+      "text": "Which of these do I think I am best at?",
+      "type": "DROPDOWN",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Grocery shopping",
+        "Weeding the garden",
+        "Sorting the mail",
+        "Putting away groceries",
+        "Packing lunches",
+        "Taking out the trash"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitcheng0",
+      "text": "What is my signature dish when it is my turn to cook?",
+      "type": "GUESS_ME",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenf0",
+      "text": "How should we split cooking and cleaning up?",
+      "type": "REFLECT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchent1",
+      "text": "Which would I rather do?",
+      "type": "THIS_OR_THAT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Setting the table",
+        "Planning the week"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchens1",
+      "text": "How much do I mind setting the table?",
+      "type": "SCALE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Don't mind it",
+      "highLabel": "Dread it",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenp1",
+      "text": "Which of these would I hand off first?",
+      "type": "PICK_ONE",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Setting the table",
+        "Taking the car in for service",
+        "Keeping the calendar",
+        "Rearranging furniture"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenm1",
+      "text": "Which of these do I usually take care of?",
+      "type": "MULTI_SELECT",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Cleaning up the kitchen",
+        "Running errands",
+        "Locking up at night",
+        "Fixing things around the house",
+        "Cooking dinner"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchenk1",
+      "text": "Rank these from least to most dreaded, for me.",
+      "type": "RANK",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Grocery shopping",
+        "Taking out the trash",
+        "Feeding the pets",
+        "Changing the sheets"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitchend1",
+      "text": "Which of these would I do happily every day?",
+      "type": "DROPDOWN",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Packing lunches",
+        "Washing the car",
+        "Answering messages",
+        "Mending clothes",
+        "Planning meals for the week",
+        "Shoveling snow"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btkitcheng1",
+      "text": "How do I feel about setting the table, honestly?",
+      "type": "GUESS_ME",
+      "category": "Food",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidet0",
+      "text": "Which would I rather do?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Mowing the lawn",
+        "Paying the bills"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsides0",
+      "text": "How much do I mind weeding the garden?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Don't mind it",
+      "highLabel": "Dread it",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidep0",
+      "text": "Which of these would I hand off first?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Mowing the lawn",
+        "Sorting the mail",
+        "Putting away groceries",
+        "Packing lunches"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidem0",
+      "text": "Which of these do I usually take care of?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Weeding the garden",
+        "Answering messages",
+        "Mending clothes",
+        "Planning meals for the week",
+        "Shoveling snow"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidek0",
+      "text": "Rank these from least to most dreaded, for me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Washing the car",
+        "Keeping the calendar",
+        "Rearranging furniture",
+        "Making breakfast"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsided0",
+      "text": "Which of these would I do happily every day?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Taking the car in for service",
+        "Planning the week",
+        "Doing the dishes",
+        "Grocery shopping",
+        "Running errands",
+        "Locking up at night"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsideg0",
+      "text": "Which errand do I actually enjoy running?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidef0",
+      "text": "What errand could we turn into a date?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsides1",
+      "text": "How much do I actually enjoy mowing the lawn?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Really do",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidep1",
+      "text": "Which of these do I secretly not mind?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Weeding the garden",
+        "Answering messages",
+        "Mending clothes",
+        "Planning meals for the week"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidem1",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Washing the car",
+        "Keeping the calendar",
+        "Rearranging furniture",
+        "Making breakfast",
+        "Watering the plants"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsidek1",
+      "text": "Order these by how much I would rather skip them.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Taking the car in for service",
+        "Locking up at night",
+        "Fixing things around the house",
+        "Cooking dinner"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsided1",
+      "text": "Which of these do I think I am best at?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "options": [
+        "Running errands",
+        "Sorting the mail",
+        "Putting away groceries",
+        "Packing lunches",
+        "Taking out the trash",
+        "Feeding the pets"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btoutsideg1",
+      "text": "How do I feel about weeding the garden, honestly?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningt0",
+      "text": "Given the choice, I would take:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Paying the bills",
+        "Cleaning the house"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunnings0",
+      "text": "How much do I actually enjoy planning the week?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Really do",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningp0",
+      "text": "Which of these do I secretly not mind?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Paying the bills",
+        "Doing the dishes",
+        "Grocery shopping",
+        "Running errands"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningm0",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Planning the week",
+        "Putting away groceries",
+        "Packing lunches",
+        "Taking out the trash",
+        "Feeding the pets"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningk0",
+      "text": "Order these by how much I would rather skip them.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Sorting the mail",
+        "Mending clothes",
+        "Planning meals for the week",
+        "Shoveling snow"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningd0",
+      "text": "Which of these do I think I am best at?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Answering messages",
+        "Doing laundry",
+        "Cleaning up the kitchen",
+        "Taking the car in for service",
+        "Keeping the calendar",
+        "Rearranging furniture"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningg0",
+      "text": "What household task do I keep track of that you might not notice?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningf0",
+      "text": "What part of running the house feels invisible to you?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 2,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunnings1",
+      "text": "How much do I mind paying the bills?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "lowLabel": "Don't mind it",
+      "highLabel": "Dread it",
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningp1",
+      "text": "Which of these would I hand off first?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Planning the week",
+        "Putting away groceries",
+        "Packing lunches",
+        "Taking out the trash"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningm1",
+      "text": "Which of these do I usually take care of?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Sorting the mail",
+        "Mending clothes",
+        "Planning meals for the week",
+        "Shoveling snow",
+        "Walking the dog"
+      ],
+      "maxChoices": 3,
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningk1",
+      "text": "Rank these from least to most dreaded, for me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Answering messages",
+        "Rearranging furniture",
+        "Making breakfast",
+        "Watering the plants"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningd1",
+      "text": "Which of these would I do happily every day?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "options": [
+        "Keeping the calendar",
+        "Doing the dishes",
+        "Grocery shopping",
+        "Running errands",
+        "Locking up at night",
+        "Fixing things around the house"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    },
+    {
+      "id": "btrunningg1",
+      "text": "How do I feel about planning the week, honestly?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money",
+        "home"
+      ],
+      "source": "American Time Use Survey activity lexicon, US Bureau of Labor Statistics, public domain"
+    }
+  ]
+}

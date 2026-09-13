@@ -1,0 +1,4997 @@
+{
+  "id": "daily-ipip-hexaco",
+  "title": "Six sides",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only.",
+  "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain",
+  "questions": [
+    {
+      "id": "ihgreedt0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I would not enjoy being a famous celebrity",
+        "I love luxury"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreeds0",
+      "text": "How much does this sound like me? “I don't strive for elegance in my appearance.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I would not enjoy being a famous celebrity",
+        "I am just an ordinary person",
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I don't strive for elegance in my appearance",
+        "I like to attract attention",
+        "I like to do frightening things",
+        "I rarely worry",
+        "I can't do without the company of others"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I love luxury",
+        "I am more capable than most others",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I seek status",
+        "I see myself as an average person",
+        "I tremble in dangerous situations",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedg0",
+      "text": "What would I buy first with a surprise ten thousand dollars?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedf0",
+      "text": "What does having enough money mean to you?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "money"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedt1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I don't strive for elegance in my appearance",
+        "I seek status"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreeds1",
+      "text": "How true is this of me? “I don't strive for elegance in my appearance.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I don't strive for elegance in my appearance",
+        "I like to attract attention",
+        "I like to do frightening things",
+        "I rarely worry"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I love luxury",
+        "I am more capable than most others",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant",
+        "I want to be liked"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I seek status",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations",
+        "I get upset by unpleasant thoughts that come into my mind"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgreedd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "money"
+      ],
+      "options": [
+        "I wish to stay young forever",
+        "I am just an ordinary person",
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support",
+        "I cry during movies"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestt0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I don't think that I'm better than other people",
+        "I like to attract attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodests0",
+      "text": "How true is this of me? “I see myself as an average person.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I don't think that I'm better than other people",
+        "I tremble in dangerous situations",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestm0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I see myself as an average person",
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support",
+        "I cry during movies"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestk0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am just an ordinary person",
+        "I like to do frightening things",
+        "I rarely worry",
+        "I can't do without the company of others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestd0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I like to attract attention",
+        "I begin to panic when there is danger",
+        "I rarely worry",
+        "I need protection",
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I don't talk a lot"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestg0",
+      "text": "What do I think I am better at than most people?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestf0",
+      "text": "What compliment from me would mean the most to you?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestt1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I see myself as an average person",
+        "I am more capable than most others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodests1",
+      "text": "Would I say this about myself? “I like to attract attention.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I see myself as an average person",
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestm1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am just an ordinary person",
+        "I like to do frightening things",
+        "I rarely worry",
+        "I can't do without the company of others",
+        "I am sensitive to the needs of others"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestk1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I like to attract attention",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant",
+        "I want to be liked"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihmodestd1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am more capable than most others",
+        "I tremble in dangerous situations",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event",
+        "I say little"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeart0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am a physical coward",
+        "I like to do frightening things"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfears0",
+      "text": "Would I say this about myself? “I begin to panic when there is danger.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am a physical coward",
+        "I rarely worry",
+        "I need protection",
+        "I am seldom bothered by the apparent suffering of strangers"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearm0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I begin to panic when there is danger",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event",
+        "I say little"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeark0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I tremble in dangerous situations",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support",
+        "I cry during movies"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeard0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I need the approval of others",
+        "I seldom feel weepy while reading the sad part of a story",
+        "I have an intense, boisterous laugh",
+        "I hate being the center of attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearg0",
+      "text": "What scary thing would I never try, even on a dare?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearf0",
+      "text": "What fear have you gotten over as an adult?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 2,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeart1",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I begin to panic when there is danger",
+        "I face danger confidently"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfears1",
+      "text": "How well does this describe me? “I am willing to take risks.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearp1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I begin to panic when there is danger",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearm1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I tremble in dangerous situations",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support",
+        "I cry during movies",
+        "I bottle up my feelings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeark1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I rarely worry",
+        "I can't do without the company of others",
+        "I am sensitive to the needs of others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeard1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I like to do frightening things",
+        "I rarely worry",
+        "I need protection",
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I don't talk a lot",
+        "I am good at making impromptu speeches"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeart2",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I tremble in dangerous situations",
+        "I love dangerous situations"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfears2",
+      "text": "How much does this sound like me? “I love dangerous situations.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearp2",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I tremble in dangerous situations",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support",
+        "I cry during movies"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfearm2",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I rarely worry",
+        "I can't do without the company of others",
+        "I am sensitive to the needs of others",
+        "I speak softly"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeark2",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I like to do frightening things",
+        "I often worry about things that turn out to be unimportant",
+        "I want to be liked",
+        "I seldom feel weepy while reading the sad part of a story"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihfeard2",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event",
+        "I say little",
+        "I don't mind being the center of attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryt0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I often worry about things that turn out to be unimportant",
+        "I rarely worry"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworrys0",
+      "text": "How well does this describe me? “I get upset by unpleasant thoughts that come into my mind.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I often worry about things that turn out to be unimportant",
+        "I need the approval of others",
+        "I seldom feel weepy while reading the sad part of a story",
+        "I have an intense, boisterous laugh"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworrym0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I need protection",
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I don't talk a lot",
+        "I am good at making impromptu speeches"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I rarely worry",
+        "I often need help",
+        "I immediately feel sad when hearing of an unhappy event",
+        "I say little"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I often worry about things that turn out to be unimportant",
+        "I let myself be influenced by others",
+        "I am sensitive to the needs of others",
+        "I tell people about it when I'm irritated",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryg0",
+      "text": "What do I do to calm down when I am on edge?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihworryf0",
+      "text": "What are you worrying about that I could help with?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleant0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need reassurance",
+        "I immediately feel sad when hearing of an unhappy event"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleans0",
+      "text": "How much does this sound like me? “I let myself be influenced by others.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleanp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need reassurance",
+        "I am sensitive to the needs of others",
+        "I tell people about it when I'm irritated",
+        "I would be afraid to give a speech in public"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleanm0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I let myself be influenced by others",
+        "I seldom feel weepy while reading the sad part of a story",
+        "I have an intense, boisterous laugh",
+        "I hate being the center of attention",
+        "I usually like to spend my free time with people"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleank0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need the approval of others",
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I don't talk a lot",
+        "I am good at making impromptu speeches"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleand0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need protection",
+        "I cry during movies",
+        "I am the life of the party",
+        "I have a strong personality",
+        "I love to chat",
+        "I laugh a lot"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleang0",
+      "text": "When do I most need reassurance from you?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleanf0",
+      "text": "How do you like to be supported when things are hard?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleant1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I let myself be influenced by others",
+        "I am never at a loss for words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleans1",
+      "text": "How true is this of me? “I need reassurance.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleanp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I let myself be influenced by others",
+        "I seldom feel weepy while reading the sad part of a story",
+        "I have an intense, boisterous laugh",
+        "I hate being the center of attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleanm1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need the approval of others",
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I don't talk a lot",
+        "I am good at making impromptu speeches",
+        "I love to chat"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleank1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I need protection",
+        "I immediately feel sad when hearing of an unhappy event",
+        "I say little",
+        "I don't mind being the center of attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihleand1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "options": [
+        "I often need help",
+        "I am sensitive to the needs of others",
+        "I tell people about it when I'm irritated",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentt0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I immediately feel sad when hearing of an unhappy event",
+        "I seldom feel weepy while reading the sad part of a story"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentiments0",
+      "text": "How true is this of me? “I cry during movies.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I immediately feel sad when hearing of an unhappy event",
+        "I am the life of the party",
+        "I have a strong personality",
+        "I love to chat"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentm0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I cry during movies",
+        "I tell people about it when I'm irritated",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentk0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I am sensitive to the needs of others",
+        "I have an intense, boisterous laugh",
+        "I hate being the center of attention",
+        "I usually like to spend my free time with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentd0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I seldom feel weepy while reading the sad part of a story",
+        "I am never at a loss for words",
+        "I have leadership abilities",
+        "I usually like to spend my free time with people",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentg0",
+      "text": "What keepsake would I grab first in a fire?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentf0",
+      "text": "What movie, song or book always makes you emotional?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentt1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I cry during movies",
+        "I am seldom bothered by the apparent suffering of strangers"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentiments1",
+      "text": "Would I say this about myself? “I seldom feel weepy while reading the sad part of a story.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentp1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I cry during movies",
+        "I tell people about it when I'm irritated",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentm1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I am sensitive to the needs of others",
+        "I have an intense, boisterous laugh",
+        "I hate being the center of attention",
+        "I usually like to spend my free time with people",
+        "I tire out quickly"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentk1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I seldom feel weepy while reading the sad part of a story",
+        "I don't talk a lot",
+        "I am good at making impromptu speeches",
+        "I love to chat"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsentimentd1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 1,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "options": [
+        "I am seldom bothered by the apparent suffering of strangers",
+        "I am the life of the party",
+        "I have a strong personality",
+        "I love to chat",
+        "I laugh a lot",
+        "I try to forgive and forget"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkt0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I talk a lot",
+        "I don't talk a lot"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalks0",
+      "text": "Would I say this about myself? “I am never at a loss for words.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I talk a lot",
+        "I have leadership abilities",
+        "I usually like to spend my free time with people",
+        "I feel healthy and vibrant most of the time"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am never at a loss for words",
+        "I have a strong personality",
+        "I love to chat",
+        "I laugh a lot",
+        "I try to forgive and forget"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am the life of the party",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I tell people about it when I'm irritated",
+        "I don't mind being the center of attention",
+        "I rarely enjoy being with people",
+        "I smile a lot",
+        "I find it hard to forgive others",
+        "I accept people as they are"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkg0",
+      "text": "What could I talk about for hours at a party?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkf0",
+      "text": "What conversation of ours do you remember best?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 2,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkt1",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am never at a loss for words",
+        "I say little"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalks1",
+      "text": "How well does this describe me? “I speak softly.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am never at a loss for words",
+        "I have a strong personality",
+        "I love to chat",
+        "I laugh a lot"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am the life of the party",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength",
+        "I am inclined to forgive others"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I tell people about it when I'm irritated",
+        "I hate being the center of attention",
+        "I usually like to spend my free time with people",
+        "I tire out quickly"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I have an intense, boisterous laugh",
+        "I have leadership abilities",
+        "I usually like to spend my free time with people",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies",
+        "I am quick to judge others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkt2",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am the life of the party",
+        "I bottle up my feelings"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalks2",
+      "text": "How much does this sound like me? “I say little.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkp2",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I am the life of the party",
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkm2",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I tell people about it when I'm irritated",
+        "I hate being the center of attention",
+        "I usually like to spend my free time with people",
+        "I tire out quickly",
+        "I am nice to people I should be angry at"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkk2",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I have an intense, boisterous laugh",
+        "I am good at making impromptu speeches",
+        "I love to chat",
+        "I maintain high energy throughout the day"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtalkd2",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "words",
+        "fun"
+      ],
+      "options": [
+        "I don't talk a lot",
+        "I have a strong personality",
+        "I love to chat",
+        "I laugh a lot",
+        "I try to forgive and forget",
+        "I criticize others' shortcomings"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldt0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I am good at making impromptu speeches",
+        "I would be afraid to give a speech in public"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihbolds0",
+      "text": "How well does this describe me? “I don't mind being the center of attention.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I am good at making impromptu speeches",
+        "I rarely enjoy being with people",
+        "I smile a lot",
+        "I find it hard to forgive others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldm0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I don't mind being the center of attention",
+        "I usually like to spend my free time with people",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies",
+        "I am quick to judge others"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldk0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I have leadership abilities",
+        "I love to chat",
+        "I laugh a lot",
+        "I try to forgive and forget"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldd0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I have a strong personality",
+        "I love to chat",
+        "I am usually active and full of energy",
+        "I am nice to people I should be angry at",
+        "I take things as they come",
+        "I am annoyed by others' mistakes"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldg0",
+      "text": "Would I rather give the toast or hide in the kitchen?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldf0",
+      "text": "When have you surprised yourself by speaking up?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldt1",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I don't mind being the center of attention",
+        "I hate being the center of attention"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihbolds1",
+      "text": "How much does this sound like me? “I have leadership abilities.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I don't mind being the center of attention",
+        "I usually like to spend my free time with people",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldm1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I have leadership abilities",
+        "I love to chat",
+        "I laugh a lot",
+        "I try to forgive and forget",
+        "I criticize others' shortcomings"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldk1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I have a strong personality",
+        "I rarely enjoy being with people",
+        "I feel that I have a lot of inner strength",
+        "I am inclined to forgive others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihboldd1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I would be afraid to give a speech in public",
+        "I rarely enjoy being with people",
+        "I smile a lot",
+        "I find it hard to forgive others",
+        "I accept people as they are",
+        "I can't stand being contradicted"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablet0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I usually like to spend my free time with people",
+        "I seem to derive less enjoyment from interacting with people than others do"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociables0",
+      "text": "How much does this sound like me? “I love to chat.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablep0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I usually like to spend my free time with people",
+        "I am usually active and full of energy",
+        "I am nice to people I should be angry at",
+        "I take things as they come"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablem0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I love to chat",
+        "I smile a lot",
+        "I find it hard to forgive others",
+        "I accept people as they are",
+        "I can't stand being contradicted"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablek0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I love to chat",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies",
+        "I am quick to judge others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociabled0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I rarely enjoy being with people",
+        "I have great stamina",
+        "I am inclined to forgive others",
+        "I criticize others' shortcomings",
+        "I am hard to convince",
+        "I rarely feel angry with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociableg0",
+      "text": "Who would I invite to a dinner party for six?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablef0",
+      "text": "How much time with friends feels right for us in a month?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 2,
+      "tags": [
+        "friends"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablet1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I love to chat",
+        "I rarely enjoy being with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociables1",
+      "text": "How true is this of me? “I rarely enjoy being with people.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablep1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I love to chat",
+        "I smile a lot",
+        "I find it hard to forgive others",
+        "I accept people as they are"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablem1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I love to chat",
+        "I feel healthy and vibrant most of the time",
+        "I love my enemies",
+        "I am quick to judge others",
+        "I am hard to satisfy"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociablek1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I rarely enjoy being with people",
+        "I laugh a lot",
+        "I try to forgive and forget",
+        "I criticize others' shortcomings"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihsociabled1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "friends"
+      ],
+      "options": [
+        "I rarely enjoy being with people",
+        "I am usually active and full of energy",
+        "I am nice to people I should be angry at",
+        "I take things as they come",
+        "I am annoyed by others' mistakes",
+        "I am usually a patient person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyt0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I maintain high energy throughout the day",
+        "I tire out quickly"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelys0",
+      "text": "How true is this of me? “I have great stamina.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I maintain high energy throughout the day",
+        "I am inclined to forgive others",
+        "I criticize others' shortcomings",
+        "I am hard to convince"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelym0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I have great stamina",
+        "I am nice to people I should be angry at",
+        "I take things as they come",
+        "I am annoyed by others' mistakes",
+        "I am usually a patient person"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am usually active and full of energy",
+        "I find it hard to forgive others",
+        "I accept people as they are",
+        "I can't stand being contradicted"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I smile a lot",
+        "I try to forgive and forget",
+        "I am quick to judge others",
+        "I get upset if others change the way that I have arranged things",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyg0",
+      "text": "What time of day do I have the most energy?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyf0",
+      "text": "What gives you energy when you are running low?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyt1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I have great stamina",
+        "I accept people as they are"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelys1",
+      "text": "Would I say this about myself? “I maintain high energy throughout the day.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I have great stamina",
+        "I am nice to people I should be angry at",
+        "I take things as they come",
+        "I am annoyed by others' mistakes"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelym1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am usually active and full of energy",
+        "I find it hard to forgive others",
+        "I accept people as they are",
+        "I can't stand being contradicted",
+        "I am easily annoyed"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I smile a lot",
+        "I love my enemies",
+        "I am quick to judge others",
+        "I am hard to satisfy"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihlivelyd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I feel healthy and vibrant most of the time",
+        "I am inclined to forgive others",
+        "I criticize others' shortcomings",
+        "I am hard to convince",
+        "I rarely feel angry with people",
+        "I keep things tidy"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgot0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I love my enemies",
+        "I find it hard to forgive others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgos0",
+      "text": "Would I say this about myself? “I try to forgive and forget.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgop0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I love my enemies",
+        "I am quick to judge others",
+        "I get upset if others change the way that I have arranged things",
+        "I find that it takes a lot to make me feel angry at someone"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgom0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I try to forgive and forget",
+        "I criticize others' shortcomings",
+        "I am hard to convince",
+        "I rarely feel angry with people",
+        "I keep things tidy"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgok0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I am inclined to forgive others",
+        "I take things as they come",
+        "I am annoyed by others' mistakes",
+        "I am usually a patient person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgod0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I am nice to people I should be angry at",
+        "I accept people as they are",
+        "I react strongly to criticism",
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I hang around doing nothing"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgog0",
+      "text": "How long does it take me to get over a disagreement?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgof0",
+      "text": "Is there anything between us you would like to let go of?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 3,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgot1",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I try to forgive and forget",
+        "I am good at taking advice"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgos1",
+      "text": "How well does this describe me? “I am nice to people I should be angry at.”",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgop1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I try to forgive and forget",
+        "I criticize others' shortcomings",
+        "I am hard to convince",
+        "I rarely feel angry with people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgom1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I am inclined to forgive others",
+        "I take things as they come",
+        "I am annoyed by others' mistakes",
+        "I am usually a patient person",
+        "I want everything to be just right"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgok1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I am nice to people I should be angry at",
+        "I accept people as they are",
+        "I can't stand being contradicted",
+        "I am easily annoyed"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihletgod1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "options": [
+        "I find it hard to forgive others",
+        "I am quick to judge others",
+        "I get upset if others change the way that I have arranged things",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I quickly lose interest in the tasks I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlet0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I take things as they come",
+        "I become frustrated and angry with people when they don't live up to my expectations"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentles0",
+      "text": "How well does this describe me? “I accept people as they are.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlep0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I take things as they come",
+        "I react strongly to criticism",
+        "I am easily annoyed",
+        "I want everything to be just right"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlem0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I accept people as they are",
+        "I get upset if others change the way that I have arranged things",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I quickly lose interest in the tasks I start"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlek0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I take things as they come",
+        "I am hard to convince",
+        "I rarely feel angry with people",
+        "I keep things tidy"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentled0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am quick to judge others",
+        "I am good at taking advice",
+        "I am usually a patient person",
+        "I keep things tidy",
+        "I do too little work",
+        "I want everything to add up perfectly"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentleg0",
+      "text": "What pet peeve do I let slide the most?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlef0",
+      "text": "What is something about me you have learned to accept, and even like?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlet1",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I accept people as they are",
+        "I am quick to judge others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentles1",
+      "text": "How much does this sound like me? “I am quick to judge others.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlep1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I accept people as they are",
+        "I get upset if others change the way that I have arranged things",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlem1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I take things as they come",
+        "I am hard to convince",
+        "I rarely feel angry with people",
+        "I keep things tidy",
+        "I push myself very hard to succeed"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentlek1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I am quick to judge others",
+        "I am annoyed by others' mistakes",
+        "I am usually a patient person",
+        "I want everything to be just right"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihgentled1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "I criticize others' shortcomings",
+        "I react strongly to criticism",
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I hang around doing nothing",
+        "I detect mistakes"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflext0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I adjust easily",
+        "When I am with a group of people, I am often bothered by at least one of them"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexs0",
+      "text": "How much does this sound like me? “I am good at taking advice.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I adjust easily",
+        "I am usually a patient person",
+        "I keep things tidy",
+        "I do too little work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am good at taking advice",
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I hang around doing nothing",
+        "I detect mistakes"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am hard to convince",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I quickly lose interest in the tasks I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I react strongly to criticism",
+        "I rarely feel angry with people",
+        "I don't finish the things that I start",
+        "I stop when work becomes too difficult",
+        "I dislike imperfect work",
+        "I do things without thinking of the consequences"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexg0",
+      "text": "What household arrangement would I defend to the end?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexf0",
+      "text": "Where are you willing to compromise more than I realize?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 2,
+      "tags": [
+        "home"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflext1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am good at taking advice",
+        "I react strongly to criticism"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexs1",
+      "text": "How true is this of me? “I am hard to satisfy.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am good at taking advice",
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I hang around doing nothing"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am hard to convince",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I quickly lose interest in the tasks I start",
+        "I pay too little attention to details"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I react strongly to criticism",
+        "I rarely feel angry with people",
+        "I keep things tidy",
+        "I push myself very hard to succeed"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I get upset if others change the way that I have arranged things",
+        "I am usually a patient person",
+        "I keep things tidy",
+        "I do too little work",
+        "I want everything to add up perfectly",
+        "I act impulsively when something is bothering me"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflext2",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I adjust easily",
+        "I am exacting in my work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexs2",
+      "text": "Would I say this about myself? “I am hard to convince.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexp2",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am hard to convince",
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I quickly lose interest in the tasks I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexm2",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I react strongly to criticism",
+        "I rarely feel angry with people",
+        "I keep things tidy",
+        "I push myself very hard to succeed",
+        "I prefer to just let things happen"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexk2",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I get upset if others change the way that I have arranged things",
+        "I am usually a patient person",
+        "I want everything to be just right",
+        "I get started quickly on doing a job"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihflexd2",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I am hard to convince",
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I hang around doing nothing",
+        "I detect mistakes",
+        "I make careless mistakes"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiencet0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I find that it takes a lot to make me feel angry at someone",
+        "I am easily annoyed"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiences0",
+      "text": "How true is this of me? “I rarely feel angry with people.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiencep0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I find that it takes a lot to make me feel angry at someone",
+        "I don't finish the things that I start",
+        "I stop when work becomes too difficult",
+        "I dislike imperfect work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiencem0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I rarely feel angry with people",
+        "I keep things tidy",
+        "I do too little work",
+        "I want everything to add up perfectly",
+        "I act impulsively when something is bothering me"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiencek0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am usually a patient person",
+        "I want everything to be just right",
+        "I hang around doing nothing",
+        "I detect mistakes"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatienced0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "options": [
+        "I am easily annoyed",
+        "I want everything to be just right",
+        "I am exacting in my work",
+        "I want every detail taken care of",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatienceg0",
+      "text": "What makes me lose patience fastest?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihpatiencef0",
+      "text": "When have you been more patient with me than I noticed?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 2,
+      "tags": [
+        "time"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyt0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I keep things tidy",
+        "I don't finish the things that I start"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidys0",
+      "text": "Would I say this about myself? “I want everything to be just right.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I keep things tidy",
+        "I am exacting in my work",
+        "I want every detail taken care of",
+        "I make plans and stick to them"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidym0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I want everything to be just right",
+        "I stop when work becomes too difficult",
+        "I dislike imperfect work",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyk0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I don't finish the things that I start",
+        "I do too little work",
+        "I want everything to add up perfectly",
+        "I act impulsively when something is bothering me"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyd0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "options": [
+        "I keep things tidy",
+        "I get started quickly on doing a job",
+        "I have an eye for detail",
+        "I make careless mistakes",
+        "I get deeply immersed in music",
+        "I am interested in science"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyg0",
+      "text": "Which drawer or closet of mine is secretly the messiest?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihtidyf0",
+      "text": "What would make our home feel more organized without more work?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentt0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I push myself very hard to succeed",
+        "I stop when work becomes too difficult"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligents0",
+      "text": "How well does this describe me? “I get started quickly on doing a job.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I push myself very hard to succeed",
+        "I have an eye for detail",
+        "I make careless mistakes",
+        "I get deeply immersed in music"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I get started quickly on doing a job",
+        "I want every detail taken care of",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth",
+        "I would love to explore strange places"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I am exacting in my work",
+        "I dislike imperfect work",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I stop when work becomes too difficult",
+        "I continue until everything is perfect",
+        "I act impulsively when something is bothering me",
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I will not probe deeply into a subject",
+        "I have trouble guessing how others will react"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentg0",
+      "text": "What task do I throw myself into the hardest?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentf0",
+      "text": "How do you know when you have worked enough for one day?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentt1",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I get started quickly on doing a job",
+        "I do too little work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligents1",
+      "text": "How much does this sound like me? “I get started quickly on doing a job.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I get started quickly on doing a job",
+        "I want every detail taken care of",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentm1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I am exacting in my work",
+        "I dislike imperfect work",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics",
+        "I enjoy intellectual games"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I stop when work becomes too difficult",
+        "I want everything to add up perfectly",
+        "I act impulsively when something is bothering me",
+        "I seldom notice the emotional aspects of paintings and pictures"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdiligentd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "I do too little work",
+        "I have an eye for detail",
+        "I make careless mistakes",
+        "I get deeply immersed in music",
+        "I am interested in science",
+        "I seldom experience sudden intuitive insights"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailt0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I pay attention to details",
+        "I pay too little attention to details"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetails0",
+      "text": "How much does this sound like me? “I continue until everything is perfect.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailp0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I pay attention to details",
+        "I act impulsively when something is bothering me",
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I will not probe deeply into a subject"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailm0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I continue until everything is perfect",
+        "I make careless mistakes",
+        "I get deeply immersed in music",
+        "I am interested in science",
+        "I seldom experience sudden intuitive insights"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailk0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I have an eye for detail",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth",
+        "I would love to explore strange places"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetaild0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I want every detail taken care of",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics",
+        "I don't know much about history",
+        "I have excellent ideas",
+        "I would hate to be considered odd or strange"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailg0",
+      "text": "What detail do I notice that nobody else does?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailf0",
+      "text": "Where is good enough good enough for you?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 2,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailt1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I continue until everything is perfect",
+        "I prefer to just let things happen"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetails1",
+      "text": "How true is this of me? “I prefer to just let things happen.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailp1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I continue until everything is perfect",
+        "I make careless mistakes",
+        "I get deeply immersed in music",
+        "I am interested in science"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailm1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I have an eye for detail",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth",
+        "I would love to explore strange places",
+        "I come up with something new"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailk1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I want every detail taken care of",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics",
+        "I enjoy intellectual games"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetaild1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I dislike imperfect work",
+        "I act impulsively when something is bothering me",
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I will not probe deeply into a subject",
+        "I have trouble guessing how others will react",
+        "I enjoy being thought of as a mainstream person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailt2",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I have an eye for detail",
+        "I enjoy intellectual games"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetails2",
+      "text": "Would I say this about myself? “I detect mistakes.”",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailp2",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I have an eye for detail",
+        "I make plans and stick to them",
+        "I enjoy feeling close to the earth",
+        "I would love to explore strange places"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailm2",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I want every detail taken care of",
+        "I do things without thinking of the consequences",
+        "I have read the great literary classics",
+        "I enjoy intellectual games",
+        "I carry the conversation to a higher level"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetailk2",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I dislike imperfect work",
+        "I act impulsively when something is bothering me",
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I don't know much about history"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihdetaild2",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "I want everything to add up perfectly",
+        "I make careless mistakes",
+        "I get deeply immersed in music",
+        "I am interested in science",
+        "I seldom experience sudden intuitive insights",
+        "I like to be viewed as proper and conventional"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplanst0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "options": [
+        "I make plans and stick to them",
+        "I do things without thinking of the consequences"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplanss0",
+      "text": "How true is this of me? “I make plans and stick to them.”",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "options": [
+        "I make plans and stick to them",
+        "I have read the great literary classics",
+        "I don't know much about history",
+        "I have excellent ideas"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansm0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "options": [
+        "I do things without thinking of the consequences",
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I will not probe deeply into a subject",
+        "I have trouble guessing how others will react",
+        "I enjoy being thought of as a mainstream person"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansk0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "options": [
+        "I act impulsively when something is bothering me",
+        "I get deeply immersed in music",
+        "I am interested in science",
+        "I seldom experience sudden intuitive insights"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansd0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "options": [
+        "I make careless mistakes",
+        "I enjoy feeling close to the earth",
+        "I enjoy intellectual games",
+        "I love to think up new ways of doing things",
+        "I swim against the current",
+        "I try to impress others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansg0",
+      "text": "What plan of mine went exactly the way I wanted?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihplansf0",
+      "text": "What is a plan we should make before the year is out?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "money"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaesthetict0",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I get deeply immersed in music",
+        "I seldom notice the emotional aspects of paintings and pictures"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaesthetics0",
+      "text": "Would I say this about myself? “I enjoy feeling close to the earth.”",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaestheticp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I get deeply immersed in music",
+        "I enjoy intellectual games",
+        "I love to think up new ways of doing things",
+        "I swim against the current"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaestheticm0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I enjoy feeling close to the earth",
+        "I don't know much about history",
+        "I have excellent ideas",
+        "I would hate to be considered odd or strange",
+        "I prefer to eat at expensive restaurants"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaesthetick0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I have read the great literary classics",
+        "I will not probe deeply into a subject",
+        "I have trouble guessing how others will react",
+        "I enjoy being thought of as a mainstream person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaestheticd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I seldom notice the emotional aspects of paintings and pictures",
+        "I would love to explore strange places",
+        "I am full of ideas",
+        "I rebel against authority",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaestheticg0",
+      "text": "What piece of music can I get completely lost in?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihaestheticf0",
+      "text": "What place looks beautiful to you in every season?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexploret0",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I am interested in science",
+        "I don't know much about history"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplores0",
+      "text": "How well does this describe me? “I would love to explore strange places.”",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorep0",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I am interested in science",
+        "I am full of ideas",
+        "I rebel against authority",
+        "I wish to stay young forever"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorem0",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I would love to explore strange places",
+        "I love to think up new ways of doing things",
+        "I swim against the current",
+        "I try to impress others",
+        "I see myself as an average person"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorek0",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I enjoy intellectual games",
+        "I have excellent ideas",
+        "I would hate to be considered odd or strange",
+        "I prefer to eat at expensive restaurants"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplored0",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I don't know much about history",
+        "I carry the conversation to a higher level",
+        "I do things that others find strange",
+        "I seek status",
+        "I am more capable than most others",
+        "I face danger confidently"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexploreg0",
+      "text": "What strange place would I love to explore?",
+      "type": "GUESS_ME",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexploref0",
+      "text": "What topic would you like us to learn about together?",
+      "type": "REFLECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexploret1",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I would love to explore strange places",
+        "I will not probe deeply into a subject"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplores1",
+      "text": "How much does this sound like me? “I don't know much about history.”",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorep1",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I would love to explore strange places",
+        "I love to think up new ways of doing things",
+        "I swim against the current",
+        "I try to impress others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorem1",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I enjoy intellectual games",
+        "I have excellent ideas",
+        "I would hate to be considered odd or strange",
+        "I prefer to eat at expensive restaurants",
+        "I am just an ordinary person"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplorek1",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I don't know much about history",
+        "I have trouble guessing how others will react",
+        "I enjoy being thought of as a mainstream person",
+        "I would not enjoy being a famous celebrity"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihexplored1",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "planning"
+      ],
+      "options": [
+        "I will not probe deeply into a subject",
+        "I am full of ideas",
+        "I rebel against authority",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideast0",
+      "text": "Which is more me?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I come up with something new",
+        "I have trouble guessing how others will react"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideass0",
+      "text": "How much does this sound like me? “I carry the conversation to a higher level.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasp0",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I come up with something new",
+        "I do things that others find strange",
+        "I seek status",
+        "I am more capable than most others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasm0",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I carry the conversation to a higher level",
+        "I rebel against authority",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideask0",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am full of ideas",
+        "I swim against the current",
+        "I try to impress others",
+        "I see myself as an average person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasd0",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I love to think up new ways of doing things",
+        "I know that my ideas sometimes surprise people",
+        "I love luxury",
+        "I like to attract attention",
+        "I like to do frightening things",
+        "I rarely worry"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasg0",
+      "text": "What is my best idea that I never followed through on?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasf0",
+      "text": "What could we make together, just for fun?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideast1",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I carry the conversation to a higher level",
+        "I seldom experience sudden intuitive insights"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideass1",
+      "text": "How true is this of me? “I carry the conversation to a higher level.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasp1",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I carry the conversation to a higher level",
+        "I rebel against authority",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasm1",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am full of ideas",
+        "I swim against the current",
+        "I try to impress others",
+        "I see myself as an average person",
+        "I would be good at rescuing people from a burning building"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideask1",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I love to think up new ways of doing things",
+        "I would hate to be considered odd or strange",
+        "I prefer to eat at expensive restaurants",
+        "I am just an ordinary person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihideasd1",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I have excellent ideas",
+        "I do things that others find strange",
+        "I seek status",
+        "I am more capable than most others",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyt0",
+      "text": "Closer to the truth about me:",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am considered to be kind of eccentric",
+        "I would hate to be considered odd or strange"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkys0",
+      "text": "How true is this of me? “I know that my ideas sometimes surprise people.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not me at all",
+      "highLabel": "Completely me",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyp0",
+      "text": "Which of these sounds most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I am considered to be kind of eccentric",
+        "I love luxury",
+        "I like to attract attention",
+        "I like to do frightening things"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkym0",
+      "text": "Pick the ones that sound like me.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I know that my ideas sometimes surprise people",
+        "I seek status",
+        "I am more capable than most others",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyk0",
+      "text": "Order these from most like me to least.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I do things that others find strange",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyd0",
+      "text": "Which one describes me best?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I rebel against authority",
+        "I don't strive for elegance in my appearance",
+        "I am just an ordinary person",
+        "I would never go riding down a stretch of rapids in a canoe",
+        "I get upset by unpleasant thoughts that come into my mind",
+        "I seek support"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyg0",
+      "text": "What is the quirkiest thing about me?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyf0",
+      "text": "What unusual tradition would you like us to start?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyt1",
+      "text": "Pick the one that sounds like me.",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I know that my ideas sometimes surprise people",
+        "I enjoy being thought of as a mainstream person"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkys1",
+      "text": "Would I say this about myself? “I like to be thought of as a normal kind of person.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very true",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyp1",
+      "text": "Which one would I pick as most like me?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I know that my ideas sometimes surprise people",
+        "I seek status",
+        "I am more capable than most others",
+        "I face danger confidently"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkym1",
+      "text": "Which of these would I say describe me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I do things that others find strange",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations",
+        "I get upset by unpleasant thoughts that come into my mind"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyk1",
+      "text": "Rank these by how much they sound like me.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I rebel against authority",
+        "I try to impress others",
+        "I see myself as an average person",
+        "I would be good at rescuing people from a burning building"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyd1",
+      "text": "If I had to pick one of these to describe me, which would it be?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I swim against the current",
+        "I love luxury",
+        "I like to attract attention",
+        "I like to do frightening things",
+        "I rarely worry",
+        "I can't do without the company of others"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyt2",
+      "text": "Which would I say fits me better?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I do things that others find strange",
+        "I like to be viewed as proper and conventional"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkys2",
+      "text": "How well does this describe me? “I would hate to be considered odd or strange.”",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Never",
+      "highLabel": "Absolutely",
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyp2",
+      "text": "Which of these would my friends say fits me best?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I do things that others find strange",
+        "I wish to stay young forever",
+        "I don't think that I'm better than other people",
+        "I love dangerous situations"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkym2",
+      "text": "Which of these are true of me?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I rebel against authority",
+        "I try to impress others",
+        "I see myself as an average person",
+        "I would be good at rescuing people from a burning building",
+        "I rarely worry"
+      ],
+      "maxChoices": 3,
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyk2",
+      "text": "Put these in order, most me first.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I swim against the current",
+        "I prefer to eat at expensive restaurants",
+        "I am just an ordinary person",
+        "I am willing to take risks"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    },
+    {
+      "id": "ihquirkyd2",
+      "text": "Which of these is the most me?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "I would hate to be considered odd or strange",
+        "I seek status",
+        "I am more capable than most others",
+        "I face danger confidently",
+        "I often worry about things that turn out to be unimportant",
+        "I want to be liked"
+      ],
+      "source": "IPIP-HEXACO, Ashton, Lee & Goldberg (2007), public domain"
+    }
+  ]
+}

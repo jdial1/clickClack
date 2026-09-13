@@ -1,0 +1,682 @@
+{
+  "id": "daily-couple-week",
+  "title": "This week",
+  "theme": "EVERYDAY",
+  "blurb": "Daily only.",
+  "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted",
+  "questions": [
+    {
+      "id": "hkcloset0",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Hugged you",
+        "Went along with something you needed"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkcloses0",
+      "text": "How much did I praise you for something you did this week?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very much",
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosep0",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Hugged you",
+        "Stuck to something we agreed on",
+        "Told you what I need",
+        "Spent time with you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosem0",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Praised you for something you did",
+        "Did my share around the house",
+        "Shared my feelings with you",
+        "Made you feel good",
+        "Helped when you asked"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosek0",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Telling you I love you",
+        "Keeping us close after a disagreement",
+        "Talking with you about all kinds of things",
+        "Complimenting you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosed0",
+      "text": "Which of these comes easiest to me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Showing you how much I love you",
+        "Giving you space for what matters to you",
+        "Asking you for help",
+        "Keeping us close after a disagreement",
+        "Talking with you about all kinds of things",
+        "Complimenting you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkcloseg0",
+      "text": "What did I do for you this week that you might not have noticed?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosef0",
+      "text": "What did I do this week that made your day better?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkcloset1",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Praised you for something you did",
+        "Told you how special we are"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosep1",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Praised you for something you did",
+        "Did my share around the house",
+        "Shared my feelings with you",
+        "Made you feel good"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosem1",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Told you I love you",
+        "Kept us close after a disagreement",
+        "Talked with you about all kinds of things",
+        "Complimented you",
+        "Went along with something you needed"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosek1",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Showing you how much I love you",
+        "Thinking of you in my everyday choices",
+        "Talking about our plans and goals",
+        "Huging you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkclosed1",
+      "text": "Which of these comes easiest to me?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "touch",
+        "words"
+      ],
+      "options": [
+        "Spending time with you",
+        "Sticking to something we agreed on",
+        "Telling you what I need",
+        "Thinking of you in my everyday choices",
+        "Talking about our plans and goals",
+        "Huging you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupt0",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Went along with something you needed",
+        "Talked about our plans and goals"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowups0",
+      "text": "How much did I give you space for what matters to you this week?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very much",
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupp0",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Went along with something you needed",
+        "Asked you for help",
+        "Showed you how much I love you",
+        "Kept us close after a disagreement"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupm0",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Gave you space for what matters to you",
+        "Told you what I need",
+        "Spent time with you",
+        "Thought of you in my everyday choices",
+        "Talked about our plans and goals"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupk0",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Sticking to something we agreed on",
+        "Sharing my feelings with you",
+        "Making you feel good",
+        "Helping when you asked"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupd0",
+      "text": "Which of these comes easiest to me?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Doing my share around the house",
+        "Telling you how special we are",
+        "Telling you I love you",
+        "Sharing my feelings with you",
+        "Making you feel good",
+        "Helping when you asked"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupg0",
+      "text": "Which of our agreements do I take most seriously?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupf0",
+      "text": "What small thing could I do more of next week?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupt1",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Gave you space for what matters to you",
+        "Praised you for something you did"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupp1",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Gave you space for what matters to you",
+        "Told you what I need",
+        "Spent time with you",
+        "Thought of you in my everyday choices"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupm1",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Stuck to something we agreed on",
+        "Shared my feelings with you",
+        "Made you feel good",
+        "Helped when you asked",
+        "Told you how special we are"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupk1",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Doing my share around the house",
+        "Talking with you about all kinds of things",
+        "Complimenting you",
+        "Going along with something you needed"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkshowupd1",
+      "text": "Which of these comes easiest to me?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "acts",
+        "home"
+      ],
+      "options": [
+        "Keeping us close after a disagreement",
+        "Asking you for help",
+        "Showing you how much I love you",
+        "Talking with you about all kinds of things",
+        "Complimenting you",
+        "Going along with something you needed"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopent0",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Talked about our plans and goals",
+        "Hugged you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopens0",
+      "text": "How much did I tell you how special we are this week?",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very much",
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenp0",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Talked about our plans and goals",
+        "Told you I love you",
+        "Did my share around the house",
+        "Shared my feelings with you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenm0",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Told you how special we are",
+        "Showed you how much I love you",
+        "Kept us close after a disagreement",
+        "Talked with you about all kinds of things",
+        "Complimented you"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenk0",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Asking you for help",
+        "Spending time with you",
+        "Thinking of you in my everyday choices",
+        "Talking about our plans and goals"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopend0",
+      "text": "Which of these comes easiest to me?",
+      "type": "DROPDOWN",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Telling you what I need",
+        "Praising you for something you did",
+        "Sticking to something we agreed on",
+        "Spending time with you",
+        "Thinking of you in my everyday choices",
+        "Talking about our plans and goals"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopeng0",
+      "text": "What have I been wanting to talk to you about?",
+      "type": "GUESS_ME",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenf0",
+      "text": "What would you like us to talk about more openly?",
+      "type": "REFLECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopent1",
+      "text": "Which did I do more this week?",
+      "type": "THIS_OR_THAT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Told you how special we are",
+        "Gave you space for what matters to you"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopens1",
+      "text": "How much did I ask you for help this week?",
+      "type": "SCALE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Very much",
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenp1",
+      "text": "Which of these did I do most this week?",
+      "type": "PICK_ONE",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Told you how special we are",
+        "Showed you how much I love you",
+        "Kept us close after a disagreement",
+        "Talked with you about all kinds of things"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenm1",
+      "text": "Which of these did I do this week?",
+      "type": "MULTI_SELECT",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Asked you for help",
+        "Spent time with you",
+        "Thought of you in my everyday choices",
+        "Talked about our plans and goals",
+        "Hugged you"
+      ],
+      "maxChoices": 3,
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    },
+    {
+      "id": "hkopenk1",
+      "text": "Rank these by how much they matter to me.",
+      "type": "RANK",
+      "category": "Deep",
+      "depth": 2,
+      "tags": [
+        "words",
+        "planning"
+      ],
+      "options": [
+        "Telling you what I need",
+        "Making you feel good",
+        "Helping when you asked",
+        "Telling you how special we are"
+      ],
+      "source": "Relational Behavior Interactions scale, Harel & Koslowsky (2024), Scientific Reports, doi:10.1038/s41598-024-58901-2, CC BY 4.0, adapted"
+    }
+  ]
+}

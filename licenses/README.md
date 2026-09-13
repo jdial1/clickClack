@@ -25,3 +25,30 @@ and the future of public-domain personality measures. *Journal of Research in
 Personality, 40*(1), 84-96.
 
 Regenerate with `python tools/ipip/ipip_questions.py`.
+
+The other `daily-ipip-*` decks (strengths, feelings, hexaco, work, pastimes)
+come from the same pool: IPIP-VIA, Barchard's (2001) emotional-intelligence
+components, IPIP-HEXACO (Ashton, Lee & Goldberg, 2007), and the Oregon
+Vocational (Pozzebon et al., 2010) and Avocational (Goldberg, 2010) Interest
+Scales. All public domain.
+
+# Government sources
+
+- `daily-atus-*.json`: activities from the **American Time Use Survey Activity
+  Lexicon** (US Bureau of Labor Statistics, 2024), reworded. Public domain.
+- `daily-cfpb-money.json`: after the **CFPB Financial Well-Being Scale**
+  (Consumer Financial Protection Bureau). Public domain.
+
+# Attribution required
+
+`daily-couple-week.json` adapts the Relational Behavior Interactions scale from
+Harel, T., & Koslowsky, M. (2024). Development and validation of the relational
+behavior interactions scale for couples. *Scientific Reports, 14*, 8086.
+<https://doi.org/10.1038/s41598-024-58901-2>. Licensed **CC BY 4.0**
+(<https://creativecommons.org/licenses/by/4.0/>). Changes: items reworded to
+address your partner and turned into daily questions.
+
+CC BY needs this credit to be visible to people using the app, not only in the
+repo. **Before any public release, show `Sources` on a screen in the app.**
+
+Regenerate these with `python tools/questions/build_open_sources.py`.

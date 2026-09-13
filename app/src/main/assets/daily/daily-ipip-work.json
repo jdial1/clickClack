@@ -1,0 +1,2763 @@
+{
+  "id": "daily-ipip-work",
+  "title": "Work you would love",
+  "theme": "FUTURE",
+  "blurb": "Daily only.",
+  "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain",
+  "questions": [
+    {
+      "id": "ioleadt0",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Making important things happen",
+        "Being the financial officer for a company"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleads0",
+      "text": "How much would I enjoy leading other people?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadp0",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Making important things happen",
+        "Planning budgets",
+        "Being a social worker",
+        "Playing an instrument in a symphony"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadm0",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Leading other people",
+        "Preparing financial contracts",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadk0",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a sales or marketing director",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadd0",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being the chief executive of a large company",
+        "Being an office manager",
+        "Being an elementary-school teacher",
+        "Writing short stories or novels",
+        "Being a physicist",
+        "Going on nature walks"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadg0",
+      "text": "What would I change first if I ran my workplace?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadf0",
+      "text": "Where in our life together would you like to take the lead more?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadt1",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Leading other people",
+        "Caring for sick people"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleads1",
+      "text": "How good would I be at making decisions that affect a lot of people?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadp1",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Leading other people",
+        "Preparing financial contracts",
+        "Counseling persons who need help",
+        "Redecorating my house"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadm1",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a sales or marketing director",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum",
+        "Solving complex puzzles"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadk1",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being the chief executive of a large company",
+        "Supervising the work of others",
+        "Being a physical therapist",
+        "Singing professionally"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadd1",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being the master of ceremonies at a meeting",
+        "Planning budgets",
+        "Being a social worker",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadt2",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a sales or marketing director",
+        "Being a professional dancer"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleads2",
+      "text": "How much would I enjoy debating topics in a public meeting?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadp2",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a sales or marketing director",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadm2",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being the chief executive of a large company",
+        "Supervising the work of others",
+        "Being a physical therapist",
+        "Singing professionally",
+        "Developing a computer program"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadk2",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being the master of ceremonies at a meeting",
+        "Planning investment strategies",
+        "Providing comfort and support to others",
+        "Being an actor or actress"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioleadd2",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Planning an advertising campaign",
+        "Preparing financial contracts",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter",
+        "Raising flowers"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizet0",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Being the financial officer for a company",
+        "Helping others learn new ideas"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizes0",
+      "text": "How good would I be at being an office manager?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizep0",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Being the financial officer for a company",
+        "Being an elementary-school teacher",
+        "Writing short stories or novels",
+        "Being a physicist"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizem0",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Being an office manager",
+        "Being a social worker",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizek0",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Planning budgets",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganized0",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Preparing financial contracts",
+        "Caring for sick people",
+        "Being a professional dancer",
+        "Explaining scientific concepts to others",
+        "Cultivating plants",
+        "Being a military officer"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizeg0",
+      "text": "What system of mine would I recommend to everyone?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizef0",
+      "text": "How should we split planning our money and our calendar?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizet1",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Being an office manager",
+        "Creating new fashion designs"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizes1",
+      "text": "How much would I enjoy monitoring business expenses?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizep1",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Being an office manager",
+        "Being a social worker",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizem1",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Planning budgets",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter",
+        "Raising flowers"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizek1",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Preparing financial contracts",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum",
+        "Solving complex puzzles"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganized1",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Developing an office filing system",
+        "Being an elementary-school teacher",
+        "Writing short stories or novels",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizet2",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Planning budgets",
+        "Being a mathematician"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizes2",
+      "text": "How good would I be at preparing financial contracts?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizep2",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Planning budgets",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizem2",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Preparing financial contracts",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum",
+        "Solving complex puzzles",
+        "Repairing cars or trucks"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganizek2",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Developing an office filing system",
+        "Being a physical therapist",
+        "Singing professionally",
+        "Developing a computer program"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "ioorganized2",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "money",
+        "planning"
+      ],
+      "options": [
+        "Supervising the work of others",
+        "Being a social worker",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpt0",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Helping others learn new ideas",
+        "Creating works of art"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelps0",
+      "text": "How much would I enjoy caring for sick people?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpp0",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Helping others learn new ideas",
+        "Being a professional dancer",
+        "Explaining scientific concepts to others",
+        "Cultivating plants"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpm0",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Caring for sick people",
+        "Writing short stories or novels",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpk0",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being an elementary-school teacher",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpd0",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being a social worker",
+        "Creating new fashion designs",
+        "Being a mathematician",
+        "Being a forest ranger",
+        "Facing physical danger",
+        "Knowing many languages"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpg0",
+      "text": "Who would I most like to help, if I could help anyone?",
+      "type": "GUESS_ME",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpf0",
+      "text": "What kind of help feels most meaningful for you to give?",
+      "type": "REFLECT",
+      "category": "Future",
+      "depth": 2,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpt1",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Caring for sick people",
+        "Designing a laboratory experiment"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelps1",
+      "text": "How good would I be at participating in charity events?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpp1",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Caring for sick people",
+        "Writing short stories or novels",
+        "Being a physicist",
+        "Going on nature walks"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpm1",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being an elementary-school teacher",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpk1",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being a social worker",
+        "Redecorating my house",
+        "Being a scientific reporter",
+        "Raising flowers"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpd1",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Counseling persons who need help",
+        "Being a professional dancer",
+        "Explaining scientific concepts to others",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpt2",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being an elementary-school teacher",
+        "Constructing new buildings"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelps2",
+      "text": "How much would I enjoy counseling persons who need help?",
+      "type": "SCALE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpp2",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being an elementary-school teacher",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research",
+        "Doing woodworking"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpm2",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being a social worker",
+        "Redecorating my house",
+        "Being a scientific reporter",
+        "Raising flowers",
+        "Being a police officer"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpk2",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Counseling persons who need help",
+        "Selecting art works for a museum",
+        "Solving complex puzzles",
+        "Repairing cars or trucks"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iohelpd2",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Future",
+      "depth": 1,
+      "tags": [
+        "work",
+        "acts"
+      ],
+      "options": [
+        "Being a doctor or nurse",
+        "Writing short stories or novels",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events",
+        "Speaking fluently on any subject"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaket0",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Creating works of art",
+        "Being a chemist"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakes0",
+      "text": "How good would I be at creating new fashion designs?",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakep0",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Creating works of art",
+        "Being a mathematician",
+        "Being a forest ranger",
+        "Facing physical danger"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakem0",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Creating new fashion designs",
+        "Explaining scientific concepts to others",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakek0",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Being a professional dancer",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaked0",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Writing short stories or novels",
+        "Designing a laboratory experiment",
+        "Constructing new buildings",
+        "Being a racing car driver",
+        "Editing a newspaper",
+        "Planning an advertising campaign"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakeg0",
+      "text": "If I could pick a talent for free, what would it be?",
+      "type": "GUESS_ME",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakef0",
+      "text": "What creative thing would you like to do more of?",
+      "type": "REFLECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaket1",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Creating new fashion designs",
+        "Being a farmer"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakes1",
+      "text": "How much would I enjoy being an actor or actress?",
+      "type": "SCALE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakep1",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Creating new fashion designs",
+        "Explaining scientific concepts to others",
+        "Cultivating plants",
+        "Being a military officer"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakem1",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Being a professional dancer",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events",
+        "Speaking fluently on any subject"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakek1",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Writing short stories or novels",
+        "Carrying out medical research",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaked1",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Playing an instrument in a symphony",
+        "Being a mathematician",
+        "Being a forest ranger",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaket2",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Being a professional dancer",
+        "Surviving in the wilderness"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakep2",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Being a professional dancer",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakem2",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Writing short stories or novels",
+        "Carrying out medical research",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider",
+        "Reading many books"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakek2",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Playing an instrument in a symphony",
+        "Being a scientific reporter",
+        "Raising flowers",
+        "Being a police officer"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaked2",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Redecorating my house",
+        "Explaining scientific concepts to others",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent",
+        "Persuading others to change their views"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaket3",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Writing short stories or novels",
+        "Making up word puzzles"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakep3",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Writing short stories or novels",
+        "Carrying out medical research",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakem3",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Playing an instrument in a symphony",
+        "Being a scientific reporter",
+        "Raising flowers",
+        "Being a police officer",
+        "Keeping a diary or journal"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomakek3",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Redecorating my house",
+        "Solving complex puzzles",
+        "Repairing cars or trucks",
+        "Being a professional athlete"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iomaked3",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Playful",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "work"
+      ],
+      "options": [
+        "Selecting art works for a museum",
+        "Being a physicist",
+        "Going on nature walks",
+        "Competing in athletic events",
+        "Speaking fluently on any subject",
+        "Making decisions that affect a lot of people"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvet0",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a chemist",
+        "Caring for cattle or horses"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolves0",
+      "text": "How much would I enjoy designing a laboratory experiment?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvep0",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a chemist",
+        "Constructing new buildings",
+        "Being a racing car driver",
+        "Editing a newspaper"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvem0",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Designing a laboratory experiment",
+        "Being a forest ranger",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvek0",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a mathematician",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolved0",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Explaining scientific concepts to others",
+        "Being a farmer",
+        "Surviving in the wilderness",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolveg0",
+      "text": "What puzzle or problem could I work on for hours?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvef0",
+      "text": "What about how the world works still amazes you?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvet1",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Designing a laboratory experiment",
+        "Engaging in exciting adventures"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolves1",
+      "text": "How good would I be at developing a computer program?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvep1",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Designing a laboratory experiment",
+        "Being a forest ranger",
+        "Facing physical danger",
+        "Knowing many languages"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvem1",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a mathematician",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent",
+        "Persuading others to change their views"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvek1",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Explaining scientific concepts to others",
+        "Going on nature walks",
+        "Competing in athletic events",
+        "Speaking fluently on any subject"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolved1",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a physicist",
+        "Constructing new buildings",
+        "Being a racing car driver",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvet2",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a mathematician",
+        "Being a professor of English"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolves2",
+      "text": "How much would I enjoy carrying out medical research?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvep2",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a mathematician",
+        "Cultivating plants",
+        "Being a military officer",
+        "Being a foreign correspondent"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvem2",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Explaining scientific concepts to others",
+        "Going on nature walks",
+        "Competing in athletic events",
+        "Speaking fluently on any subject",
+        "Making decisions that affect a lot of people"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolvek2",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Being a physicist",
+        "Doing woodworking",
+        "Being a long-distance bicycle rider",
+        "Reading many books"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iosolved2",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "work"
+      ],
+      "options": [
+        "Carrying out medical research",
+        "Being a forest ranger",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting",
+        "Establishing time schedules"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildt0",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Caring for cattle or horses",
+        "Being a professional athlete"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuilds0",
+      "text": "How good would I be at being a farmer?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildp0",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Caring for cattle or horses",
+        "Surviving in the wilderness",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildm0",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a farmer",
+        "Being a racing car driver",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildk0",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Constructing new buildings",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildd0",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a forest ranger",
+        "Engaging in exciting adventures",
+        "Being a professor of English",
+        "Being the chief executive of a large company",
+        "Developing an office filing system",
+        "Being a doctor or nurse"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildg0",
+      "text": "What would I build or grow if we had more space?",
+      "type": "GUESS_ME",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildf0",
+      "text": "What would you like to make with your hands?",
+      "type": "REFLECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildt1",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a farmer",
+        "Being a librarian"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuilds1",
+      "text": "How much would I enjoy repairing cars or trucks?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildp1",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a farmer",
+        "Being a racing car driver",
+        "Editing a newspaper",
+        "Planning an advertising campaign"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildm1",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Constructing new buildings",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting",
+        "Establishing time schedules"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildk1",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a forest ranger",
+        "Being a military officer",
+        "Being a foreign correspondent",
+        "Persuading others to change their views"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildd1",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Cultivating plants",
+        "Surviving in the wilderness",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildt2",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Constructing new buildings",
+        "Being a sales or marketing director"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuilds2",
+      "text": "How good would I be at going on nature walks?",
+      "type": "SCALE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildp2",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Constructing new buildings",
+        "Facing physical danger",
+        "Knowing many languages",
+        "Debating topics in a public meeting"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildm2",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Being a forest ranger",
+        "Being a military officer",
+        "Being a foreign correspondent",
+        "Persuading others to change their views",
+        "Monitoring business expenses"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildk2",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Cultivating plants",
+        "Competing in athletic events",
+        "Speaking fluently on any subject",
+        "Making decisions that affect a lot of people"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iobuildd2",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Everyday",
+      "depth": 1,
+      "tags": [
+        "home",
+        "work"
+      ],
+      "options": [
+        "Going on nature walks",
+        "Being a racing car driver",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies",
+        "Providing comfort and support to others"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodaret0",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a professional athlete",
+        "Being a translator or interpreter"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodares0",
+      "text": "How much would I enjoy engaging in exciting adventures?",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarep0",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a professional athlete",
+        "Being a professor of English",
+        "Being the chief executive of a large company",
+        "Developing an office filing system"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarem0",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Engaging in exciting adventures",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarek0",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Surviving in the wilderness",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodared0",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a racing car driver",
+        "Being a librarian",
+        "Being a sales or marketing director",
+        "Preparing financial contracts",
+        "Counseling persons who need help",
+        "Redecorating my house"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodareg0",
+      "text": "What adventure is at the top of my list?",
+      "type": "GUESS_ME",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodaref0",
+      "text": "What is the most physically challenging thing you want to try?",
+      "type": "REFLECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodaret1",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Engaging in exciting adventures",
+        "Leading other people"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodares1",
+      "text": "How good would I be at being a police officer?",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarep1",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Engaging in exciting adventures",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarem1",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Surviving in the wilderness",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies",
+        "Providing comfort and support to others"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarek1",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a racing car driver",
+        "Knowing many languages",
+        "Debating topics in a public meeting",
+        "Establishing time schedules"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodared1",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Facing physical danger",
+        "Being a professor of English",
+        "Being the chief executive of a large company",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodaret2",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Surviving in the wilderness",
+        "Planning budgets"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodares2",
+      "text": "How much would I enjoy competing in athletic events?",
+      "type": "SCALE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarep2",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Surviving in the wilderness",
+        "Editing a newspaper",
+        "Planning an advertising campaign",
+        "Planning investment strategies"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarem2",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a racing car driver",
+        "Knowing many languages",
+        "Debating topics in a public meeting",
+        "Establishing time schedules",
+        "Participating in charity events"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodarek2",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Facing physical danger",
+        "Being a foreign correspondent",
+        "Persuading others to change their views",
+        "Monitoring business expenses"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iodared2",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Travel",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "options": [
+        "Being a military officer",
+        "Making up word puzzles",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist",
+        "Singing professionally"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordst0",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a translator or interpreter",
+        "Making important things happen"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordss0",
+      "text": "How good would I be at being a librarian?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsp0",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a translator or interpreter",
+        "Being a sales or marketing director",
+        "Preparing financial contracts",
+        "Counseling persons who need help"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsm0",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a librarian",
+        "Being the chief executive of a large company",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsk0",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a professor of English",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsd0",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Making up word puzzles",
+        "Leading other people",
+        "Planning budgets",
+        "Being a social worker",
+        "Playing an instrument in a symphony",
+        "Carrying out medical research"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsg0",
+      "text": "What language would I learn overnight if I could?",
+      "type": "GUESS_ME",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsf0",
+      "text": "What book would you like me to read, and why?",
+      "type": "REFLECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordst1",
+      "text": "Which would I rather do all day?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a librarian",
+        "Being an office manager"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordss1",
+      "text": "How much would I enjoy reading many books?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Not at all",
+      "highLabel": "Loads",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsp1",
+      "text": "Which of these would I be best at?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a librarian",
+        "Being the chief executive of a large company",
+        "Developing an office filing system",
+        "Being a doctor or nurse"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsm1",
+      "text": "Pick the ones I would enjoy doing for a living.",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a professor of English",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist",
+        "Singing professionally"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsk1",
+      "text": "Rank these from dream job to no thanks.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Making up word puzzles",
+        "Planning an advertising campaign",
+        "Planning investment strategies",
+        "Providing comfort and support to others"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsd1",
+      "text": "If money did not matter, which would I spend my days doing?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Editing a newspaper",
+        "Being a sales or marketing director",
+        "Preparing financial contracts",
+        "Counseling persons who need help",
+        "Redecorating my house",
+        "Being a scientific reporter"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordst2",
+      "text": "Which would I pick for a career?",
+      "type": "THIS_OR_THAT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a professor of English",
+        "Being an elementary-school teacher"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordss2",
+      "text": "How good would I be at knowing many languages?",
+      "type": "SCALE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "lowLabel": "Terrible",
+      "highLabel": "Great",
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsp2",
+      "text": "Which of these would I try first?",
+      "type": "PICK_ONE",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Being a professor of English",
+        "Being the master of ceremonies at a meeting",
+        "Supervising the work of others",
+        "Being a physical therapist"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsm2",
+      "text": "Which of these would I be good at?",
+      "type": "MULTI_SELECT",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Making up word puzzles",
+        "Planning an advertising campaign",
+        "Planning investment strategies",
+        "Providing comfort and support to others",
+        "Being an actor or actress"
+      ],
+      "maxChoices": 3,
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsk2",
+      "text": "Order these by how much I would enjoy them.",
+      "type": "RANK",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Editing a newspaper",
+        "Debating topics in a public meeting",
+        "Establishing time schedules",
+        "Participating in charity events"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    },
+    {
+      "id": "iowordsd2",
+      "text": "Which of these would I secretly love to try?",
+      "type": "DROPDOWN",
+      "category": "Know me",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "options": [
+        "Knowing many languages",
+        "Being the chief executive of a large company",
+        "Developing an office filing system",
+        "Being a doctor or nurse",
+        "Selecting art works for a museum",
+        "Solving complex puzzles"
+      ],
+      "source": "Oregon Vocational Interest Scales, Pozzebon et al. (2010), public domain"
+    }
+  ]
+}
