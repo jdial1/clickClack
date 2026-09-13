@@ -1,0 +1,59 @@
+{
+  "id": "alaska-day",
+  "title": "Alaska Day",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "oak1",
+      "text": "Which would I rather see first?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "category": "Travel",
+      "options": [
+        "The northern lights",
+        "A glacier",
+        "A bear, from far away",
+        "Denali"
+      ]
+    },
+    {
+      "id": "oak2",
+      "text": "How ready am I for the long dark stretch ahead?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday",
+      "lowLabel": "Not at all",
+      "highLabel": "Bring it on"
+    },
+    {
+      "id": "oak3",
+      "text": "What gets me through the darkest weeks of the year?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "time",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oak4",
+      "text": "What would you want someone from the Lower 48 to understand about living up here?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

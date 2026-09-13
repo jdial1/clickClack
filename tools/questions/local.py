@@ -155,9 +155,63 @@ LOCAL_TEAMS = [
     D("rlt8", "If {nfl} made the Super Bowl, where would I watch it?", ["At home, just us", "A big party", "A sports bar", "At the game, somehow", "I would not watch", "Wherever the snacks are"], 1, ["sports", "friends"], "Playful"),
 ]
 
+# More leagues. Each question is only asked while every league it names has a
+# team within 300 miles and is in season (see League and Teams.activeLeagues).
+LOCAL_TEAMS += [
+    T("rlt9", "Playoff basketball with {nba}:", "Every game, loudly", "Just the big ones", 1, ["sports", "fun"], "Playful"),
+    G("rlt10", "Which {nba} player would I most want to have dinner with?", 1, ["sports", "fun"], "Playful"),
+    P("rlt11", "A night at a {nba} game, I would be most excited about:", ["Courtside seats", "The food", "The halftime show", "Getting on the big screen"], 1, ["sports", "fun"], "Playful"),
+    T("rlt12", "A {nhl} game, I am there for:", "The hockey", "The fights and the organ music", 1, ["sports", "fun"], "Playful"),
+    S("rlt13", "How much could I explain icing and offsides if you asked?", 1, ["sports", "words"], "Playful", "Not a word", "Diagrams included"),
+    D("rlt14", "If {nhl} won the Cup, how would I celebrate?", ["Parade, obviously", "Quietly, with a beer", "Tell everyone at work", "Buy a jersey", "Call my family", "I would find out the next day"], 1, ["sports", "friends"], "Playful"),
+    T("rlt15", "A {mls} match:", "In the supporters' section singing", "Somewhere with a seat and a view", 1, ["sports", "fun"], "Playful"),
+    R("rlt16", "What sport would you want us to learn to love together?", 1, ["sports", "time"], "Playful"),
+    P("rlt17", "On a {college} football Saturday, I am most likely:", ["At the game or the tailgate", "In front of the TV all day", "Checking the score now and then", "Enjoying the empty stores"], 1, ["sports", "time"], "Playful"),
+    S("rlt18", "How much does a {college} loss ruin my weekend?", 1, ["sports"], "Playful", "Not at all", "Until Tuesday"),
+    G("rlt19", "What is my best {college} game day memory?", 1, ["sports", "past"], "Playful"),
+    M("rlt20", "Pick the local teams I would actually go see this year.", ["{mlb}", "{nfl}", "{nba}", "{nhl}", "{mls}", "{college} football"], 1, ["sports", "fun"], "Playful", 3),
+]
+
+# The light where you live, filled in from the home ZIP. Asked on every other
+# day of that kind (by date), the days weather questions are not.
+SUN = {
+    "longest": ("Longest day", [
+        T("sln1", "The longest day of the year, sunset at {sunset}. We should:", "Stay out until it is gone", "Go to bed like it is any other day", 1, ["time", "fun"], "Playful"),
+        R("sln2", "What should we do with all this light tonight?", 1, ["time", "planning"], "Everyday"),
+        G("sln3", "What is my favorite way to spend a long summer evening?", 1, ["time", "fun"], "Know me"),
+        P("sln4", "The best place to watch the sun go down at {sunset}?", ["The porch", "A hill or a roof", "The water", "The car, windows down"], 1, ["time", "romance"], "Romantic"),
+        S("sln5", "How much do I love these long light evenings?", 1, ["time"], "Everyday", "Too bright to sleep", "Best time of year"),
+        R("sln6", "{daylight} of daylight today. What is one thing worth spending it on this summer?", 1, ["planning", "time"], "Everyday"),
+    ]),
+    "shortest": ("Shortest day", [
+        T("ssh1", "The shortest day of the year. Tonight is for:", "Candles and staying in", "Going out anyway", 1, ["time", "home"], "Everyday"),
+        R("ssh2", "Only {daylight} of daylight today. What helps you most in the dark part of the year?", 2, ["time", "words"], "Deep"),
+        G("ssh3", "What do I miss most about summer right now?", 1, ["time"], "Know me"),
+        P("ssh4", "The best part of a long winter night?", ["Sleeping in", "Soup and a movie", "Lights on the houses", "Nothing, it is too dark"], 1, ["home", "time"], "Everyday"),
+        S("ssh5", "How much do the short days get to me?", 2, ["words"], "Deep", "Not at all", "More than I say"),
+        R("ssh6", "From tomorrow the days get longer. What are you looking forward to as the light comes back?", 1, ["planning", "time"], "Everyday"),
+    ]),
+    "early_dark": ("Dark early", [
+        T("sed1", "Dark by {sunset}. The evening is for:", "A walk before it goes", "Giving up and getting cozy", 1, ["time", "home"], "Everyday"),
+        G("sed2", "What gets me through evenings that start this early?", 1, ["time", "words"], "Know me"),
+        P("sed3", "The coziest way to spend a long dark evening?", ["A bath", "Cooking something slow", "A long game", "Bed by eight"], 1, ["home", "time"], "Everyday"),
+        R("sed4", "What is one small thing we could do to make these dark evenings better?", 1, ["home", "planning"], "Everyday"),
+        S("sed5", "How much do early sunsets change my mood?", 1, ["words"], "Everyday", "Not at all", "A lot"),
+        M("sed6", "Pick what I would want on an evening dark by {sunset}.", ["A fire or candles", "Something warm to drink", "A show we both like", "Blankets", "You, nearby"], 1, ["home", "touch"], "Everyday", 3),
+    ]),
+    "late_light": ("Light late", [
+        T("sll1", "Light until {sunset} tonight. After dinner:", "Back outside", "Couch, light or no light", 1, ["time", "fun"], "Everyday"),
+        P("sll2", "What would I do with an extra hour of light tonight?", ["Walk somewhere", "Sit outside", "Work in the yard", "Nothing different, honestly"], 1, ["time", "home"], "Everyday"),
+        G("sll3", "What is my favorite thing to do on a summer night after work?", 1, ["time", "work"], "Know me"),
+        R("sll4", "Where would you want to watch the sun go down at {sunset}, if we went tonight?", 1, ["time", "romance"], "Romantic"),
+        S("sll5", "How late do I like to stay out when it is still light?", 1, ["time", "fun"], "Home by dark", "As long as it lasts"),
+        D("sll6", "The best food for an evening that stays light?", ["Something grilled", "Ice cream", "A picnic", "Takeout on the porch", "Whatever is cold", "Corn on the cob"], 1, ["fun", "home"], "Food"),
+    ]),
+}
+
 existing_ids = set()
 for f in glob.glob(os.path.join(ASSETS, "*", "*.json")):
-    if os.path.basename(os.path.dirname(f)) in ("weather", "regions", "local"):
+    if os.path.basename(os.path.dirname(f)) in ("weather", "regions", "local", "sun"):
         continue
     for q in json.load(open(f, encoding="utf-8"))["questions"]:
         existing_ids.add(q["id"])
@@ -195,4 +249,7 @@ for region, (title, qs) in REGIONS.items():
     n += len(qs)
 write("local", "local-teams", "Local teams", "PLAYFUL", LOCAL_TEAMS, "Written for Click Clack")
 n += len(LOCAL_TEAMS)
+for kind, (title, qs) in SUN.items():
+    write("sun", f"sun-{kind.replace('_', '-')}", title, "EVERYDAY", qs, "Written for Click Clack")
+    n += len(qs)
 print("wrote", n, "questions")

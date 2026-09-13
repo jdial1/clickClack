@@ -125,6 +125,182 @@
         "friends"
       ],
       "category": "Playful"
+    },
+    {
+      "id": "rlt9",
+      "text": "Playoff basketball with {nba}:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Every game, loudly",
+        "Just the big ones"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt10",
+      "text": "Which {nba} player would I most want to have dinner with?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt11",
+      "text": "A night at a {nba} game, I would be most excited about:",
+      "type": "PICK_ONE",
+      "options": [
+        "Courtside seats",
+        "The food",
+        "The halftime show",
+        "Getting on the big screen"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt12",
+      "text": "A {nhl} game, I am there for:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "The hockey",
+        "The fights and the organ music"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt13",
+      "text": "How much could I explain icing and offsides if you asked?",
+      "type": "SCALE",
+      "lowLabel": "Not a word",
+      "highLabel": "Diagrams included",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "words"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt14",
+      "text": "If {nhl} won the Cup, how would I celebrate?",
+      "type": "DROPDOWN",
+      "options": [
+        "Parade, obviously",
+        "Quietly, with a beer",
+        "Tell everyone at work",
+        "Buy a jersey",
+        "Call my family",
+        "I would find out the next day"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "friends"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt15",
+      "text": "A {mls} match:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "In the supporters' section singing",
+        "Somewhere with a seat and a view"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt16",
+      "text": "What sport would you want us to learn to love together?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt17",
+      "text": "On a {college} football Saturday, I am most likely:",
+      "type": "PICK_ONE",
+      "options": [
+        "At the game or the tailgate",
+        "In front of the TV all day",
+        "Checking the score now and then",
+        "Enjoying the empty stores"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt18",
+      "text": "How much does a {college} loss ruin my weekend?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "Until Tuesday",
+      "depth": 1,
+      "tags": [
+        "sports"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt19",
+      "text": "What is my best {college} game day memory?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rlt20",
+      "text": "Pick the local teams I would actually go see this year.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "{mlb}",
+        "{nfl}",
+        "{nba}",
+        "{nhl}",
+        "{mls}",
+        "{college} football"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
     }
   ]
 }

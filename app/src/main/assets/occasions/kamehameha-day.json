@@ -1,0 +1,60 @@
+{
+  "id": "kamehameha-day",
+  "title": "King Kamehameha Day",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "okh1",
+      "text": "Who in my family would I call the strongest?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "family"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "okh2",
+      "text": "Which island would I pick for a long weekend?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "category": "Travel",
+      "options": [
+        "Oahu",
+        "Maui",
+        "Kauai",
+        "The Big Island"
+      ]
+    },
+    {
+      "id": "okh3",
+      "text": "A parade in town or a quiet day at the beach?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful",
+      "options": [
+        "The parade",
+        "The beach"
+      ]
+    },
+    {
+      "id": "okh4",
+      "text": "What tradition from where you grew up do you want us to keep?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "family",
+        "past"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

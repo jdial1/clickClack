@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.leagues
+import com.ampersand.model.League
+import com.ampersand.model.SunKind
 import com.ampersand.model.ZipTable
 import com.ampersand.model.UsRegion
 import com.ampersand.model.WeatherKind
@@ -45,6 +48,8 @@ class QuestionPool(
     val regional: Map<UsRegion, List<Question>> = emptyMap(),
     /** Questions naming the local teams, drawn only once a home ZIP is set. */
     val localTeams: List<Question> = emptyList(),
+    /** A few questions for each kind of day the light makes. See [daily]. */
+    val sun: Map<SunKind, List<Question>> = emptyMap(),
     /** Every ZIP, for turning a home ZIP into a forecast and a region. */
     val places: ZipTable = ZipTable.empty,
 ) {
@@ -79,7 +84,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams)
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + sun.values.flatten())
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -135,15 +140,22 @@ class QuestionPool(
         weatherKind: WeatherKind? = null,
         /** Where you live. Adds that region's questions to the pool. */
         region: UsRegion? = null,
+        /** The home state, for days that belong to a place: Mardi Gras, Derby Day. */
+        state: String? = null,
+        /** The kind of day the light makes at home, on the days weather questions are not. */
+        sunKind: SunKind? = null,
+        /** Leagues with a local team in season. A team question needs all of its leagues here. */
+        leagues: Set<League> = emptySet(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
-        val everything = all + region?.let { regional[it].orEmpty() + localTeams }.orEmpty()
+        val teams = localTeams.filter { q -> q.leagues.isNotEmpty() && leagues.containsAll(q.leagues) }
+        val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty()
         val open = everything.filter(::shown).ifEmpty { everything }
 
         // A day that is not like the others gets its own question. Rotated by
         // year, so the same holiday does not ask the same thing every time.
-        Occasion.on(date, anniversary)?.let { occasion ->
+        Occasion.on(date, anniversary, state)?.let { occasion ->
             occasions[occasion.id]?.questions?.takeIf { it.isNotEmpty() }?.let { pool ->
                 return pool[date.year.mod(pool.size)]
             }
@@ -164,6 +176,12 @@ class QuestionPool(
 
         if (weatherKind != null && date.toEpochDay().mod(2L) == 0L) {
             weather[weatherKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
+        }
+
+        // The other half of the days: the light, where the day is one worth
+        // mentioning. Never both on one day, so a snowy solstice stays readable.
+        if (sunKind != null && date.toEpochDay().mod(2L) == 1L) {
+            sun[sunKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
         }
 
         val candidates = open.filter(::fits).ifEmpty { open }
@@ -261,6 +279,10 @@ class QuestionPool(
                 UsRegion.entries.firstOrNull { "region-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
             }.toMap(),
             localTeams = QuizJson.loadFolder(context, "local").flatMap { it.questions },
+            sun = QuizJson.loadFolder(context, "sun").mapNotNull { deck ->
+                SunKind.entries.firstOrNull { "sun-${it.name.lowercase().replace('_', '-')}" == deck.id }
+                    ?.let { it to deck.questions }
+            }.toMap(),
             // ponytail: parsed on first launch of the screen, about 34k lines;
             // index lazily or by prefix if it ever shows up in a startup trace.
             places = context.assets.open("zips.csv").bufferedReader().useLines { ZipTable.parse(it) },

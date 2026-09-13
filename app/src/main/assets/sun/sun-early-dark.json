@@ -1,0 +1,94 @@
+{
+  "id": "sun-early-dark",
+  "title": "Dark early",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "sed1",
+      "text": "Dark by {sunset}. The evening is for:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "A walk before it goes",
+        "Giving up and getting cozy"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sed2",
+      "text": "What gets me through evenings that start this early?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "time",
+        "words"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "sed3",
+      "text": "The coziest way to spend a long dark evening?",
+      "type": "PICK_ONE",
+      "options": [
+        "A bath",
+        "Cooking something slow",
+        "A long game",
+        "Bed by eight"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "time"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sed4",
+      "text": "What is one small thing we could do to make these dark evenings better?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "home",
+        "planning"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sed5",
+      "text": "How much do early sunsets change my mood?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "A lot",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sed6",
+      "text": "Pick what I would want on an evening dark by {sunset}.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A fire or candles",
+        "Something warm to drink",
+        "A show we both like",
+        "Blankets",
+        "You, nearby"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "home",
+        "touch"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

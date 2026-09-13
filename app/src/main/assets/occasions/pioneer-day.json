@@ -1,0 +1,55 @@
+{
+  "id": "pioneer-day",
+  "title": "Pioneer Day",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "opn1",
+      "text": "What would I have packed if we were heading west in a wagon?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "opn2",
+      "text": "Fireworks tonight: up close or from the porch?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful",
+      "options": [
+        "Up close",
+        "From the porch"
+      ]
+    },
+    {
+      "id": "opn3",
+      "text": "Which ancestor or family story do I think about most?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "family",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "opn4",
+      "text": "What is something the two of us started from nothing?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past",
+        "home"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

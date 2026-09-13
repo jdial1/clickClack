@@ -1,0 +1,86 @@
+{
+  "id": "sun-longest",
+  "title": "Longest day",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "sln1",
+      "text": "The longest day of the year, sunset at {sunset}. We should:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Stay out until it is gone",
+        "Go to bed like it is any other day"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "sln2",
+      "text": "What should we do with all this light tonight?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "time",
+        "planning"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sln3",
+      "text": "What is my favorite way to spend a long summer evening?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "sln4",
+      "text": "The best place to watch the sun go down at {sunset}?",
+      "type": "PICK_ONE",
+      "options": [
+        "The porch",
+        "A hill or a roof",
+        "The water",
+        "The car, windows down"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "sln5",
+      "text": "How much do I love these long light evenings?",
+      "type": "SCALE",
+      "lowLabel": "Too bright to sleep",
+      "highLabel": "Best time of year",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sln6",
+      "text": "{daylight} of daylight today. What is one thing worth spending it on this summer?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "time"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

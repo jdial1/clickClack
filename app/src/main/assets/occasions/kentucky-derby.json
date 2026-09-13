@@ -1,0 +1,60 @@
+{
+  "id": "kentucky-derby",
+  "title": "Kentucky Derby Day",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "okd1",
+      "text": "Derby day: which of us would wear the bigger hat?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "okd2",
+      "text": "How would I pick a horse to bet on?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports"
+      ],
+      "category": "Playful",
+      "options": [
+        "The name",
+        "The odds",
+        "The color of the silks",
+        "Whatever you pick"
+      ]
+    },
+    {
+      "id": "okd3",
+      "text": "What is my honest opinion of a mint julep?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "okd4",
+      "text": "What would the perfect Derby party at our place look like?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "planning"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

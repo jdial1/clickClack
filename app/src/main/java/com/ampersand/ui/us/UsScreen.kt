@@ -1155,7 +1155,7 @@ private fun DatesSection(
         Spacer(Modifier.height(10.dp))
     }
 
-    Occasion.next(state.today.date.plusDays(1), state.anniversary)?.let { (occasion, day) ->
+    Occasion.next(state.today.date.plusDays(1), state.anniversary, state.homeState)?.let { (occasion, day) ->
         Text(
             "Next day with its own question: ${occasion.label}, ${day.format(ShortDay)}.",
             style = MaterialTheme.typography.bodySmall,

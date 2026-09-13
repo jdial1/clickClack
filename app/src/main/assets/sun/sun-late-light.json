@@ -1,0 +1,95 @@
+{
+  "id": "sun-late-light",
+  "title": "Light late",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "sll1",
+      "text": "Light until {sunset} tonight. After dinner:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Back outside",
+        "Couch, light or no light"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sll2",
+      "text": "What would I do with an extra hour of light tonight?",
+      "type": "PICK_ONE",
+      "options": [
+        "Walk somewhere",
+        "Sit outside",
+        "Work in the yard",
+        "Nothing different, honestly"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "sll3",
+      "text": "What is my favorite thing to do on a summer night after work?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "time",
+        "work"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "sll4",
+      "text": "Where would you want to watch the sun go down at {sunset}, if we went tonight?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "time",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "sll5",
+      "text": "How late do I like to stay out when it is still light?",
+      "type": "SCALE",
+      "lowLabel": "Home by dark",
+      "highLabel": "As long as it lasts",
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "sll6",
+      "text": "The best food for an evening that stays light?",
+      "type": "DROPDOWN",
+      "options": [
+        "Something grilled",
+        "Ice cream",
+        "A picnic",
+        "Takeout on the porch",
+        "Whatever is cold",
+        "Corn on the cob"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Food"
+    }
+  ]
+}

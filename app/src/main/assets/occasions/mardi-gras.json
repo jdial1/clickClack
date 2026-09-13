@@ -1,0 +1,61 @@
+{
+  "id": "mardi-gras",
+  "title": "Mardi Gras",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "omg1",
+      "text": "Mardi Gras: out on the route, or somewhere far from the crowds?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "friends"
+      ],
+      "category": "Playful",
+      "options": [
+        "On the route",
+        "Far from the crowds"
+      ]
+    },
+    {
+      "id": "omg2",
+      "text": "What would I give up for Lent, if I had to pick today?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "omg3",
+      "text": "Which part of Mardi Gras would I miss most if we moved away?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "home"
+      ],
+      "category": "Playful",
+      "options": [
+        "King cake",
+        "The parades",
+        "The costumes",
+        "A day off"
+      ]
+    },
+    {
+      "id": "omg4",
+      "text": "What is a Mardi Gras memory, ours or from growing up, you still laugh about?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

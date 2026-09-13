@@ -1,0 +1,85 @@
+{
+  "id": "sun-shortest",
+  "title": "Shortest day",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "ssh1",
+      "text": "The shortest day of the year. Tonight is for:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Candles and staying in",
+        "Going out anyway"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "ssh2",
+      "text": "Only {daylight} of daylight today. What helps you most in the dark part of the year?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "time",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "ssh3",
+      "text": "What do I miss most about summer right now?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "time"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "ssh4",
+      "text": "The best part of a long winter night?",
+      "type": "PICK_ONE",
+      "options": [
+        "Sleeping in",
+        "Soup and a movie",
+        "Lights on the houses",
+        "Nothing, it is too dark"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "time"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "ssh5",
+      "text": "How much do the short days get to me?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "More than I say",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "ssh6",
+      "text": "From tomorrow the days get longer. What are you looking forward to as the light comes back?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "time"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

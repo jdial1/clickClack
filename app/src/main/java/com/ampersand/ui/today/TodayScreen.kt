@@ -145,10 +145,13 @@ fun TodayScreen(
 
         // The forecast both phones saved, in one plain line. Nothing when no
         // home ZIP is set or the weather service had nothing to say.
-        state.weather?.let { weather ->
+        listOfNotNull(
+            state.weather?.line,
+            state.daylight?.let { "Sunset ${it.sunsetText}" },
+        ).takeIf { it.isNotEmpty() }?.joinToString("  ·  ")?.let { line ->
             Spacer(Modifier.height(4.dp))
             Text(
-                weather.line,
+                line,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

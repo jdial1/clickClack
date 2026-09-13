@@ -1,0 +1,52 @@
+{
+  "id": "cesar-chavez",
+  "title": "Cesar Chavez Day",
+  "theme": "DEEP",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "occ1",
+      "text": "What cause would I march for?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "occ2",
+      "text": "Who is someone whose work feeds us that we never think to thank?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "occ3",
+      "text": "How much do I think about where our food comes from?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Food",
+      "lowLabel": "Hardly ever",
+      "highLabel": "All the time"
+    },
+    {
+      "id": "occ4",
+      "text": "What would we give a day to, if we gave one together?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "planning"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

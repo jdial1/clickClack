@@ -1,0 +1,62 @@
+{
+  "id": "lei-day",
+  "title": "Lei Day",
+  "theme": "ROMANTIC",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "old1",
+      "text": "Which flower would I pick for a lei made for you?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "gifts"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Plumeria",
+        "Pikake",
+        "Orchid",
+        "Ti leaf"
+      ]
+    },
+    {
+      "id": "old2",
+      "text": "What is a small gift I have made or chosen for you that meant the most?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "gifts",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "old3",
+      "text": "Beach at sunrise or beach at sunset?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "time",
+        "romance"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Sunrise",
+        "Sunset"
+      ]
+    },
+    {
+      "id": "old4",
+      "text": "What does aloha mean in how we treat each other?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "words",
+        "acts"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

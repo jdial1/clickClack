@@ -1,0 +1,57 @@
+{
+  "id": "patriots-day",
+  "title": "Patriots' Day",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "opd1",
+      "text": "Marathon Monday: cheering on the course, or a long lazy morning?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports"
+      ],
+      "category": "Playful",
+      "options": [
+        "Cheering on the course",
+        "A long lazy morning"
+      ]
+    },
+    {
+      "id": "opd2",
+      "text": "What is the hardest thing I have ever pushed myself to finish?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "opd3",
+      "text": "Would I ever run a marathon?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Never",
+      "highLabel": "Already training"
+    },
+    {
+      "id": "opd4",
+      "text": "What would you want to do together on a day off in April?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "time",
+        "planning"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

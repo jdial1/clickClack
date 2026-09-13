@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.Sun
 import com.ampersand.model.League
 import com.ampersand.model.Teams
 import com.ampersand.model.forPlace
@@ -330,7 +331,7 @@ class FirestoreCoupleRepository(
         val homeZip = coupleDoc?.getString("homeZip")
         val place = homeZip?.let { pool.places.lookup(it) }
         history = historyDocs
-            .mapNotNull { it.toDayEntry(pool) { id -> resolveQuestion(id)?.forPlace(place) } }
+            .mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
             .filter { it.date != today }
             .sortedByDescending { it.date }
 
@@ -380,16 +381,19 @@ class FirestoreCoupleRepository(
         val hidden = hiddenByUid.values.flatten().toSet()
         val interestsByUid = coupleDoc.topicsByUid("interests")
         val weather = todayDoc.toWeather()
+        val daylight = place?.let { Sun.daylight(today, it.lat, it.lon) }
+        val sunKind = daylight?.let { Sun.kind(today, it) }
+        val leagues = place?.let { Teams.activeLeagues(it, today) }.orEmpty()
         maybeFetchWeather(place, weather)
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, sunKind = sunKind, leagues = leagues)
             // A question one of you wrote outranks one a stranger wrote.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region)
-        }.forPlace(place)
+            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, sunKind = sunKind, leagues = leagues)
+        }.forPlace(place, today)
 
         val todayEntry = DayEntry(
             date = today,
@@ -433,6 +437,8 @@ class FirestoreCoupleRepository(
             interests = interestsByUid.values.flatten().toSet(),
             homeZip = homeZip,
             region = place?.region,
+            homeState = place?.state,
+            daylight = daylight,
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
@@ -955,13 +961,13 @@ class FirestoreCoupleRepository(
     }
 
     /** A pool question, or one of you wrote it. */
-    private fun resolveQuestion(id: String?): Question? = when {
+    private fun resolveQuestion(id: String?, date: LocalDate = today): Question? = when {
         id == null -> null
         Wildcard.isWildcard(id) ->
             allWildcards.firstOrNull { it.id == Wildcard.idOf(id) }?.asQuestion()
         // Team questions are filled in wherever a question is looked up, so a
         // past day opened on the reveal names the teams too.
-        else -> pool.question(id)?.forPlace(coupleDoc?.getString("homeZip")?.let { pool.places.lookup(it) })
+        else -> pool.question(id)?.forPlace(coupleDoc?.getString("homeZip")?.let { pool.places.lookup(it) }, date)
     }
 
     override fun setProfile(gender: String?, birthday: LocalDate?) {
@@ -1317,12 +1323,12 @@ private fun DocumentSnapshot.toAnswer(): Answer? {
     return Answer(uid = id, values = values, guess = guess)
 }
 
-private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?) -> Question?): DayEntry? {
+private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?, LocalDate) -> Question?): DayEntry? {
     val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
     // A day document can exist with nobody having answered: the forecast is
     // saved on it first thing. That is not a day anyone played.
     if (getString("questionId") == null && getBoolean("revealed") != true && toSubmitted().isEmpty()) return null
-    val question = resolve(getString("questionId")) ?: pool.daily(date)
+    val question = resolve(getString("questionId"), date) ?: pool.daily(date)
     // History carries no answers: they live in a subcollection that would need
     // a read each. The Shelf shows questions, dates and reactions, so this is
     // what it needs; the Reveal screen loads a single day in full.

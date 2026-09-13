@@ -1,0 +1,59 @@
+{
+  "id": "texas-independence",
+  "title": "Texas Independence Day",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "otx1",
+      "text": "What is the most Texan thing about me, honestly?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "otx2",
+      "text": "Which Texas city would I pick for a weekend away?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "category": "Travel",
+      "options": [
+        "Austin",
+        "San Antonio",
+        "Fort Worth",
+        "Galveston"
+      ]
+    },
+    {
+      "id": "otx3",
+      "text": "Brisket or Tex-Mex, if it had to be one forever?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food",
+      "options": [
+        "Brisket",
+        "Tex-Mex"
+      ]
+    },
+    {
+      "id": "otx4",
+      "text": "What would you want someone new to Texas to understand about living here?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}
