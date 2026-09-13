@@ -22,7 +22,7 @@
     {
       "id": "cf2",
       "type": "SCALE",
-      "text": "How much do I feel we are building a secure future?",
+      "text": "How sure do I feel that we are building a safe future together?",
       "depth": 2,
       "lowLabel": "Not yet",
       "highLabel": "Very much",
@@ -50,7 +50,7 @@
     {
       "id": "cf4",
       "type": "SCALE",
-      "text": "How much does the way we handle money let me enjoy life?",
+      "text": "How much does the way we handle money leave room for me to enjoy life?",
       "depth": 2,
       "lowLabel": "Not much",
       "highLabel": "A lot",
@@ -94,7 +94,7 @@
     {
       "id": "cf7",
       "type": "THIS_OR_THAT",
-      "text": "A gift for a friend's wedding is:",
+      "text": "Buying a gift for a friend's wedding is:",
       "depth": 1,
       "options": [
         "Easy to fit in",
@@ -115,7 +115,7 @@
       "options": [
         "Plenty left over",
         "A little left over",
-        "About nothing left",
+        "Just about nothing left",
         "Less than we need"
       ],
       "category": "Future",
@@ -128,7 +128,7 @@
     {
       "id": "cf9",
       "type": "SCALE",
-      "text": "How on top of our finances do I feel?",
+      "text": "How on top of our money do I feel?",
       "depth": 2,
       "lowLabel": "Behind",
       "highLabel": "On top of it",
@@ -142,7 +142,7 @@
     {
       "id": "cf10",
       "type": "SCALE",
-      "text": "How much does money set the pace of my life?",
+      "text": "How much does money run my life?",
       "depth": 2,
       "lowLabel": "Not at all",
       "highLabel": "Completely",

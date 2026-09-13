@@ -29,7 +29,7 @@
     },
     {
       "id": "ioorganizeg0",
-      "text": "What system of mine would I recommend to everyone?",
+      "text": "What way of keeping things organized would I tell everyone to copy?",
       "type": "GUESS_ME",
       "category": "Future",
       "depth": 1,
@@ -67,7 +67,7 @@
     },
     {
       "id": "iohelpf0",
-      "text": "What kind of help feels most meaningful for you to give?",
+      "text": "What kind of helping out makes you feel best?",
       "type": "REFLECT",
       "category": "Future",
       "depth": 2,
@@ -160,7 +160,7 @@
     },
     {
       "id": "iodaref0",
-      "text": "What is the most physically challenging thing you want to try?",
+      "text": "What is the toughest physical challenge you want to try?",
       "type": "REFLECT",
       "category": "Travel",
       "depth": 1,

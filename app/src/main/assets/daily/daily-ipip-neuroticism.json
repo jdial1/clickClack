@@ -40,7 +40,7 @@
     },
     {
       "id": "ipn2f",
-      "text": "When you are irritated, what do you want the other person to do?",
+      "text": "When you are annoyed, what do you want me to do?",
       "type": "REFLECT",
       "category": "Deep",
       "depth": 2,
@@ -63,7 +63,7 @@
     },
     {
       "id": "ipn3f",
-      "text": "What is something that reliably lifts you out of a gray mood?",
+      "text": "What always cheers you up when you are feeling down?",
       "type": "REFLECT",
       "category": "Deep",
       "depth": 3,
@@ -99,7 +99,7 @@
     },
     {
       "id": "ipn5g",
-      "text": "What is the one thing I can never resist, however full I am?",
+      "text": "What is the one treat I can never say no to, even when I am full?",
       "type": "GUESS_ME",
       "category": "Food",
       "depth": 1,

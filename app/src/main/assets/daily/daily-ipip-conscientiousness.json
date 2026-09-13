@@ -7,7 +7,7 @@
   "questions": [
     {
       "id": "ipc1g",
-      "text": "What is the thing I am most confident I can handle?",
+      "text": "What do I feel sure I can handle, no matter what?",
       "type": "GUESS_ME",
       "category": "Future",
       "depth": 1,
@@ -67,7 +67,7 @@
     },
     {
       "id": "ipc3f",
-      "text": "What promise are you proudest of having kept?",
+      "text": "What promise are you proudest you kept?",
       "type": "REFLECT",
       "category": "Everyday",
       "depth": 2,
@@ -91,7 +91,7 @@
     },
     {
       "id": "ipc4f",
-      "text": "What does doing enough look like to you, at work and at home?",
+      "text": "What does a good enough day look like to you, at work and at home?",
       "type": "REFLECT",
       "category": "Future",
       "depth": 2,
