@@ -1,5 +1,8 @@
 package com.ampersand.ui.quiz
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
+import com.ampersand.ui.components.ThemeIcon
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Row
 import com.ampersand.ui.brick.structureSlug
@@ -14,8 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +29,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ampersand.model.BrickHeight
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DeckState
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizTheme
-import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.feel.Feel
@@ -42,7 +41,6 @@ import com.ampersand.ui.feel.play
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
-import com.ampersand.ui.theme.Stud
 
 /** Decks tab: shape tomorrow, the longer tests, then every deck with your-turn decks first. Results are on Us. */
 @Composable
@@ -86,34 +84,42 @@ fun DecksScreen(
         Spacer(Modifier.height(28.dp))
         SectionLabel("Themes")
         Spacer(Modifier.height(10.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(deckThemes, key = { it.name }) { t ->
-                val on = theme == t
-                val inTheme = decks.filter { it.theme == t }
-                val waiting = inTheme.count { state.deckState(it.id) == DeckState.WAITING_ON_YOU }
-                BrickPill(
-                    slug = t.brick.slug,
-                    studSize = Stud.chip,
-                    height = BrickHeight.HIGH,
-                    alpha = if (theme == null || on) 1f else 0.5f,
-                    modifier = Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
+        // Three across. Grey cards; only the icon brick carries the theme colour.
+        deckThemes.chunked(3).forEach { rowThemes ->
+            Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                rowThemes.forEach { t ->
+                    val on = theme == t
+                    val inTheme = decks.filter { it.theme == t }
+                    val waiting = inTheme.count { state.deckState(it.id) == DeckState.WAITING_ON_YOU }
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = if (on) 2.2f else 1.4f)
+                            .then(if (on) Modifier.border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(12.dp)) else Modifier)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                            ) {
+                                sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+                                feel.play(if (on) Feel.DESELECT else Feel.SELECT)
+                                theme = if (on) null else t
+                            }
+                            .padding(horizontal = 6.dp, vertical = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
-                        feel.play(if (on) Feel.DESELECT else Feel.SELECT)
-                        theme = if (on) null else t
-                    },
-                ) {
-                    Column(Modifier.padding(horizontal = 14.dp, vertical = 8.dp)) {
-                        Text(t.label, style = MaterialTheme.typography.titleSmall, color = inkOnBrick(t.brick.slug))
+                        ThemeIcon(t, size = 40.dp)
+                        Spacer(Modifier.height(6.dp))
+                        Text(t.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
                         Text(
-                            if (waiting > 0) "${inTheme.size} decks, $waiting for you" else "${inTheme.size} decks",
+                            if (waiting > 0) "${inTheme.size} · $waiting for you" else "${inTheme.size} decks",
                             style = MaterialTheme.typography.labelSmall,
-                            color = inkOnBrick(t.brick.slug),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
                         )
                     }
                 }
+                // Keep a short last row the same card width.
+                repeat(3 - rowThemes.size) { Spacer(Modifier.weight(1f)) }
             }
         }
 

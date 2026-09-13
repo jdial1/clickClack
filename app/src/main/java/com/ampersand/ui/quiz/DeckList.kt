@@ -1,5 +1,9 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.brick.glass
+import androidx.compose.ui.draw.alpha
+import com.ampersand.ui.components.ThemeIcon
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
@@ -37,9 +41,7 @@ import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.label
-import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.BrickPill
-import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
@@ -273,8 +275,7 @@ private fun DeckRow(
     state: CoupleState,
     onOpen: (String) -> Unit,
 ) {
-    val slug = deck.theme.brick.slug
-    val ink = inkOnBrick(slug)
+    val ink = MaterialTheme.colorScheme.onBackground
 
     val detail = when (group) {
         DeckState.WAITING_ON_YOU -> "${deck.size} questions  ·  ${state.them.name} is done"
@@ -283,24 +284,19 @@ private fun DeckRow(
         DeckState.NOT_STARTED -> "${deck.size} questions  ·  about ${deck.minutes} min"
     }
 
-    BrickSlab(
-        slugs = listOf(slug),
-        studs = 12,
-        height = BrickHeight.MEDIUM,
-        // Dimmed while waiting on them.
-        alpha = if (group == DeckState.WAITING_ON_THEM) 0.5f else 1f,
-        modifier = Modifier
+    // Grey card; the icon brick carries the theme colour. Dimmed while waiting on them.
+    Row(
+        Modifier
             .fillMaxWidth()
-            .clickable { onOpen(deck.id) },
+            .alpha(if (group == DeckState.WAITING_ON_THEM) 0.6f else 1f)
+            .glass(inkOnBrick(structureSlug()), corner = 14.dp, strength = 1.4f)
+            .clickable { onOpen(deck.id) }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 14.dp, end = 14.dp, top = 24.dp, bottom = 16.dp)
-                .glassOn(slug, corner = 14.dp)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        ThemeIcon(deck.theme, size = 44.dp)
+        Spacer(Modifier.width(12.dp))
+        run {
             Column(Modifier.weight(1f)) {
                 Text(
                     text = deck.title,

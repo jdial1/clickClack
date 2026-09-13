@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.ThemeIcon
 import com.ampersand.ui.components.UiIcon
 import com.ampersand.model.DayEntry
 import com.ampersand.ui.theme.LocalAppearance
@@ -235,14 +236,18 @@ private fun QuestionHero(
                 DepthDots(question.depth, tint = ink)
             }
             why?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = ink,
-                    modifier = Modifier
+                Row(
+                    Modifier
                         .glass(ink, corner = 10.dp, strength = 1.6f)
-                        .padding(horizontal = 10.dp, vertical = 4.dp),
-                )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    QuizTheme.entries.firstOrNull { t -> t.label == question.category }?.let { t ->
+                        ThemeIcon(t, size = 22.dp)
+                        Spacer(Modifier.width(6.dp))
+                    }
+                    Text(text = it, style = MaterialTheme.typography.labelMedium, color = ink)
+                }
             }
         }
 

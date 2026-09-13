@@ -73,3 +73,20 @@ fun IconAction(
         Text(label, style = MaterialTheme.typography.labelLarge, color = color)
     }
 }
+
+/** The theme's icon brick, in the theme's colour. Drawn by tools/ui/themes.py. */
+@Composable
+fun ThemeIcon(theme: com.ampersand.model.QuizTheme, modifier: Modifier = Modifier, size: Dp = 40.dp) {
+    val res = when (theme) {
+        com.ampersand.model.QuizTheme.KNOW_ME -> R.drawable.theme_know_me
+        com.ampersand.model.QuizTheme.EVERYDAY -> R.drawable.theme_everyday
+        com.ampersand.model.QuizTheme.FUTURE -> R.drawable.theme_future
+        com.ampersand.model.QuizTheme.PLAYFUL -> R.drawable.theme_playful
+        com.ampersand.model.QuizTheme.DEEP -> R.drawable.theme_deep
+        com.ampersand.model.QuizTheme.FOOD -> R.drawable.theme_food
+        com.ampersand.model.QuizTheme.TRAVEL -> R.drawable.theme_travel
+        com.ampersand.model.QuizTheme.ROMANTIC -> R.drawable.theme_romantic
+        com.ampersand.model.QuizTheme.SPICY -> R.drawable.theme_spicy
+    }
+    Image(painterResource(res), contentDescription = null, modifier = modifier.size(size))
+}
