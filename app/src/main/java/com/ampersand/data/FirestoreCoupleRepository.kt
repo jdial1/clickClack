@@ -112,7 +112,17 @@ class FirestoreCoupleRepository(
     private var todayDoc: DocumentSnapshot? = null
     private var todayAnswers: Map<String, Answer> = emptyMap()
     private var history: List<DayEntry> = emptyList()
+    private var historyDocs: List<DocumentSnapshot> = emptyList()
     private var plates: List<BuildPlate> = emptyList()
+
+    /**
+     * Whether the plates listener has answered yet.
+     *
+     * Until it has, an empty [plates] means "not arrived", and awarding or
+     * sealing against it laid bricks on a fresh plate that then shadowed the
+     * real week.
+     */
+    private var platesLoaded = false
     private var anniversary: LocalDate? = null
 
     /** Every wildcard either of you has written, used or not. */
@@ -170,10 +180,7 @@ class FirestoreCoupleRepository(
                     Log.w(TAG, "history listener failed", error)
                     return@addSnapshotListener
                 }
-                history = snap?.documents.orEmpty()
-                    .mapNotNull { it.toDayEntry(pool) }
-                    .filter { it.date != today }
-                    .sortedByDescending { it.date }
+                historyDocs = snap?.documents.orEmpty()
                 recompose()
             }
 
@@ -254,6 +261,7 @@ class FirestoreCoupleRepository(
                     return@addSnapshotListener
                 }
                 plates = snap?.documents.orEmpty().mapNotNull { it.toPlate() }
+                platesLoaded = true
                 recompose()
             }
     }
@@ -267,9 +275,44 @@ class FirestoreCoupleRepository(
     private fun recompose() {
         val current = _state.value
         val waiting = allWildcards.filter { it.usedOn == null }.sortedBy { it.createdAtMillis }
+        // Only a wildcard written before today can be today's question. One
+        // written this morning waits for tomorrow, as promised, instead of
+        // replacing the question while somebody is halfway through answering.
+        // A pending server timestamp reads as 0 and waits too.
+        val startOfToday = today.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val ready = waiting.filter { it.createdAtMillis in 1 until startOfToday }
+
+        // Mapped here rather than in the history listener, so a past wildcard
+        // day resolves once the wildcards arrive instead of showing whatever
+        // pool question happened to fall on that date.
+        history = historyDocs
+            .mapNotNull { it.toDayEntry(pool, ::resolveQuestion) }
+            .filter { it.date != today }
+            .sortedByDescending { it.date }
 
         val you = me.toMember(myUid, current.you)
         val partner = them.toMember(partnerUid, current.them)
+        val quizRuns = runs.values.flatMap { it.values }
+        val instrumentRuns = (instrumentResponses.keys + instrumentProgress.keys +
+            instrumentDrafts.keys).map { id ->
+            InstrumentRun(
+                instrumentId = id,
+                answers = instrumentResponses[id].orEmpty(),
+                progress = instrumentProgress[id].orEmpty(),
+                draft = instrumentDrafts[id].orEmpty(),
+            )
+        }
+        // What today's question is drawn from: everything that has arrived, not
+        // the previous state. Reading the previous state meant a history that
+        // landed last was ignored until some unrelated listener fired.
+        val basis = current.copy(
+            you = you,
+            them = partner,
+            history = history,
+            quizRuns = quizRuns,
+            instrumentRuns = instrumentRuns,
+            knowing = knowing,
+        )
 
         // Pinned first, always: whoever answered first decided what today is,
         // and re-deciding it on the second phone is how two people end up
@@ -281,16 +324,16 @@ class FirestoreCoupleRepository(
         // They can disagree for a moment if one has synced a sitting the other
         // has not -- and it self-corrects, because the first answer pins the
         // question and the pin outranks everything below.
-        val taste = Profiles.of(current)
-        val recent = recentlyAsked(current)
-        val picked = Turns.themeFor(today, current.history, myUid, partnerUid)
-        val milestone = Milestones.on(today, current.history) != null
+        val taste = Profiles.of(basis)
+        val recent = recentlyAsked(basis)
+        val picked = Turns.themeFor(today, history, myUid, partnerUid)
+        val milestone = Milestones.on(today, history) != null
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
             pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
             // A question one of you wrote outranks one a stranger wrote.
-            waiting.isNotEmpty() -> waiting.first().asQuestion()
+            ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
             else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
         }
@@ -312,36 +355,20 @@ class FirestoreCoupleRepository(
         // The period is over, so the sculpture is dated. Driven by the calendar
         // rather than by a button: a week ends whether or not anyone opened the
         // app that day.
-        if (live.isSealed.not() && live.placed.isNotEmpty() && live.endsOn() < today) {
+        if (platesLoaded && live.isSealed.not() && live.placed.isNotEmpty() && live.endsOn() < today) {
             sealPlate()
         }
 
-        val next = current.copy(
-            you = you,
-            them = partner,
+        val next = basis.copy(
             today = todayEntry,
-            history = history,
             plate = live,
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
-            quizRuns = runs.values.flatMap { it.values },
             anniversary = anniversary,
             streak = Streaks.run(history, todayEntry),
             // Only a capsule if today really is asking the old question again.
             // The ladder can find a day whose question the pin then overrode.
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
-            knowing = knowing,
-            // Every instrument anybody has touched, whether that was sealing
-            // it or answering four questions and putting the phone down.
-            instrumentRuns = (instrumentResponses.keys + instrumentProgress.keys +
-                instrumentDrafts.keys).map { id ->
-                InstrumentRun(
-                    instrumentId = id,
-                    answers = instrumentResponses[id].orEmpty(),
-                    progress = instrumentProgress[id].orEmpty(),
-                    draft = instrumentDrafts[id].orEmpty(),
-                )
-            },
         )
 
         // The assignment. Without it every listener in this class computed the
@@ -354,11 +381,13 @@ class FirestoreCoupleRepository(
         // a day or a deck opens when the *other* person submits -- which this
         // phone learns from a listener, not from anything it did.
         if (todayDoc?.getBoolean("revealed") == true) {
-            awardForToday()
+            if (platesLoaded) awardForToday()
             recordKnowing(todayEntry)
         }
-        awardForQuizzes(next)
-        awardForTalks(next)
+        if (platesLoaded) {
+            awardForQuizzes(next)
+            awardForTalks(next)
+        }
     }
 
     /**
@@ -626,8 +655,10 @@ class FirestoreCoupleRepository(
 
         // The run goes down with the seal, so a streak past the ten weeks of
         // history the phones load still has something to count from.
+        // Counted with today as open, which is what this write makes it. The
+        // state still holds the moment before, so it was always one short.
         val s = _state.value
-        val run = Streaks.run(s.history, s.today)
+        val run = Streaks.run(s.history, s.today.copy(opened = true))
         dayRef.set(mapOf("revealed" to true, "run" to run), SetOptions.merge())
             .addOnFailureListener { Log.d(TAG, "day not ready to open yet", it) }
     }
@@ -892,7 +923,12 @@ class FirestoreCoupleRepository(
         // Unplaced bricks carry over. They were earned by answering.
         val carried = plate.tray(myUid) + plate.tray(partnerUid)
         val next = emptyPlate(today).copy(blocks = carried)
-        couple.collection(PLATES).document().set(next.toMap())
+        // A fixed id, so two phones sealing the same week write one next plate
+        // instead of two that each carry the same bricks.
+        plateRef(next).set(
+            next.toMap() + ("blocks" to next.blocks.map { it.toMap() }),
+            SetOptions.merge(),
+        )
     }
 
     /**
@@ -1055,9 +1091,9 @@ private fun DocumentSnapshot.toAnswer(): Answer? {
     return Answer(uid = id, values = values, guess = guess)
 }
 
-private fun DocumentSnapshot.toDayEntry(pool: QuestionPool): DayEntry? {
+private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?) -> Question?): DayEntry? {
     val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
-    val question = pool.question(getString("questionId")) ?: pool.daily(date)
+    val question = resolve(getString("questionId")) ?: pool.daily(date)
     // History carries no answers: they live in a subcollection that would need
     // a read each. The Shelf shows questions, dates and reactions, so this is
     // what it needs; the Reveal screen loads a single day in full.
@@ -1151,6 +1187,9 @@ private fun BuildPlate.toMap(): Map<String, Any?> = mapOf(
     "periodDays" to periodDays,
     "gridW" to gridW,
     "gridH" to gridH,
-    "completedOn" to completedOn?.toString(),
+) + (
+    // Written only when set. A merge carrying completedOn: null from a stale
+    // copy of the plate un-sealed a week the other phone had just sealed.
+    completedOn?.let { mapOf("completedOn" to it.toString()) } ?: emptyMap()
 )
 
