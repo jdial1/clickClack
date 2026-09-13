@@ -1,0 +1,58 @@
+{
+  "id": "date-moved-in",
+  "title": "Moved in",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dmi1",
+      "text": "What did I find hardest about moving in together?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday",
+      "options": [
+        "Sharing space",
+        "Whose stuff stayed",
+        "New routines",
+        "Nothing, honestly"
+      ]
+    },
+    {
+      "id": "dmi2",
+      "text": "How much does this place feel like home to me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday",
+      "lowLabel": "Not yet",
+      "highLabel": "Completely"
+    },
+    {
+      "id": "dmi3",
+      "text": "What was the first thing I unpacked?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "home",
+        "past"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "dmi4",
+      "text": "What would you want the next place we live to have?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "home",
+        "future"
+      ],
+      "category": "Future"
+    }
+  ]
+}

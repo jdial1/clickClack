@@ -1,0 +1,57 @@
+{
+  "id": "date-pet",
+  "title": "Pet",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dpt1",
+      "text": "What is my favorite thing about our pet?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "home",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "The greetings",
+        "The cuddles",
+        "The weird habits",
+        "The chaos"
+      ]
+    },
+    {
+      "id": "dpt2",
+      "text": "How spoiled do I think our pet is?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Royalty"
+    },
+    {
+      "id": "dpt3",
+      "text": "What would our pet say about me if it could talk?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "dpt4",
+      "text": "What has having a pet together changed about us?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

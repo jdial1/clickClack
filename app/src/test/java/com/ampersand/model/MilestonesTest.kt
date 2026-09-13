@@ -85,15 +85,4 @@ class MilestonesTest {
         ),
     )
 
-    @Test
-    fun `a milestone asks a deep one even on a weekday`() {
-        assertEquals(3, pool.daily(today, deeper = true).depth.level)
-        assertTrue(pool.daily(today).depth.level <= 2)
-    }
-
-    @Test
-    fun `when the deep ones were all asked lately it falls back to an ordinary day`() {
-        val recent = setOf("deep1", "deep2", "deep3")
-        assertTrue(pool.daily(today, recent = recent, deeper = true).depth.level <= 2)
-    }
 }

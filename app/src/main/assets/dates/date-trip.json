@@ -1,0 +1,58 @@
+{
+  "id": "date-trip",
+  "title": "Trip",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dtr1",
+      "text": "What do I remember most from that trip?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "planning"
+      ],
+      "category": "Travel",
+      "options": [
+        "The food",
+        "The views",
+        "Something that went wrong",
+        "Time with you"
+      ]
+    },
+    {
+      "id": "dtr2",
+      "text": "How much would I want to go back?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Travel",
+      "lowLabel": "Once was enough",
+      "highLabel": "Tomorrow"
+    },
+    {
+      "id": "dtr3",
+      "text": "What is the one thing I would bring home from there?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "dtr4",
+      "text": "Where should the next trip like that one be?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "future"
+      ],
+      "category": "Travel"
+    }
+  ]
+}

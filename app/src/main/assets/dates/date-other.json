@@ -1,0 +1,56 @@
+{
+  "id": "date-other",
+  "title": "Special day",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dot1",
+      "text": "What do I remember first when I think of this day?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Everyday",
+      "options": [
+        "Where we were",
+        "How I felt",
+        "Who was there",
+        "What happened after"
+      ]
+    },
+    {
+      "id": "dot2",
+      "text": "How much does this day still matter to me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Everyday",
+      "lowLabel": "A little",
+      "highLabel": "A lot"
+    },
+    {
+      "id": "dot3",
+      "text": "What would I want to do to mark this day?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "dot4",
+      "text": "What does this day remind you about us?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

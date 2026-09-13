@@ -287,7 +287,8 @@ data class CoupleState(
     /** The home ZIP's state, for holidays that belong to a place. */
     val homeState: String? = null,
     /** Sunrise and sunset at home today. */
-    val daylight: Daylight? = null,
+    /** Why today's question was chosen, for the tag on its card: "Weather", "First date", "Family". */
+    val why: String? = null,
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */
     val weather: DayWeather? = null,
     /**

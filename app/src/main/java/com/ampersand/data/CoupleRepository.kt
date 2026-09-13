@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.DateKind
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import com.ampersand.model.League
@@ -84,7 +85,7 @@ interface CoupleRepository {
      */
     fun setHomeZip(zip: String): Boolean
 
-    fun addSpecialDate(label: String, date: LocalDate)
+    fun addSpecialDate(label: String, date: LocalDate, kind: DateKind)
 
     fun removeSpecialDate(id: String)
 
@@ -420,8 +421,8 @@ class FakeCoupleRepository(
         return true
     }
 
-    override fun addSpecialDate(label: String, date: LocalDate) = mutate {
-        it.copy(specialDates = it.specialDates + SpecialDate("sd${it.specialDates.size + 1}", label, date))
+    override fun addSpecialDate(label: String, date: LocalDate, kind: DateKind) = mutate {
+        it.copy(specialDates = it.specialDates + SpecialDate("sd${it.specialDates.size + 1}", label, date, kind))
     }
 
     override fun removeSpecialDate(id: String) = mutate {

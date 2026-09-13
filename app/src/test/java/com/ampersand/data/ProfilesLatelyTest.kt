@@ -66,42 +66,10 @@ class ProfilesLatelyTest {
         assertTrue(taste.reasons.single().contains("food"))
     }
 
-    /** A fortnight of what is alive should outweigh a questionnaire from March. */
-    @Test
-    fun `the week weighs more than a single profile rule`() {
-        val taste = Profiles.of(state(listOf(past(1, "Travel", talked = true))))
-        assertTrue((taste.themes["Travel"] ?: 1) > 2)
-    }
-
-    @Test
-    fun `say more tonight goes a little deeper`() {
-        val taste = Profiles.of(state(listOf(past(3, reaction = Reaction.CURIOUS))))
-        assertEquals(2, taste.themes["Deep"])
-        assertTrue(taste.reasons.single().contains("say more tonight"))
-    }
-
-    @Test
-    fun `other reactions do not count as asking for more`() {
-        val taste = Profiles.of(state(listOf(past(3, reaction = Reaction.LOVE))))
-        assertFalse(taste.themes.containsKey("Deep"))
-    }
-
     @Test
     fun `lately means the last fortnight`() {
         val taste = Profiles.of(state(listOf(past(20, "Food", talked = true, reaction = Reaction.CURIOUS))))
         assertTrue(taste.isEmpty)
-    }
-
-    /** Keep missing each other and the pool offers easier calls, not more misses. */
-    @Test
-    fun `missing each other leans toward either-or days`() {
-        val base = state(emptyList())
-        val struggling = base.copy(
-            knowing = Knowing(listOf(KnowingMonth(YearMonth.from(today), youHits = 2, theyHits = 2, scored = 12))),
-        )
-        val taste = Profiles.of(struggling)
-        assertEquals(setOf(QuestionType.THIS_OR_THAT), taste.types)
-        assertFalse(QuestionType.GUESS_ME in taste.types)
     }
 
     @Test

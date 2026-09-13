@@ -1,0 +1,58 @@
+{
+  "id": "date-wedding",
+  "title": "Wedding",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dwd1",
+      "text": "Which moment from our wedding day would I relive?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Getting ready",
+        "The vows",
+        "The first dance",
+        "The end of the night"
+      ]
+    },
+    {
+      "id": "dwd2",
+      "text": "How much of the day do I actually remember?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Romantic",
+      "lowLabel": "A blur",
+      "highLabel": "Every minute"
+    },
+    {
+      "id": "dwd3",
+      "text": "What is my favorite photo from that day?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "dwd4",
+      "text": "Which promise from that day feels most true now?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "future",
+        "romance"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

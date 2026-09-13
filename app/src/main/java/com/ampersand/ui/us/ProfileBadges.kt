@@ -80,23 +80,13 @@ fun ProfileBadges(
         BadgeWall.groups(state.instrumentRuns, state.you, state.them)
     }
     var open by remember { mutableStateOf<String?>(null) }
-    // Collapsed to start. Three explanations at three lines each is most of a
-    // screen of prose above the only thing anybody came to look at, and the
-    // wall stops reading as a wall.
-    var explaining by remember { mutableStateOf<String?>(null) }
 
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
 
     Column(modifier.fillMaxWidth()) {
         SectionLabel("Profiles")
-        Spacer(Modifier.height(6.dp))
-        Text(
-            "Sat down together, answered whole, kept.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
 
         groups.forEachIndexed { i, group ->
             if (i > 0) Spacer(Modifier.height(30.dp))
@@ -105,11 +95,6 @@ fun ProfileBadges(
                 you = you,
                 them = them,
                 openSlot = open,
-                explaining = explaining == group.instrumentId,
-                onExplain = {
-                    explaining =
-                        if (explaining == group.instrumentId) null else group.instrumentId
-                },
                 onTake = onTake,
                 onTap = { badge ->
                     if (badge.isEarned) open = if (open == badge.slotId) null else badge.slotId
@@ -117,67 +102,6 @@ fun ProfileBadges(
             )
         }
 
-        Spacer(Modifier.height(18.dp))
-        WhatItDoes(state)
-    }
-}
-
-/**
- * What taking these actually changes, said plainly.
- *
- * Two states and they are the same sentence at different times. Before: here is
- * what finishing them would do. After: here is what they are doing, in your own
- * names, one line per rule that fired.
- *
- * Saying it is not politeness. An app that quietly steers what it asks you
- * based on a questionnaire somebody filled in months ago is doing something
- * people are right to be wary of; the only difference between that and a good
- * feature is that the arithmetic is out loud and you can see which sentence
- * caused which.
- */
-@Composable
-private fun WhatItDoes(state: CoupleState) {
-    val taste = remember(state.instrumentRuns, state.knowing, state.you, state.them) {
-        Profiles.of(state)
-    }
-
-    if (taste.reasons.isEmpty()) {
-        QuietNote(
-            "Nothing fills until you have both finished. Once they do, the daily " +
-                "question starts leaning toward what they found.",
-        )
-        return
-    }
-
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
-            .padding(horizontal = 14.dp, vertical = 13.dp),
-    ) {
-        Text(
-            "What this is doing",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        taste.reasons.forEach { reason ->
-            Spacer(Modifier.height(8.dp))
-            Text(
-                reason,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        Text(
-            // The promise that keeps this a tilt rather than a filter, which is
-            // also true of the code: every question survives tier one.
-            "Nothing is ever taken out of the pool -- these only change how often " +
-                "things come up.",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 
@@ -195,8 +119,6 @@ private fun WallGroup(
     you: BrickColor,
     them: BrickColor,
     openSlot: String?,
-    explaining: Boolean,
-    onExplain: () -> Unit,
     onTap: (Badge) -> Unit,
     onTake: (String) -> Unit,
 ) {
@@ -205,46 +127,34 @@ private fun WallGroup(
     val interaction = remember { MutableInteractionSource() }
 
     Column(Modifier.fillMaxWidth()) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .clickable(interactionSource = interaction, indication = null) {
-                    sounds.play(Sfx.NAV)
-                    feel.play(Feel.NAV)
-                    onExplain()
-                }
-                .onWall(corner = 12.dp),
+        Row(
+            Modifier.fillMaxWidth().onWall(corner = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Text(
+                group.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            // Retake once your half is in; before that, how long it takes.
+            if (!group.yourTurn) {
                 Text(
-                    group.title,
-                    style = MaterialTheme.typography.titleMedium,
+                    "Retake",
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onBackground,
-                )
-                Text(
-                    text = when {
-                        // Status earns the slot over "what is this": once a
-                        // test is done, how long it took stops being useful.
-                        group.isEarned -> if (explaining) "Done" else "Done · What is this?"
-                        else -> "${group.minutes} min · What is this?"
+                    modifier = Modifier.clickable(interactionSource = interaction, indication = null) {
+                        sounds.play(Sfx.PRESS)
+                        feel.play(Feel.PRESS)
+                        onTake(group.instrumentId)
                     },
+                )
+            } else if (!group.isEarned) {
+                Text(
+                    "${group.minutes} min",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            }
-            AnimatedVisibility(visible = explaining) {
-                Column {
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        group.about,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
             }
         }
 
@@ -271,23 +181,6 @@ private fun WallGroup(
             TakeIt(group = group, onTake = onTake)
         }
 
-        // Once your half is in, you can always sit it again. Answers drift,
-        // and a result from a bad week should not be the one that sticks.
-        if (!group.yourTurn) {
-            Spacer(Modifier.height(10.dp))
-            Text(
-                "Take it again",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier
-                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                        sounds.play(Sfx.PRESS)
-                        feel.play(Feel.PRESS)
-                        onTake(group.instrumentId)
-                    }
-                    .onWall(corner = 12.dp),
-            )
-        }
     }
 }
 
@@ -416,14 +309,6 @@ private fun WallRow(
                             modifier = Modifier.weight(1f),
                         )
                     }
-                }
-                Sources[Instruments[earned.firstOrNull()?.instrumentId]?.sourceId]?.let { source ->
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        "${source.credit} · ${source.licence}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-                    )
                 }
             }
         }
@@ -579,14 +464,6 @@ private fun Detail(badge: Badge, color: BrickColor, modifier: Modifier = Modifie
             }
         }
 
-        badge.note?.let {
-            Spacer(Modifier.height(10.dp))
-            Text(
-                it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
     }
 }
 

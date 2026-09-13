@@ -36,11 +36,25 @@ enum class Topic(val label: String, val detail: String, val theme: String? = nul
         (theme != null && question.category == theme) || (tag != null && tag in question.tags)
 }
 
+/** What kind of day a special date is. Each has its own few questions for the day itself. */
+enum class DateKind(val id: String, val label: String) {
+    FIRST_DATE("first-date", "First date"),
+    ENGAGEMENT("engagement", "Engagement"),
+    WEDDING("wedding", "Wedding"),
+    MOVED_IN("moved-in", "Moved in"),
+    BIRTHDAY("birthday", "Birthday"),
+    PET("pet", "Pet"),
+    TRIP("trip", "Trip"),
+    REMEMBERING("remembering", "Remembering someone"),
+    OTHER("other", "Something else"),
+}
+
 /** A date worth a countdown: a birthday, a first date, the day you moved in. */
 data class SpecialDate(
     val id: String,
     val label: String,
     val date: LocalDate,
+    val kind: DateKind = DateKind.OTHER,
 )
 
 /** One line on the Us screen's dates: what, when it next comes round, and since when. */
@@ -59,6 +73,22 @@ object Dates {
      * Every yearly date the two of you have, soonest first: the day you started,
      * your wedding, both birthdays and anything you added.
      */
+    /**
+     * The kinds of date that fall on [today]: added dates, both birthdays and
+     * the wedding. The first one gets the day's question.
+     */
+    fun kindsOn(
+        today: LocalDate,
+        added: List<SpecialDate>,
+        birthdays: List<LocalDate?>,
+        marriedOn: LocalDate?,
+    ): List<DateKind> {
+        fun on(d: LocalDate?) = d != null && MonthDay.from(d) == MonthDay.from(today)
+        return added.filter { on(it.date) }.map { it.kind } +
+            listOfNotNull(DateKind.WEDDING.takeIf { on(marriedOn) }) +
+            birthdays.filter(::on).map { DateKind.BIRTHDAY }
+    }
+
     fun upcoming(state: CoupleState): List<UpcomingDate> {
         val today = state.today.date
         val entries = buildList {

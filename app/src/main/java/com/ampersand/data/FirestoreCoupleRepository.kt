@@ -1,5 +1,7 @@
 package com.ampersand.data
 
+import com.ampersand.model.Dates
+import com.ampersand.model.DateKind
 import com.google.firebase.firestore.DocumentReference
 import android.os.Looper
 import android.os.Handler
@@ -182,7 +184,7 @@ class FirestoreCoupleRepository(
                 val label = doc.getString("label")?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
                 val date = doc.getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
                     ?: return@mapNotNull null
-                SpecialDate(doc.id, label, date)
+                SpecialDate(doc.id, label, date, DateKind.entries.firstOrNull { it.name == doc.getString("kind") } ?: DateKind.OTHER)
             }
             recompose()
         }
@@ -382,7 +384,6 @@ class FirestoreCoupleRepository(
         val taste = Profiles.of(basis)
         val recent = recentlyAsked(basis)
         val picked = Turns.themeFor(today, history, myUid, partnerUid)
-        val milestone = Milestones.on(today, history) != null
         val hiddenByUid = coupleDoc.topicsByUid("hiddenTopics")
         val interestsByUid = coupleDoc.topicsByUid("interests")
         val followingByUid = coupleDoc.leaguesByUid()
@@ -391,18 +392,18 @@ class FirestoreCoupleRepository(
         val hidden = hiddenByUid.values.flatten().toSet() +
             (if (Following.hideSports(following, interests)) setOf(Topic.SPORTS) else emptySet())
         val weather = todayDoc.toWeather()
-        val daylight = place?.let { Sun.daylight(today, it.lat, it.lon) }
-        val sunKind = daylight?.let { Sun.kind(today, it) }
+        val dateKinds = Dates.kindsOn(today, specialDates, listOf(you.birthday, partner.birthday), coupleDoc?.getString("marriedOn")
+            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() })
         val leagues = Following.leagues(place?.let { Teams.activeLeagues(it, today) }.orEmpty(), following)
         maybeFetchWeather(place, weather)
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, sunKind = sunKind, leagues = leagues)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
             // A question one of you wrote outranks one a stranger wrote.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, sunKind = sunKind, leagues = leagues)
+            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
         }.forPlace(place, today)
 
         val todayEntry = DayEntry(
@@ -451,7 +452,7 @@ class FirestoreCoupleRepository(
             homeZip = homeZip,
             region = place?.region,
             homeState = place?.state,
-            daylight = daylight,
+            why = pool.why(question, today, anniversary, place?.state, dateKinds, interests),
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
@@ -1091,8 +1092,8 @@ class FirestoreCoupleRepository(
         }.start()
     }
 
-    override fun addSpecialDate(label: String, date: LocalDate) {
-        couple.collection(DATES).add(mapOf("label" to label, "date" to date.toString(), "byUid" to myUid))
+    override fun addSpecialDate(label: String, date: LocalDate, kind: DateKind) {
+        couple.collection(DATES).add(mapOf("label" to label, "date" to date.toString(), "kind" to kind.name, "byUid" to myUid))
     }
 
     override fun removeSpecialDate(id: String) {

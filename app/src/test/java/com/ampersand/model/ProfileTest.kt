@@ -55,4 +55,21 @@ class ProfileTest {
             assertEquals("plain", pool.daily(today.plusDays(n), hidden = setOf(Topic.MONEY)).id)
         }
     }
+
+    @Test
+    fun `a date that falls today brings its own question and names it`() {
+        val today = java.time.LocalDate.of(2026, 9, 13)
+        val first = SpecialDate("a", "First date", java.time.LocalDate.of(2019, 9, 13), DateKind.FIRST_DATE)
+        val kinds = Dates.kindsOn(today, listOf(first), listOf(null), null)
+        assertEquals(listOf(DateKind.FIRST_DATE), kinds)
+        val special = Question("dfd1", "?", QuestionType.REFLECT, "Romantic", Depth(1))
+        val pool = com.ampersand.data.QuestionPool(
+            decks = listOf(Quiz("d", "d", "", QuizTheme.EVERYDAY, listOf(Question("q", "?", QuestionType.REFLECT, "Everyday", Depth(1))))),
+            dates = mapOf(DateKind.FIRST_DATE to listOf(special)),
+        )
+        val q = pool.daily(today, dateKinds = kinds)
+        assertEquals("dfd1", q.id)
+        assertEquals("First date", pool.why(q, today, null, null, kinds, emptySet()))
+        assertEquals(emptyList<DateKind>(), Dates.kindsOn(today.plusDays(1), listOf(first), listOf(null), null))
+    }
 }

@@ -1,0 +1,59 @@
+{
+  "id": "date-first-date",
+  "title": "First date",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dfd1",
+      "text": "What do I remember best about our first date?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic",
+      "options": [
+        "What you wore",
+        "What we talked about",
+        "Where we went",
+        "How it ended"
+      ]
+    },
+    {
+      "id": "dfd2",
+      "text": "How nervous was I that day?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Romantic",
+      "lowLabel": "Not at all",
+      "highLabel": "Very"
+    },
+    {
+      "id": "dfd3",
+      "text": "What did I think of you by the end of that first date?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "dfd4",
+      "text": "If we redid our first date today, what would you keep and what would you change?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.model.DateKind
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.components.AmpCheckboxGroup
 import com.ampersand.model.label
@@ -102,7 +103,7 @@ fun UsScreen(
     onAddToBucket: (String, BucketGroup) -> Unit = { _, _ -> },
     onTickBucket: (String) -> Unit = {},
     onRemoveFromBucket: (String) -> Unit = {},
-    onAddSpecialDate: (String, java.time.LocalDate) -> Unit = { _, _ -> },
+    onAddSpecialDate: (String, java.time.LocalDate, DateKind) -> Unit = { _, _, _ -> },
     onRemoveSpecialDate: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -1155,7 +1156,7 @@ private fun ProfileRow(title: String, status: String, done: Boolean, open: Boole
 @Composable
 private fun DatesSection(
     state: CoupleState,
-    onAdd: (String, java.time.LocalDate) -> Unit,
+    onAdd: (String, java.time.LocalDate, DateKind) -> Unit,
     onRemove: (String) -> Unit,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -1202,13 +1203,26 @@ private fun DatesSection(
         return
     }
     var label by rememberSaveable { mutableStateOf("") }
+    var kind by rememberSaveable { mutableStateOf<DateKind?>(null) }
     var date by remember { mutableStateOf<java.time.LocalDate?>(null) }
-    AmpField(value = label, onValueChange = { label = it.take(60) }, color = you, placeholder = "What it is, like our first date")
+    AmpDropdown(
+        options = DateKind.entries.map { it.label },
+        selected = kind?.label,
+        accent = Color(you.argb),
+        placeholder = "What kind of day",
+        onSelect = { picked ->
+            val k = DateKind.entries.first { it.label == picked }
+            if (label.isBlank() || DateKind.entries.any { it.label == label }) label = if (k == DateKind.OTHER) "" else k.label
+            kind = k
+        },
+    )
+    Spacer(Modifier.height(10.dp))
+    AmpField(value = label, onValueChange = { label = it.take(60) }, color = you, placeholder = "Name")
     Spacer(Modifier.height(10.dp))
     DateFields(state.today.date, initial = null, yearsBack = 100) { date = it }
     Spacer(Modifier.height(12.dp))
-    AmpButton(label = "Save the date", slug = you.slug, enabled = label.isNotBlank() && date != null) {
-        onAdd(label.trim(), date!!)
+    AmpButton(label = "Save", slug = you.slug, enabled = label.isNotBlank() && date != null && kind != null) {
+        onAdd(label.trim(), date!!, kind!!)
         label = ""
         adding = false
     }

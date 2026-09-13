@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.DateKind
 import com.ampersand.model.leagues
 import com.ampersand.model.League
 import com.ampersand.model.SunKind
@@ -48,8 +49,10 @@ class QuestionPool(
     val regional: Map<UsRegion, List<Question>> = emptyMap(),
     /** Questions naming the local teams, drawn only once a home ZIP is set. */
     val localTeams: List<Question> = emptyList(),
-    /** A few questions for each kind of day the light makes. See [daily]. */
+    /** Old daylight questions, kept only so past days that asked one still resolve. */
     val sun: Map<SunKind, List<Question>> = emptyMap(),
+    /** A few questions for each kind of special date, asked on the day. */
+    val dates: Map<DateKind, List<Question>> = emptyMap(),
     /** Every ZIP, for turning a home ZIP into a forecast and a region. */
     val places: ZipTable = ZipTable.empty,
 ) {
@@ -84,7 +87,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + sun.values.flatten())
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + sun.values.flatten() + dates.values.flatten())
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -92,18 +95,12 @@ class QuestionPool(
     fun deck(id: String?): Quiz? = playable.firstOrNull { it.id == id }
 
     /**
-     * Today's question, chosen by date.
+     * Today's question, chosen by date so both phones land on the same one.
      *
-     * Deterministic, and that is the whole requirement: both phones have to land
-     * on the same question before either has written anything. Anything drawn at
-     * random, or stored by whoever opens the app first, gives the second person
-     * a different question.
-     *
-     * Weekdays draw from the shallow end and Friday to Sunday from the whole
-     * pool. Depth exists so the app can keep a tired Tuesday light and put the
-     * ones worth a real evening where there is an evening to give them -- and a
-     * pool that ignores it will eventually ask what you are most afraid of at
-     * 7am on a Monday.
+     * A few strong signals, first match wins: one of your dates, a holiday,
+     * the theme picked last night, notable weather (every other such day).
+     * Otherwise a draw leaning toward the topics you asked for more of.
+     * Weekdays stay at depth 1-2; Friday to Sunday use the whole pool.
      */
     fun daily(
         date: LocalDate,
@@ -115,37 +112,20 @@ class QuestionPool(
          * share, so skipping keeps the two landing on the same question.
          */
         recent: Set<String> = emptySet(),
-        /**
-         * The category one of you picked for today last night, if anybody did.
-         *
-         * Narrows the draw to that theme. Depth still holds on a weekday where
-         * the theme has anything shallow enough; if everything in the theme was
-         * asked lately, the pick gives way to the whole pool rather than
-         * repeating a question to honour it.
-         */
+        /** The category picked for today last night. Falls back to the whole pool if it is used up. */
         theme: String? = null,
-        /**
-         * A day worth more than a Tuesday -- see [com.ampersand.model.Milestones].
-         * Draws from the deepest questions whatever the weekday, falling back
-         * to the ordinary rules when none are left.
-         */
-        deeper: Boolean = false,
         /** Topics either of you took out. A filter, because you asked for one. */
         hidden: Set<Topic> = emptySet(),
-        /**
-         * The kind of day the saved forecast says it is. On every other day of
-         * that weather -- by date, so both phones agree -- the question comes
-         * from its small set, so a wet week is not every day about rain.
-         */
+        /** Notable weather. Used on every other such day, so a wet week is not all about rain. */
         weatherKind: WeatherKind? = null,
         /** Where you live. Adds that region's questions to the pool. */
         region: UsRegion? = null,
         /** The home state, for days that belong to a place: Mardi Gras, Derby Day. */
         state: String? = null,
-        /** The kind of day the light makes at home, on the days weather questions are not. */
-        sunKind: SunKind? = null,
         /** Leagues with a local team in season. A team question needs all of its leagues here. */
         leagues: Set<League> = emptySet(),
+        /** Kinds of special date that fall today; see [com.ampersand.model.Dates.kindsOn]. */
+        dateKinds: List<DateKind> = emptyList(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
@@ -153,8 +133,12 @@ class QuestionPool(
         val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty()
         val open = everything.filter(::shown).ifEmpty { everything }
 
-        // A day that is not like the others gets its own question. Rotated by
-        // year, so the same holiday does not ask the same thing every time.
+        // Your own dates, then holidays. Rotated by year so a date does not
+        // ask the same thing every time.
+        dateKinds.firstNotNullOfOrNull { dates[it]?.takeIf { q -> q.isNotEmpty() } }?.let { pool ->
+            return pool[date.year.mod(pool.size)]
+        }
+
         Occasion.on(date, anniversary, state)?.let { occasion ->
             occasions[occasion.id]?.questions?.takeIf { it.isNotEmpty() }?.let { pool ->
                 return pool[date.year.mod(pool.size)]
@@ -163,30 +147,43 @@ class QuestionPool(
 
         val weekend = date.dayOfWeek in setOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         fun fits(q: Question) = weekend || q.depth.level <= 2
-        fun deep(q: Question) = q.depth.level >= 3
 
         theme?.let { t ->
             val themed = open.filter { it.category == t }
-            if (deeper) walk(themed.filter(::deep), date, weekend, taste, recent)?.let { return it }
             val picked = themed.filter(::fits).ifEmpty { themed }
             if (picked.isNotEmpty()) walk(picked, date, weekend, taste, recent)?.let { return it }
         }
-
-        if (deeper) walk(open.filter(::deep), date, weekend, taste, recent)?.let { return it }
 
         if (weatherKind != null && date.toEpochDay().mod(2L) == 0L) {
             weather[weatherKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
         }
 
-        // The other half of the days: the light, where the day is one worth
-        // mentioning. Never both on one day, so a snowy solstice stays readable.
-        if (sunKind != null && date.toEpochDay().mod(2L) == 1L) {
-            sun[sunKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
-        }
-
         val candidates = open.filter(::fits).ifEmpty { open }
         return walk(candidates, date, weekend, taste, recent)
             ?: slot(tiltedOrNot(candidates, taste), date, weekend).let { (draw, start) -> draw[start] }
+    }
+
+    /**
+     * The one-word reason [question] is today's, for the tag on its card.
+     * Worked out from which set it came from, so a pinned question gets the
+     * same tag on both phones. The theme pick, a written question and a repeat
+     * are named by the screen, which knows who did them.
+     */
+    fun why(
+        question: Question,
+        date: LocalDate,
+        anniversary: LocalDate?,
+        state: String?,
+        dateKinds: List<DateKind>,
+        interests: Set<Topic>,
+    ): String {
+        fun inSet(list: List<Question>?) = list.orEmpty().any { it.id == question.id }
+        dateKinds.firstOrNull { inSet(dates[it]) }?.let { return it.label }
+        Occasion.on(date, anniversary, state)?.takeIf { inSet(occasions[it.id]?.questions) }?.let { return it.label }
+        if (weather.values.any(::inSet)) return "Weather"
+        if (regional.values.any(::inSet) || inSet(localTeams)) return "Local"
+        interests.firstOrNull { it.matches(question) }?.let { return it.label.substringBefore(" and ") }
+        return question.category
     }
 
     /** Every category a daily question can come from, in the order the pool holds them. */
@@ -279,6 +276,9 @@ class QuestionPool(
                 UsRegion.entries.firstOrNull { "region-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
             }.toMap(),
             localTeams = QuizJson.loadFolder(context, "local").flatMap { it.questions },
+            dates = QuizJson.loadFolder(context, "dates").mapNotNull { deck ->
+                DateKind.entries.firstOrNull { "date-${it.id}" == deck.id }?.let { it to deck.questions }
+            }.toMap(),
             sun = QuizJson.loadFolder(context, "sun").mapNotNull { deck ->
                 SunKind.entries.firstOrNull { "sun-${it.name.lowercase().replace('_', '-')}" == deck.id }
                     ?.let { it to deck.questions }

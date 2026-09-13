@@ -1,0 +1,57 @@
+{
+  "id": "date-birthday",
+  "title": "Birthday",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "dbd1",
+      "text": "How would I most like to spend my birthday?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Everyday",
+      "options": [
+        "Out with friends",
+        "Just us",
+        "Somewhere new",
+        "Quiet at home"
+      ]
+    },
+    {
+      "id": "dbd2",
+      "text": "How much do I like a fuss made on my birthday?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Everyday",
+      "lowLabel": "Please don't",
+      "highLabel": "Make a fuss"
+    },
+    {
+      "id": "dbd3",
+      "text": "What did I want for my birthday as a kid?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "dbd4",
+      "text": "What do you hope this next year brings?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "future"
+      ],
+      "category": "Future"
+    }
+  ]
+}

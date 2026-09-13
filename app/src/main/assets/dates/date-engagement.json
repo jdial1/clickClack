@@ -1,0 +1,59 @@
+{
+  "id": "date-engagement",
+  "title": "Engagement",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "den1",
+      "text": "What part of the proposal do I think about most?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic",
+      "options": [
+        "The place",
+        "The words",
+        "The ring",
+        "What came after"
+      ]
+    },
+    {
+      "id": "den2",
+      "text": "How surprised was I?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Romantic",
+      "lowLabel": "Saw it coming",
+      "highLabel": "No idea"
+    },
+    {
+      "id": "den3",
+      "text": "Who did I want to tell first?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "den4",
+      "text": "What did saying yes mean to you then, and what does it mean now?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "past",
+        "future"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

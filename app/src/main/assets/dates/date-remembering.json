@@ -1,0 +1,58 @@
+{
+  "id": "date-remembering",
+  "title": "Remembering",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "questions": [
+    {
+      "id": "drm1",
+      "text": "How do I like to spend this day?",
+      "type": "PICK_ONE",
+      "depth": 2,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Deep",
+      "options": [
+        "Quietly",
+        "Talking about them",
+        "Doing something they loved",
+        "Keeping busy"
+      ]
+    },
+    {
+      "id": "drm2",
+      "text": "How heavy does this day feel for me this year?",
+      "type": "SCALE",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Deep",
+      "lowLabel": "Light",
+      "highLabel": "Heavy"
+    },
+    {
+      "id": "drm3",
+      "text": "What is a small thing that helps me on this day?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "acts"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "drm4",
+      "text": "What is something about them you would like me to know?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

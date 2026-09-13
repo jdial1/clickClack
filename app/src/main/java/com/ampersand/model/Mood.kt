@@ -1,42 +1,30 @@
 package com.ampersand.model
 
 /**
- * How you are today, said in bricks.
- *
- * One tap, shown to the other person, and gone tomorrow. Named the way a
- * builder would say it, with a plain line underneath so nobody has to decode
- * "stepped on one" at seven in the morning. No emoji: each mood is a brick from
- * the pack (see MoodArt).
- *
- * The five character bricks come first and carry the everyday moods; each can
- * be worn in its own pack colour or any of the four brick colours. After them,
- * the pack's other special bricks, then three built from plain bricks for the
- * ones a face cannot say.
- *
- * Not a chat and not a log. It says where you are so the other person can go
- * gently, or not, and that is all it does.
+ * How you are today. One tap, shown to the other person, gone tomorrow.
+ * Plain names; the brick art carries the fun (see MoodArt).
  */
-enum class Mood(val label: String, val plain: String, val kind: Kind) {
-    SNAPPED_IN("Snapped in", "Good, and close to you", Kind.FACE),
-    CLICKED("Clicked into place", "Content and easy", Kind.FACE),
-    PLAYING_IT_COOL("Playing it cool", "Fine, really", Kind.FACE),
-    NEW_SET("New set energy", "Excited", Kind.FACE),
-    FLAT_PLATE("Flat plate", "Neither up nor down", Kind.FACE),
-    SOMETHING_TO_TELL("Something to tell you", "I have news", Kind.SPECIAL),
-    RARE_PIECE("Found a rare piece", "Lucky, grateful", Kind.SPECIAL),
-    SOLID_GROUND("On solid ground", "Steady", Kind.SPECIAL),
-    STILL_IN_THE_BOX("Still in the box", "Low on energy", Kind.SPECIAL),
-    HEAVY("Heavy as a stone", "Weighed down", Kind.SPECIAL),
-    HANDLE_WITH_CARE("Handle with care", "Stressed, go gently", Kind.SPECIAL),
-    MISSING_A_PIECE("Missing a piece", "Missing something, or you", Kind.BUILT),
-    KNOCKED_OVER("Knocked over", "Overwhelmed", Kind.BUILT),
-    STEPPED_ON_ONE("Stepped on one", "Sore or annoyed", Kind.BUILT);
+enum class Mood(val label: String, val kind: Kind) {
+    SNAPPED_IN("Happy", Kind.FACE),
+    CLICKED("Content", Kind.FACE),
+    PLAYING_IT_COOL("Fine", Kind.FACE),
+    NEW_SET("Excited", Kind.FACE),
+    FLAT_PLATE("Meh", Kind.FACE),
+    SOMETHING_TO_TELL("Got news", Kind.SPECIAL),
+    RARE_PIECE("Grateful", Kind.SPECIAL),
+    SOLID_GROUND("Steady", Kind.SPECIAL),
+    STILL_IN_THE_BOX("Tired", Kind.SPECIAL),
+    HEAVY("Down", Kind.SPECIAL),
+    HANDLE_WITH_CARE("Stressed", Kind.SPECIAL),
+    MISSING_A_PIECE("Missing you", Kind.BUILT),
+    KNOCKED_OVER("Overwhelmed", Kind.BUILT),
+    STEPPED_ON_ONE("Annoyed", Kind.BUILT);
 
     enum class Kind {
         /** A character brick, in a colour of your choosing. */
         FACE,
 
-        /** One of the pack's special bricks, as the pack draws it. */
+        /** One of the pack's special bricks. */
         SPECIAL,
 
         /** Plain bricks arranged, in your own colour. */

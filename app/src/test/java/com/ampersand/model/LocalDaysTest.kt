@@ -60,16 +60,13 @@ class LocalDaysTest {
     private fun q(id: String, text: String = id) = Question(id, text, QuestionType.REFLECT, "Everyday", Depth(1))
 
     @Test
-    fun `a team question waits for its league, and sun questions take the other days`() {
+    fun `a team question waits for its league`() {
         val pool = QuestionPool(
             decks = listOf(Quiz("d", "d", "", QuizTheme.EVERYDAY, (1..5).map { q("q$it") })),
             localTeams = listOf(q("hockey", "{nhl} tonight?")),
-            sun = mapOf(SunKind.EARLY_DARK to listOf(q("dark1"), q("dark2"))),
         )
         val days = (0L..60L).map { LocalDate.of(2026, 11, 2).plusDays(it) }
         assertTrue(days.none { pool.daily(it, region = UsRegion.MID_ATLANTIC).id == "hockey" })
         assertTrue(days.any { pool.daily(it, region = UsRegion.MID_ATLANTIC, leagues = setOf(League.NHL)).id == "hockey" })
-        val dark = days.map { pool.daily(it, sunKind = SunKind.EARLY_DARK).id.startsWith("dark") }
-        assertEquals(days.map { it.toEpochDay() % 2 == 1L }, dark)
     }
 }

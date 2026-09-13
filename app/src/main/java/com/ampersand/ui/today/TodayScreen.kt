@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.model.Wildcard
 import com.ampersand.ui.components.WeatherBrickArt
 import com.ampersand.ui.components.MoodArt
 import com.ampersand.model.MoodEntry
@@ -180,8 +181,11 @@ fun TodayScreen(
 
         Spacer(Modifier.height(18.dp))
         QuestionHero(
-            askedBefore = state.capsule?.date,
-            pickedBy = pickedBy(state),
+            why = when {
+                state.capsule?.question?.id == question.id -> "Again"
+                Wildcard.isWildcard(question.id) -> "Your own"
+                else -> pickedBy(state)?.let { if (it == "You") "Your pick" else "$it's pick" } ?: state.why
+            },
             milestone = remember(state.history, day.date) { Milestones.on(day.date, state.history) },
             question = question,
             you = BrickColor.of(state.you.colorArgb),
@@ -249,10 +253,8 @@ private fun QuestionHero(
     question: Question,
     you: BrickColor,
     them: BrickColor,
-    /** Set when the two of you answered this exact question once before. */
-    askedBefore: LocalDate? = null,
-    /** Set when somebody picked today's theme last night: "You" or their name. */
-    pickedBy: String? = null,
+    /** Why this question today, shown as a tag: "Weather", "First date", "Tasia's pick". */
+    why: String? = null,
     /** The run today makes, when that is one of [Milestones.Runs]. */
     milestone: Int? = null,
     /** Whose move it is, said on the card itself. */
@@ -285,12 +287,25 @@ private fun QuestionHero(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "${question.type.label.uppercase()}  ·  ${question.category.uppercase()}",
-                style = MaterialTheme.typography.labelSmall,
-                color = ink.copy(alpha = 0.85f),
-            )
-            DepthDots(question.depth, tint = ink)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = question.type.label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ink.copy(alpha = 0.85f),
+                )
+                Spacer(Modifier.width(8.dp))
+                DepthDots(question.depth, tint = ink)
+            }
+            why?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = ink,
+                    modifier = Modifier
+                        .glass(ink, corner = 10.dp, strength = 1.6f)
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            }
         }
 
         // Said before the question, like everything else about the day: a
@@ -305,26 +320,6 @@ private fun QuestionHero(
             )
         }
 
-        pickedBy?.let { who ->
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "$who picked this one's theme last night.",
-                style = MaterialTheme.typography.labelSmall,
-                color = ink,
-            )
-        }
-
-        // Said before the question rather than after it. Knowing this one is
-        // coming back changes how you answer it, and finding out afterwards
-        // would make the app feel like it had kept something from you.
-        askedBefore?.let { then ->
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "You both answered this ${agoIn(then)}. Answer it again.",
-                style = MaterialTheme.typography.labelSmall,
-                color = ink,
-            )
-        }
         Spacer(Modifier.height(14.dp))
         SelectionContainer {
             Text(
@@ -1012,7 +1007,7 @@ private fun MoodTiles(moods: List<Mood>, you: BrickColor, faceColor: BrickColor?
         moods.forEach { mood ->
             Column(
                 Modifier
-                    .width(96.dp)
+                    .width(84.dp)
                     .glass(inkOnBrick(structureSlug()), corner = 12.dp)
                     .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onPick(mood) }
                     .padding(8.dp),
@@ -1024,12 +1019,6 @@ private fun MoodTiles(moods: List<Mood>, you: BrickColor, faceColor: BrickColor?
                     mood.label,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    mood.plain,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
             }
