@@ -69,17 +69,11 @@ private const val PeriodDays = 7
  * on the same question before either has written anything, or whoever opens the
  * app second gets a different one.
  *
- * ```
- * couples/{cid}/days/{yyyy-mm-dd}   questionId, revealed, reactions{uid:name}
- *   .../answers/{uid}               values[], guess[], submittedAt
- * couples/{cid}/plates/{pid}        startedOn, periodDays, gridW, gridH,
- *                                   completedOn, blocks[], placed[]
- * ```
+ * The document layout is in README.md, under "Firestore model".
  *
- * Four listeners: both user documents, today, the last ten weeks, and the
- * plates. They each write into [_state] through [recompose], because a
- * [CoupleState] is a whole picture and updating it field by field from four
- * callbacks arriving in any order is how you get a screen that is briefly
+ * One listener per source, all writing into [_state] through [recompose],
+ * because a [CoupleState] is a whole picture and updating it field by field
+ * from callbacks arriving in any order is how you get a screen that is briefly
  * wrong.
  */
 class FirestoreCoupleRepository(

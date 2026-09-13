@@ -18,13 +18,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
 /**
- * The seam Firebase will slot into.
+ * Everything the screens can ask of a couple.
  *
- * Everything above this interface is pure UI, so the Firestore implementation
- * can replace [FakeCoupleRepository] without touching a screen. The sealed
- * behaviour is modelled here rather than in the UI on purpose: when this is
- * backed by Firestore, the partner's answer simply will not be readable until
- * security rules allow it, and the UI already handles that state.
+ * Firestore backs it on a real phone; [FakeCoupleRepository] backs previews.
+ * The sealed behaviour is modelled here rather than in the UI on purpose: in
+ * Firestore the partner's answer is simply unreadable until the rules allow
+ * it, and the UI already handles that state.
  */
 interface CoupleRepository {
 
@@ -242,8 +241,8 @@ class FakeCoupleRepository(
      *
      * Idempotent: block ids are `date_uid`, so running this again on an
      * already-rewarded day is a no-op. That matters because it is called from
-     * both submit paths and will be called from a Firestore listener later,
-     * where the same day can arrive more than once.
+     * both submit paths, and the Firestore version runs from listeners where
+     * the same day can arrive more than once.
      */
     private fun awardIfComplete(s: CoupleState): CoupleState {
         if (!s.today.isRevealed) return s

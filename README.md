@@ -302,40 +302,39 @@ reactions, colours, bricks and sealed sculptures, all keyed to their account.
 Two phones on two profiles see each other's contributions, which is what makes
 any of this testable.
 
-**Questions are still mock.** The pool arrives as JSON, so today's question is
-picked out of `MockQuestions` *by date*. Picking rather than storing matters
-more than it looks: both phones must land on the same question before either
-has written anything, or whoever opens the app second gets a different one.
+Questions come from the bundled JSON pool (`assets/quizzes`, `assets/daily`,
+`assets/occasions`), picked **by date** from state both phones share. Picking
+rather than storing matters more than it looks: both phones must land on the
+same question before either has written anything. The first answer pins the
+question on the day document, and the pin outranks everything after that.
 
-Four listeners — both user documents, today, the last ten weeks, the plates —
-all feeding one `recompose()`. A `CoupleState` is a whole picture, and updating
-it field by field from four callbacks arriving in any order is how you get a
-screen that is briefly wrong.
+One listener per source (both user documents, today's answer, ten weeks of
+days, decks and their runs, sittings, wildcards, knowing, plates), all feeding
+one `recompose()`. A `CoupleState` is a whole picture, and updating it field by
+field from callbacks arriving in any order is how you get a screen that is
+briefly wrong.
 
-Two details worth keeping:
+Details worth keeping:
 
-- **The answers listener fails before the reveal, on purpose.** The rules deny
-  the collection query rather than filtering it, so the error path falls back to
-  reading only your own answer. The seal is enforced by the database; the app
-  never has to hide anything.
-- **`revealed` can only become true once both answer documents exist.** The rule
-  checks with `exists()` on both, so a client cannot flip it early to peek.
-  Properly this belongs in a Cloud Function — the rule is what makes the client
-  version honest.
-
-The scaffold controls that fake your partner are **no-ops against Firestore**.
-There is no honest way to answer as someone else once the rules only let you
-write your own documents; use a second account.
+- **Your own answer is read by name, never by listing.** The rules refuse a
+  query over a collection where one document is unreadable, so a listener on
+  the whole `answers` collection died on its first snapshot.
+- **The seal is the database's job.** A day, deck or sitting is created shut and
+  `revealed` can only become true once both halves exist, and never go back.
+  Properly the lifting belongs in a Cloud Function; the rule is what makes the
+  client version honest.
+- **Awards wait for the plates listener.** Until it answers, an empty list means
+  "not arrived", and awarding against it laid bricks on a phantom plate.
 
 ### Still to do
 
-- No Cloud Function. Sealing a plate at the end of a week, and lifting the seal,
-  both depend on a client being open.
-- History rows carry no answers — they live in a subcollection that would need a
+- History rows carry no answers; they live in a subcollection that would need a
   read each. The Shelf shows questions, dates and reactions; the Reveal screen
   loads a single day in full.
-- Streaks are computed on the client from the last ten weeks, so a couple older
-  than that undercounts.
+- Day boundaries follow each phone's clock. Two phones in different timezones
+  can disagree about which day it is.
+- Members can still write each other's per-person fields (reactions, progress,
+  plates). The rules check membership, not whose key is being written.
 
 ## The build
 
@@ -546,8 +545,10 @@ here because the packs are good.
 model/Models.kt          Question, Answer, Reaction, DayEntry, CoupleState.
 model/Blocks.kt          Brick geometry, BuildPlate, placement rules, Rewards.
 model/BrickColor.kt      The four pickable colours, lifted from the pack SVGs.
-data/MockData.kt         16 questions, a couple with history, three sculptures.
-data/CoupleRepository.kt The seam Firebase slots into. Fake implementation here.
+data/MockData.kt         Preview fixtures: a couple with history, three sculptures.
+data/CoupleRepository.kt The interface, and the in-memory one previews use.
+data/QuestionPool.kt     The daily draw: by date, weighted, recent-skipping.
+tools/                   Generators for the research-sourced daily decks.
 ui/theme/Theme.kt        The blended two-person palette.
 ui/brick/                Atlas, geometry, drawBrickArt, BrickSlab, Sculpture.
 ui/today/                Question, input, seal, waiting.
@@ -556,8 +557,8 @@ ui/history/              The Shelf: on this day, sculptures, ten weeks, index.
 ui/us/                   Streak, sync score, live colour pickers, sound toggle.
 ```
 
-`model/` is plain Kotlin on purpose — when the Firestore layer arrives it maps
-documents to these types and nothing in `ui/` changes.
+`model/` is plain Kotlin on purpose: the Firestore layer maps documents to these
+types, and everything in it can be unit tested on the JVM.
 
 ## Visual language
 
@@ -572,29 +573,31 @@ colours in RGB gives grey, which is how the first version of this painted the
 app's signature surface mud, and an unclamped blend put white text on magenta at
 about 3:1.
 
-Coloured shadows need API 28. Below that `glow` degrades to a standard black
-shadow, which still reads fine.
-
 ## What is not built yet
 
-- Firebase Auth, Firestore, FCM (see below)
-- Pairing by invite code
-- Notifications
-- Automatic weekly sealing — the rule exists, the clock does not
 - Undo on a placed brick, and brick rotation
-- Wildcard (one of you writes the question) and time capsule (questions return
-  in six months, then vs. now)
-- `Rewards` never awards slopes, only flats plus a character at 7-day streaks
+- A screen that shows `Sources`. The CC BY decks need their credit visible in
+  the app before any public release (see `licenses/README.md`).
 
-## Planned Firestore model
+## Firestore model
 
 ```
-users/{uid}                      displayName, colorArgb, coupleId, tz, fcmToken
-couples/{cid}                    members[2], homeTz, streak, freezes, queue[], lastDay
-couples/{cid}/days/{yyyy-mm-dd}  questionId, type, submitted[], revealed, score, reactions
-  .../answers/{uid}              response, guess, submittedAt      <- the sealed part
-couples/{cid}/plates/{pid}       startedOn, completedOn, blocks[], placed[]
-questions/{qid}                  text, type, options[], category, depth, source
+users/{uid}                        displayName, colorArgb, coupleId, inviteCode,
+                                   inviteExpiresAt, fcmToken
+invites/{code}                     fromUid, fromName, createdAt, expiresAt
+couples/{cid}                      members[2], createdAt, endedAt, anniversary
+  days/{yyyy-mm-dd}                questionId, revealed, submitted[], reactions{uid},
+                                   talkedAbout[], nextTheme, nextThemeBy, run
+    answers/{uid}                  values[], guess[], submittedAt   <- sealed
+  quizzes/{deckId}                 revealed, submitted[]
+    runs/{uid}                     answers{}, completedAt           <- sealed
+  instruments/{id}                 revealed, submitted[], progress{uid}
+    runs/{uid}                     responses[], completedAt         <- sealed
+    drafts/{uid}                   responses[]                      <- owner only
+  wildcards/{id}                   text, type, options[], byUid, byName, createdAt, usedOn
+  knowing/{yyyy-mm}                per-day hit maps
+  plates/{yyyy-mm-dd start}        startedOn, periodDays, gridW, gridH,
+                                   completedOn, blocks[], placed[]
 ```
 
 Answers **must** be one document per person. Firestore rules are per-document
@@ -611,16 +614,8 @@ match /couples/{cid}/days/{d}/answers/{uid} {
 }
 ```
 
-Reactions are a map on the day document, writable by either member only once
-`revealed` is true, and each member may only write their own key.
-
-A sealed plate — `completedOn != null` — should reject writes in rules as well
-as in the repository. Otherwise a late listener could append a brick to last
-week's sculpture.
-
-Day boundaries follow the couple's `homeTz`, never device time. That is the
-difference between working and not working if you are ever in different
-timezones, and it is far cheaper to decide now than to migrate later.
+A sealed plate (`completedOn != null`) rejects writes in the rules as well as
+in the repository, so a late listener cannot append a brick to last week.
 
 ## Toolchain
 
