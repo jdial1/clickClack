@@ -35,18 +35,7 @@ import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 
-/**
- * Asked once, at setup: when should we say something.
- *
- * Placed after pairing rather than before, so the question arrives when there is
- * already a reason to answer it. Asking permission to interrupt someone before
- * they have seen what the app does is how an app gets its notifications turned
- * off forever on the first screen.
- *
- * "Not now" is a real answer and sits next to the button rather than hidden
- * behind a back gesture. The app has exactly one notification to send, and a
- * person who does not want it is not a problem to be solved.
- */
+/** One-time setup after pairing: pick a daily reminder hour and request notification permission. */
 @Composable
 fun ReminderSetupScreen(
     color: BrickColor,
@@ -56,8 +45,7 @@ fun ReminderSetupScreen(
     val context = LocalContext.current
     var hour by remember { mutableStateOf<String?>("8 pm") }
 
-    // The permission only exists on API 33+. Below that a notification simply
-    // posts, so the launcher is never used and the flow is identical.
+    // POST_NOTIFICATIONS is API 33+; the launcher is unused below that.
     val ask = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -65,10 +53,7 @@ fun ReminderSetupScreen(
         onDone()
     }
 
-    // Its own ground. Without this the screen paints straight onto the window
-    // background from themes.xml, which is the dark one whatever the theme says
-    // -- so in light mode a light-mode wall and light-mode ink both landed on a
-    // dark sheet and the headline vanished into it.
+    // Own background: the themes.xml window background is always dark, which hid text in light mode.
     Surface(color = MaterialTheme.colorScheme.background) {
     Box(modifier.fillMaxSize()) {
         BrickWall(you = color, them = BrickColor.BLUE, alpha = 0.12f)
@@ -82,21 +67,20 @@ fun ReminderSetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "One nudge a day.",
+                text = "Daily reminder",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "So the question does not sit there unanswered while you both wait " +
-                    "for the other one.",
+                text = "We'll remind you once a day to answer the question.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
 
             Spacer(Modifier.height(30.dp))
-            SectionLabel("What time suits")
+            SectionLabel("Time")
             Spacer(Modifier.height(10.dp))
             AmpDropdown(
                 options = Hours,
@@ -129,12 +113,7 @@ fun ReminderSetupScreen(
     }
 }
 
-/**
- * Whole hours only, named the way people say them.
- *
- * A minute picker would be a third dropdown to serve a difference nobody can
- * feel: an inexact alarm is allowed to drift a few minutes anyway.
- */
+/** Whole-hour options; labels are parsed by [parseHour]. */
 private val Hours = listOf(
     "7 am", "8 am", "9 am", "12 pm", "5 pm", "6 pm",
     "7 pm", "8 pm", "9 pm", "10 pm",

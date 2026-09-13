@@ -16,11 +16,8 @@ import com.ampersand.model.BrickShape
 import kotlin.math.roundToInt
 
 /**
- * Brick art geometry, from the pack's own pixel sizes.
- *
- * A stud is 64px across, the shortest brick body is 28px tall, and the nub on
- * top is 16px and overhangs the body. Everything below is expressed as ratios of
- * the stud width so bricks scale to any screen.
+ * Brick art geometry from the pack's pixel sizes: stud 64px wide, shortest body 28px,
+ * nub 16px above the body. Expressed as ratios of stud width.
  */
 object BrickArt {
     const val STUD_PX = 64f
@@ -36,28 +33,13 @@ object BrickArt {
     /** Plate aspect ratio for a grid of [w] studs by [h] rows. */
     fun aspect(w: Int, h: Int): Float = (w * STUD_PX) / (h * ROW_PX)
 
-    /**
-     * As [aspect], but counting the nub the top course sticks up above its body.
-     *
-     * A plate has room above the highest brick and does not need this; anything
-     * cropped tight to its own content does, or the top row of studs is drawn
-     * outside the bounds.
-     */
+    /** As [aspect], plus the top nub. Use when cropping tight to content, or top studs get clipped. */
     fun aspectWithNub(w: Int, rows: Int): Float = w / (rows * ROW_RATIO + NUB_RATIO)
 
-    /**
-     * The widths available in the pack, largest first.
-     *
-     * There is no 3- or 5-stud brick, so a run of that length is built the way
-     * you would build it out of the box: a 2 and a 1.
-     */
+    /** Brick widths in the pack, largest first. There are no 3- or 5-stud bricks. */
     val WIDTHS = listOf(6, 4, 2, 1)
 
-    /**
-     * Asset name for [shape] in [slug], or the neutral greyscale set when the
-     * slug is null. The pack ships those unprefixed (`brick_low_1`), which is
-     * why this is not just string concatenation at every call site.
-     */
+    /** Asset name for [shape] in [slug]; null slug gives the unprefixed gray set (`brick_low_1`). */
     fun assetFor(slug: String?, shape: BrickShape): String =
         if (slug.isNullOrEmpty()) shape.asset else "${slug}_${shape.asset}"
 
@@ -74,13 +56,7 @@ object BrickArt {
     }
 }
 
-/**
- * Draws one brick from the pack art.
- *
- * The art is already the right colour, so nothing is tinted: earlier this
- * multiplied a greyscale source, which could not reach the pack's saturated reds
- * without clipping and left the bricks slightly off from the rest of the UI.
- */
+/** Draws one brick from the pack art, untinted, with its bottom-left at ([left], [bottom]). */
 fun DrawScope.drawBrickArt(
     atlas: BrickAtlas,
     asset: String,
@@ -95,8 +71,7 @@ fun DrawScope.drawBrickArt(
     val rowPx = studPx * BrickArt.ROW_RATIO
     val nubPx = studPx * BrickArt.NUB_RATIO
     val bodyH = rows * rowPx
-    // The nub sits above the body, so the image is taller than the footprint and
-    // is drawn shifted up by exactly that overhang.
+    // The image includes the nub, so shift it up by the nub height.
     val top = bottom - bodyH - nubPx
 
     drawImage(
@@ -157,28 +132,14 @@ fun DrawScope.drawBrick(
 
 private val DotShape = BrickShape(1, BrickHeight.LOW)
 
-/**
- * The small marker used for depth, score pips and list bullets.
- *
- * A real 1-stud brick from the pack rather than a drawn circle. Top-down studs
- * were a shortcut: nothing else in the app is seen from above, so they read as a
- * different object at every size. [slug] null uses the neutral greyscale brick,
- * for markers sitting on a gradient where a palette colour would vanish.
- */
+/** A 1-stud brick used for depth, score pips and list bullets. [slug] null uses the gray brick. */
 @Composable
 fun BrickDot(
     slug: String?,
     modifier: Modifier = Modifier,
     studSize: Dp = 14.dp,
     filled: Boolean = true,
-    /**
-     * What an unfilled marker fades to.
-     *
-     * 0.28 is right for a marker that is *absent* -- an unearned depth pip, a
-     * score that was not reached. It is too faint for one that is merely
-     * unchosen: a row of coloured stops has to still read as a ramp before
-     * anybody picks one, and yellow at 28% on a pale panel is not a colour.
-     */
+    /** Alpha for an unfilled marker. Raise it for unselected options that must stay visible. */
     dimAlpha: Float = 0.28f,
 ) {
     val asset = BrickArt.assetFor(slug, DotShape)

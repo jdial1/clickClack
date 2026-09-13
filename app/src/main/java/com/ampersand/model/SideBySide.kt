@@ -3,13 +3,7 @@ package com.ampersand.model
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-/**
- * The Us screen's table: the same three facts for each of you, in two rows.
- *
- * Counts of things you did, never a score of each other. Guesses landed is the
- * one that compares, and it is already on the screen as a sentence that
- * refuses to declare a winner.
- */
+/** One person's row in the Us screen's side-by-side table. */
 data class Tally(val daysShowedUp: Int, val guessesLanded: Int, val decksFinished: Int)
 
 object SideBySide {
@@ -26,12 +20,7 @@ object SideBySide {
 
 private const val DaysPerMonth = 30.44
 
-/**
- * How far off a date is, the way a person would say it.
- *
- * Never a bare day count past a fortnight: "in 243 days" is arithmetic, "in 8
- * months" is a date.
- */
+/** Relative time to a date: days under two weeks, then weeks, then months. */
 fun until(from: LocalDate, to: LocalDate): String {
     val days = ChronoUnit.DAYS.between(from, to)
     return when {
@@ -39,8 +28,7 @@ fun until(from: LocalDate, to: LocalDate): String {
         days == 1L -> "Tomorrow"
         days < 14L -> "In $days days"
         days < 60L -> "In ${days / 7} weeks"
-        // Rounded to the nearest month: eleven May from the thirteenth of
-        // September is "in 8 months", not the seven whole months it strictly is.
+        // Rounded to the nearest month, not truncated.
         else -> Math.round(days / DaysPerMonth).coerceAtLeast(2).let { "In $it months" }
     }
 }

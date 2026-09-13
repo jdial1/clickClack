@@ -26,20 +26,11 @@ import com.ampersand.model.QuestionType
 import com.ampersand.ui.theme.Duo
 
 /**
- * One person's answer, and whether the other one called it.
+ * One person's answer, plus the partner's guess and whether it hit. Shared by
+ * the reveal and deck result screens.
  *
- * Lives here rather than on a screen because two screens need exactly this and
- * had drifted badly apart: the reveal showed the guess beside the truth, and
- * the deck result -- the screen whose whole job is scoring -- showed the two
- * answers, a pass/fail mark, and never the guess at all. The guess is the
- * interesting half. "You got this one wrong" is a fact about nothing; "you
- * thought I'd say coffee" is the conversation.
- *
- * Laid out side by side by [AnswerPanelPair], which is where the sizing
- * happens. [compact] is what a panel does about being half a phone wide:
- * tighter padding, and the guess label stacked over its verdict rather than
- * beside it, because "MAYA GUESSED  NAILED IT" does not fit on one line at
- * that width and wrapping it mid-phrase reads as broken.
+ * [compact] is for half-width use in [AnswerPanelPair]: tighter padding, and the
+ * guess label stacked above its badge so it doesn't wrap mid-phrase.
  */
 @Composable
 fun AnswerPanel(
@@ -70,11 +61,9 @@ fun AnswerPanel(
         Spacer(Modifier.height(10.dp))
 
         if (answer.isEmpty()) {
-            // Nothing to compare against. Saying so is better than an empty
-            // panel with a verdict floating under it, which is what the deck
-            // result used to draw for a question nobody answered.
+            // No answer: show a note instead of an empty panel with a badge.
             Text(
-                text = "Nothing recorded.",
+                text = "No answer.",
                 style = MaterialTheme.typography.bodyMedium,
                 fontStyle = FontStyle.Italic,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -85,12 +74,10 @@ fun AnswerPanel(
         AnswerValues(answer, type)
 
         if (type == QuestionType.RANK && scored) {
-            // Ranking is scored on the top pick alone, and a reader looking at
-            // four items and one verdict has no way to know which part was
-            // being judged.
+            // Rankings are scored on the top pick only.
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Scored on the first pick.",
+                text = "Only the top pick counts.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -110,29 +97,15 @@ fun AnswerPanel(
                 }
             }
             Spacer(Modifier.height(6.dp))
-            // Through AnswerValues, not joinToString: a ranked guess is an
-            // order, and a comma list throws away the only thing it says.
+            // AnswerValues keeps rank order visible.
             AnswerValues(guess, type, quiet = true)
         }
     }
 }
 
 /**
- * Both answers, on one row.
- *
- * Side by side rather than stacked, so the comparison is a glance rather than a
- * scroll: the two cards are the same question answered twice, and reading one
- * after the other makes them feel like two separate facts.
- *
- * [IntrinsicSize.Min] is what keeps them honest. Without it the shorter answer
- * gets a shorter card and the pair reads as one person having said less, which
- * is a claim about the people rather than about the text. Measuring both and
- * taking the taller means the cards differ only in what is written in them.
- *
- * The cost of the row is width: each side is about half a phone, so a typed
- * sentence wraps hard. That is what [AnswerPanel]'s compact mode is for, and it
- * is the trade the layout makes -- the comparison is worth more than the line
- * length.
+ * Both answers side by side in compact panels. [IntrinsicSize.Min] keeps the
+ * two cards the same height.
  */
 @Composable
 fun AnswerPanelPair(
@@ -161,9 +134,7 @@ fun AnswerPanelPair(
             ownerColor = yourColor,
             type = type,
             answer = yourAnswer,
-            // Their guess sits under your answer, because that is what it was
-            // aiming at. Pairing a guess with its own author instead would put
-            // the prediction and the truth in different columns.
+            // Their guess goes under your answer, the thing it was guessing.
             guess = theirGuess,
             guesserName = theirName,
             scored = scored,
@@ -186,23 +157,10 @@ fun AnswerPanelPair(
     }
 }
 
-/**
- * Landed or missed, in words.
- *
- * A word rather than a tick, because a bare mark has to be learned and these
- * two do not: nobody has to be told what MISSED means. It is also the only
- * place in the app that passes judgement, and judgement reads better in the
- * app's own voice than as a symbol.
- */
+/** Text badge for a guess: hit or miss. */
 @Composable
 fun HitBadge(hit: Boolean) {
-    // Weight, not hue. `outline` against `primary` was the pair before, and in
-    // a palette built from two people's colours those land close enough that
-    // the two verdicts were the same magenta pill at a glance -- on the one
-    // screen whose entire job is telling them apart. A landed guess is the
-    // notable event and is filled and loud; a miss is the ordinary outcome and
-    // recedes. That reads at arm's length and survives any pair of colours,
-    // which a red/green pair would not.
+    // Filled vs. muted rather than two hues: couple-derived palettes can make hues look alike.
     val bg = if (hit) {
         MaterialTheme.colorScheme.primary
     } else {
@@ -215,7 +173,7 @@ fun HitBadge(hit: Boolean) {
             .padding(horizontal = 7.dp, vertical = 2.dp),
     ) {
         Text(
-            text = if (hit) "NAILED IT" else "MISSED",
+            text = if (hit) "GOT IT" else "MISSED",
             style = MaterialTheme.typography.labelSmall,
             color = if (hit) Duo.inkOn(bg) else MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -223,15 +181,8 @@ fun HitBadge(hit: Boolean) {
 }
 
 /**
- * A stored answer, printed the way it was given.
- *
- * [QuestionType.RANK] is the one that cannot be flattened: the order *is* the
- * answer, and a comma-separated line says the same thing for "dancing first"
- * and "dancing last". Everything else is a set, and reads fine as a list.
- *
- * [quiet] is for an answer in a supporting role -- a guess printed under the
- * truth it was aiming at -- where the same size and weight as the real answer
- * would make the panel read as having two of them.
+ * Prints a stored answer: numbered lines for [QuestionType.RANK], a comma list
+ * otherwise. [quiet] uses smaller italic text, for guesses.
  */
 @Composable
 fun AnswerValues(

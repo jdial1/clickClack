@@ -24,22 +24,7 @@ import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 
-/**
- * The only screen you can reach signed out.
- *
- * Sits on the same brick wall as the rest of the app. Without it this was a
- * wordmark floating in an empty field, which reads as a placeholder rather than
- * the front of something -- and in light mode, where the ground is pale rather
- * than deep navy, there was nothing on screen at all between the button and the
- * bottom edge.
- *
- * One sentence of copy, not two. There is nothing to explore before you are in,
- * and the seal is the only thing worth saying up front.
- *
- * The wordmark is laid in brick, one colour each, because that is the product
- * in one image -- and it is the same two pieces as the launcher icon, so the
- * thing you tapped is the thing that opens.
- */
+/** Signed-out screen: brick wordmark (same as the launcher icon), tagline, and Google sign-in. */
 @Composable
 fun SignInScreen(
     busy: Boolean,
@@ -62,7 +47,7 @@ fun SignInScreen(
 
         Spacer(Modifier.height(22.dp))
         Text(
-            text = "Neither answer opens until both are in.",
+            text = "Answers open when you both finish.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -92,12 +77,9 @@ fun SignInScreen(
     }
 }
 
-/** The name, in the two colours it is named after. */
+/** The app wordmark, same as the splash. */
 @Composable
 private fun Wordmark() {
-    // The same mark as the splash, still. The two screens used to disagree
-    // about what the app was called: a falling pair of bricks on one and a
-    // twelve-stud slab with a line of type across it on the other.
     BrickMark(you = BrickColor.RED, them = BrickColor.BLUE, stud = 38.dp)
 }
 

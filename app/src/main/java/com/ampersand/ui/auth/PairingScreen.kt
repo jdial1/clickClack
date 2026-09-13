@@ -38,17 +38,7 @@ import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 
-/**
- * Signed in, but on your own.
- *
- * Both directions on one screen, because there is no way for the app to know
- * which of you will move first, and asking ("do you have a code?") is a
- * question neither person can answer until one of them has acted.
- *
- * On the same brick wall as everything else. A pale empty screen with two
- * controls stranded at the top reads as unfinished, and in light mode there was
- * nothing at all below the button.
- */
+/** Signed in but unpaired: create an invite code or redeem your partner's, on one screen. */
 @Composable
 fun PairingScreen(
     name: String,
@@ -66,9 +56,7 @@ fun PairingScreen(
 
       Column(
         Modifier
-            // fillMaxSize, not fillMaxWidth: a scrolling column sized to its
-            // content leaves the window background showing below it, as a hard
-            // horizontal edge across the screen.
+            // fillMaxSize, or the window background shows below the content as a hard edge.
             .fillMaxSize()
             .systemBarsPadding()
             .verticalScroll(rememberScrollState())
@@ -84,19 +72,19 @@ fun PairingScreen(
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            text = "Click Clack takes two.",
+            text = "Connect with your partner to start.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
 
         Spacer(Modifier.height(30.dp))
-        SectionLabel("Invite them")
+        SectionLabel("Invite your partner")
         Spacer(Modifier.height(12.dp))
 
         if (code == null) {
             AmpButton(
-                label = if (busy) "Making a code" else "Make a code",
+                label = if (busy) "Creating code" else "Create invite code",
                 slug = BrickColor.RED.slug,
                 enabled = !busy,
                 onClick = onCreateInvite,
@@ -105,9 +93,7 @@ fun PairingScreen(
             CodePlate(code)
             Spacer(Modifier.height(10.dp))
             Text(
-                // The expiry is the useful half. "It works once" is a rule you
-                // find out by trying; an hour is a thing you can plan around.
-                text = "Works once, for an hour.",
+                text = "Single use. Expires in 1 hour.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -118,19 +104,18 @@ fun PairingScreen(
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(Modifier.height(24.dp))
 
-        SectionLabel("Or type theirs")
+        SectionLabel("Or enter their code")
         Spacer(Modifier.height(12.dp))
         AmpField(
             value = entered,
             onValueChange = { entered = it },
-            // Blue to match the button under it. Nobody has picked a colour
-            // yet at this point, so there is no "yours" to use.
+            // No user color exists yet; blue matches the button below.
             color = BrickColor.BLUE,
-            placeholder = "8 characters",
+            placeholder = "8-character code",
         )
         Spacer(Modifier.height(14.dp))
         AmpButton(
-            label = if (busy) "Joining" else "Join them",
+            label = if (busy) "Joining" else "Join",
             slug = BrickColor.BLUE.slug,
             enabled = !busy && entered.isNotBlank(),
             onClick = { onRedeem(entered) },
@@ -151,13 +136,7 @@ fun PairingScreen(
     }
 }
 
-/**
- * The code, big, monospaced and spaced out.
- *
- * Monospace because two people are going to compare it character by character,
- * and a proportional font makes that harder than it needs to be. Selectable so
- * it can be copied into a message without being retyped.
- */
+/** The invite code, large and monospaced for easy comparison, and selectable for copying. */
 @Composable
 private fun CodePlate(code: String) {
     BrickSlab(

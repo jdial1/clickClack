@@ -57,19 +57,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import com.ampersand.model.ProgressFloor
 
 /**
- * Playing one deck: a question at a time, then the cross-answer chart.
- *
- * One question per screen rather than a scrolling list. A deck is five or six
- * questions each asked twice -- your answer and your guess at theirs -- and a
- * dozen inputs on one page is a form to be endured. One at a time also means
- * the answer you just gave is off screen before you answer the next, which is
- * the point: you are supposed to say the first thing, not tune a set of
- * responses against each other.
- *
- * There is no back step *within* a deck, and the system back leaves the deck
- * rather than rewinding it. The seal already says answers cannot be edited
- * after submitting, and letting you revise question three while looking at
- * question four is the same thing in miniature.
+ * Plays one deck a question per page, then shows the result once both have submitted.
+ * No going back to earlier questions; system back leaves the deck.
  */
 @Composable
 fun DeckScreen(
@@ -83,7 +72,6 @@ fun DeckScreen(
     val theirs = state.theirRun(quiz.id)
 
     when {
-        // Both in: the deck is done and this is the payoff.
         mine != null && theirs != null -> DeckResult(
             result = QuizResult.of(quiz, mine, theirs),
             state = state,
@@ -113,16 +101,11 @@ private fun DeckPlayer(
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
 
-    // Keyed on the question, so moving on genuinely clears the form rather than
-    // carrying the previous answer forward as a suggestion.
+    // Keyed on the question so the next question starts blank.
     val mine = rememberDraft(question)
     val guess = rememberDraft(question)
 
-    // A deck is already one question a page. What it lacked was somewhere to
-    // look that stays put: the count and the progress row sat inside the scroll
-    // and left the screen the moment you reached the answer field, which is
-    // exactly when "how many left" becomes the question. Short decks keep it
-    // inline -- five questions is a thing you can hold in your head.
+    // Longer decks pin the header above the scroll; short ones keep it inline.
     val sticky = quiz.size > ProgressFloor
 
     Column(modifier.fillMaxSize()) {
@@ -155,9 +138,7 @@ private fun DeckPlayer(
             slugs = listOf(quiz.theme.brick.slug),
             studs = 12,
             height = BrickHeight.MEDIUM,
-            // The next question comes in from the side. Enter only: the page
-            // being replaced is the one you have just finished with, and
-            // animating its exit holds the deck up for no one's benefit.
+            // Slide in on each new question; no exit animation.
             modifier = Modifier.fillMaxWidth().arrive(index, slide = 16.dp),
         ) {
             Column(
@@ -167,10 +148,7 @@ private fun DeckPlayer(
                     .glassOn(quiz.theme.brick.slug)
                     .padding(horizontal = 16.dp, vertical = 14.dp),
             ) {
-                // What kind of question this is, and what it is about. Both
-                // change how you answer: "put in order" is a different job from
-                // "pick one", and knowing the category stops a light question
-                // reading as a loaded one.
+                // Question type and category.
                 Text(
                     text = "${question.type.label.uppercase()}  ·  ${question.category.uppercase()}",
                     style = MaterialTheme.typography.labelSmall,
@@ -194,7 +172,7 @@ private fun DeckPlayer(
 
         if (question.isScored) {
             Spacer(Modifier.height(26.dp))
-            SectionLabel("What ${state.them.name} will say")
+            SectionLabel("Guess ${state.them.name}'s answer")
             Spacer(Modifier.height(10.dp))
             Box(Modifier.arrive(index, index = 2, slide = 16.dp)) {
                 QuestionInput(question, guess, them, forPartner = true, state = state)
@@ -210,8 +188,7 @@ private fun DeckPlayer(
             label = if (last) "Done" else "Next",
             slug = you.slug,
             enabled = ready,
-            // Finishing a deck is the same act as sealing a day, and until now
-            // it made the same noise as stepping to question three.
+            // Last question uses the seal sound and haptic.
             sfx = if (last) Sfx.SEAL else Sfx.RELEASE,
             feelOnClick = if (last) Feel.SEAL else Feel.RELEASE,
         ) {
@@ -225,7 +202,7 @@ private fun DeckPlayer(
     }
 }
 
-/** The way out, the count, and the run of studs -- wherever it is put. */
+/** Leave button, question count, and progress row. */
 @Composable
 private fun DeckHeader(quiz: Quiz, index: Int, you: BrickColor, onBack: () -> Unit) {
     val sounds = LocalSounds.current
@@ -247,7 +224,7 @@ private fun DeckHeader(quiz: Quiz, index: Int, you: BrickColor, onBack: () -> Un
     Progress(done = index, total = quiz.size, color = you)
 }
 
-/** Your side is in; theirs is not. The seal, applied to a whole deck. */
+/** Shown after you submit a deck and before your partner has. */
 @Composable
 private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modifier: Modifier) {
     Column(
@@ -255,7 +232,6 @@ private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modif
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(60.dp))
-        // The deck's own colour, in its own brick. The identity was an emoji.
         BrickSlab(
             slugs = listOf(quiz.theme.brick.slug),
             studs = 4,
@@ -264,13 +240,13 @@ private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modif
         )
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "Click.",
+            text = "Done",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "You have finished ${quiz.title}. Nothing opens until $theirName has too.",
+            text = "You finished ${quiz.title}. Waiting for $theirName. Opens when you both finish.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -325,7 +301,7 @@ private fun DeckResult(
 
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "Now go and ask them about it.",
+            text = "Talk about it together.",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -336,19 +312,15 @@ private fun DeckResult(
 }
 
 /**
- * How far through, in bricks rather than a bar: one brick per question.
- *
- * No height is set. BrickSlab rounds up to whole courses and ignores an
- * incoming height constraint, so asking for a 10dp strip gets a taller slab
- * that draws over its neighbour.
+ * One brick per question, lit up to the current one.
+ * No height set: BrickSlab rounds up to whole courses and would overdraw neighbors.
  */
 @Composable
 private fun Progress(done: Int, total: Int, color: BrickColor) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         repeat(total) { i ->
             val lit = i <= done
-            // Glide on the alpha, spring on the position. A bouncy spring here
-            // would overshoot 1.0 and hand that straight to drawImage.
+            // No spring on alpha: overshooting 1.0 breaks drawImage.
             val alpha by animateFloatAsState(
                 if (lit) 1f else 0.22f, Motion.glide, label = "progressLit",
             )

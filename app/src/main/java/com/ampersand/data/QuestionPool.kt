@@ -16,32 +16,12 @@ import com.ampersand.model.Taste
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-/**
- * Every question the app knows about, loaded from the bundled decks.
- *
- * The decks are both things at once: a deck is something you sit down and play,
- * and its questions are also the pool the daily question is drawn from. Keeping
- * one source means a question cannot exist in the app and be missing from the
- * pool, which is what happens the moment there are two lists.
- */
+/** Every bundled question. Deck questions double as the daily question pool. */
 class QuestionPool(
     val decks: List<Quiz>,
-    /**
-     * One small deck per occasion, keyed by [Occasion.id].
-     *
-     * Kept out of [decks] on purpose: these are the source for a particular
-     * day, not something to sit down and play. A Christmas deck listed on the
-     * eleventh of March is clutter.
-     */
+    /** One small deck per occasion, keyed by [Occasion.id]. Not listed as playable decks. */
     val occasions: Map<String, Quiz> = emptyMap(),
-    /**
-     * Questions that only ever arrive as the daily question.
-     *
-     * The decks and the daily pool used to be one list, so an evening spent on
-     * a deck was an evening spent using up daily questions -- and five months in
-     * the pool had been round. These widen the daily pool and are never offered
-     * as a deck, so nothing can spend them but the day.
-     */
+    /** Questions for the daily pool only; also offered as [packs]. */
     val dailyOnly: List<Quiz> = emptyList(),
     /** A few questions for each kind of weather. See [daily]. */
     val weather: Map<WeatherKind, List<Question>> = emptyMap(),
@@ -60,16 +40,8 @@ class QuestionPool(
     val all: List<Question> = decks.flatMap { it.questions } + dailyOnly.flatMap { it.questions }
 
     /**
-     * The daily-only questions cut into packs of [PackSize], so they can be
-     * played in an evening too.
-     *
-     * They were only ever reachable one a day, which left the Decks tab showing
-     * 99 questions out of six hundred. A pack that the two of you both finish
-     * is skipped by the daily draw for six weeks (see `recentlyAsked`), so
-     * playing one spends its questions exactly the way a deck always did.
-     *
-     * Cut in file order, so a pack's id and contents stay put between builds
-     * as long as the question files do.
+     * [dailyOnly] cut into playable packs of [PackSize], in file order so ids stay stable.
+     * A finished pack is skipped by the daily draw for six weeks (see `recentlyAsked`).
      */
     val packs: List<Quiz> = dailyOnly.flatMap { source ->
         val chunks = source.questions.chunked(PackSize)
@@ -106,17 +78,13 @@ class QuestionPool(
         date: LocalDate,
         anniversary: LocalDate? = null,
         taste: Taste = Taste.none,
-        /**
-         * Question ids to pass over: asked in the last few weeks, or played in a
-         * deck the two of you finished recently. Built from state both phones
-         * share, so skipping keeps the two landing on the same question.
-         */
+        /** Question ids to skip (recently asked or in a recently finished deck). Must be shared state so both phones agree. */
         recent: Set<String> = emptySet(),
         /** The category picked for today last night. Falls back to the whole pool if it is used up. */
         theme: String? = null,
-        /** Topics either of you took out. A filter, because you asked for one. */
+        /** Topics either of you hid. Filtered out. */
         hidden: Set<Topic> = emptySet(),
-        /** Notable weather. Used on every other such day, so a wet week is not all about rain. */
+        /** Notable weather. Used on every other such day. */
         weatherKind: WeatherKind? = null,
         /** Where you live. Adds that region's questions to the pool. */
         region: UsRegion? = null,
@@ -133,8 +101,7 @@ class QuestionPool(
         val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty()
         val open = everything.filter(::shown).ifEmpty { everything }
 
-        // Your own dates, then holidays. Rotated by year so a date does not
-        // ask the same thing every time.
+        // Your own dates, then holidays. Rotated by year.
         dateKinds.firstNotNullOfOrNull { dates[it]?.takeIf { q -> q.isNotEmpty() } }?.let { pool ->
             return pool[date.year.mod(pool.size)]
         }
@@ -164,10 +131,8 @@ class QuestionPool(
     }
 
     /**
-     * The one-word reason [question] is today's, for the tag on its card.
-     * Worked out from which set it came from, so a pinned question gets the
-     * same tag on both phones. The theme pick, a written question and a repeat
-     * are named by the screen, which knows who did them.
+     * The short tag for why [question] is today's, based on which set it came from.
+     * Theme picks, wildcards and repeats are labeled by the screen instead.
      */
     fun why(
         question: Question,
@@ -214,15 +179,8 @@ class QuestionPool(
         draw to (sameKindDay(date, weekend) * strideFor(draw.size)).mod(draw.size.toLong()).toInt()
 
     /**
-     * A day number that counts only days of the same kind.
-     *
-     * Weekends and weekdays draw from different lists, and the calendar day
-     * number repeats its day of the week every seven. Stepping a weekend list by
-     * calendar days meant every weekend slot was the same distance apart each
-     * week, so a weekend list whose length was a multiple of seven only ever
-     * reached three sevenths of itself. Counting Fridays to Sundays as 0, 1, 2,
-     * 3, 4... and Mondays to Thursdays likewise makes consecutive days of a kind
-     * consecutive numbers, and the stride then reaches everything.
+     * A day index counting only weekend days (Fri-Sun) or only weekdays (Mon-Thu).
+     * Calendar day numbers left gaps that stopped the stride from reaching the whole list.
      */
     private fun sameKindDay(date: LocalDate, weekend: Boolean): Long {
         val week = Math.floorDiv(date.with(DayOfWeek.MONDAY).toEpochDay(), 7L)
@@ -232,32 +190,15 @@ class QuestionPool(
     }
 
     /**
-     * How far the daily slot moves each day.
-     *
-     * A prime stride walks the list rather than stepping through it in order,
-     * so consecutive days are not neighbours in the same deck. It has to share
-     * no factor with the list's length, or it only ever reaches a fraction of
-     * it: a stride of seven over a list of 140 visits twenty questions and never
-     * the other hundred and twenty. A fixed seven was safe while the pool was 76
-     * or 99; the weighting changes the length day to day, so the stride is chosen
-     * to fit.
+     * How far the daily slot moves each day: the smallest prime that does not divide
+     * [size], so the walk reaches every question.
      */
     private fun strideFor(size: Int): Long =
         Strides.first { size % it != 0 }.toLong()
 
     /**
-     * The pool, with what the tests found leaning on it.
-     *
-     * Laid out in tiers rather than by repeating each question in place: tier
-     * one is every candidate, tier two is every candidate the profile weights
-     * at two or more, and so on. Grouping a question's copies together would
-     * put them within a few strides of each other and the same question would
-     * come round twice in a fortnight; a tier is a whole pool apart.
-     *
-     * Every question survives tier one whatever the profile says. The tilt
-     * changes the odds and never the reachable set -- an app that quietly
-     * retires a third of its questions because of a test somebody took in March
-     * is a worse app than one that never asked.
+     * The pool weighted by [taste], laid out in tiers: tier 1 is every candidate, tier 2
+     * those weighted 2+, and so on. Tiers keep a question's copies far apart in the walk.
      */
     private fun tilted(candidates: List<Question>, taste: Taste): List<Question> {
         val top = candidates.maxOf { taste.weightOf(it) }
@@ -288,13 +229,13 @@ class QuestionPool(
             places = context.assets.open("zips.csv").bufferedReader().useLines { ZipTable.parse(it) },
         )
 
-        /** Primes to try as a stride, smallest first. One always fits: no list is that long. */
+        /** Primes to try as a stride, smallest first. */
         private val Strides = listOf(7, 11, 13, 17, 19, 23)
 
-        /** Questions to a pack: an evening's worth, like the hand-written decks. */
+        /** Questions per pack. */
         const val PackSize = 8
 
-        /** How far back "asked lately" reaches: six weeks. */
+        /** How far back "recently asked" reaches: six weeks. */
         const val RecentDays = 42L
     }
 }

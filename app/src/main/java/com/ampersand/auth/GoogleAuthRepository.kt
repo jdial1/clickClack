@@ -22,17 +22,8 @@ import kotlin.coroutines.resume
 private const val TAG = "GoogleAuth"
 
 /**
- * Google sign-in through Credential Manager, exchanged for a Firebase session.
- *
- * Credential Manager rather than the old `GoogleSignIn` API: that one is
- * deprecated, and its `startActivityForResult` flow needs a launcher plumbed
- * through the composable tree for what is conceptually one suspending call.
- *
- * The flow is two hops and it is worth being clear which is which. Credential
- * Manager returns a **Google ID token**, which proves who the person is to
- * Google. That is then exchanged with Firebase for a **Firebase session**,
- * which is what the Firestore security rules actually check. Skipping the
- * second hop leaves you with a signed-in user the database has never heard of.
+ * Google sign-in via Credential Manager, then exchanged for a Firebase session.
+ * The Firebase session is what Firestore rules check; the Google ID token alone is not enough.
  */
 class GoogleAuthRepository(
     context: Context,
@@ -48,9 +39,7 @@ class GoogleAuthRepository(
     private val listener = FirebaseAuth.AuthStateListener { it.currentUser.publish() }
 
     init {
-        // Fires immediately with the cached session, which is why AuthState has
-        // a Loading case: without it the sign-in screen flashes on every cold
-        // start before this first callback lands.
+        // Fires immediately with the cached session, ending AuthState.Loading.
         auth.addAuthStateListener(listener)
     }
 
@@ -60,7 +49,7 @@ class GoogleAuthRepository(
         } else {
             AuthState.SignedIn(
                 uid = uid,
-                // A Google account can genuinely have no display name set.
+                // A Google account may have no display name.
                 displayName = displayName?.takeIf { it.isNotBlank() }
                     ?: email?.substringBefore('@')
                     ?: "You",
@@ -89,7 +78,7 @@ class GoogleAuthRepository(
 
             signInToFirebase(token)
         } catch (e: GetCredentialCancellationException) {
-            // They closed the sheet. Not a failure worth telling them about.
+            // User closed the sheet; not an error.
             Log.d(TAG, "Sign-in dismissed")
             Result.success(Unit)
         } catch (e: NoCredentialException) {
@@ -101,12 +90,7 @@ class GoogleAuthRepository(
         }
     }
 
-    /**
-     * Exchange the Google ID token for a Firebase session.
-     *
-     * Wrapped by hand rather than pulling in kotlinx-coroutines-play-services
-     * for the single `await()` this file would use it for.
-     */
+    /** Exchange the Google ID token for a Firebase session. */
     private suspend fun signInToFirebase(idToken: String): Result<Unit> =
         suspendCancellableCoroutine { cont ->
             auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null))
@@ -124,17 +108,8 @@ class GoogleAuthRepository(
 
     private companion object {
         /**
-         * The OAuth **web** client id, baked in at build time.
-         *
-         * Read straight out of google-services.json by the build script, so an
-         * absent config gives an empty string rather than a missing symbol.
-         *
-         * This used to be a `Resources.getIdentifier` lookup, for the same
-         * reason: the generated string only exists when a Firebase config does.
-         * But a reflective lookup is invisible to the resource shrinker, which
-         * duly removed the string from the release build -- and the app then
-         * reported "No default_web_client_id" on a build that had one. A
-         * constant cannot be shrunk away.
+         * The OAuth web client id from google-services.json, baked into BuildConfig (empty if absent).
+         * Not a `getIdentifier` lookup: the resource shrinker removed that string in release.
          */
         fun webClientId(context: Context): String? =
             com.ampersand.BuildConfig.WEB_CLIENT_ID.takeIf { it.isNotBlank() }

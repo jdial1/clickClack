@@ -58,17 +58,8 @@ import com.ampersand.ui.theme.Motion
 
 
 /**
- * The results of every whole-instrument sitting, kept.
- *
- * A number that appears once and scrolls away is not worth a six-minute
- * sitting, so the badges live here permanently. They are bricks because the app
- * has exactly one visual language, and an unclaimed slot is a ghost brick
- * because an empty spot is an invitation this app already knows how to make.
- *
- * Tapping an earned badge opens the shape behind it rather than just the
- * headline -- four letters with their margins, five love-language scores rather
- * than only the loudest. A four-letter type that hides how close an axis ran is
- * claiming a precision the instrument does not have.
+ * Saved results of every whole-instrument test, as badge bricks. Unclaimed slots
+ * are ghost bricks; tapping an earned badge shows its full score breakdown.
  */
 @Composable
 fun ProfileBadges(
@@ -105,14 +96,7 @@ fun ProfileBadges(
     }
 }
 
-/**
- * One test, and everything it produced.
- *
- * The heading carries the explanation because a badge on its own is a result
- * with no question attached to it -- "Acts of service" means nothing in April
- * to somebody who answered in January. It is also what makes three courses
- * legible as one sitting rather than as three tests sharing a word.
- */
+/** One test: a heading, then its badge rows or a single take button. */
 @Composable
 private fun WallGroup(
     group: BadgeGroup,
@@ -137,7 +121,7 @@ private fun WallGroup(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            // Retake once your half is in; before that, how long it takes.
+            // Retake once you've done yours; before that, show the duration.
             if (!group.yourTurn) {
                 Text(
                     "Retake",
@@ -160,12 +144,7 @@ private fun WallGroup(
 
         Spacer(Modifier.height(12.dp))
 
-        // One button per test, not one per slot.
-        //
-        // Rendering the unclaimed state slot by slot put six "Take it" bricks
-        // under Love language -- two people times three courses -- for a
-        // single six-minute sitting. The courses only exist once there is
-        // something to put in them.
+        // One button per test, not per slot (per-slot showed six "Take it" bricks for one test).
         if (group.isEarned) {
             group.rows.forEachIndexed { i, row ->
                 if (i > 0) Spacer(Modifier.height(12.dp))
@@ -184,14 +163,7 @@ private fun WallGroup(
     }
 }
 
-/**
- * The whole unclaimed test, as one brick.
- *
- * Disabled once you have done your half: there is nothing left for you to tap
- * and a live button that does nothing is the dead end this app keeps trying to
- * design out. It still draws as a brick rather than vanishing, because the
- * slot is the invitation -- to the other person.
- */
+/** An untaken test as one ghost brick. Disabled (but still shown) once you've done your part. */
 @Composable
 private fun TakeIt(
     group: BadgeGroup,
@@ -224,13 +196,9 @@ private fun TakeIt(
                 Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // Where the two of you have got to, which is the only place
-                // either of you can see the other mid-sitting. Falls back to
-                // the length when nobody has started, because "5 min, each"
-                // is the useful thing to know before you begin and useless
-                // once somebody has.
+                // Progress for both partners; falls back to duration before anyone starts.
                 Text(
-                    text = group.standing.ifBlank { "${group.minutes} min, each" },
+                    text = group.standing.ifBlank { "${group.minutes} min each" },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(
                         alpha = if (yourTurn) 0.72f else 0.5f,
@@ -259,8 +227,7 @@ private fun WallRow(
     onTap: (Badge) -> Unit,
 ) {
     Column(Modifier.fillMaxWidth()) {
-        // Empty on a test that produces a single course: a sub-heading above
-        // one row that restates the group's own name is noise.
+        // Blank for single-row tests, so no redundant sub-heading.
         if (row.label.isNotBlank()) {
             SectionLabel(row.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(7.dp))
@@ -285,9 +252,7 @@ private fun WallRow(
             }
         }
 
-        // Tapping either brick opens both, each under its own. The point of
-        // the detail is the comparison: a four-letter type means more beside
-        // the other person's margins than it does alone.
+        // Tapping either brick opens details for both, side by side for comparison.
         if (row.badges.any { it.slotId == openSlot }) {
             val earned = row.badges.filter { it.isEarned }
             Column(
@@ -315,13 +280,7 @@ private fun WallRow(
     }
 }
 
-/**
- * One badge, as a brick.
- *
- * A couple result spans the row and is painted in both colours, the same way
- * every other shared surface in the app is -- it is not either person's result
- * and should not be either person's colour.
- */
+/** One badge as a brick. Couple results span the row in both colors. */
 @Composable
 private fun BadgeBrick(
     badge: Badge,
@@ -363,18 +322,11 @@ private fun BadgeBrick(
         onTap()
     }
 
-    // Slabs rather than pills, and six studs rather than a hugged width. A pill
-    // sizes itself to its label, which is right for a chip and wrong here: two
-    // badges side by side came out at whatever width "Time" and "Acts of
-    // service" happened to need, and a wall whose courses are all different
-    // lengths does not read as a wall. Six and six make the twelve the page is
-    // already built on, so an individual badge and a couple badge share a stud
-    // size and the rows stack like brickwork.
+    // Fixed six-stud slabs, not label-sized pills, so side-by-side badges match widths.
     val body: @Composable () -> Unit = { Box(Modifier.fillMaxWidth(), Alignment.Center) { label() } }
 
     when {
-        // Not taken yet: a ghost brick, not a missing one. The wall reads as
-        // having a hole in it rather than as being short a row.
+        // Not taken yet: ghost brick.
         !badge.isEarned -> BrickSlab(
             slugs = listOf(quietSlug()),
             modifier = modifier.then(tap),
@@ -384,7 +336,7 @@ private fun BadgeBrick(
             content = { body() },
         )
 
-        // Not either person's result, so not either person's colour.
+        // Couple result: both colors, full row.
         badge.owner == Owner.BOTH -> BrickSlab(
             slugs = listOf(color.slug, other.slug),
             modifier = modifier.then(tap),
@@ -406,21 +358,12 @@ private fun BadgeBrick(
 /** Half the twelve-stud page, so two badges make one course. */
 private const val HalfRow = 6
 
-/**
- * How faint an unclaimed slot is.
- *
- * Low enough to read as a hole rather than as a filled grey brick -- at the
- * first value the quiet brick came through as solid charcoal in light mode and
- * the row looked taken.
- */
+/** Alpha for unclaimed slots; higher values looked like a solid, taken brick in light mode. */
 private const val GhostAlpha = 0.3f
 
 @Composable
 private fun ink(badge: Badge, color: BrickColor, other: BrickColor): Color = when {
-    // Not `inkOnBrick`: that answers for a *solid* brick, and at
-    // [GhostAlpha] the ground shows through and decides the contrast. White on
-    // a 30%-black brick over a pale wall is unreadable; the theme's own ink is
-    // correct on either ground by construction.
+    // Not inkOnBrick: at GhostAlpha the background decides contrast, so use theme ink.
     !badge.isEarned -> MaterialTheme.colorScheme.onBackground
     badge.owner == Owner.BOTH -> inkOnBricks(color.slug, other.slug)
     else -> inkOnBrick(color.slug)
@@ -429,14 +372,7 @@ private fun ink(badge: Badge, color: BrickColor, other: BrickColor): Color = whe
 private fun takeLabel(badge: Badge): String =
     if (badge.waitingOnThem) "Waiting" else "Take it"
 
-/**
- * The shape behind one person's headline, sized for half a row.
- *
- * Every bar is labelled with the number it stands for, because the whole reason
- * this exists is that a headline word is a rounding of a continuum and the app
- * should not pretend otherwise. The label sits on its own line above the bar,
- * because half a phone is not wide enough for "Inward or outward" beside one.
- */
+/** One person's score breakdown: a labeled bar with its value per dimension. Labels sit above bars for width. */
 @Composable
 private fun Detail(badge: Badge, color: BrickColor, modifier: Modifier = Modifier) {
     Column(modifier) {

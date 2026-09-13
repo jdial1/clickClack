@@ -5,16 +5,11 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 /**
- * Whether one person turned up on a given day: answered the day's question, or
- * finished a deck.
+ * Whether one person answered the day's question or finished a deck on a date,
+ * for the Shelf's per-person day pips.
  *
- * The Shelf's ten weeks draw one pip per person per day, so a day only one of
- * you managed looks different from a day you both did. A past day carries no
- * answers, so the day's `submitted` list says who answered, and a day that
- * opened means both did.
- *
- * A partner's deck only counts once that deck has opened: their run is
- * unreadable until then, which is the seal doing its job.
+ * Past days carry no answers, so `submitted` says who answered and `opened`
+ * means both did.
  */
 object DayPips {
 

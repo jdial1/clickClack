@@ -6,29 +6,16 @@ import java.time.Month
 import java.time.temporal.TemporalAdjusters
 
 /**
- * A day that is not like the others.
+ * A holiday, solstice or anniversary whose daily question comes from its own deck.
  *
- * Holidays, solstices and the day the two of you started. On these the daily
- * question is drawn from that occasion's own small deck instead of the general
- * pool, because "what did you need this week" on Christmas morning is a wasted
- * question and "what are you dreading about today" is the one worth asking.
- *
- * [id] matches a file in `assets/occasions/`, so adding an occasion is a JSON
- * file and one line here.
- *
- * No icons. There were emoji; no icon set has a Juneteenth or a Presidents' Day
- * mark, and twenty occasions illustrated by whatever happened to be close is
- * worse than twenty occasions named plainly.
- *
- * **Declaration order is precedence**, because occasions collide: Father's Day
- * 2026 falls on the twenty-first of June, which is also the summer solstice.
- * The named days people actually mark come first and the astronomical markers
- * last, so nobody gets asked about the long evenings on Father's Day.
+ * [id] matches a file in `assets/occasions/`.
+ * Declaration order is precedence when occasions share a date (e.g. Father's Day
+ * and the summer solstice), so named days come before astronomical ones.
  */
 enum class Occasion(
     val id: String,
     val label: String,
-    /** Where this is a day worth a question. Empty means everywhere. */
+    /** States where this occasion applies. Empty means everywhere. */
     val states: Set<String> = emptySet(),
 ) {
     // Named days first.
@@ -49,8 +36,7 @@ enum class Occasion(
     CHRISTMAS("christmas", "Christmas Day"),
     NEW_YEARS_EVE("new-years-eve", "New Year's Eve"),
 
-    // Days that belong to a place, asked only for couples whose home ZIP is
-    // there. After the national ones, so Christmas still wins anywhere.
+    // State-specific days, only for couples whose home ZIP is there. After national ones.
     MARDI_GRAS("mardi-gras", "Mardi Gras", setOf("LA", "AL", "MS")),
     TEXAS_INDEPENDENCE("texas-independence", "Texas Independence Day", setOf("TX")),
     CESAR_CHAVEZ("cesar-chavez", "Cesar Chavez Day", setOf("CA", "CO", "TX", "AZ", "NM")),
@@ -67,21 +53,13 @@ enum class Occasion(
     AUTUMN("autumn", "First day of fall"),
     WINTER("winter", "Winter solstice"),
 
-    /**
-     * The day the two of you started, which only exists once someone has told
-     * the app when that was.
-     */
+    /** The day the two of you started, once it is set. */
     ANNIVERSARY("anniversary", "Your anniversary"),
     ;
 
     companion object {
 
-        /**
-         * Which occasion [date] is, if any.
-         *
-         * The anniversary wins over a public holiday. If you got together on the
-         * fourth of July, the fourth of July is your anniversary.
-         */
+        /** Which occasion [date] is, if any. The anniversary wins over a holiday. */
         fun on(date: LocalDate, anniversary: LocalDate? = null, state: String? = null): Occasion? {
             if (anniversary != null &&
                 date.month == anniversary.month &&
@@ -122,14 +100,7 @@ enum class Occasion(
         }
     }
 
-    /**
-     * Whether this occasion falls on [date].
-     *
-     * The solstices and equinoxes are fixed dates rather than computed
-     * astronomically. The real ones wander by a day either side and depend on
-     * where you are standing; an almanac calculation would be a lot of code for
-     * a question about whether you like the dark evenings.
-     */
+    /** Whether this occasion falls on [date]. Solstices and equinoxes use fixed dates. */
     fun falls(date: LocalDate): Boolean = when (this) {
         NEW_YEAR -> date.month == Month.JANUARY && date.dayOfMonth == 1
         MLK_DAY -> date.isNth(3, DayOfWeek.MONDAY, Month.JANUARY)
@@ -172,12 +143,7 @@ private fun LocalDate.isNth(n: Int, day: DayOfWeek, month: Month): Boolean =
 private fun LocalDate.isLast(day: DayOfWeek, month: Month): Boolean =
     this.month == month && this == with(TemporalAdjusters.lastInMonth(day))
 
-/**
- * How long the two of you have been going, said the way a person would.
- *
- * Years and months, not days. "1,247 days together" is a number from a
- * spreadsheet; nobody has ever said it out loud.
- */
+/** Time together in years and months (days only under a month). */
 fun timeTogether(since: LocalDate, now: LocalDate): String {
     if (since > now) return "Starting today"
     val period = java.time.Period.between(since, now)
@@ -186,7 +152,7 @@ fun timeTogether(since: LocalDate, now: LocalDate): String {
     val days = period.days
 
     return when {
-        years == 0 && months == 0 && days == 0 -> "Since this morning"
+        years == 0 && months == 0 && days == 0 -> "Starting today"
         years == 0 && months == 0 -> "$days ${plural(days, "day")}"
         years == 0 -> "$months ${plural(months, "month")}"
         months == 0 -> "$years ${plural(years, "year")}"

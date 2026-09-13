@@ -20,12 +20,8 @@ import com.ampersand.ui.brick.BrickTile
 import com.ampersand.ui.brick.rememberBricks
 
 /**
- * A mood as a brick.
- *
- * Faces are the pack's character bricks in [faceColor] (null: the face's own
- * pack colour; the others come from tools/moods/faces.py). Special bricks are
- * drawn as the pack draws them. Built moods are plain bricks in [color], the
- * person's own: one on its side, one upside down, a gap where a piece should be.
+ * Draws a mood. Faces use character sprites in [faceColor] (null: the sprite's own
+ * color; recolors come from tools/moods/faces.py). Built moods use plain bricks in [color].
  */
 @Composable
 fun MoodArt(
@@ -80,7 +76,7 @@ private fun special(mood: Mood): Int = when (mood) {
     else -> R.drawable.extra_crate_explosive
 }
 
-/** Each face's own colour first, then red, yellow, green, blue in [BrickColor] order. */
+/** Each face's own color first, then red, yellow, green, blue in [BrickColor] order. */
 private val faces = mapOf(
     Mood.SNAPPED_IN to listOf(
         R.drawable.extra_character_a, R.drawable.extra_character_a_red, R.drawable.extra_character_a_yellow,

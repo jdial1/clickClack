@@ -7,16 +7,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Today's forecast from api.weather.gov.
- *
- * Free, no key, public domain, and covering every US ZIP -- which is the whole
- * country this app is for. Two requests: the point tells us which forecast
- * office and grid square a location belongs to, and the forecast for that
- * square gives today's period. NWS asks for a User-Agent that says who is
- * calling, and refuses requests without one.
- *
- * Blocking, so call it off the main thread. Throws on anything unexpected;
- * the caller treats that as a day with no weather.
+ * Today's forecast from api.weather.gov (US only, no API key).
+ * Two requests: /points gives the grid forecast URL, which gives today's period.
+ * NWS rejects requests without a User-Agent. Blocking; throws on any failure.
  */
 object NationalWeatherService {
 

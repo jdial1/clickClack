@@ -13,23 +13,10 @@ data class BadgeBar(
 )
 
 /**
- * A result, kept.
+ * A test result, drawn as a brick on the Us page.
  *
- * A number that appears once and scrolls away is not worth a twelve-minute
- * sitting, so everything an instrument computes lands here and stays on the Us
- * page. The badge draws as a brick, because the app has exactly one visual
- * language and this is the obvious thing to say in it.
- *
- * [result] null means the slot is unclaimed and the brick draws as an outline.
- * That is a state rather than an absence: an outlined brick carrying the test's
- * name and its length is the whole acquisition funnel, and an empty spot is an
- * invitation this app already knows how to make.
- *
- * [detail] is the shape behind the headline, and is never optional in spirit
- * even though it is in the type. A four-letter type that hides its margins is
- * claiming a precision the instrument does not have, and a love language shown
- * as one word tells somebody they *are* a category the evidence does not
- * support. The brick says the headline; one tap says the truth.
+ * [result] null means the slot is unclaimed and draws as an outline.
+ * [detail] holds the subscale bars shown when the badge is tapped.
  */
 data class Badge(
     val slotId: String,
@@ -39,7 +26,7 @@ data class Badge(
     /** Null until both of you have finished. */
     val result: String? = null,
     val detail: List<BadgeBar> = emptyList(),
-    /** The sentence worth acting on, shown under the shape. */
+    /** Note shown under the bars. */
     val note: String? = null,
     val instrumentId: String,
     val minutes: Int,
@@ -50,10 +37,9 @@ data class Badge(
 }
 
 /**
- * One course of the wall: an optional sub-label and the bricks under it.
+ * One row of badges under an optional sub-label.
  *
- * [label] is empty whenever a test produces a single course, because a heading
- * above one row that repeats the group's own name is noise.
+ * [label] is empty when a test produces a single row.
  */
 data class BadgeRow(
     val label: String,
@@ -62,31 +48,19 @@ data class BadgeRow(
     val isEarned: Boolean get() = badges.all { it.isEarned }
 }
 
-/**
- * Everything one test produced, under one heading.
- *
- * Grouping is not cosmetic here. Love languages yields three courses -- what
- * you want, what you give, and the fit between them -- and as three peers on
- * the wall they read as three unrelated tests that happen to share a word.
- * They are one sitting, and the third course only means anything because the
- * first two exist.
- *
- * [about] is the reason the heading is worth its space: a badge saying
- * "Acts of service" is a result with no question attached to it, and nobody
- * remembers in April what they answered in January.
- */
+/** Everything one test produced, under one heading. [about] says what the test asks. */
 data class BadgeGroup(
     val instrumentId: String,
     val title: String,
     val about: String,
     val minutes: Int,
-    /** For the one line that has to name them: "Waiting on Maya". */
+    /** Partner's name, for "Waiting for Maya". */
     val partnerName: String,
-    /** The line above the action, saying where the two of you have got to. */
+    /** Progress line shown above the action. */
     val standing: String,
-    /** What the action brick says: "Take it", "Carry on", "Waiting on Maya". */
+    /** Action label: "Start", "Continue", "Waiting for Maya". */
     val action: String,
-    /** False once you have sealed your half; there is nothing left to tap. */
+    /** False once you have sealed your half. */
     val yourTurn: Boolean,
     val rows: List<BadgeRow>,
 ) {

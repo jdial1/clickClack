@@ -3,13 +3,10 @@ package com.ampersand.model
 import java.time.LocalDate
 
 /**
- * The build: what you get for showing up, and what you make out of it.
+ * Bricks, build plates and the rules for earning them.
  *
- * Geometry follows the brick art rather than the other way round. In the pack a
- * stud is 64px and the shortest brick body is 28px, so the grid cell is 64 x 28
- * -- wider than it is tall, exactly like a real brick. Heights come in 1, 2 and
- * 4 rows; widths in 1, 2, 4 and 6 studs. Inventing a square grid and stretching
- * the art onto it would have been the obvious move and it would look wrong.
+ * Grid cells are 64 x 28 to match the brick art (stud 64px, shortest body 28px).
+ * Heights are 1, 2 or 4 rows; widths 1, 2, 4 or 6 studs.
  */
 
 /** Brick body heights, in grid rows. */
@@ -37,12 +34,7 @@ data class BrickShape(
     val w: Int get() = studs
     val h: Int get() = height.rows
 
-    /**
-     * The drawable this maps to, e.g. `brick_medium_slope_left_4`.
-     *
-     * Slopes are collided as their full bounding box. Honouring the diagonal
-     * would be more correct and, on a plate this size, invisible.
-     */
+    /** The drawable name, e.g. `brick_medium_slope_left_4`. Slopes collide as their full bounding box. */
     val asset: String
         get() = buildString {
             append("brick_")
@@ -62,19 +54,19 @@ enum class BlockFace(val asset: String) {
     E("extra_character_e"),
 }
 
-/** Characters are drawn from their own art, so they ignore the owner's colour. */
+/** Characters are drawn from their own art, so they ignore the owner's color. */
 val CharacterShape = BrickShape(2, BrickHeight.HIGH)
 
 data class Block(
     val id: String,
     val shape: BrickShape,
-    /** 0xAARRGGBB. The owner's colour, so the finished piece shows who built what. */
+    /** 0xAARRGGBB. The owner's color. */
     val colorArgb: Long,
     val ownerUid: String,
     val earnedOn: LocalDate,
     val face: BlockFace? = null,
 ) {
-    /** Faces have their own art; every other brick exists in the owner's colour. */
+    /** Faces have their own art; every other brick exists in the owner's color. */
     val asset: String get() = face?.asset ?: BrickColor.of(colorArgb).asset(shape)
 }
 
@@ -91,23 +83,9 @@ data class BuildPlate(
     val gridH: Int,
     val blocks: List<Block> = emptyList(),
     val placed: List<Placement> = emptyList(),
-    /**
-     * The day this sculpture was sealed, or null while it is still being built.
-     *
-     * The date belongs to the **finished thing**, not to the bricks in it. A
-     * brick that remembered its own day would turn the sculpture into a
-     * scrollable diary and the plate into an index; what you actually want to
-     * be able to say is "that is the one we made the week of the ninth". So
-     * individual blocks stay anonymous and the plate carries the date.
-     */
+    /** The day this sculpture was sealed, or null while still being built. Blocks carry no date of their own. */
     val completedOn: LocalDate? = null,
-    /**
-     * One line each about the week, keyed by uid: "the week we...".
-     *
-     * Written after the plate seals, which is the only thing a sealed plate
-     * still accepts. It is what turns the shelf from a row of objects into a
-     * row of weeks somebody remembers.
-     */
+    /** One line each about the week, keyed by uid. Written after the plate seals. */
     val notes: Map<String, String> = emptyMap(),
     /** The words each of you picked to name the week, keyed by uid. See [SculptureNames]. */
     val words: Map<String, NameWords> = emptyMap(),
@@ -116,15 +94,7 @@ data class BuildPlate(
         /** Width in studs. A brick is up to 6 wide, so this fits two side by side. */
         const val GRID_W = 12
 
-        /**
-         * Height in rows, at 4 rows to a tall brick.
-         *
-         * Deliberately far more than a fortnight of bricks can fill. The plate
-         * is the room the sculpture gets to grow into, and a board sized to the
-         * expected number of bricks makes every week end the same shape --
-         * spread wide along the floor, because there was nowhere else to go.
-         * Headroom is what lets a tower be a choice.
-         */
+        /** Height in rows. Intentionally far more than two weeks of bricks can fill, so towers are possible. */
         const val GRID_H = 28
     }
 
@@ -135,7 +105,7 @@ data class BuildPlate(
     /** Sealed sculptures are read-only: no tray, no placing, no awarding. */
     val isSealed: Boolean get() = completedOn != null
 
-    /** The last row with anything standing on it. Sizes a thumbnail honestly. */
+    /** The last row with anything standing on it. Used to size thumbnails. */
     fun builtHeight(): Int = placed.maxOfOrNull { p ->
         p.y + (byId[p.blockId]?.shape?.h ?: 0)
     } ?: 0
@@ -169,12 +139,8 @@ data class BuildPlate(
     }
 
     /**
-     * Whether [shape] may sit with its bottom-left corner at ([x], [y]).
-     *
-     * Three rules, and the third is the one that makes it feel like bricks
-     * rather than stickers: a block must be on the baseplate or resting on at
-     * least one stud of something already placed. Without it you can hang
-     * bricks in mid-air and the sculpture stops reading as built.
+     * Whether [shape] may sit with its bottom-left corner at ([x], [y]): in bounds,
+     * not overlapping, and on the baseplate or resting on at least one occupied cell.
      */
     fun canPlace(
         shape: BrickShape,
@@ -202,41 +168,19 @@ data class BuildPlate(
     ): Int? = (0 until gridH).firstOrNull { canPlace(shape, x, it, occupied) }
 }
 
-/** What turning up is worth, and what knowing them is worth. */
+/** Brick rewards for days, talks and decks. */
 object Rewards {
 
     /**
-     * One brick for each thing you personally finished, sized by how well you
-     * did on it.
+     * One brick for [member] for a revealed day they answered.
      *
-     * Both halves of that are deliberate, and both are changes from the first
-     * version, which handed each person one identical brick per completed day.
-     *
-     * **Volume is participation.** If you answer the daily question and play two
-     * decks and your partner answers the daily question, you earn three bricks
-     * and they earn one, and the week's sculpture is visibly three quarters your
-     * colour. Real couples are not symmetric -- one person nearly always turns
-     * up more -- and an app that quietly evens that out is telling a comfortable
-     * lie about the week. The sculpture is a record, so it should record it.
-     *
-     * **Size is how well you knew them.** A landed guess earns a six-stud
-     * brick, a miss earns a two. So a good week builds wide and solid and a
-     * rough one builds out of stubs, and the two are different silhouettes
-     * across the room. It is not a score anybody has to read.
-     *
-     * **Height is depth, plus what you put in.** A deep question is taller
-     * than a light one, and a real answer to a text question is one step
-     * taller than a word or two -- see [effortOf]. It is your own words that
-     * count, so a partner who writes an essay does not grow your brick and one
-     * who writes "yeah" does not shrink it.
-     *
-     * Nothing here pays more for *winning* an argument about who is better --
-     * both people earn on their own knowledge of the other, independently.
+     * Width is whether the guess landed (6 hit, 2 miss, 4 unscored). Height is
+     * question depth plus [effortOf]. Every 7-day streak earns a character instead,
+     * and wildcards or called deep questions earn a roof.
      */
     fun forDay(day: DayEntry, member: Member, partner: Member, streakAfter: Int): List<Block> {
         if (!day.isRevealed) return emptyList()
-        // You earn for turning up, so no answer means no brick -- even when
-        // your partner answered and the day is technically revealed.
+        // No answer from you means no brick, even if the day is revealed.
         val mine = day.answerFor(member.uid) ?: return emptyList()
         val theirs = day.answerFor(partner.uid) ?: return emptyList()
 
@@ -245,14 +189,8 @@ object Rewards {
         val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
             milestone -> CharacterShape
-            // The one day whose question came from inside the relationship
-            // earns the piece that is not a box. A day that carried on away
-            // from the phone earns one too, but not here: that is only known
-            // the morning after, long after this brick is laid -- see [forTalk].
+            // Talked-about days earn their piece later, in [forTalk].
             Wildcard.isWildcard(day.question.id) -> roof(member, partner)
-            // The rarest good outcome in the app: you called the answer to a
-            // question that was actually hard. It earns the only piece that is
-            // not a box, which is the only way a week ever stops being one.
             called && day.question.depth.level >= 3 -> roof(member, partner)
             !day.question.isScored -> unscored(day.question.depth, effort)
             called -> landed(day.question.depth, effort)
@@ -272,17 +210,10 @@ object Rewards {
     }
 
     /**
-     * A small sloped piece for a day that came up again, laid the morning after.
+     * A small extra slope for a day you talked about, dated [on] (the morning after).
      *
-     * An extra piece rather than an upgrade to the day's own brick, for two
-     * reasons. That brick is already built into the plate by then, and turning
-     * a two-stud stub into anything wider could collide with whatever was laid
-     * beside it. And the week it belonged to may have sealed overnight -- a new
-     * piece simply lands on the week you are in, dated the morning you said so.
-     *
-     * Both of you earn one, whichever of you tapped: the conversation was had by
-     * two people. Two studs wide so it adds to a week without dominating it, and
-     * sloped so it still reads from across the room.
+     * A separate piece because the day's brick may already be placed or its plate
+     * sealed. Both partners earn one.
      */
     fun forTalk(day: DayEntry, member: Member, partner: Member, on: LocalDate): List<Block> {
         if (!day.isRevealed || !day.wasTalkedAbout) return emptyList()
@@ -301,14 +232,7 @@ object Rewards {
         )
     }
 
-    /**
-     * A brick for finishing a deck, sized by the share of your guesses that
-     * landed.
-     *
-     * A deck is five or six questions rather than one, so it pays a taller
-     * brick than a day: the height says how much you did, the width says how
-     * well.
-     */
+    /** A brick for finishing a deck: width from the share of guesses that landed, a roof for all of them. */
     fun forQuiz(
         result: QuizResult,
         member: Member,
@@ -323,9 +247,7 @@ object Rewards {
                 block(result, member, BrickShape(4, deckHeight(4, effort)), earnedOn),
             )
         }
-        // Every scorable question in the deck, called. Worth a roof for the
-        // same reason a deep day is: it is the outcome that does not happen by
-        // turning up.
+        // Every scorable question called earns a roof.
         if (hits == result.possible) {
             return listOf(block(result, member, roof(member, partner), earnedOn))
         }
@@ -342,16 +264,8 @@ object Rewards {
     }
 
     /**
-     * Whether you wrote properly across a deck: 0 or 1, the same cap as a day.
-     *
-     * One step if at least half of the deck's text questions got a real answer
-     * from you, by the same fifteen-word line [effortOf] uses. Half rather than
-     * all, because a deck is five or six questions played in one go and one
-     * short answer in the middle of it should not undo the rest. A deck with no
-     * text questions has nothing to measure and earns nothing extra.
-     *
-     * [yours] picks which side of each cross-answer is the member's own writing,
-     * since a result holds both of you and only your words count toward yours.
+     * 1 if at least half of the deck's text questions got a real answer (per [effortOf]),
+     * else 0. [yours] picks which side of each [CrossAnswer] is the member's own writing.
      */
     fun deckEffort(rows: List<CrossAnswer>, yours: Boolean): Int {
         val text = rows.filter {
@@ -369,20 +283,12 @@ object Rewards {
         return if (substantial * 2 >= text.size) 1 else 0
     }
 
-    /**
-     * A deck pays a step taller than a day, and what you wrote adds one more --
-     * but only where the result still fits under the roof.
-     *
-     * The six-stud brick for guessing most of a deck right is the one that
-     * cannot grow: at four rows it would be twenty-four cells, half again the
-     * rarest piece in the app. It is already the widest thing a deck can earn,
-     * so effort shows on everything narrower instead.
-     */
+    /** Decks are MEDIUM, or HIGH with effort as long as the area stays within [RoofArea]. */
     private fun deckHeight(width: Int, effort: Int): BrickHeight =
         if (effort > 0 && width * BrickHeight.HIGH.rows <= RoofArea) BrickHeight.HIGH
         else BrickHeight.MEDIUM
 
-    /** The slope's footprint, and the ceiling nothing ordinary may exceed. */
+    /** The roof's footprint; no ordinary brick may exceed it. */
     const val RoofArea = 4 * 4
 
     private fun block(
@@ -391,8 +297,7 @@ object Rewards {
         shape: BrickShape,
         earnedOn: LocalDate,
     ) = Block(
-        // Idempotent the same way a day is: one brick per deck per person, no
-        // matter how many listeners report the reveal.
+        // One brick per deck per person, however many listeners report the reveal.
         id = "quiz_${result.quiz.id}_${member.uid}",
         shape = shape,
         colorArgb = member.colorArgb,
@@ -401,17 +306,8 @@ object Rewards {
     )
 
     /**
-     * The piece that gives a sculpture a skyline.
-     *
-     * Flats can only ever make a rectangle: every week the two of you built
-     * came out the same shape, wider or narrower, and the silhouette said
-     * nothing the caption did not. A slope is the one piece that changes the
-     * outline, and it is deliberately the hardest to get.
-     *
-     * The pair face opposite ways, decided by whose uid sorts first so both
-     * phones agree without talking. When you both call the same deep question
-     * the two slopes meet in a peak, which is the sculpture saying something
-     * about the two of you rather than about each of you.
+     * The 4x4 slope, the rarest piece. The lower uid faces left so both phones
+     * agree, and a shared win makes a peak.
      */
     private fun roof(member: Member, partner: Member): BrickShape = BrickShape(
         studs = 4,
@@ -420,22 +316,8 @@ object Rewards {
     )
 
     /**
-     * Whether you actually wrote something: 0 or 1, and never more.
-     *
-     * Only the two question types that are a text box. Every other type is a
-     * choice between options somebody else wrote, so its "length" is the length
-     * of the option label and measures nothing about you.
-     *
-     * One step, not a scale, and that is the cap. Fifteen words and fifteen
-     * hundred earn the same brick. Letting length keep climbing would turn a
-     * six-stud "you called it" into a four-row slab twenty-four cells big --
-     * half again the size of the rarest piece in the app -- and one long night
-     * would fill a third of the week's plate by itself. Worse, it would pay for
-     * an essay over a sentence that was true, which is the wrong thing to pay
-     * for in a couples app.
-     *
-     * Counts your answer and your guess together, since both are things you
-     * wrote. Words rather than characters, so "aaaaaaaaaaaaaaaa" is one.
+     * 1 if your answer plus guess on a text question (REFLECT or GUESS_ME) reaches
+     * [SubstantialWords] words, else 0. Capped at 1 so long answers cannot outgrow the roof.
      */
     fun effortOf(answer: Answer, question: Question): Int {
         if (question.type != QuestionType.REFLECT && question.type != QuestionType.GUESS_ME) return 0
@@ -444,21 +326,11 @@ object Rewards {
         return if (words >= SubstantialWords) 1 else 0
     }
 
-    /** A couple of real sentences, typed on a phone. */
     const val SubstantialWords = 15
 
     private val Whitespace = Regex("\\s+")
 
-    /**
-     * Depth and effort, one step each, capped at the tallest brick the pack has.
-     *
-     * Adding rather than taking the higher is what lets both show: a light
-     * question answered properly stands as tall as a deep one answered in two
-     * words, and only a deep question answered properly reaches HIGH. Because
-     * the roof already takes every called deep day, the widest brick that can
-     * reach HIGH is the four-stud reflection -- sixteen cells, exactly the
-     * roof's own size -- so nothing ordinary ever outgrows the best piece.
-     */
+    /** Deep question (level 3+) and effort add one row step each, capped at HIGH. */
     private fun heightFor(depth: Depth, effort: Int): BrickHeight =
         when ((if (depth.level >= 3) 1 else 0) + effort) {
             0 -> BrickHeight.LOW
@@ -466,13 +338,13 @@ object Rewards {
             else -> BrickHeight.HIGH
         }
 
-    /** Wide and solid: you called it. */
+    /** Guess landed. */
     private fun landed(depth: Depth, effort: Int) = BrickShape(6, heightFor(depth, effort))
 
-    /** A stub. You turned up, which is the part that earns anything at all. */
+    /** Guess missed. */
     private fun missed(depth: Depth, effort: Int) = BrickShape(2, heightFor(depth, effort))
 
-    /** REFLECT days cannot be got right or wrong, so they are not judged. */
+    /** Unscored (REFLECT) days. */
     private fun unscored(depth: Depth, effort: Int) = BrickShape(4, heightFor(depth, effort))
 
     private fun faceFor(streak: Int): BlockFace =

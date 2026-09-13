@@ -30,172 +30,104 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
 /**
- * Everything the screens can ask of a couple.
- *
- * Firestore backs it on a real phone; [FakeCoupleRepository] backs previews.
- * The sealed behaviour is modelled here rather than in the UI on purpose: in
- * Firestore the partner's answer is simply unreadable until the rules allow
- * it, and the UI already handles that state.
+ * Data operations for a couple. Firestore on device; [FakeCoupleRepository] for previews.
+ * The partner's answer stays hidden until reveal because Firestore rules block reading it.
  */
 interface CoupleRepository {
 
     val state: StateFlow<CoupleState>
 
-    /**
-     * Point the local half of the couple at the signed-in account.
-     *
-     * Idempotent, because it is called from a composition that can re-run for
-     * reasons that have nothing to do with the account changing.
-     */
+    /** Binds the local member to the signed-in account. Idempotent (called from composition). */
     fun bindLocalUser(uid: String, displayName: String)
 
-    /** Submit your own answer for today. Irreversible, by design. */
+    /** Submits your answer for today. Cannot be changed. */
     fun submitToday(values: List<String>, guess: List<String>?)
 
-    /**
-     * Only your own. A colour is part of a profile, and the rules refuse a
-     * write to your partner's document anyway -- so the UI offering to change
-     * it was offering something that could not happen.
-     */
+    /** Sets your own color. Rules block writes to the partner's document. */
     fun setColor(colorArgb: Long)
 
-    /** The day the two of you started. Either of you may set it. */
+    /** Either partner may set it. */
     fun setAnniversary(date: LocalDate)
 
-    /** About you. Your own document, so only you. */
+    /** Writes your own member document only. */
     fun setProfile(gender: String?, birthday: LocalDate?)
 
-    /** About the two of you. Either of you. */
+    /** Either partner may set it. */
     fun setRelationship(status: RelationshipStatus, marriedOn: LocalDate?)
 
-    /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
+    /** Hides or unhides a topic for you; the draw uses both partners' settings. */
     fun setTopicHidden(topic: Topic, hidden: Boolean)
 
-    /** How you are today, and for a face the colour it is in. Null clears it. */
+    /** Sets today's mood (and optional color). Null clears it. */
     fun setMood(mood: Mood?, color: BrickColor? = null)
 
-    /** The sports you follow, and that you have been asked. Empty means none. */
+    /** Sets followed leagues and marks interests as asked. Empty means none. */
     fun setFollowing(leagues: Set<League>)
 
-    /** Ask for more of a topic, or stop asking. Yours; the draw uses both. */
+    /** Adds or removes a topic interest for you; the draw uses both partners' settings. */
     fun setTopicInterest(topic: Topic, interested: Boolean)
 
-    /**
-     * The couple's home ZIP, for weather and regional questions. False when the
-     * ZIP is not one the bundled table knows, and nothing is saved.
-     */
+    /** Saves the home ZIP. Returns false (and saves nothing) if the ZIP is not in the bundled table. */
     fun setHomeZip(zip: String): Boolean
 
     fun addSpecialDate(label: String, date: LocalDate, kind: DateKind)
 
     fun removeSpecialDate(id: String)
 
-    /** Put an earned brick on the shared plate. Ignored if the spot is illegal. */
+    /** Places an earned brick on the plate. Ignored if the spot is illegal. */
     fun placeBlock(blockId: String, x: Int, y: Int)
 
-    /**
-     * Set or clear your reaction to a revealed day.
-     *
-     * Changeable, unlike an answer: an answer is a statement made under seal
-     * and editing it would undo the whole mechanic, whereas a reaction is a
-     * gesture and people change their minds about those.
-     */
+    /** Sets or clears your reaction to a revealed day. Unlike answers, reactions can change. */
     fun react(date: LocalDate, reaction: Reaction?)
 
-    /**
-     * Seal the current plate and start the next one.
-     *
-     * Driven by the calendar: the Firestore implementation calls this itself
-     * once the period has run out, so a sculpture is dated whether or not
-     * anyone opened the app that day.
-     */
+    /** Seals the current plate and starts the next. Firestore calls this itself when the period ends. */
     fun sealPlate()
 
     /**
-     * Submit your run through a deck. Irreversible, like a day.
-     *
-     * [answers] and [guesses] are keyed by question id rather than positional,
-     * because a deck can gain or lose a question between you starting it and
-     * your partner finishing it, and an index would then pair up the wrong two
-     * answers.
+     * Submits your deck run. Cannot be changed.
+     * [answers] and [guesses] are keyed by question id, since a deck can change between partners' runs.
      */
     fun submitQuizRun(quizId: String, answers: Map<String, List<String>>, guesses: Map<String, List<String>>)
 
-    /**
-     * Write a question of your own for the two of you.
-     *
-     * Queued rather than asked immediately: a question that arrives the instant
-     * it is written is a message, and this app deliberately has no messages.
-     * Waiting until tomorrow is what makes it a question.
-     */
+    /** Queues your own question; it is asked on a later day, not immediately. */
     fun addWildcard(text: String, type: QuestionType, options: List<String>)
 
     /**
-     * Submit a whole sitting with one instrument. Submitting again is a retake
-     * and replaces your earlier answers.
-     *
-     * [responses] is every item, in the published order, every pass
-     * concatenated -- `Instrument.length` of them, each 1..5. Positional rather
-     * than keyed, because unlike a deck an instrument's item list cannot change
-     * between the two of you taking it: changing it would make the scoring key
-     * wrong and the citation on it false.
+     * Submits a full instrument sitting; submitting again replaces your earlier answers.
+     * [responses] is every item in published order, all passes concatenated
+     * (`Instrument.length` values, each 1..5).
      */
     fun submitInstrument(instrumentId: String, responses: List<Int>)
 
     /**
-     * Keep a half-finished sitting, so leaving does not throw it away.
-     *
-     * Written as each page is turned rather than on every tap: a page is the
-     * unit somebody actually commits to, and forty writes for forty ratings is
-     * a lot of network for a form nobody is racing.
-     *
-     * [responses] is the whole list with zeros where nothing has been answered
-     * yet. The draft is yours alone -- the rules make it unreadable to your
-     * partner, because unsealed answers are exactly what the seal is for. What
-     * they *can* see is the count, which is written alongside it and gives away
-     * nothing about the answers.
+     * Saves a partial sitting (called per page, not per tap).
+     * [responses] is the full list with 0 for unanswered. Rules hide the draft from the
+     * partner; only the answered count is visible to them.
      */
     fun saveInstrumentDraft(instrumentId: String, responses: List<Int>)
 
-    /**
-     * Say that a revealed day came up again, away from the phone.
-     *
-     * The one thing the app most wants to know and has never been able to see.
-     * Additive and un-take-backable by design: this is a note that something
-     * happened, and there is no version of "actually we did not talk about it
-     * after all" worth building a control for.
-     */
+    /** Marks that a revealed day was talked about. Cannot be undone. */
     fun markTalkedAbout(date: LocalDate)
 
-    /** Your one line about a sealed week. Rewritable until you are happy with it. */
+    /** Sets your note on a sealed week. Can be rewritten. */
     fun noteWeek(plateId: String, text: String)
 
-    /** Your two words toward a sealed week's name. */
+    /** Sets your two words toward a sealed week's name. */
     fun nameWeek(plateId: String, words: NameWords)
 
-    /** Put something on the list the two of you share. */
     fun addToBucket(text: String, group: BucketGroup)
 
-    /** Tick it off. Earns a brick each; un-ticking is not a thing. */
+    /** Marks an item done and awards each partner a brick. Cannot be undone. */
     fun tickBucket(id: String)
 
-    /** Take it off again. Only what you added, and only while it is not done. */
+    /** Removes an item. Only your own, and only if not done. */
     fun removeFromBucket(id: String)
 
-    /**
-     * Pick what tomorrow's question is about. Only works on your turn, once
-     * today is open, and only once. See [com.ampersand.model.Turns].
-     */
+    /** Picks tomorrow's theme. Only on your turn, after today is revealed, once. See [com.ampersand.model.Turns]. */
     fun pickTomorrow(theme: String)
 }
 
-/**
- * Firestore when there is a project and a real couple behind it, the mock
- * otherwise.
- *
- * The same test as the auth and pairing factories, so the three never disagree
- * about which world the app is running in.
- */
+/** Firestore when configured and the couple is real, the fake otherwise. Same test as the auth and pairing factories. */
 fun createCoupleRepository(
     hasFirebase: Boolean,
     coupleId: String,
@@ -209,7 +141,7 @@ fun createCoupleRepository(
         FakeCoupleRepository()
     }
 
-/** In-memory, deterministic, and seeded from [MockCouple]. */
+/** In-memory repository seeded from [MockCouple]. */
 class FakeCoupleRepository(
     initial: CoupleState = MockCouple.state(),
 ) : CoupleRepository {
@@ -218,18 +150,8 @@ class FakeCoupleRepository(
     override val state: StateFlow<CoupleState> = _state.asStateFlow()
 
     /**
-     * Rewrite the local member, and every reference to them, to the real uid.
-     *
-     * The rewrite is the whole job. `you.uid` appears as a map key on every
-     * answer, as `ownerUid` on every brick, and inside block ids of the form
-     * `date_uid` -- so changing the member alone would leave ten weeks of
-     * history belonging to a user who no longer exists, and the plate would
-     * show your bricks as your partner's. Renaming without remapping is the
-     * obvious version of this and it silently guts the mock data.
-     *
-     * Firestore will not need any of this: there the uid is the uid from the
-     * first write. It exists because the sample couple was invented before
-     * anyone had signed in.
+     * Rewrites the local member's uid everywhere it appears in the mock data: answer keys,
+     * brick owners, and `date_uid` block ids. Changing only the member would orphan history.
      */
     override fun bindLocalUser(uid: String, displayName: String) = mutate { current ->
         if (current.you.uid == uid && current.you.name == displayName) return@mutate current
@@ -252,8 +174,7 @@ class FakeCoupleRepository(
         fun BuildPlate.rebind() = copy(
             blocks = blocks.map { b ->
                 b.copy(
-                    // Block ids are `date_uid` and are the idempotency key for
-                    // awarding, so they have to move with the owner.
+                    // Block ids are `date_uid` (the award idempotency key), so remap them too.
                     id = b.id.removeSuffix("_$old").let { if (it == b.id) b.id else "${it}_$uid" },
                     ownerUid = remap(b.ownerUid),
                 )
@@ -270,9 +191,7 @@ class FakeCoupleRepository(
             history = history.map { it.rebind() },
             plate = plate.rebind(),
             shelf = shelf.map { it.rebind() },
-            // Responses are keyed by uid too, so a seeded sitting would belong
-            // to a user who no longer exists and the badge wall would read as
-            // half-finished the moment somebody signed in.
+            // Instrument answers are keyed by uid too.
             instrumentRuns = instrumentRuns.map { run ->
                 run.copy(answers = run.answers.mapKeys { remap(it.key) })
             },
@@ -292,14 +211,7 @@ class FakeCoupleRepository(
         )
     }
 
-    /**
-     * Both answered, so both earn a brick.
-     *
-     * Idempotent: block ids are `date_uid`, so running this again on an
-     * already-rewarded day is a no-op. That matters because it is called from
-     * both submit paths, and the Firestore version runs from listeners where
-     * the same day can arrive more than once.
-     */
+    /** Awards both partners' bricks once today is revealed. Idempotent via `date_uid` block ids. */
     private fun awardIfComplete(s: CoupleState): CoupleState {
         if (!s.today.isRevealed) return s
         val existing = s.plate.blocks.mapTo(mutableSetOf()) { it.id }
@@ -314,7 +226,7 @@ class FakeCoupleRepository(
     override fun react(date: LocalDate, reaction: Reaction?) = mutate { current ->
         val uid = current.you.uid
         current.withDay(date) { day ->
-            // Nothing to react to until the seal has lifted.
+            // Only revealed days take reactions.
             if (!day.isRevealed) day
             else day.copy(
                 reactions = if (reaction == null) {
@@ -326,11 +238,7 @@ class FakeCoupleRepository(
         }
     }
 
-    /**
-     * A day lives in exactly one of two places, and callers should not have to
-     * know which. Today graduates into history at the day boundary, so the same
-     * reaction call has to work either side of midnight.
-     */
+    /** Updates the day for [date] whether it is today or already in history. */
     private fun CoupleState.withDay(date: LocalDate, f: (DayEntry) -> DayEntry): CoupleState =
         if (today.date == date) {
             copy(today = f(today))
@@ -350,9 +258,7 @@ class FakeCoupleRepository(
                 periodDays = plate.periodDays,
                 gridW = plate.gridW,
                 gridH = plate.gridH,
-                // Unplaced bricks carry over. They were earned by answering,
-                // and confiscating them would punish you for not having tidied
-                // the tray before a deadline you did not choose.
+                // Unplaced bricks carry over to the new plate.
                 blocks = plate.tray(current.you.uid) + plate.tray(current.them.uid),
             ),
         )
@@ -362,9 +268,7 @@ class FakeCoupleRepository(
         val plate = current.plate
         if (plate.isSealed) return@mutate current
         val block = plate.block(blockId) ?: return@mutate current
-        // Already down, or not a legal spot: leave the plate alone. Validating
-        // here rather than in the UI means the Firestore version can run the
-        // same check inside a transaction and reject a race the same way.
+        // Validated here (not in UI) so Firestore can run the same check in a transaction.
         if (plate.placed.any { it.blockId == blockId }) return@mutate current
         if (!plate.canPlace(block.shape, x, y)) return@mutate current
 

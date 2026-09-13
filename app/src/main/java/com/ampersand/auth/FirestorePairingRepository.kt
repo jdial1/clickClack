@@ -30,11 +30,8 @@ internal const val COUPLES = "couples"
  * couples/{cid}    members[2], createdAt, endedAt
  * ```
  *
- * Two listeners, not one. The user document says which couple you are in; the
- * couple document says whether it is still going. Watching only the first is
- * what made unpairing one-sided -- the person who did not tap it kept a
- * `coupleId` pointing at a couple that had been abandoned, and nothing on their
- * phone ever told them.
+ * Listens to both the user doc (which couple) and the couple doc (whether it ended),
+ * so an unpair by the partner is noticed on this phone.
  */
 class FirestorePairingRepository(
     private val uid: String,
@@ -69,8 +66,7 @@ class FirestorePairingRepository(
             stopWatchingCouple()
             _state.value = when {
                 code.isNullOrBlank() -> PairState.Solo
-                // A code that has run out is not an invitation any more, and
-                // leaving it on screen invites someone to read out a dead one.
+                // Expired codes are not shown.
                 expires != null && expires <= System.currentTimeMillis() -> PairState.Solo
                 else -> PairState.Inviting(code, expires)
             }
@@ -79,7 +75,7 @@ class FirestorePairingRepository(
         watchCouple(coupleId)
     }
 
-    /** Live, because the other person can end it and this phone must notice. */
+    /** Live, so this phone notices when the partner ends the couple. */
     private fun watchCouple(coupleId: String) {
         if (watching == coupleId) return
         stopWatchingCouple()
@@ -92,8 +88,7 @@ class FirestorePairingRepository(
                     return@addSnapshotListener
                 }
                 if (couple.getTimestamp("endedAt") != null) {
-                    // They unpaired. Tidy our own document so a reinstall does
-                    // not come back pointing at a finished couple.
+                    // Partner unpaired. Clear our own coupleId too.
                     db.collection(USERS).document(uid)
                         .set(mapOf("coupleId" to null), SetOptions.merge())
                     _state.value = PairState.Solo
@@ -112,11 +107,11 @@ class FirestorePairingRepository(
                         _state.value = PairState.Paired(
                             coupleId = coupleId,
                             partnerUid = partnerUid,
-                            partnerName = partner.getString("displayName") ?: "Them",
+                            partnerName = partner.getString("displayName") ?: "Partner",
                         )
                     }
                     .addOnFailureListener {
-                        _state.value = PairState.Paired(coupleId, partnerUid, "Them")
+                        _state.value = PairState.Paired(coupleId, partnerUid, "Partner")
                     }
             }
     }
@@ -130,8 +125,7 @@ class FirestorePairingRepository(
     override suspend fun createInvite(): Result<String> {
         (_state.value as? PairState.Inviting)?.let { live ->
             val ms = live.expiresAtMillis
-            // Reuse a code that is still good; mint a new one if it has run
-            // out, rather than handing back something already dead.
+            // Reuse an unexpired code; otherwise make a new one.
             if (ms == null || ms > System.currentTimeMillis()) return Result.success(live.code)
         }
 
@@ -141,8 +135,7 @@ class FirestorePairingRepository(
         )
 
         return runCatching {
-            // The invite first. An orphan invite is harmless; a code shown on
-            // screen that was never written is not.
+            // Write the invite first: an orphan invite is harmless, an unwritten code is not.
             await(
                 db.collection(INVITES).document(code).set(
                     mapOf(
@@ -167,13 +160,7 @@ class FirestorePairingRepository(
         }
     }
 
-    /**
-     * Join the couple behind [code], in one transaction.
-     *
-     * Two people can be tapping at the same moment. Two redemptions of one code
-     * racing outside a transaction is how you get two couples, each holding one
-     * person, both users pointing at whichever write landed last.
-     */
+    /** Join the couple behind [code] in one transaction, so concurrent redeems cannot create two couples. */
     override suspend fun redeem(code: String): Result<Unit> {
         val clean = InviteCode.normalise(code)
         if (clean.length < 8) return Result.failure(RedeemException(RedeemError.UNKNOWN_CODE))
@@ -192,9 +179,7 @@ class FirestorePairingRepository(
 
                     val expiresAt = invite.getTimestamp("expiresAt")
                     if (expiresAt == null || expiresAt.toDate().time <= System.currentTimeMillis()) {
-                        // Expired codes are consumed rather than left lying
-                        // around. Returned, not thrown: throwing aborts the
-                        // transaction, and the delete with it.
+                        // Delete expired codes. Returned, not thrown: throwing aborts the transaction and the delete.
                         txn.delete(inviteRef)
                         return@runTransaction RedeemError.EXPIRED
                     }
@@ -203,8 +188,7 @@ class FirestorePairingRepository(
                         ?: throw RedeemException(RedeemError.UNKNOWN_CODE)
                     if (fromUid == uid) throw RedeemException(RedeemError.OWN_CODE)
 
-                    // A code made before its owner paired with someone else
-                    // would otherwise pull them out of that couple.
+                    // The code's owner may have paired with someone else since.
                     if (txn.get(db.collection(USERS).document(fromUid)).getString("coupleId") != null) {
                         throw RedeemException(RedeemError.THEY_ARE_PAIRED)
                     }
@@ -236,7 +220,7 @@ class FirestorePairingRepository(
                         ),
                         SetOptions.merge(),
                     )
-                    // Consumed on a valid match. An invite is for one person.
+                    // One use per invite.
                     txn.delete(inviteRef)
                     null
                 },
@@ -251,15 +235,9 @@ class FirestorePairingRepository(
     /**
      * End the couple for both of you.
      *
-     * Writes `endedAt` on the **couple**, which both members may update, rather
-     * than clearing your own `coupleId`, which only you may write. That is the
-     * whole fix: the partner's listener sees the shared document change and
-     * their app leaves too. Clearing your own pointer afterwards is tidying, not
-     * the mechanism.
-     *
-     * The couple document is kept rather than deleted. It is the parent of every
-     * answer and sculpture the two of you made, and deleting a parent in
-     * Firestore orphans the subcollections rather than removing them.
+     * Sets `endedAt` on the couple doc (both members may write it), which the partner's
+     * listener picks up; rules only let you clear your own `coupleId`. The couple doc is
+     * kept, since deleting it would orphan its subcollections.
      */
     override suspend fun unpair(): Result<Unit> {
         val coupleId = (_state.value as? PairState.Paired)?.coupleId
@@ -288,14 +266,8 @@ class FirestorePairingRepository(
     }
 
     /**
-     * One place to bridge Play Services Tasks, instead of a whole dependency.
-     *
-     * Fails with [resumeWithException], not `cancel`. Cancelling a continuation
-     * raises a CancellationException that merely *carries* the cause, so every
-     * failure arrived here as a cancellation: the specific reason a code did
-     * not work -- expired, unknown, your own -- was thrown inside the
-     * transaction and then replaced by the generic "try again in a moment" on
-     * the way out. It also killed the coroutine that was waiting.
+     * Awaits a Play Services Task.
+     * Uses [resumeWithException], not `cancel`, so the original [RedeemException] reaches the caller.
      */
     private suspend fun <T> await(task: com.google.android.gms.tasks.Task<T>): T =
         suspendCancellableCoroutine { cont ->

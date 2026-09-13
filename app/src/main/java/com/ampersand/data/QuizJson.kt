@@ -10,10 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * The wire format for quiz data.
- *
- * Quizzes arrive as JSON files, so this parser is the actual contract and the
- * shape below is the thing to write pool content against.
+ * Parses quiz deck JSON files. Expected shape:
  *
  * ```json
  * {
@@ -41,17 +38,12 @@ import org.json.JSONObject
  * }
  * ```
  *
- * Rules the parser enforces, because a bad deck should fail loudly at load
- * rather than quietly render an unanswerable question:
- *
+ * Validation (throws on a bad deck):
  * - `id`, `text` and `type` are required; everything else has a default.
  * - `depth` defaults to 1 and is clamped to 1..3.
  * - `category` defaults to the deck's theme label.
- * - Choice types must carry `options`; a `THIS_OR_THAT` needs exactly two.
- * - `REFLECT` and `GUESS_ME` must **not** carry options.
- *
- * `org.json` rather than a serialisation library: it is in the platform, the
- * format is a dozen fields, and a dependency here would buy nothing.
+ * - Choice types need `options`; `THIS_OR_THAT` needs exactly two.
+ * - `REFLECT`, `GUESS_ME` and `SCALE` must not have options.
  */
 object QuizJson {
 
@@ -110,8 +102,7 @@ object QuizJson {
                 require(options.size >= 2) { "question \"$id\" is $type and needs at least 2 options" }
         }
         require(options.distinct().size == options.size) {
-            // AmpDragRank identifies rows by their text, so duplicates make a
-            // reorderable list swap the wrong rows.
+            // AmpDragRank keys rows by text, so duplicates swap the wrong rows.
             "question \"$id\" has duplicate options"
         }
 

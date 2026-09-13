@@ -108,10 +108,8 @@ import com.ampersand.ui.wildcard.WildcardScreen
 import java.time.LocalDate
 
 /**
- * Holds the couple repository for one pairing.
- *
- * Built per couple rather than once, because the Firestore implementation
- * attaches its listeners to a specific couple id and a specific pair of uids.
+ * Holds the couple repository for one pairing. Built per couple because the
+ * Firestore listeners are bound to a couple id and both uids.
  */
 class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
     override fun onCleared() {
@@ -135,13 +133,7 @@ class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
     }
 }
 
-/**
- * Holds the auth repository across configuration changes.
- *
- * Separate from [AmpersandViewModel] because it needs a Context to build and
- * that one deliberately does not take any -- and because signing out has to
- * survive without tearing down the couple state with it.
- */
+/** Holds the auth repository across configuration changes. Needs a Context, unlike [AmpersandViewModel]. */
 class AuthViewModel(val auth: AuthRepository) : ViewModel() {
     companion object {
         fun factory(context: Context) = viewModelFactory {
@@ -150,13 +142,7 @@ class AuthViewModel(val auth: AuthRepository) : ViewModel() {
     }
 }
 
-/**
- * Pairing, keyed to the signed-in account.
- *
- * Separate from [AuthViewModel] because it cannot be built until there *is* an
- * account: the Firestore implementation watches `users/{uid}`, and there is no
- * uid to watch before sign-in.
- */
+/** Pairing for the signed-in account. Built after sign-in because it watches `users/{uid}`. */
 class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
     companion object {
         fun factory(context: Context, uid: String, name: String) = viewModelFactory {
@@ -169,9 +155,7 @@ private enum class Tab(val label: String) {
     TODAY("Today"),
     DECKS("Decks"),
     BUILD("Build"),
-    // "Shelf", not "History": it is where the finished sculptures live, and a
-    // log is not what that screen is for. It is also the only label that fits a
-    // 2-stud tile without shrinking the type.
+    // History screen; "Shelf" fits a 2-stud tile without shrinking the type.
     SHELF("Shelf"),
     US("Us"),
 }
@@ -209,17 +193,10 @@ fun AmpersandApp() {
           LocalFeel provides feel,
           LocalAppearance provides appearance,
       ) {
-        // The splash is gated on its own animation finishing, not on auth, so
-        // the click-clack always plays in full. It is under a second, and
-        // cutting it short the moment a cached session resolves would mean the
-        // animation is only ever seen by people who are signed out.
-        // Saveable, not remembered. The Activity is recreated on rotation, and
-        // a plain remember replayed the whole drop -- and now the two landing
-        // thumps with it -- every time the phone turned.
+        // Splash waits for its own animation, not auth. Saveable so rotation doesn't replay it.
         var splashDone by rememberSaveable { mutableStateOf(false) }
         if (!splashDone) {
-            // Fixed colours: this plays before anyone is signed in, so there is
-            // no profile to take them from yet.
+            // Fixed colors: no profile exists before sign-in.
             SplashScreen(
                 you = BrickColor.RED,
                 them = BrickColor.BLUE,
@@ -229,9 +206,7 @@ fun AmpersandApp() {
         }
 
         when (auth) {
-            // Nothing on screen rather than a spinner. This resolves from the
-            // cached session in a frame or two, and a spinner that fast is just
-            // a flicker.
+            // Blank, not a spinner: the cached session resolves in a frame or two.
             AuthState.Loading -> Surface(color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.fillMaxSize())
             }
@@ -268,7 +243,7 @@ private fun SignedOutScreen(auth: AuthRepository) {
             onSignIn = {
                 val activity = context.findActivity()
                 if (activity == null) {
-                    error = "Could not open the Google sheet."
+                    error = "Couldn't open Google sign-in."
                     return@SignInScreen
                 }
                 busy = true
@@ -276,8 +251,7 @@ private fun SignedOutScreen(auth: AuthRepository) {
                 scope.launch {
                     val result = auth.signInWithGoogle(activity)
                     busy = false
-                    // A dismissed sheet comes back as success with no session,
-                    // so only a real failure is worth saying anything about.
+                    // A dismissed sheet returns success with no session; only show real failures.
                     error = result.exceptionOrNull()?.let {
                         it.message ?: "Sign-in failed."
                     }
@@ -288,10 +262,8 @@ private fun SignedOutScreen(auth: AuthRepository) {
 }
 
 /**
- * Signed in, but the product needs two people.
- *
- * Keyed on the uid so switching accounts builds a new pairing repository rather
- * than leaving the previous account's listener attached.
+ * Signed in; shows pairing until paired. Keyed on uid so switching accounts
+ * doesn't leave the old account's listener attached.
  */
 @Composable
 private fun PairedGate(
@@ -300,8 +272,7 @@ private fun PairedGate(
 ) {
     val context = LocalContext.current
     val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
-    // Loaded once. The decks are both the thing you play and the pool the daily
-    // question is drawn from, so there is exactly one list.
+    // Loaded once; shared by decks and the daily question.
     val pool = remember(context) { QuestionPool.load(context) }
     val pairVm: PairingViewModel = viewModel(
         key = "pairing_${account.uid}",
@@ -318,8 +289,7 @@ private fun PairedGate(
         }
 
         is PairState.Paired -> {
-            // Asked once, and only after pairing: permission to interrupt
-            // somebody lands better when there is already a reason to.
+            // Reminder permission is asked once, after pairing.
             var askedReminder by remember { mutableStateOf(Reminder.hasBeenAsked(context)) }
             if (!askedReminder) {
                 ReminderSetupScreen(
@@ -329,10 +299,8 @@ private fun PairedGate(
                 return@PairedGate
             }
 
-            // Keyed on the couple and the day: a new pairing gets a new
-            // repository, and so does a new morning. The repository fixes its
-            // date when it is built, so a process kept alive overnight used to
-            // show yesterday's question and write today's answer to yesterday.
+            // Keyed on couple and day: the repository fixes its date at build time,
+            // so without the day key an overnight process wrote to yesterday.
             val today = rememberToday()
             val vm: AmpersandViewModel = viewModel(
                 key = "couple_${p.coupleId}_$today",
@@ -348,9 +316,7 @@ private fun PairedGate(
             AmpersandTheme(
                 you = Color(state.you.colorArgb),
                 them = Color(state.them.colorArgb),
-                // The inner theme rebuilds the whole scheme from the couple's
-                // colours, so it has to be told the mode again or it falls back
-                // to the phone and the setting only holds until you pair.
+                // Pass dark mode again, or the inner theme falls back to the system setting.
                 darkTheme = LocalAppearance.current?.isDark() ?: isSystemInDarkTheme(),
             ) {
                 SignedInApp(
@@ -395,12 +361,8 @@ private fun PairedGate(
 }
 
 /**
- * Where you are, as one value.
- *
- * The screen used to be chosen by reading three pieces of state inside a
- * `when`, which is fine for drawing and useless for animating: a transition
- * needs one thing to compare, and comparing `CoupleState` would restart it
- * every time Firestore pushed anything at all.
+ * The current screen as one value, so AnimatedContent has a stable target
+ * (comparing `CoupleState` would restart it on every Firestore update).
  */
 private sealed interface Screen {
     data class Deck(val id: String) : Screen
@@ -411,7 +373,7 @@ private sealed interface Screen {
     data class Main(val tab: Tab) : Screen
 }
 
-/** The whole product, once we know who is using it. */
+/** Main app for a signed-in, paired user. */
 @Composable
 private fun SignedInApp(
     vm: AmpersandViewModel,
@@ -421,20 +383,15 @@ private fun SignedInApp(
     onSignOut: () -> Unit,
     onUnpair: () -> Unit,
 ) {
-        // Point both halves of the couple at the real accounts. Keyed on the
-        // uids so this runs once per pairing rather than every recomposition.
+        // Bind the local user once per account.
         val appContext = LocalContext.current
         LaunchedEffect(account.uid, account.displayName) {
             vm.repo.bindLocalUser(account.uid, account.displayName)
-            // Where the sender finds this phone. Re-run on every signed-in
-            // launch rather than tracked, because the system can rotate a token
-            // whenever it likes and a stale one fails silently.
+            // Registered on every launch: tokens rotate and stale ones fail silently.
             Push.register(appContext, account.uid)
         }
 
-        // What the daily question may be about, asked once. Waits for your
-        // profile to load (null), so it never flashes up for someone who has
-        // already answered.
+        // Interests setup, asked once. null means the profile is still loading.
         if (state.interestsAsked == false) {
             InterestsSetupScreen(color = BrickColor.of(state.you.colorArgb), onDone = { following, leaveOut ->
                 leaveOut.forEach { vm.repo.setTopicHidden(it, true) }
@@ -443,10 +400,7 @@ private fun SignedInApp(
             return
         }
 
-        // Leave the receiver a note about what is actually outstanding. It
-        // fires with no app process and cannot go and ask Firestore, so the
-        // alternative is a reminder that says the same thing whether or not
-        // there is anything to do.
+        // Cache what's outstanding for the reminder, which runs without Firestore access.
         val context = LocalContext.current
         val waiting = state.decksAwaitingYou(pool.playable.map { it.id })
         val unanswered = state.today.answerFor(account.uid) == null
@@ -459,21 +413,13 @@ private fun SignedInApp(
             )
         }
 
-        // Saveable, all of these: the Activity is recreated on rotation, and
-        // plain remember dropped you back on Today out of whatever was open.
+        // Saveable so rotation keeps the open screen.
         var tab by rememberSaveable { mutableStateOf(Tab.TODAY) }
-        // The *date* of the open day, not the day itself. Holding the entry
-        // would freeze it at the moment it was opened, so a reaction added on
-        // the reveal screen would never appear on the reveal screen.
+        // A date, not the entry, so live updates (reactions) still show.
         var openDate by rememberSaveable { mutableStateOf<LocalDate?>(null) }
-        // The deck you are playing, if any. A quiz id rather than the Quiz, so
-        // the screen re-resolves it and a deck that gains a question mid-play
-        // does not leave a stale copy on screen.
+        // An id, not the Quiz, so the screen re-resolves the latest deck.
         var openDeck by rememberSaveable { mutableStateOf<String?>(null) }
-        // Which day has already been unpacked. Hoisted above the screen because
-        // the screen is disposed every time you leave it, and a flag inside it
-        // would let the reveal put on its whole performance again on the way
-        // back in. Saveable so a rotation does not do the same.
+        // Day whose reveal animation already played. Hoisted so it doesn't replay on return.
         var openedReveal by rememberSaveable { mutableStateOf<String?>(null) }
         var writing by rememberSaveable { mutableStateOf(false) }
         var sitting by rememberSaveable { mutableStateOf<String?>(null) }
@@ -482,20 +428,11 @@ private fun SignedInApp(
         val sounds = LocalSounds.current
         val feel = LocalFeel.current
 
-        // Back walks back through the app rather than out of it.
-        //
-        // Everything here is one composable swapping its contents, so there was
-        // no back stack for the system to pop: a press from four screens deep
-        // closed the app. Out of a deck or a reveal first, then off whichever
-        // tab you are on, and only from Today does the press fall through and
-        // leave -- which is where leaving should mean leaving.
+        // No nav back stack, so handle back manually: close overlays, then return to Today.
+        // Disabled on Today so back exits the app.
         BackHandler(
             enabled = settings || writing || openDeck != null || openDate != null || tab != Tab.TODAY,
         ) {
-            // Going back is a navigation, and only the forward direction ever
-            // said so. Note the handler is disabled on Today, so leaving the
-            // app stays silent -- which is right: the app has no opinion about
-            // you closing it.
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
             when {
@@ -521,9 +458,7 @@ private fun SignedInApp(
                 },
             ) { padding ->
                 Box(Modifier.fillMaxSize()) {
-                    // The wall everything sits on. Outside the Scaffold's inset
-                    // padding so it runs under the nav bar rather than stopping
-                    // short of it.
+                    // Background wall, outside the inset padding so it runs under the nav bar.
                     BrickWall(
                         you = BrickColor.of(state.you.colorArgb),
                         them = BrickColor.of(state.them.colorArgb),
@@ -543,15 +478,8 @@ private fun SignedInApp(
                         else -> Screen.Main(tab)
                     }
 
-                    // One surface leaving, then the next arriving -- never both
-                    // at once. Every screen here is a transparent column on the
-                    // same brick wall, so a true crossfade draws two sets of
-                    // cards at half opacity over one background and reads as a
-                    // double exposure rather than as a transition.
-                    //
-                    // SizeTransform off: BrickSlab reports its own height, and a
-                    // container animating between two measured heights around
-                    // one is a fight nobody wins.
+                    // Fade out, then fade in (screens are transparent, so a crossfade looks doubled).
+                    // SizeTransform off: BrickSlab measures its own height.
                     AnimatedContent(
                         targetState = here,
                         transitionSpec = {
@@ -560,9 +488,7 @@ private fun SignedInApp(
                         },
                         label = "screen",
                     ) { screen ->
-                    // Resolved from the *target* screen, not from the live vars:
-                    // reading those would make the outgoing screen draw the
-                    // incoming one's content for the length of the transition.
+                    // Resolve from `screen`, not the live vars, so the outgoing screen keeps its content.
                     val day = (screen as? Screen.Reveal)?.date?.let { date ->
                         if (state.today.date == date) {
                             state.today
@@ -659,9 +585,7 @@ private fun SignedInApp(
 
                         screen.tab == Tab.SHELF -> HistoryScreen(
                             state = state,
-                            // A day only one of you answered has nothing to
-                            // reveal; opening it showed an empty half and
-                            // offered reactions to a day that never opened.
+                            // Only revealed days open.
                             onOpenDay = { if (it.isRevealed) openDate = it.date },
                             onNoteWeek = vm.repo::noteWeek,
                             onNameWeek = vm.repo::nameWeek,
@@ -687,16 +611,8 @@ private fun SignedInApp(
 }
 
 /**
- * The nav bar is one continuous run of brick: four 2-stud tabs in the user's
- * colour, joined by 1-stud black bricks.
- *
- * Eleven studs wide (4 x 2 + 3 x 1), laid out on stud weights rather than fixed
- * sizes so the run stays true at any screen width. The black joiners are what
- * turn four separate tiles into a single bar -- without them the tabs float,
- * and the bar stops reading as something built.
- *
- * Labels sit *on* the bricks, inset below the nubs so the text never collides
- * with them.
+ * Bottom nav drawn as bricks: 2-stud tabs in the user's color joined by 1-stud
+ * structure bricks, sized from the width. Labels sit below the nubs.
  */
 @Composable
 private fun BottomBar(
@@ -709,9 +625,7 @@ private fun BottomBar(
     val feel = LocalFeel.current
     val tabShape = BrickShape(2, BrickHeight.MEDIUM)
     val joinShape = BrickShape(1, BrickHeight.MEDIUM)
-    // Structure, not a choice -- and which brick counts as structure depends on
-    // the ground. Black joins the bar on navy and punches holes in it on a pale
-    // one, where the neutral brick does the same job.
+    // Joiner color depends on the theme (black on dark, neutral on light).
     val joinAsset = BrickArt.assetFor(structureSlug(), joinShape)
     val atlas = rememberBricks(listOf(color.asset(tabShape), joinAsset))
 
@@ -724,8 +638,7 @@ private fun BottomBar(
         // Two studs a tab and one between each: 14 for five tabs.
         val stud = maxWidth / (Tab.entries.size * 3 - 1).toFloat()
         val barHeight = stud * (tabShape.h * BrickArt.ROW_RATIO + BrickArt.NUB_RATIO)
-        // Body starts below the nub; centring in the whole tile would sit the
-        // label half on the studs.
+        // Label offset so it centers on the body, below the nub.
         val nub = stud * BrickArt.NUB_RATIO
 
         Row(Modifier.fillMaxWidth().height(barHeight)) {
@@ -745,8 +658,7 @@ private fun BottomBar(
                 }
 
                 val on = enabled && entry == current
-                // Not a bouncy spring: this value feeds an alpha a few lines down, and an
-                // overshoot past 1.0 goes straight into drawImage.
+                // No bouncy spring: this feeds an alpha, and overshoot past 1.0 breaks drawImage.
                 val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "tabLift")
                 val fg by animateColorAsState(
                     if (on) Duo.inkOn(Color(color.argb)) else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -764,9 +676,6 @@ private fun BottomBar(
                         .clickable(
                             interactionSource = interaction,
                             indication = null,
-                            // Dimmed inside a deck or a reveal, and now actually
-                            // unreachable there: the visual said disabled while
-                            // the tap still went through.
                             enabled = enabled,
                         ) { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onSelect(entry) },
                 ) {
@@ -779,7 +688,7 @@ private fun BottomBar(
                             left = 0f,
                             bottom = size.height,
                             studPx = size.width / tabShape.w,
-                            // Unselected tabs are the same brick, further away.
+                            // Unselected tabs are faded.
                             alpha = 0.34f + 0.66f * lift,
                         )
                     }

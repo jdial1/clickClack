@@ -138,12 +138,9 @@ fun TodayScreen(
             StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
         }
 
-        // The forecast both phones saved: a brick for the sky and one plain
-        // line. Nothing when no home ZIP is set or the weather service had
-        // nothing to say.
+        // Saved forecast; absent when no home ZIP is set or the service returned nothing.
         state.weather?.let { weather ->
             Spacer(Modifier.height(6.dp))
-            // On glass, like every other line of text laid over the wall.
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -166,14 +163,11 @@ fun TodayScreen(
         Spacer(Modifier.height(12.dp))
         Moods(state, onSetMood)
 
-        // Yesterday, asked about this morning. Above the question rather than
-        // below it, because it is about the day that has finished and the one
-        // below has not started.
-        // The morning after a run ends, said once and without a sad face.
+        // Shown the morning after a run ends.
         val ended = remember(state.history, day.date) { Milestones.ended(day.date, state.history) }
         ended?.let { run ->
             Spacer(Modifier.height(14.dp))
-            QuietNote("The run stopped at $run days. Today starts the next one.")
+            QuietNote("Your $run-day run ended. Start a new one today.")
         }
 
         Spacer(Modifier.height(14.dp))
@@ -193,17 +187,15 @@ fun TodayScreen(
             status = when {
                 yourAnswer == null -> HeroStatus(
                     "Your turn",
-                    "${state.them.name} will not see what you say until they answer too.",
+                    "${state.them.name} sees your answer once they answer too.",
                 )
-                !day.isRevealed -> HeroStatus("Sealed", "${state.them.name} has not answered yet.")
-                else -> HeroStatus("Both in", "Open it.", onOpenReveal)
+                !day.isRevealed -> HeroStatus("Waiting for ${state.them.name}", "${state.them.name} has not answered yet.")
+                else -> HeroStatus("You both answered", "Tap to see answers.", onOpenReveal)
             },
         )
         Spacer(Modifier.height(28.dp))
 
-        // Whether *this* phone just did it, rather than whether it is done.
-        // Coming back to an already-answered day should find the panel sitting
-        // there, not watch it arrive again.
+        // True only if this phone just submitted, so revisiting doesn't replay the animation.
         var justSealed by remember(day.date) { mutableStateOf(false) }
 
         if (yourAnswer == null) {
@@ -214,16 +206,13 @@ fun TodayScreen(
         } else {
             val sounds = LocalSounds.current
             val feel = LocalFeel.current
-            // A Column, not a Box: the panel is several siblings, and a Box
-            // stacked the waiting line on top of what you said.
+            // Column, not Box: a Box overlapped the waiting line with the answer.
             Column(
                 Modifier.arrive(
                     key = Unit,
                     rise = 10.dp,
                     enabled = justSealed,
-                    // The seal is cued by the picture, not by the tap -- the
-                    // button that made the noise has already gone by then, which
-                    // is why the old one landed on nothing.
+                    // Play the seal cue when the panel lands; the button is gone by then.
                     onLanded = {
                         if (justSealed) {
                             sounds.play(Sfx.SEAL)
@@ -241,13 +230,7 @@ fun TodayScreen(
     }
 }
 
-/**
- * The question, on the gradient between the two of you.
- *
- * This is the one surface that says what the app is about without words: your
- * colour on one edge, theirs on the other, and the question sitting in the
- * blend. Every couple gets a different hero.
- */
+/** Today's question card, on a brick slab in both partners' colors. */
 @Composable
 private fun QuestionHero(
     question: Question,
@@ -260,13 +243,9 @@ private fun QuestionHero(
     /** Whose move it is, said on the card itself. */
     status: HeroStatus? = null,
 ) {
-    // One line of text crosses both halves of the wall, so the ink has to suit
-    // the paler of the two. White over pack yellow is unreadable.
+    // Text spans both colors, so pick ink that reads on the paler one (white on yellow fails).
     val ink = inkOnBricks(you.slug, them.slug)
 
-    // The hero is a wall built from both of you, not a gradient panel. The
-    // blend idea survives -- it is just said in brick rather than in colour
-    // interpolation, which is the only version of it the pack can actually make.
     BrickSlab(
         slugs = listOf(you.slug, them.slug),
         studs = 12,
@@ -277,8 +256,7 @@ private fun QuestionHero(
         Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
-            // The glass has to match the ink chosen for both colours, or a
-            // yellow partner gets dark text on a darkened pane.
+            // Glass must match the ink, or a yellow partner gets dark text on a dark pane.
             .glass(ink)
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
@@ -308,13 +286,11 @@ private fun QuestionHero(
             }
         }
 
-        // Said before the question, like everything else about the day: a
-        // hundredth day is answered differently from a Tuesday.
         milestone?.let { run ->
             Spacer(Modifier.height(8.dp))
             Text(
                 text = Milestones.headline(run) +
-                    if (question.depth.level >= 3) " Today's is one of the deep ones." else "",
+                    if (question.depth.level >= 3) " Today's question goes deep." else "",
                 style = MaterialTheme.typography.titleSmall,
                 color = ink,
             )
@@ -329,9 +305,7 @@ private fun QuestionHero(
             )
         }
 
-        // The state of the day lives on the card, not in a panel below it:
-        // one glance at the question says whether it is waiting on you, on
-        // them, or open. Tappable only when there is somewhere to go.
+        // Day status; tappable only when it has an onClick.
         status?.let { st ->
             val sounds = LocalSounds.current
             val feel = LocalFeel.current
@@ -360,16 +334,7 @@ private fun QuestionHero(
     }
 }
 
-/**
- * The way in to writing your own question.
- *
- * Sits under the day rather than above it: today already has a question, and
- * offering to write one before you have answered the one in front of you is
- * offering a way out of it.
- *
- * When something is already queued it says so instead. Two people who both
- * write one on the same evening should be able to see that they did.
- */
+/** Button to write your own question, plus a note on how many are already queued. */
 @Composable
 internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -390,11 +355,11 @@ internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
         QuietNote(
             when {
                 mine > 0 && theirs > 0 ->
-                    "${count(mine)} of yours and ${count(theirs)} of ${state.them.name}'s are waiting."
+                    "${count(mine)} from you and ${count(theirs)} from ${state.them.name} are queued."
                 theirs > 0 ->
-                    "${state.them.name} has written one. It is the next question."
-                mine == 1 -> "Yours is waiting. It will be the next question."
-                else -> "$mine of yours are waiting."
+                    "${state.them.name} wrote one. It's up next."
+                mine == 1 -> "Yours is up next."
+                else -> "$mine of yours are queued."
             },
         )
     }
@@ -402,12 +367,7 @@ internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
 
 private fun count(n: Int) = if (n == 1) "One" else n.toString()
 
-/**
- * How long ago, roughly, and never in days.
- *
- * "One hundred and eighty-three days ago" is a number; "six months ago" is a
- * memory. The whole feature is about distance feeling like distance.
- */
+/** Rough "how long ago" in months or years, never days. */
 internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
     val months = ChronoUnit.MONTHS.between(then, now)
     return when {
@@ -420,20 +380,8 @@ internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
 }
 
 /**
- * Did yesterday's question come up again?
- *
- * The only thing this app has ever wanted to know and had no way of being
- * told. The reveal is designed to send the two of you into the other room --
- * one of the six reactions is literally "Say more tonight" -- and until now
- * whether that happened was invisible to it.
- *
- * One tap, no second state, and no way to take it back. There is no version of
- * "actually we did not talk about it after all" worth building a control for,
- * and a yes/no would turn a nice thing into a report card.
- *
- * Only ever about yesterday, and only when yesterday opened. Asking about a
- * day somebody never finished is asking them about a conversation they could
- * not have had.
+ * One-tap prompt marking yesterday's question as talked about. Not undoable.
+ * Shown only when yesterday was revealed and not already marked.
  */
 @Composable
 private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
@@ -465,7 +413,7 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
         BrickDot(slug = you.slug, studSize = Stud.pip)
         Column(Modifier.weight(1f)) {
             Text(
-                "Did yesterday's question come up again?",
+                "Did you talk about yesterday's question?",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -479,7 +427,7 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
             )
         }
         Text(
-            "It did",
+            "We did",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -487,11 +435,8 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
 }
 
 /**
- * Who picked today, when somebody did and the question actually honours it.
- *
- * Checked against the question's category rather than trusted: a wildcard, a
- * capsule or an occasion outranks the pick, and crediting somebody with a
- * Christmas question they did not choose would be a small lie.
+ * Who picked today's theme, or null. Checked against the question's category,
+ * since a wildcard, capsule or occasion can override the pick.
  */
 private fun pickedBy(state: CoupleState): String? {
     val theme = Turns.themeFor(state.today.date, state.history, state.you.uid, state.them.uid)
@@ -502,12 +447,8 @@ private fun pickedBy(state: CoupleState): String? {
 }
 
 /**
- * The one thing today that is only one of yours to do.
- *
- * Shown once the day is open, to both of you: the chooser gets the themes, and
- * the other person is told whose turn it is and, once it is done, only that it
- * is done. Tomorrow's theme is the surprise, so it stays off the second phone
- * until the question itself arrives.
+ * Tomorrow's theme picker. The chooser sees the themes; the other partner only
+ * sees whether a pick was made, not which one.
  */
 @Composable
 internal fun TomorrowPick(
@@ -524,10 +465,10 @@ internal fun TomorrowPick(
         Spacer(Modifier.height(6.dp))
         Text(
             text = when {
-                yours && picked == null -> "Your turn to pick what tomorrow is about."
-                yours -> "Tomorrow is ${picked!!.lowercase()}. ${state.them.name} finds out in the morning."
-                picked == null -> "${state.them.name} picks what tomorrow is about."
-                else -> "${state.them.name} picked tomorrow. You find out in the morning."
+                yours && picked == null -> "Your turn to pick tomorrow's theme."
+                yours -> "Tomorrow is ${picked!!.lowercase()}. ${state.them.name} sees it in the morning."
+                picked == null -> "${state.them.name} picks tomorrow's theme."
+                else -> "${state.them.name} picked tomorrow's theme. You'll see it in the morning."
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
@@ -552,17 +493,8 @@ internal fun TomorrowPick(
 }
 
 /**
- * A week of one-stud bricks, lit as far as the streak has got.
- *
- * A pill reading "7 DAY STREAK" is a number about bricks printed on a brick.
- * Seven studs is the same fact as a thing you can see filling up, and it says
- * what a number cannot: how much of the week is left. Which is the part that
- * makes anybody open the app on a Thursday.
- *
- * Seven, and it wraps. A streak of ten lights all seven and reads as the week
- * it is in, because a strip that grows without bound is a strip that stops
- * fitting on the row -- and the count is still there beside it for anyone who
- * wants the whole number.
+ * Streak count plus seven one-stud bricks lit for the current week of the streak.
+ * Wraps every seven days so the row never grows.
  */
 @Composable
 private fun StreakStuds(days: Int, you: BrickColor) {
@@ -584,9 +516,7 @@ private fun StreakStuds(days: Int, you: BrickColor) {
                 modifier = Modifier.padding(end = 8.dp),
             )
         }
-        // Pip, not small: these are markers, which is the size that word means
-        // in this app. Seven at 24dp is 168 of them beside a date, and the
-        // streak starts arguing with the day it is counting.
+        // Pip size keeps the row small next to the date.
         Canvas(
             Modifier.size(
                 width = Stud.pip * StreakWeek,
@@ -603,9 +533,7 @@ private fun StreakStuds(days: Int, you: BrickColor) {
                     left = i * studPx,
                     bottom = size.height,
                     studPx = studPx,
-                    // Unlit days are there to be counted, not read. Full
-                    // opacity on seven grey studs makes a row that competes
-                    // with the question underneath it.
+                    // Dim unlit days so the row doesn't compete with the question.
                     alpha = if (i < lit) 1f else 0.32f,
                 )
             }
@@ -613,17 +541,12 @@ private fun StreakStuds(days: Int, you: BrickColor) {
     }
 }
 
-/** Seven, because a streak is measured in days and shown as a week. */
+/** Studs in the streak row. */
 private const val StreakWeek = 7
 
 // --- Draft -------------------------------------------------------------------
 
-/**
- * One in-progress answer, covering every question type.
- *
- * A single object rather than eight loose `remember`s, so resetting on a
- * question change is one line and cannot half-happen.
- */
+/** One in-progress answer for any question type; a single object so it resets atomically. */
 internal data class Draft(
     val text: String = "",
     val pick: String? = null,
@@ -684,7 +607,7 @@ private fun AnswerForm(
     Spacer(Modifier.height(28.dp))
 
     AmpButton(
-        label = "Seal it",
+        label = "Submit",
         slug = BrickColor.of(state.you.colorArgb).slug,
         enabled = ready,
         // Silent on the click: the seal is cued by the panel landing instead.
@@ -700,7 +623,7 @@ private fun AnswerForm(
 
     Spacer(Modifier.height(12.dp))
     Text(
-        text = "Sealed until you have both answered. No edits after.",
+        text = "Hidden until you both answer. You can't edit after.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth(),
@@ -716,7 +639,7 @@ private fun youLabel(type: QuestionType) = when (type) {
 }
 
 private fun themLabel(type: QuestionType, name: String) = when (type) {
-    QuestionType.RANK -> "$name's order, as you predict it"
+    QuestionType.RANK -> "Your guess at $name's order"
     QuestionType.MULTI_SELECT -> "What $name will pick"
     QuestionType.SCALE -> "What $name will say"
     else -> "What $name will say"
@@ -736,13 +659,12 @@ internal fun AnswerInput(
         QuestionType.REFLECT, QuestionType.GUESS_ME -> AmpField(
             value = draft.text,
             onValueChange = { onChange(draft.copy(text = it)) },
-            // The accent is always one of the four brick colours; the field
-            // needs the brick itself, not just its paint.
+            // Accent is always a brick color; the field needs the BrickColor.
             color = BrickColor.of(accent.toArgbLong()),
             placeholder = if (forPartner) {
-                "Your best guess."
+                "Your best guess"
             } else {
-                "Honestly, though."
+                "Your answer"
             },
         )
 
@@ -792,7 +714,7 @@ internal fun AnswerInput(
     }
 }
 
-/** After you submit: your answer stays visible, theirs does not exist yet. */
+/** After you submit: shows your answer and guess, then waiting or open. */
 @Composable
 private fun SealedPanel(
     state: CoupleState,
@@ -814,14 +736,14 @@ private fun SealedPanel(
         Row(verticalAlignment = Alignment.CenterVertically) {
             PersonDot(state.you.name, youColor, size = 28)
             Spacer(Modifier.size(10.dp))
-            SectionLabel("You said")
+            SectionLabel("Your answer")
         }
         Spacer(Modifier.height(10.dp))
         AnswerValues(yours.values, day.question.type)
 
         yours.guessText?.let { guess ->
             Spacer(Modifier.height(14.dp))
-            SectionLabel("You guessed ${state.them.name} would say")
+            SectionLabel("Your guess for ${state.them.name}")
             Spacer(Modifier.height(6.dp))
             Text(
                 guess,
@@ -840,7 +762,7 @@ private fun SealedPanel(
 
     AnimatedVisibility(visible = bothIn, enter = fadeIn(), exit = fadeOut()) {
         AmpButton(
-            label = "Open it",
+            label = "See answers",
             slug = BrickColor.of(state.you.colorArgb).slug,
             sfx = Sfx.SEAL,
             onClick = onOpenReveal,
@@ -848,13 +770,7 @@ private fun SealedPanel(
     }
 }
 
-/**
- * Every deck and test one of you has finished and the other has not.
- *
- * Chips for whose turn, with counts, and rows that say it in a sentence. The
- * two bricks on the right are the same two-a-day pips as the Shelf: lit for
- * whoever has done it.
- */
+/** Decks and tests one partner finished and the other hasn't, filtered by whose turn. */
 @Composable
 internal fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxItem) -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -910,7 +826,7 @@ internal fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxI
                     Text(
                         when (item.turn) {
                             Turn.YOURS -> "${state.them.name} finished. Your turn."
-                            Turn.THEIRS -> "You finished. ${state.them.name} has not yet."
+                            Turn.THEIRS -> "You finished. Waiting for ${state.them.name}."
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = ink,
@@ -927,12 +843,8 @@ internal fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxI
 }
 
 /**
- * How each of you is today, in bricks, and the way to say yours.
- *
- * Yours opens a picker: the five faces, in whichever colour you tap in the row
- * above them, then the pack's other bricks. Tapping one sets it and closes.
- * Theirs is shown as they left it, and nothing when they have not said -- no
- * "Tasia has not set a mood", because not saying is an answer too.
+ * Today's moods. Tapping yours opens a picker (face color row, faces, other bricks);
+ * picking sets it and closes. Theirs is hidden when unset.
  */
 @Composable
 private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
@@ -962,7 +874,7 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
             who = "You",
             entry = mine,
             color = you,
-            empty = "How are you, in bricks?",
+            empty = "Set your mood",
         ) { picking = !picking }
         theirs?.let {
             MoodChip(modifier = Modifier.weight(1f), who = state.them.name, entry = it, color = them, empty = "", onClick = null)
@@ -975,7 +887,7 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Faces in", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
+                Text("Face color", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
                 (listOf<BrickColor?>(null) + BrickColor.entries).forEachIndexed { i, c ->
                     MoodArt(
                         Mood.SNAPPED_IN,
@@ -1061,18 +973,7 @@ private fun MoodChip(
 /** What the question card says about the day, and where tapping it goes. */
 private data class HeroStatus(val title: String, val detail: String, val onClick: (() -> Unit)? = null)
 
-/**
- * The waiting state, said with the app's own name.
- *
- * Half the name is on screen and the other half has not happened yet: your
- * answer made the click, and the clack is theirs to make. It is the one place
- * where the title of the app is also the state the app is in, which is the
- * entire reason it is called this.
- *
- * "Clack" breathes rather than spinning. Nothing is loading -- someone is
- * thinking -- and a spinner would promise that waiting is a technical problem
- * about to resolve itself.
- */
+/** Waiting state: "Click." solid, "Clack." pulsing until the partner answers. */
 @Composable
 private fun WaitingLine(theirName: String) {
     val pending by rememberInfiniteTransition(label = "clack").animateFloat(
@@ -1213,13 +1114,8 @@ private fun PreviewRankDark() = AmpersandTheme(darkTheme = true) {
 }
 
 /**
- * One question's input, with the draft held for you.
- *
- * The deck player needs exactly what the daily question needs -- the same eight
- * controls, chosen the same way -- so this is the shared entry point rather
- * than a second copy that drifts. [rememberDraft] is keyed on the question, so
- * moving to the next one genuinely clears the form instead of carrying the last
- * answer forward as a suggestion.
+ * Shared question input for the deck player. [rememberDraft] is keyed on the
+ * question id, so moving to the next question clears the draft.
  */
 @Composable
 internal fun rememberDraft(question: Question): MutableState<Draft> =

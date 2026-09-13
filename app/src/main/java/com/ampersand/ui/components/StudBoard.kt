@@ -26,17 +26,8 @@ private const val WallSeed = 20260911
 private data class WallBrick(val startStud: Int, val row: Int, val color: BrickColor)
 
 /**
- * The app is built on a half-finished wall of the two of you.
- *
- * Six-stud bricks stacked in running bond, alternating between your colour and
- * theirs, with random gaps where a brick has not been laid yet. It is the same
- * idea as the plate on the Build tab, running quietly behind everything: a thing
- * the two of you are still making.
- *
- * Drawn from the real pack art rather than procedurally, so the background is
- * made of exactly the same bricks as the sculpture. Layout is generated once
- * against a fixed seed -- a wall that rearranged itself on every recomposition
- * would be a strobe light.
+ * Faint background wall of six-stud bricks in both partners' colors, with random
+ * gaps. Layout uses a fixed seed so it doesn't reshuffle on recomposition.
  */
 @Composable
 fun BrickWall(
@@ -54,10 +45,7 @@ fun BrickWall(
 
         val bricks = remember(rows, you, them) { layout(rows, you, them) }
 
-        // Alpha on the whole layer, not per brick. Drawing each brick
-        // translucent let the nub of a lower brick show *through* the brick
-        // stacked on it -- studs appearing in the middle of a solid wall.
-        // One offscreen layer means they occlude properly first, then fade.
+        // Alpha on the whole layer, not per brick, or lower nubs show through.
         Canvas(
             Modifier
                 .fillMaxSize()
@@ -83,14 +71,8 @@ fun BrickWall(
 }
 
 /**
- * Running bond with holes: every other course is offset by half a brick, and
- * a small fraction of slots are left empty -- just enough to read as unfinished
- * rather than tiled. Alpha is tuned for legibility
- * rather than realism: at full strength the wall wins every contrast fight with
- * the body text sitting on it.
- *
- * Bricks are allowed to start off the left edge and run off the right one. That
- * is what stops the pattern reading as a tidy grid of tiles.
+ * Running bond: odd rows offset by half a brick, about 12% of slots left empty.
+ * Bricks may overhang either edge.
  */
 private fun layout(rows: Int, you: BrickColor, them: BrickColor): List<WallBrick> {
     val random = Random(WallSeed)

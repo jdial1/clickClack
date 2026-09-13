@@ -53,12 +53,7 @@ import java.time.format.DateTimeFormatter
 
 private val DayFormat = DateTimeFormatter.ofPattern("EEEE d MMMM")
 
-/**
- * Both answers, side by side, each in its owner's colour.
- *
- * Deliberately not a chat. One reaction and one optional follow-up note each is
- * the whole interaction budget: the conversation is meant to happen out loud.
- */
+/** A revealed day: both answers side by side, plus one reaction each. */
 @Composable
 fun RevealScreen(
     state: CoupleState,
@@ -66,7 +61,7 @@ fun RevealScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     onReact: (Reaction?) -> Unit = {},
-    /** False once this day has already opened, so it never unpacks twice. */
+    /** Pass false if this day was already opened, to skip the entrance animation. */
     animateIn: Boolean = true,
     onOpened: () -> Unit = {},
 ) {
@@ -76,13 +71,10 @@ fun RevealScreen(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
-    // Keyed on the *date*, not on the day. DayEntry is a data class, so a
-    // reaction arriving from the other phone changes its equality and would
-    // restart the whole unpacking under the reader's hands.
+    // Keyed on date, not DayEntry: an incoming reaction changes equality and would restart the animation.
     LaunchedEffect(day.date, animateIn) {
         if (!animateIn) return@LaunchedEffect
-        // Three beats: the question is already on screen when you arrive, and
-        // the two answers share a beat now that they share a row.
+        // One sound per staggered element after the question.
         repeat(3) { i ->
             delay(Motion.StaggerMs.toLong())
             sounds.play(if (i % 2 == 0) Sfx.CLICK else Sfx.CLACK)
@@ -158,8 +150,7 @@ fun RevealScreen(
             )
         }
 
-        // Only on a capsule day, and only after the seal -- the whole trick is
-        // that you answered today without being able to see this.
+        // Capsule days only, after reveal: the earlier answers to the same question.
         state.capsule?.takeIf { it.question.id == day.question.id && day.isRevealed }?.let { then ->
             Spacer(Modifier.height(30.dp))
             Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
@@ -191,7 +182,7 @@ fun RevealScreen(
         }
 
         Spacer(Modifier.height(30.dp))
-        SectionLabel("Say something back")
+        SectionLabel("React")
         Spacer(Modifier.height(10.dp))
         Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
             AmpReactionRow(
@@ -210,14 +201,12 @@ fun RevealScreen(
                 color = BrickColor.of(state.them.colorArgb),
             )
         } else {
-            QuietNote("${state.them.name} has not said anything back yet.")
+            QuietNote("${state.them.name} hasn't reacted yet.")
         }
 
         Spacer(Modifier.height(30.dp))
-        // The last word on the screen, and the only instruction the app ever
-        // gives: the reaction is a receipt, not the conversation.
         Text(
-            text = "Now go and ask them about it.",
+            text = "Talk about it together.",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -238,9 +227,9 @@ private fun ScoreBanner(score: Int) {
         Spacer(Modifier.size(4.dp))
         Text(
             text = when (score) {
-                2 -> "You both called it."
-                1 -> "One of you called it."
-                else -> "Neither of you saw that coming."
+                2 -> "You both guessed right."
+                1 -> "One of you guessed right."
+                else -> "Neither of you guessed right."
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -268,7 +257,7 @@ private fun PreviewRevealReflect() = AmpersandTheme {
     }
 }
 
-/** Both of you have reacted: the row lit on your side, their label underneath. */
+/** Both partners have reacted. */
 @Preview(name = "Reveal - reacted", showBackground = true, heightDp = 1100)
 @Composable
 private fun PreviewRevealReacted() = AmpersandTheme {

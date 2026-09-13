@@ -29,10 +29,7 @@ fun SectionLabel(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    /**
-     * False when the label is already inside a panel of its own. Two frostings
-     * stacked is a panel with a panel in it, which reads as a mistake.
-     */
+    /** False when the label is already inside a panel, to avoid a double backdrop. */
     panel: Boolean = true,
 ) {
     Text(
@@ -43,15 +40,10 @@ fun SectionLabel(
     )
 }
 
-/**
- * Three studs, filled to the question's depth. Light Tuesday vs. real evening.
- *
- * [tint] is for the gradient hero, where theme colours would vanish.
- */
+/** Three studs, filled to the question's depth level. [tint] is currently unused. */
 @Composable
 fun DepthDots(depth: Depth, modifier: Modifier = Modifier, tint: Color? = null) {
-    // Neutral brick: depth sits on the gradient hero, where a palette colour
-    // would disappear into the background it is drawn on.
+    // Neutral brick so it stays visible on the gradient hero.
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         repeat(3) { i ->
             BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < depth.level)
@@ -59,12 +51,7 @@ fun DepthDots(depth: Depth, modifier: Modifier = Modifier, tint: Color? = null) 
     }
 }
 
-/**
- * A person's initial on their own brick. The only "avatar" the app needs.
- *
- * Was a circle. A round avatar is the single most "generic app" shape there is,
- * and it sat next to actual bricks everywhere it appeared.
- */
+/** A person's initial on a one-stud brick in their color. */
 @Composable
 fun PersonDot(
     name: String,
@@ -72,8 +59,7 @@ fun PersonDot(
     modifier: Modifier = Modifier,
     size: Int = 28,
 ) {
-    // One real stud with an initial on it. Sized from [size] so every existing
-    // call site keeps the footprint it asked for, nub included.
+    // Stud scaled so the total footprint, nub included, matches [size].
     val slug = BrickColor.of(color.toArgbLong()).slug
     BrickPill(
         slug = slug,
@@ -89,7 +75,7 @@ fun PersonDot(
     }
 }
 
-/** Centred, quiet, used for empty and waiting states. */
+/** Centered muted text for empty and waiting states. */
 @Composable
 fun QuietNote(text: String, modifier: Modifier = Modifier, panel: Boolean = true) {
     Text(

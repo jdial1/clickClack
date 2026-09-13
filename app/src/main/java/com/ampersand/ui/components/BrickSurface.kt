@@ -16,16 +16,9 @@ import com.ampersand.ui.theme.Motion
 import kotlinx.coroutines.delay
 
 /**
- * A brick going down under a finger, and springing back when it is let go.
- *
- * Travel only, in the draw phase -- deliberately not padding or height.
- * [com.ampersand.ui.brick.BrickSlab] is a custom Layout that rounds its height
- * up to whole courses and ignores an incoming height constraint, so anything
- * that changes layout around one fights it and shoves its neighbours about.
- * `graphicsLayer` moves pixels and nothing else, which is all a keypress is.
- *
- * One nub of travel. Deeper reads as squashy rather than solid, and a scale
- * change reads as a balloon: real keys go down, they do not shrink.
+ * Moves the element down while pressed and springs back on release.
+ * Uses graphicsLayer, not layout: [com.ampersand.ui.brick.BrickSlab] ignores
+ * height constraints, so layout changes would shove its neighbors.
  */
 fun Modifier.pressDepth(pressed: Boolean, depth: Dp = Motion.Depth): Modifier = composed {
     val down by animateFloatAsState(
@@ -37,11 +30,8 @@ fun Modifier.pressDepth(pressed: Boolean, depth: Dp = Motion.Depth): Modifier = 
 }
 
 /**
- * Two quick cycles sideways, to say no.
- *
- * Keyed on a counter rather than a flag so a second refusal shakes again --
- * a boolean that is already true animates nothing, which is exactly the moment
- * someone taps harder. Starts at zero so it does not fire on first composition.
+ * Horizontal shake, e.g. for a rejected action. Increment [key] to shake again;
+ * 0 does nothing, so it won't fire on first composition.
  */
 fun Modifier.shake(key: Int, distance: Dp = 6.dp): Modifier = composed {
     val offset = remember { Animatable(0f) }
@@ -62,16 +52,8 @@ fun Modifier.shake(key: Int, distance: Dp = 6.dp): Modifier = composed {
 }
 
 /**
- * A thing settling into place, on its own beat.
- *
- * Drawn, not laid out: the child occupies its final space from the first frame
- * and only its pixels move. That is what keeps a staggered group from reflowing
- * a scrolling column five times in a third of a second -- and it is the more
- * physical reading anyway. The bricks are already there; they are bedding in.
- *
- * [index] is the child's place in a stagger, in beats of [Motion.StaggerMs].
- * Restarts whenever [key] changes, which for a group means every child restarts
- * together.
+ * Fade-and-rise entrance, drawn in graphicsLayer so layout never reflows.
+ * [index] delays by that many [Motion.StaggerMs]. Restarts when [key] changes.
  */
 fun Modifier.arrive(
     key: Any?,
@@ -79,23 +61,20 @@ fun Modifier.arrive(
     rise: Dp = 8.dp,
     slide: Dp = 0.dp,
     enabled: Boolean = true,
-    /** Fired on the frame it comes to rest, for a cue that has to land with it. */
+    /** Called when the animation finishes. Not called if disposed mid-animation. */
     onLanded: () -> Unit = {},
 ): Modifier = composed {
     val progress = remember { Animatable(if (enabled) 0f else 1f) }
     LaunchedEffect(key, enabled) {
         if (!enabled) {
-            // Already seen. Render finished rather than flashing through it.
+            // Disabled: show the final state immediately.
             progress.snapTo(1f)
             return@LaunchedEffect
         }
         progress.snapTo(0f)
         delay(index * Motion.StaggerMs.toLong())
         progress.animateTo(1f, Motion.glide)
-        // Deliberately after animateTo, and deliberately not in a finally: if
-        // this composable is disposed mid-flight the coroutine is cancelled and
-        // the cue never fires, which is what you want. A sound with no picture
-        // is worse than neither.
+        // Not in a finally, so cancellation skips the cue.
         onLanded()
     }
     graphicsLayer {

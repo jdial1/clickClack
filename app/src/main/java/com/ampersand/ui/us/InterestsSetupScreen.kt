@@ -33,13 +33,8 @@ import com.ampersand.ui.components.AmpCheckboxGroup
 import com.ampersand.ui.components.BrickWall
 
 /**
- * A few questions, once, about what the daily question should and should not
- * be about.
- *
- * Sports first, because it is the one that fills a pool with questions about
- * teams somebody may never have watched: nothing about sports is asked until
- * one of you says you follow something, and then only those leagues. Then any
- * topics to leave out. Both can be changed later under Your profile.
+ * One-time setup: which sports leagues you follow (none means no sports
+ * questions), then topics to leave out. Both are editable later in Your profile.
  */
 @Composable
 fun InterestsSetupScreen(
@@ -71,7 +66,7 @@ fun InterestsSetupScreen(
             ) {
                 when (step) {
                     0 -> {
-                        Heading("Do you follow sports?", "Only the ones you pick will show up in your questions.")
+                        Heading("Do you follow sports?", "Only the ones you pick show up in questions.")
                         Spacer(Modifier.height(24.dp))
                         AmpButton(label = "Yes", slug = color.slug) { step = 1 }
                         Spacer(Modifier.height(10.dp))
@@ -79,7 +74,7 @@ fun InterestsSetupScreen(
                     }
 
                     1 -> {
-                        Heading("Which ones?", "Local teams come from your home ZIP, once one is set.")
+                        Heading("Which ones?", "Local teams are based on your home ZIP.")
                         Spacer(Modifier.height(20.dp))
                         AmpCheckboxGroup(
                             options = League.entries.map { it.label },
@@ -94,8 +89,8 @@ fun InterestsSetupScreen(
 
                     else -> {
                         Heading(
-                            "Anything you would rather not be asked about?",
-                            "Whatever either of you leaves out stays out of the daily question for both.",
+                            "Any topics to skip?",
+                            "If either of you skips a topic, it's skipped for both.",
                         )
                         Spacer(Modifier.height(20.dp))
                         AmpCheckboxGroup(
@@ -106,7 +101,7 @@ fun InterestsSetupScreen(
                             onToggle = { leaveOut = if (it in leaveOut) leaveOut - it else leaveOut + it },
                         )
                         Spacer(Modifier.height(20.dp))
-                        AmpButton(label = "That is everything", slug = color.slug) { finish() }
+                        AmpButton(label = "Done", slug = color.slug) { finish() }
                     }
                 }
             }

@@ -15,21 +15,17 @@ enum class RelationshipStatus(val label: String) {
 }
 
 /**
- * A subject either of you can take out of the daily question.
- *
- * Hidden by either of you means hidden for both: the daily question has to be
- * the same on two phones, and a topic one person would rather not be asked
- * about is not one to ask the other about either. Decks are not filtered --
- * choosing to play one is its own consent.
+ * A subject either of you can hide from the daily question.
+ * Hidden by either means hidden for both, so both phones draw the same question. Decks are not filtered.
  */
 enum class Topic(val label: String, val detail: String, val theme: String? = null, val tag: String? = null) {
     SPICY("Spicy", "Warm, flirty questions about wanting each other.", theme = "Spicy"),
     ROMANTIC("Romantic", "Dates, love letters and how you fell for each other.", theme = "Romantic"),
-    SPORTS("Sports", "Teams, games, and the ones you would travel to see.", tag = "sports"),
-    MONEY("Money", "Saving, spending and what you would do with more.", tag = "money"),
+    SPORTS("Sports", "Teams, games and trips to see them.", tag = "sports"),
+    MONEY("Money", "Saving, spending and big plans.", tag = "money"),
     FAMILY("Family and upbringing", "How you were raised and the families you come from.", tag = "family"),
     PAST("The past", "Old memories, old choices and how you got here.", tag = "past"),
-    WORK("Work", "Jobs, ambitions and what a working week does to you.", tag = "work"),
+    WORK("Work", "Jobs, goals and work life.", tag = "work"),
     ;
 
     fun matches(question: Question): Boolean =
@@ -57,22 +53,18 @@ data class SpecialDate(
     val kind: DateKind = DateKind.OTHER,
 )
 
-/** One line on the Us screen's dates: what, when it next comes round, and since when. */
+/** One row in the Us screen's dates: label, next occurrence, original date. */
 data class UpcomingDate(val label: String, val next: LocalDate, val since: LocalDate)
 
 object Dates {
 
-    /** The next time [date]'s month and day come round, today included. */
+    /** The next time [date]'s month and day come around, today included. */
     fun nextOccurrence(date: LocalDate, today: LocalDate): LocalDate {
         val md = MonthDay.from(date)
         val thisYear = md.atYear(today.year)
         return if (thisYear < today) md.atYear(today.year + 1) else thisYear
     }
 
-    /**
-     * Every yearly date the two of you have, soonest first: the day you started,
-     * your wedding, both birthdays and anything you added.
-     */
     /**
      * The kinds of date that fall on [today]: added dates, both birthdays and
      * the wedding. The first one gets the day's question.
@@ -89,6 +81,7 @@ object Dates {
             birthdays.filter(::on).map { DateKind.BIRTHDAY }
     }
 
+    /** Every yearly date (anniversary, wedding, birthdays, added dates), soonest first. */
     fun upcoming(state: CoupleState): List<UpcomingDate> {
         val today = state.today.date
         val entries = buildList {

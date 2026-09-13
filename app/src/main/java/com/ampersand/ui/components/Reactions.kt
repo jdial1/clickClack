@@ -42,19 +42,12 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Motion
 
-// MEDIUM, matching the nav tab. These are two identical-looking 2-stud
-// tiles on two bars that sit within a hundred dp of each other, and they were
-// different thicknesses. HIGH is for things thick enough to press *down*,
-// which is a button, not a row of markers.
+// MEDIUM to match the nav tabs.
 private val Tile = BrickShape(2, BrickHeight.MEDIUM)
 
 /**
- * The drawable behind a [Reaction].
- *
- * Kenney's emotes pack, the speech-bubble style: a white bubble stays legible
- * on all four brick colours, and a bubble is the right shape for the one place
- * in the app where you say something back. Mapped here rather than in the enum
- * so the model keeps no Android imports.
+ * Drawable for a [Reaction], from Kenney's emotes pack (speech-bubble style).
+ * Mapped here so the model has no Android imports.
  */
 @DrawableRes
 fun Reaction.drawable(): Int = when (icon) {
@@ -67,16 +60,8 @@ fun Reaction.drawable(): Int = when (icon) {
 }
 
 /**
- * The six reactions, each on its own brick, in your colour.
- *
- * Two studs wide and four rows high apiece, so the six of them come to exactly
- * twelve studs -- the same width as the plate, the hero and every slab in the
- * app. Nothing here is sized in dp: the run is laid out on stud weights, so it
- * stays a true brick run at any screen width.
- *
- * Tapping your current reaction clears it. That matters more than it sounds:
- * the alternative is that a mis-tap is permanent, and the whole reason this is
- * a reaction and not an answer is that it is allowed to be taken back.
+ * Row of reaction bricks in your color, sized from the width (12 studs total).
+ * Tapping the current reaction clears it.
  */
 @Composable
 fun AmpReactionRow(
@@ -98,12 +83,7 @@ fun AmpReactionRow(
         Row(Modifier.fillMaxWidth().height(tall)) {
             Reaction.entries.forEach { reaction ->
                 val on = reaction == selected
-                // The unpicked ones are the same brick, further away. Hiding
-                // them until you tap would mean not knowing what is on offer.
-                // Glide, not settle: `lift` feeds the brick's alpha below, and
-                // a bouncy spring overshoots 1.0 straight into drawImage. The
-                // spring lives on the emote's scale instead, where overshoot is
-                // the whole point.
+                // `lift` uses glide, not a spring: it feeds alpha, and overshoot past 1.0 breaks drawImage.
                 val lift by animateFloatAsState(
                     if (on) 1f else 0f, Motion.glide, label = "reactionLift",
                 )
@@ -133,11 +113,7 @@ fun AmpReactionRow(
                             left = 0f,
                             bottom = size.height,
                             studPx = size.width / Tile.w,
-                            // Not 0.3: six bricks of the same colour sit edge
-                            // to edge here, and that far back they stop having
-                            // visible edges and read as one smear rather than
-                            // as six things you can press. The nav bar gets
-                            // away with 0.34 because black joiners separate it.
+                            // Higher floor than the nav bar so adjacent same-color bricks stay distinct.
                             alpha = 0.55f + 0.45f * lift,
                         )
                     }
@@ -146,12 +122,9 @@ fun AmpReactionRow(
                         contentDescription = reaction.label,
                         modifier = Modifier
                             .align(Alignment.Center)
-                            // Body starts below the nub; centring in the whole
-                            // tile sits the art half on the studs.
+                            // Center on the body, below the nub.
                             .padding(top = nub)
-                            // The chosen one leans in. A tenth, not a pop: six
-                            // of these sit in a row and anything larger turns
-                            // the row into a fairground.
+                            // Selected emote scales up 10%.
                             .graphicsLayer {
                                 scaleX = 1f + 0.10f * pop
                                 scaleY = 1f + 0.10f * pop
@@ -164,13 +137,7 @@ fun AmpReactionRow(
     }
 }
 
-/**
- * What they said back, in their colour and their words.
- *
- * Shows the [Reaction.label] rather than only the glyph. An emoji on its own is
- * ambiguous in exactly the way this app is trying not to be, and the label is
- * the sentence the glyph was standing in for all along.
- */
+/** The partner's reaction: badge plus "name: label" text. */
 @Composable
 fun PartnerReaction(
     name: String,
@@ -189,14 +156,7 @@ fun PartnerReaction(
     }
 }
 
-/**
- * A single 2-stud brick with one emoji sitting on it.
- *
- * Sized from the brick rather than from the glyph. At a 15dp stud the body is
- * only 13dp tall and a 15sp emoji hangs off the top and both sides, which looks
- * like a rendering bug rather than a badge -- so the stud is set first and the
- * glyph is sized to the body it has to fit inside.
- */
+/** A 2-stud brick with the reaction emote sized to fit its body. */
 @Composable
 private fun BrickBadge(color: BrickColor, reaction: Reaction) {
     val shape = BrickShape(2, BrickHeight.MEDIUM)

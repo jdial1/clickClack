@@ -51,19 +51,7 @@ import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.AmpersandTheme
 import kotlinx.coroutines.delay
 
-/**
- * How a finished quiz is reported: two towers, not one number.
- *
- * Every couples app in this space collapses the result to a single percentage,
- * and that percentage throws away the only genuinely interesting thing in the
- * data -- that it is usually lopsided. "We scored 60%" is a fact nobody repeats.
- * "You knew me five times and I knew you twice" is the whole conversation.
- *
- * Drawn as bricks stacked per point, because a stack of bricks is already this
- * app's unit of "a thing you accumulated", and because at these sizes -- six
- * points, maybe ten -- counting real objects is easier than reading a bar
- * against an axis.
- */
+/** Quiz result as two brick towers (one per person's guessing score) plus the verdict lines. */
 @Composable
 fun CrossAnswerChart(
     result: QuizResult,
@@ -77,16 +65,11 @@ fun CrossAnswerChart(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
-    // Both towers build off one counter, so they race rather than take turns --
-    // the lopsided result, which is the whole reason there are two towers, is
-    // only legible if the shorter one visibly stops first.
-    //
-    // One cue per course, not one per brick per tower: twelve clicks in a row
-    // stops being a thing being built and starts being a slot machine.
+    // Both towers share one counter so they build together; one sound per course, not per brick.
     val built = remember(result.quiz.id) { mutableIntStateOf(0) }
     LaunchedEffect(result.quiz.id) {
         val tallest = maxOf(result.youKnewThem, result.theyKnewYou)
-        // Keeps a long deck's build under about two thirds of a second.
+        // Faster beat for tall towers.
         val beat = if (tallest > 6) Motion.BrickMs / 2 else Motion.BrickMs
         repeat(tallest) {
             delay(beat.toLong())
@@ -106,7 +89,6 @@ fun CrossAnswerChart(
                 built = built,
                 possible = possible,
                 color = you,
-                // Whose *knowledge* is being measured, not whose answer.
                 caption = "$yourName knew $theirName",
                 modifier = Modifier.weight(1f),
             )
@@ -143,7 +125,7 @@ fun CrossAnswerChart(
         if (result.agreements > 0) {
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "You gave the same answer ${result.agreements} " +
+                text = "You answered the same ${result.agreements} " +
                     if (result.agreements == 1) "time." else "times.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -154,13 +136,7 @@ fun CrossAnswerChart(
     }
 }
 
-/**
- * One person's score, as a stack.
- *
- * Every possible point is drawn; the ones not scored are the same brick left
- * faint. Showing only what was earned would make three-out-of-four and
- * three-out-of-ten look identical, which is exactly the comparison being made.
- */
+/** One person's score as a stack: every possible point drawn, unscored ones faint. */
 @Composable
 private fun ScoreTower(
     score: Int,
@@ -188,11 +164,7 @@ private fun ScoreTower(
             ) {
                 val studPx = size.width / shape.w
                 val coursePx = studPx * shape.h * BrickArt.ROW_RATIO
-                // `built` is read here, inside the draw lambda, and nowhere
-                // else. A snapshot read in this scope invalidates draw only --
-                // so a tower can lay six courses without recomposing, which
-                // matters because this Canvas lives inside a BoxWithConstraints
-                // and recomposing it re-subcomposes the whole measurement.
+                // Read `built` only in the draw lambda so ticks redraw without recomposing the BoxWithConstraints.
                 val laid = minOf(built.intValue, score)
                 for (i in 0 until possible.coerceAtLeast(1)) {
                     drawBrickArt(
@@ -220,21 +192,7 @@ private fun ScoreTower(
     }
 }
 
-/**
- * The per-question breakdown under the chart.
- *
- * Was four stacked lines -- your answer, their answer, and two lines of small
- * grey text saying who called it. That showed the two *answers* and never the
- * two *guesses*, even though the row holds both, which left the scoring
- * unexplained: "Justin called it" with nothing to say what Justin had said.
- * The verdict was also the quietest thing in the row, on the screen whose only
- * job is the verdict.
- *
- * Now the same two panels the reveal uses, for the same reason it uses them.
- * Both screens are answering one question -- what did you each say, and did the
- * other one see it coming -- and having two different shapes for that was the
- * real bug.
- */
+/** Per-question breakdown: answers and guesses in the same [AnswerPanelPair] the reveal uses. */
 @Composable
 fun CrossAnswerRow(
     row: CrossAnswer,
@@ -243,7 +201,7 @@ fun CrossAnswerRow(
     yourName: String,
     theirName: String,
     modifier: Modifier = Modifier,
-    /** Position in the deck, so a row can be pointed at out loud. */
+    /** 1-based position in the deck; shows a "Question N" label when set. */
     number: Int? = null,
 ) {
     Column(modifier.fillMaxWidth().padding(vertical = 14.dp)) {
@@ -257,13 +215,11 @@ fun CrossAnswerRow(
             color = MaterialTheme.colorScheme.onBackground,
         )
 
-        // Agreeing is not the same as knowing, and the chart only counts it in
-        // aggregate. Worth marking here too: a row where you both independently
-        // said the same thing is the one to talk about.
+        // Mark rows where both gave the same answer.
         if (row.question.isScored && row.agreed) {
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "You both said the same thing.",
+                text = "Same answer",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -290,12 +246,7 @@ fun CrossAnswerRow(
 
 // --- Previews ----------------------------------------------------------------
 
-/**
- * A worked cross-answer result, used by the previews and the quiz kit.
- *
- * Deliberately lopsided -- four hits against two -- because a balanced sample
- * makes the chart look like a decoration rather than a comparison.
- */
+/** Sample lopsided result (four hits vs two) for previews and the quiz kit. */
 internal fun sampleCrossResult(): QuizResult {
     fun q(id: String, text: String, vararg options: String) = Question(
         id = id,

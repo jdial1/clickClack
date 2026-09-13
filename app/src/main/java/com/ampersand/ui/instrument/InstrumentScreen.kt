@@ -60,23 +60,9 @@ import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.theme.Motion
 
 /**
- * One sitting with one whole instrument.
- *
- * Deliberately not the deck screen. A deck is one question at a time because
- * each one deserves a think; an instrument is thirty-two either-ors that take
- * four minutes precisely *because* you answer them quickly and without
- * deliberating, which is what a scrolling list affords and a one-at-a-time
- * carousel actively prevents.
- *
- * The order is the published order and is never shuffled. Every item must be
- * answered before it can be sealed, because a subscale with a hole in it
- * produces a number that looks like a score and is not one.
- *
- * A multi-pass instrument asks the same items again under a second stem. The
- * love languages research measures what makes you feel loved and what you
- * actually do, and the gap between your first pass and their second is the
- * entire finding -- so the two passes run back to back, in one sitting, or not
- * at all.
+ * Takes one instrument as paged, scrolling lists of 1-5 items, in published order (never shuffled).
+ * Every item must be answered before sealing, or subscale scores are invalid.
+ * Multi-pass instruments re-ask the same items under another stem in the same sitting.
  */
 @Composable
 fun InstrumentScreen(
@@ -85,25 +71,22 @@ fun InstrumentScreen(
     onBack: () -> Unit,
     onSeal: (responses: List<Int>) -> Unit,
     modifier: Modifier = Modifier,
-    /** What you had answered when you last left, if you did. */
+    /** Saved draft responses to resume from. */
     resume: List<Int> = emptyList(),
-    /** Called as each page is turned, and on the way out. */
+    /** Called on each page turn and when leaving. */
     onSaveDraft: (responses: List<Int>) -> Unit = {},
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
-    // One slot per response across every pass. 0 means unanswered, which is
-    // outside the 1..5 the instrument accepts, so it can never be mistaken for
-    // a real answer the way a defaulted 3 could.
+    // One slot per response across all passes; 0 = unanswered (valid answers are 1..5).
     val responses = remember(instrument.id) {
         mutableStateListOf<Int>().apply {
             repeat(instrument.length) { i -> add(resume.getOrElse(i) { 0 }) }
         }
     }
     val pages = remember(instrument.id) { instrument.pages() }
-    // Open on the first page with something still to answer, so resuming lands
-    // where you stopped rather than making you page past work you have done.
+    // Start on the first page with unanswered items.
     var page by rememberSaveable(instrument.id) {
         mutableStateOf(
             pages.indexOfFirst { p -> p.slots.any { responses[it] == 0 } }
@@ -119,29 +102,18 @@ fun InstrumentScreen(
     val answered = responses.count { it > 0 }
 
     val scroll = rememberScrollState()
-    // Each page opens at its own top. Carrying the previous page's scroll into
-    // a fresh set of ten rows lands you in the middle of questions you have not
-    // seen, which reads as having skipped some.
+    // Reset scroll to top on each page.
     LaunchedEffect(page) { scroll.scrollTo(0) }
 
     Column(modifier.fillMaxSize()) {
-        // Fixed, outside the scroll. The point of a progress header is that it
-        // is there while you are working, and one that scrolls off the top is
-        // only ever visible at the moment you did not need it.
         val back: () -> Unit = {
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
-            // Back means the previous page while there is one. Leaving from
-            // page three and losing twenty answers is not what anybody
-            // reaching for that word intends.
-            // Saved on the way out too, not only on a page turn. Backing
-            // out of page one after answering six is still six answers.
+            // Save the draft, then go to the previous page, or leave from page one.
             onSaveDraft(responses.toList())
             if (here.index > 0) page -= 1 else onBack()
         }
-        // The phone's back does the same as the header's. It used to fall
-        // through to the app shell, which left the sitting on screen and saved
-        // nothing, and the second press closed the app.
+        // System back must match the header; otherwise it falls through to the shell and saves nothing.
         BackHandler(onBack = back)
 
         StickyHeader(
@@ -161,9 +133,7 @@ fun InstrumentScreen(
                 .verticalScroll(scroll)
                 .padding(horizontal = 24.dp),
         ) {
-            // Only where the framing actually changes: at the top of the
-            // sitting, and again when a second pass re-asks the same items
-            // under a different stem.
+            // Intro and scale note at the start of each pass.
             if (here.items.first == 0) {
                 Spacer(Modifier.height(16.dp))
                 Text(
@@ -199,7 +169,7 @@ fun InstrumentScreen(
             Spacer(Modifier.height(26.dp))
             AmpButton(
                 label = when {
-                    last -> "Seal it"
+                    last -> "Finish"
                     endsPass -> "Next round"
                     else -> "Next"
                 },
@@ -219,14 +189,13 @@ fun InstrumentScreen(
             Spacer(Modifier.height(12.dp))
             QuietNote(
                 when {
-                    !ready -> "Every one of them, or the arithmetic behind it means nothing."
-                    last -> "Nothing opens until you have both finished."
-                    else -> "Answered. ${pages.size - here.index - 1} more to go."
+                    !ready -> "Answer every item to continue."
+                    last -> "Opens when you both finish."
+                    else -> "${pages.size - here.index - 1} more pages to go."
                 },
             )
 
-            // Only on the last page. A credit line under every page of a
-            // four-page sitting is the same sentence printed four times.
+            // Source credit, last page only.
             if (last) {
                 Sources[instrument.sourceId]?.let { source ->
                     Spacer(Modifier.height(18.dp))
@@ -246,18 +215,8 @@ fun InstrumentScreen(
 }
 
 /**
- * One item and its five stops.
- *
- * The poles sit on their own line above the stops rather than either side of
- * them. Flanking was the obvious layout and it does not survive real items:
- * "prefer to take multiple choice test" against "prefer essay answers" leaves
- * about seventy dp in the middle, which squeezed the stops down to something
- * you could neither see nor reliably hit. Full width for the words, full width
- * for the taps, and both get enough room.
- *
- * Every row is its own panel. The wall behind it has a seam and a run of studs
- * every course, and a line of small grey type crossing those is a line of type
- * with a stripe through it.
+ * One item in its own panel: text, pole labels on a line above, then five stops.
+ * Poles don't flank the stops because long labels squeeze the tap targets.
  */
 @Composable
 private fun ItemRow(
@@ -271,8 +230,7 @@ private fun ItemRow(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            // Answered rows recede. What is left to do should be what carries
-            // down a list of thirty-two.
+            // Answered rows are more transparent.
             .background(
                 MaterialTheme.colorScheme.surface.copy(alpha = if (answered) 0.55f else 0.88f),
             )
@@ -297,10 +255,7 @@ private fun ItemRow(
         }
 
         Spacer(Modifier.height(10.dp))
-        // Spread, not centred. Centred stops float in the middle of the row
-        // with the two anchors marooned at the edges, and nothing says which
-        // end means which -- the first stop has to sit under "Not like me" or
-        // the labels above it are decoration.
+        // Spread edge to edge so the end stops sit under the pole labels.
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -321,18 +276,14 @@ private fun ItemRow(
                         slug = stopSlug(item, stop, value, accent),
                         studSize = Stud.small,
                         filled = value == stop,
-                        // A ramp has to be visible before it is chosen from --
-                        // that is the whole point of colouring it. A pole
-                        // pair's unchosen stops are just markers and stay faint.
+                        // Statement ramps stay visible; pole-pair stops are faint until chosen.
                         dimAlpha = if (item.isPolePair) 0.28f else 0.6f,
                     )
                 }
             }
         }
 
-        // What you just said, in words. Five identical bricks record a number
-        // and show nothing back, so a row you answered and a row you answered
-        // differently look the same on a scroll back up before sealing.
+        // The chosen stop in words.
         if (answered) {
             Spacer(Modifier.height(6.dp))
             Text(
@@ -347,18 +298,8 @@ private fun ItemRow(
 }
 
 /**
- * The bar that does not scroll away.
- *
- * Three things, in the order you need them: the way out, where you are in the
- * whole sitting, and what this page is even asking. The last matters most on a
- * two-pass instrument, where the same twenty items come round again under a
- * different stem -- answering round two while reading round one's heading
- * would produce a valid-looking set of numbers that measures nothing.
- *
- * The studs are one per item on *this* page rather than on the whole sitting.
- * Thirty-two studs across a phone is a texture, not a count, and the number
- * beside it already carries the total. What the row is for is the near
- * question: how many more before this page will let you on.
+ * Fixed header: back/leave, overall count, the current pass's stem, page number,
+ * and one stud per item on this page.
  */
 @Composable
 private fun StickyHeader(
@@ -411,19 +352,13 @@ private fun StickyHeader(
     }
 }
 
-/**
- * One stud per item on the page, lit as you answer.
- *
- * The same object the deck screen counts questions with, so a sitting and a
- * deck report progress in the same language rather than each inventing one.
- */
+/** One stud per item on the page, lit as you answer. */
 @Composable
 private fun PageStuds(done: Int, of: Int, you: BrickColor) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
         repeat(of) { i ->
             val lit = i < done
-            // Glide, not a bouncy spring: an overshoot above 1.0 goes straight
-            // into drawImage as an alpha and is a documented trap in this repo.
+            // No spring on alpha: overshooting 1.0 breaks drawImage.
             val alpha by animateFloatAsState(
                 if (lit) 1f else 0.22f, Motion.glide, label = "pageStud",
             )
@@ -439,24 +374,8 @@ private fun PageStuds(done: Int, of: Int, you: BrickColor) {
 }
 
 /**
- * What colour a stop is drawn in.
- *
- * On a statement the five stops are a ramp -- how much of this is you -- so
- * they run cool to hot and stay coloured whether or not they are picked. A row
- * of five identical grey bricks gives no clue which way it counts; a row that
- * visibly warms from left to right explains the scale before anybody reads the
- * anchors. `filled` does the rest: 28% for the four you did not choose, full
- * for the one you did.
- *
- * The first stop is [quietSlug] rather than a palette colour because it means
- * *none of this*, and because a fixed neutral is the pack's near-white brick,
- * which vanishes on a pale panel. The remaining four are every colour the pack
- * ships, in the only order that reads as increasing.
- *
- * A pole pair gets none of this. Its five stops are a position between two
- * descriptions, not an amount, and the middle means half and half -- so warming
- * toward one end would assert that one of the two is *more*, which is the one
- * thing the item is careful not to say.
+ * Brick color for a stop. Statements use a cool-to-hot ramp starting at [quietSlug]
+ * (a fixed white would vanish on pale panels). Pole pairs are neutral except the chosen stop.
  */
 @Composable
 private fun stopSlug(item: InstrumentItem, stop: Int, value: Int, accent: BrickColor): String? =
@@ -472,29 +391,19 @@ private fun stopSlug(item: InstrumentItem, stop: Int, value: Int, accent: BrickC
         }
     }
 
-/** How to read the five stops on this instrument, said once at the top. */
+/** Scale instructions shown at the top of the instrument. */
 private fun scaleNote(instrument: Instrument): String =
     if (instrument.items.firstOrNull()?.isPolePair == true) {
-        "Five steps between the two descriptions. The far ends mean that side " +
-            "is always you; the middle one means half and half."
+        "Pick a spot between the two descriptions. The ends mean always that " +
+            "side. The middle means half and half."
     } else {
-        "Five steps, from not at all like you on the left to very much like " +
-            "you on the right. The middle one means sometimes."
+        "Left means not at all like you, right means very much like you. " +
+            "The middle means sometimes."
     }
 
 /**
- * What one of the five stops means, in words.
- *
- * The two kinds of item mean genuinely different things by the same five
- * positions, which is the whole reason this is worth saying out loud. On a
- * statement the scale is *how true of you* -- the middle is "sometimes". On a
- * pole pair it is *how far between two descriptions* -- the middle is "half
- * and half", which is the one instruction Jorgenson's own sheet spells out.
- *
- * Pole pairs say left and right rather than naming the pole, because the poles
- * run to nine words ("when describing an event, will tell people what
- * happened") and a caption that wraps to three lines under every answered row
- * is worse than no caption.
+ * Caption for a chosen stop. Pole pairs say left/right instead of repeating the
+ * pole text, which can be long enough to wrap several lines.
  */
 private fun stopLabel(item: InstrumentItem, stop: Int): String =
     if (item.isPolePair) {

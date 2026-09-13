@@ -15,15 +15,8 @@ data class InboxItem(
 )
 
 /**
- * What is waiting, and on whom: every deck or test one of you has finished and
- * the other has not.
- *
- * Today's question is not in here. Its state is on its own card, which is the
- * first thing on the screen; listing it twice would make the list look busier
- * than the day is.
- *
- * Yours first, then theirs, each in the order the decks and tests are listed,
- * so the list does not reshuffle every time something lands.
+ * Decks and tests one of you has finished and the other has not.
+ * Excludes today's question (it has its own card). Yours first, then theirs, in list order.
  */
 object Inbox {
 
@@ -36,8 +29,7 @@ object Inbox {
         }
         val sittingItems = sittings.mapNotNull { kit ->
             val run = state.instrumentRuns.lastOrNull { it.instrumentId == kit.id } ?: return@mapNotNull null
-            // Their run stays unreadable until the seal lifts, so a finished
-            // partner shows up as a full progress count rather than as answers.
+            // Partner's answers are sealed, so use their progress count.
             val you = run.answeredBy(state.you.uid, kit.length) >= kit.length
             val them = run.answeredBy(state.them.uid, kit.length) >= kit.length
             if (you == them) return@mapNotNull null

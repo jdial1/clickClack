@@ -43,21 +43,8 @@ import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 
 /**
- * Write a question of your own.
- *
- * The pool is a hundred and eighty-two questions and every one of them was
- * written by a stranger months ago. They are decent, and they will never once
- * ask about the thing that actually happened this week. This is the only place
- * in the app where the content comes from inside the relationship.
- *
- * It goes in a queue rather than being asked immediately. A question that
- * arrives the second it is written is a message, and the whole design of this
- * app is that there are no messages -- waiting until tomorrow is what turns it
- * back into a question.
- *
- * Three types, not eight. This gets written on a phone, in a minute, usually
- * about something specific, and a form with eight controls on it is a form
- * nobody finishes.
+ * Write your own question for your partner. It is queued for the next unanswered day,
+ * not sent immediately. Only the [Wildcard.WRITABLE] types are offered.
  */
 @Composable
 fun WildcardScreen(
@@ -102,13 +89,13 @@ fun WildcardScreen(
 
         Spacer(Modifier.height(18.dp))
         Text(
-            text = "Ask them something the app would never think of.",
+            text = "Write your own question.",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
 
         Spacer(Modifier.height(24.dp))
-        SectionLabel("The question")
+        SectionLabel("Question")
         Spacer(Modifier.height(10.dp))
         AmpField(
             value = text,
@@ -118,7 +105,7 @@ fun WildcardScreen(
         )
 
         Spacer(Modifier.height(26.dp))
-        SectionLabel("What kind")
+        SectionLabel("Type")
         Spacer(Modifier.height(10.dp))
         AmpRadioGroup(
             options = Wildcard.WRITABLE.map { it.label },
@@ -133,26 +120,26 @@ fun WildcardScreen(
 
         if (needsOptions) {
             Spacer(Modifier.height(22.dp))
-            SectionLabel("The two sides")
+            SectionLabel("Options")
             Spacer(Modifier.height(10.dp))
             AmpField(
                 value = optionA,
                 onValueChange = { optionA = it },
-                placeholder = "One",
+                placeholder = "Option 1",
                 color = you,
             )
             Spacer(Modifier.height(10.dp))
             AmpField(
                 value = optionB,
                 onValueChange = { optionB = it },
-                placeholder = "Or the other",
+                placeholder = "Option 2",
                 color = you,
             )
         }
 
         Spacer(Modifier.height(28.dp))
         AmpButton(
-            label = "Put it in the queue",
+            label = "Add question",
             slug = you.slug,
             enabled = ready,
             sfx = Sfx.SEAL,
@@ -167,15 +154,15 @@ fun WildcardScreen(
         }
 
         Spacer(Modifier.height(12.dp))
-        QuietNote("It will be the question on the next day nobody has answered yet.")
+        QuietNote("It will be the question on the next unanswered day.")
         Spacer(Modifier.height(40.dp))
     }
 }
 
 private fun explain(type: QuestionType, them: String): String = when (type) {
-    QuestionType.REFLECT -> "You both write an answer. Nothing is scored: this is the one that is just for reading."
-    QuestionType.GUESS_ME -> "You both answer, and you both guess what $them will say. This is the one with a score in it."
-    else -> "Two options, one each. Fast, and surprisingly hard to call."
+    QuestionType.REFLECT -> "You both write an answer. No score."
+    QuestionType.GUESS_ME -> "You both answer and guess what $them will say. Scored."
+    else -> "Two options. You each pick one."
 }
 
 @Preview(name = "Wildcard", showBackground = true, heightDp = 1000)

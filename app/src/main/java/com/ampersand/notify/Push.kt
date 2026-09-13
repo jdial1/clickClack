@@ -20,28 +20,14 @@ import com.google.firebase.messaging.RemoteMessage
 private const val TAG = "Push"
 
 /**
- * The one thing the daily reminder cannot do: tell you the *other* person moved.
+ * FCM token registration, for pushes when your partner does something.
  *
- * The local alarm knows the time of day and nothing else. It cannot know that
- * your partner answered four minutes ago, because knowing that means something
- * off this phone telling it -- and the whole shape of the app is two people
- * waiting on each other. A seal that lifts in silence is a seal nobody notices
- * until tomorrow.
- *
- * The token lives on your own user document, which only you may write. The
- * thing that reads it and sends the message is a Cloud Function, because a
- * client cannot send a push to another client without shipping a server key,
- * and a server key in an APK is a server key everyone has.
+ * The token is stored on your own user doc (owner-only write). A Cloud Function
+ * sends the push, since clients cannot without shipping a server key.
  */
 object Push {
 
-    /**
-     * Put this phone's token where the sender can find it.
-     *
-     * Idempotent and cheap, so it runs on every signed-in launch rather than
-     * being tracked: a token can be rotated by the system at any time, and a
-     * stale one fails silently, which is the worst kind of broken.
-     */
+    /** Save this phone's token. Runs on every signed-in launch, since tokens can rotate silently. */
     fun register(context: Context, uid: String) {
         if (!hasFirebaseConfigFor(context)) return
         FirebaseMessaging.getInstance().token
@@ -50,11 +36,8 @@ object Push {
     }
 
     /**
-     * Take this phone's token off the account, then carry on.
-     *
-     * Before sign-out rather than after: the write needs the account's
-     * credentials. [then] runs whether or not it worked, so a phone offline at
-     * the moment of signing out still signs out.
+     * Remove this phone's token, then run [then] (even on failure).
+     * Call before sign-out: the write needs the account's credentials.
      */
     fun unregister(context: Context, uid: String, then: () -> Unit) {
         if (!hasFirebaseConfigFor(context)) return then()
@@ -73,13 +56,8 @@ object Push {
 }
 
 /**
- * Receives the push and draws it.
- *
- * Deliberately renders a *data* message rather than letting the system draw a
- * notification payload: the copy is decided by the sender, but the icon,
- * channel and tap target are this app's business, and a notification-payload
- * message is drawn by the OS with none of them when the app is in the
- * background.
+ * Shows incoming pushes. Uses data messages so this app sets the icon, channel
+ * and tap target even when backgrounded.
  */
 class MessagingService : FirebaseMessagingService() {
 
@@ -109,8 +87,7 @@ class MessagingService : FirebaseMessagingService() {
             .build()
 
         runCatching {
-            // Throws when the user declined notifications, which is a normal
-            // outcome and not a crash.
+            // Throws if notifications are denied.
             NotificationManagerCompat.from(this).notify(2, note)
         }
     }

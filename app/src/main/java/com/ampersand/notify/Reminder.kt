@@ -23,20 +23,10 @@ private const val KEY_DECKS = "decksWaiting"
 private const val KEY_PARTNER = "partnerName"
 
 /**
- * One reminder a day, at a time the user picked.
+ * A daily local reminder at a user-picked time, stored per device in SharedPreferences.
  *
- * Local, not push. The thing being reminded about is "a question is waiting",
- * which is true every day at the same time and needs no server to know it --
- * and a personal app for two people should not require a messaging
- * infrastructure to tell you it is Tuesday.
- *
- * Stored per device in SharedPreferences rather than on the couple. It is a
- * property of the phone in your pocket, not a fact about the pair: you and your
- * partner should be able to want reminding at different times, or not at all.
- *
- * To watch one land, move the clock rather than sending the broadcast: the
- * receiver is not exported, so `adb shell am broadcast` is dropped in silence
- * and looks exactly like a reminder that decided it had nothing to say.
+ * To test, move the clock: the receiver is not exported, so `adb shell am broadcast`
+ * is silently dropped.
  *
  * ```
  * adb shell cmd alarm set-time <millis just before the chosen hour>
@@ -55,13 +45,8 @@ object Reminder {
     }
 
     /**
-     * What is actually outstanding, left where the receiver can read it.
-     *
-     * The alarm fires in a broadcast receiver with no app process, no signed-in
-     * Firebase session and a few milliseconds to live, so it cannot go and ask
-     * Firestore what is waiting. The app knows, every time its state changes, so
-     * it leaves a note instead. Stale by at most one app launch, which is the
-     * right trade for a nudge.
+     * Cache what is outstanding for the receiver, which cannot query Firestore.
+     * Can be stale by one app launch.
      */
     fun cacheOutstanding(
         context: Context,
@@ -105,14 +90,11 @@ object Reminder {
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            // Already gone today, so the first one is tomorrow. Without this the
-            // alarm fires the instant it is set, at any hour.
+            // Time already passed today: start tomorrow, or it fires immediately.
             if (timeInMillis <= System.currentTimeMillis()) add(Calendar.DAY_OF_YEAR, 1)
         }
 
-        // Inexact on purpose. An exact alarm needs a special permission on
-        // recent Android and is for things like alarm clocks; a nudge that
-        // arrives within a few minutes of eight is a nudge that arrived.
+        // Inexact: exact alarms need a special permission on recent Android.
         alarms.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             next.timeInMillis,
@@ -121,13 +103,7 @@ object Reminder {
         )
     }
 
-    /**
-     * Stop the alarm and forget everything cached about this couple.
-     *
-     * Called on sign-out and unpair. Without it the alarm kept telling someone
-     * with no partner that their partner had finished two decks. The asked
-     * flag goes too, so whoever pairs next on this phone is asked again.
-     */
+    /** Stop the alarm and clear all cached state, including the asked flag. Called on sign-out and unpair. */
     fun cancel(context: Context) {
         prefs(context).edit().clear().apply()
         context.getSystemService(AlarmManager::class.java)?.cancel(pending(context))
@@ -144,10 +120,9 @@ object Reminder {
             NotificationChannel(
                 CHANNEL,
                 "Daily question",
-                // Default, not high: this is a nudge, not an emergency, and a
-                // heads-up notification for a question would be rude.
+                // Default importance: no heads-up popup.
                 NotificationManager.IMPORTANCE_DEFAULT,
-            ).apply { description = "One reminder a day that a question is waiting." },
+            ).apply { description = "A daily reminder when a question is waiting." },
         )
     }
 
@@ -172,9 +147,7 @@ class ReminderReceiver : BroadcastReceiver() {
         }
         val (questionPending, decksWaiting, partner) = Reminder.outstanding(context)
 
-        // Nothing outstanding, so nothing to say. An app that reminds you about
-        // a thing you have already done is an app you turn notifications off
-        // for, and the streak is not a reason to interrupt someone.
+        // Nothing outstanding: no notification.
         if (!questionPending && decksWaiting == 0) return
 
         Reminder.ensureChannel(context)
@@ -186,17 +159,16 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Says the most useful true thing, and only one of them. No streak, no
-        // exclamation, no count of days missed.
+        // One short message about what is waiting.
         val decks = if (decksWaiting == 1) "a deck" else "$decksWaiting decks"
         val title = when {
-            questionPending && decksWaiting > 0 -> "Today's question, and $decks"
+            questionPending && decksWaiting > 0 -> "Today's question and $decks"
             decksWaiting > 0 -> "$partner finished $decks"
             else -> "Today's question is waiting"
         }
         val body = when {
-            decksWaiting > 0 -> "Waiting on you."
-            else -> "Answer it and it opens when they do."
+            decksWaiting > 0 -> "Waiting for you."
+            else -> "Opens when you both answer."
         }
 
         val note = NotificationCompat.Builder(context, CHANNEL)
@@ -208,8 +180,7 @@ class ReminderReceiver : BroadcastReceiver() {
             .build()
 
         runCatching {
-            // Throws when the user declined the notifications permission, which
-            // is a normal outcome and not a crash.
+            // Throws if notifications are denied.
             androidx.core.app.NotificationManagerCompat.from(context).notify(1, note)
         }
     }

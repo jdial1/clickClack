@@ -195,29 +195,12 @@ internal val BrickDrawables: Map<String, Int> = mapOf(
 typealias BrickAtlas = Map<String, ImageBitmap>
 
 /**
- * Every brick decoded so far, for the life of the process.
- *
- * The cache has to be per *asset*, not per caller. [rememberBricks] keys its
- * `remember` on the set of names it was handed, which means a red twelve-stud
- * slab and a blue one share nothing, and a screen holding eight slabs decoded
- * eight overlapping sets from scratch -- synchronously, in composition, on the
- * frame they first appeared. That is what put an ANR on the Us page: not the
- * number of bricks, but the same PNGs being decoded over and over because no
- * two callers asked for quite the same list.
- *
- * Bounded by the pack, which is 145 files. A session touches perhaps a third of
- * them, and those are bitmaps the live composables were holding anyway -- this
- * only stops them being held several times over.
+ * Process-wide cache of decoded bricks, per asset. Per-caller caching re-decoded the
+ * same PNGs for each slab and caused an ANR on the Us page. Bounded by the 145-file pack.
  */
 private val decoded = ConcurrentHashMap<String, ImageBitmap>()
 
-/**
- * Decodes only the bricks a screen actually asks for, and only once ever.
- *
- * The pack is 145 files across five colourways. Decoding them all up front
- * would be roughly 14MB of bitmaps for a screen that shows a dozen, so the
- * caller passes the asset names it needs.
- */
+/** Decodes only the named bricks, once per process (all 145 up front would be about 14MB). */
 @Composable
 fun rememberBricks(names: Collection<String>): BrickAtlas {
     val context = LocalContext.current

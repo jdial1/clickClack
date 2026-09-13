@@ -25,11 +25,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.random.Random
 
-/**
- * Stand-in for the real question pool, which will be ingested into Firestore.
- * Shaped exactly like the eventual `questions/{id}` documents so swapping the
- * source is a repository change and not a UI change.
- */
+/** Sample question pool, shaped like the `questions/{id}` documents. */
 object MockQuestions {
 
     val pool: List<Question> = listOf(
@@ -239,20 +235,20 @@ object MockQuestions {
     fun byId(id: String): Question = pool.first { it.id == id }
 }
 
-/** A believable couple with a fortnight of history behind them. */
+/** Sample couple with two weeks of history, for previews and the fake repository. */
 object MockCouple {
 
-    // Pack red and pack blue. They meet at magenta, which is the hero gradient.
+    // Red and blue; the hero gradient runs between them.
     val you = Member(uid = "u_justin", name = "Justin", colorArgb = 0xFFF54E4F)
     val them = Member(uid = "u_maya", name = "Maya", colorArgb = 0xFF108BE2)
 
-    /** A sculpture is a week. Short enough that you finish one and start again. */
+    /** Plate length in days. */
     const val PeriodDays = 7
     private const val GridW = BuildPlate.GRID_W
     private const val GridH = BuildPlate.GRID_H
 
 
-    /** Today starts unanswered, so the app opens on the state worth designing. */
+    /** Today, unanswered. */
     fun freshToday(today: LocalDate = LocalDate.now()): DayEntry =
         DayEntry(date = today, question = MockQuestions.byId("g1"))
 
@@ -302,7 +298,7 @@ object MockCouple {
             youGuess = "Save it",
             themGuess = "Spend it",
         ),
-        // Day 8 is missing on purpose: that is the miss the weekly freeze absorbed.
+        // Day 8 missing on purpose: the miss covered by the weekly freeze.
         day(
             today.minusDays(9), "r3",
             yourResponse = "Finishing the bike. Genuinely just the bike.",
@@ -316,10 +312,7 @@ object MockCouple {
             themGuess = "You talk to the cat",
         ),
 
-        // --- Older, and deliberately on today's date --------------------------
-        // These exist so "on this day" has something to find. Six months and a
-        // year back, because the whole point of that block is to show the app
-        // holding on to something long after you would have forgotten it.
+        // Six months and a year back on today's date, for "on this day".
         day(
             today.minusMonths(6), "r4",
             yourResponse = "For you to tell me it was fine. I did not want it fixed.",
@@ -334,7 +327,7 @@ object MockCouple {
         ),
     )
 
-    /** A both-answered day. Omitted guesses simply count as a miss. */
+    /** A day both answered. Omitted guesses count as misses. */
     private fun day(
         date: LocalDate,
         questionId: String,
@@ -353,14 +346,7 @@ object MockCouple {
         reactions = reactions,
     )
 
-    /**
-     * A fortnight's plate, part built.
-     *
-     * Hand-placed rather than generated so the sample reads as something two
-     * people actually made -- a random scatter would sell the feature short.
-     * Every placement satisfies the support rule, so this doubles as a fixture
-     * for [BuildPlate.canPlace].
-     */
+    /** A part-built, hand-placed plate. Every placement satisfies [BuildPlate.canPlace]. */
     fun plate(today: LocalDate = LocalDate.now()): BuildPlate {
         val start = today.minusDays(4)
         var n = 0
@@ -387,7 +373,7 @@ object MockCouple {
         // Foundation, two six-stud bricks.
         put(BrickShape(6, low), you, 0, 0)
         put(BrickShape(6, low), them, 6, 0)
-        // Staggered course, the way you actually lay bricks.
+        // Staggered course.
         put(BrickShape(4, low), them, 0, 1)
         put(BrickShape(4, low), you, 4, 1)
         put(BrickShape(4, low), them, 8, 1)
@@ -401,10 +387,10 @@ object MockCouple {
         // The roof line, in slopes.
         put(BrickShape(4, med, Slope.LEFT), you, 2, 5)
         put(BrickShape(4, med, Slope.RIGHT), them, 6, 5)
-        // And somebody on top.
+        // Character on top.
         put(CharacterShape, you, 4, 7, BlockFace.A)
 
-        // Earned but not yet placed -- what the tray shows.
+        // Earned but unplaced (the tray).
         brick(BrickShape(4, low), you)
         brick(BrickShape(2, med, Slope.RIGHT), you)
         brick(BrickShape(6, low), you)
@@ -423,31 +409,18 @@ object MockCouple {
     }
 
     /**
-     * Sealed sculptures for the shelf.
-     *
-     * Generated rather than hand-placed, and generated *through*
-     * [BuildPlate.dropRow] rather than by writing coordinates -- so every one of
-     * these is a plate that the real placement rules would have accepted, and
-     * the shelf doubles as a fixture for them. A fixed seed per week keeps each
-     * sculpture the same between runs, which matters: a shelf that reshuffles
-     * itself is not a memory of anything.
+     * Sealed plates for the shelf, generated via [BuildPlate.dropRow] so they obey placement rules.
+     * Fixed seeds keep them stable between runs.
      */
     fun shelf(today: LocalDate = LocalDate.now()): List<BuildPlate> =
         listOf(
-            // Three different weeks on purpose, because the shelf is where the
-            // shape of a week is supposed to be legible at a glance:
-            // an even one, a lopsided one, and a rough one built out of stubs.
+            // An even week, a lopsided week, and a low-hit week of stubs.
             sculpture("plate_w1", today.minusDays(11), seed = 4021, yourShare = 0.5f, hitRate = 0.7f),
             sculpture("plate_w2", today.minusDays(18), seed = 1177, yourShare = 0.78f, hitRate = 0.6f),
             sculpture("plate_w3", today.minusDays(25), seed = 8830, yourShare = 0.45f, hitRate = 0.15f),
         )
 
-    /**
-     * [yourShare] is how much of the week was yours, and [hitRate] how often the
-     * guesses landed -- the two things the real [Rewards] now encode. A sample
-     * shelf where every week is an even fifty-fifty of identical bricks would
-     * make the feature look like it does nothing.
-     */
+    /** [yourShare] is the fraction of bricks that are yours; [hitRate] how often guesses landed (see [Rewards]). */
     private fun sculpture(
         id: String,
         startedOn: LocalDate,
@@ -492,17 +465,8 @@ object MockCouple {
     }
 
     /**
-     * Where a person would actually put this brick.
-     *
-     * [BuildPlate.canPlace] only asks for **one** stud of support, which is the
-     * right rule for a human placing a brick on purpose -- overhangs are half of
-     * what makes a sculpture look built. Dropped at random, though, that rule
-     * produces an inverted pyramid: a 6-stud brick balanced on a single stud,
-     * over and over, until the whole week looks like it is about to fall over.
-     *
-     * So this scores every legal column by how much of the brick is actually
-     * supported and how low it sits, and takes the best. Ties are broken by the
-     * seeded [random] so the three shelf pieces do not come out identical.
+     * Picks the column with the most support and lowest row, plus seeded jitter.
+     * [BuildPlate.canPlace] needs only one stud of support, so random drops would stack top-heavy.
      */
     private fun bestSpot(
         plate: BuildPlate,
@@ -520,8 +484,7 @@ object MockCouple {
             } else {
                 (0 until shape.w).count { dx -> (x + dx to y - 1) in occupied }
             }
-            // Support dominates; height breaks near-ties towards the baseplate;
-            // the jitter keeps the silhouette from being perfectly symmetrical.
+            // Support first, then lower rows, plus jitter to avoid symmetry.
             val score = under * 10 - y * 3 + random.nextInt(4)
             if (score > bestScore) {
                 bestScore = score
@@ -532,36 +495,29 @@ object MockCouple {
     }
 
     /**
-     * Deck runs in three different states, so the grouped list has something to
-     * group. All-unplayed is the one arrangement that makes the sections look
-     * like they do nothing.
-     *
-     * Question ids match the real deck files, because the result is built by
-     * pairing runs against the loaded quiz -- ids that do not exist would score
-     * a confident zero.
+     * Deck runs in three states: partner done, you done, both done.
+     * Question ids must match the real deck files or results score zero.
      */
     fun runs(): List<QuizRun> = listOf(
-        // Maya has played this one and is waiting on you.
+        // Maya played; waiting on you.
         QuizRun(
             quizId = "food-dinner",
             uid = them.uid,
             answers = mapOf("fd2" to listOf("Takeout on the couch"), "fd3" to listOf("Ramen")),
             guesses = mapOf("fd2" to listOf("Cook it together"), "fd3" to listOf("Ramen")),
         ),
-        // You have played this one; nothing opens until she does.
+        // You played; waiting on Maya.
         QuizRun(
             quizId = "travel-where",
             uid = you.uid,
             answers = mapOf("tr2" to listOf("Decide at breakfast")),
             guesses = mapOf("tr2" to listOf("Plan every day")),
         ),
-        // Both in: there is a result sitting in this one.
+        // Both played: result available.
         QuizRun(
             quizId = "playful-fast",
             uid = you.uid,
-            // pl5 is a RANK, and it is here on purpose: an ordered answer is
-            // the one shape that cannot be checked by reading a comma list, so
-            // the finished deck needs one to be worth looking at.
+            // pl5 is a RANK, to cover ordered-answer results.
             answers = mapOf(
                 "pl3" to listOf("Fly"),
                 "pl2" to listOf("Coffee"),
@@ -601,14 +557,7 @@ object MockCouple {
         ),
     )
 
-    /**
-     * The day today's question is coming back from.
-     *
-     * Six months, and the same question id as [freshToday] -- that match is
-     * what makes it a capsule rather than an old day that happens to be
-     * loaded. Answered differently then, obviously: a capsule where nothing
-     * changed would be a screenshot of the feature rather than the feature.
-     */
+    /** Six months ago, same question id as [freshToday] (the capsule needs that match). */
     fun capsule(today: LocalDate = LocalDate.now()): DayEntry = day(
         today.minusMonths(6),
         "g1",
@@ -618,7 +567,7 @@ object MockCouple {
         themGuess = "The laptop",
     )
 
-    /** One waiting, so the queue on Today has something in it. */
+    /** One queued wildcard. */
     fun wildcards(): List<Wildcard> = listOf(
         Wildcard(
             id = "w1",
@@ -630,13 +579,7 @@ object MockCouple {
         ),
     )
 
-    /**
-     * Four months of scoreboard, lopsided on purpose.
-     *
-     * A tidy fifty-fifty would say nothing, and the whole reason this is kept
-     * is that it is usually not even -- one of you is better at this, and the
-     * app has never been able to say so before.
-     */
+    /** Four months of guess scores, deliberately uneven between partners. */
     fun knowing(today: LocalDate = LocalDate.now()): Knowing = Knowing(
         (0L..3L).map { back ->
             val month = YearMonth.from(today.minusMonths(back))
@@ -665,17 +608,8 @@ object MockCouple {
     )
 
     /**
-     * One instrument taken, one not.
-     *
-     * Deliberately half-finished, because the badge wall has two states worth
-     * looking at and a fully populated mock only ever shows one of them. Love
-     * languages is in; the Jungian scales are the ghost brick.
-     *
-     * The numbers are a specific, plausible couple rather than noise: you want
-     * acts of service and give words, they want time and give touch. That is
-     * the shape the research is about -- two people both trying and both
-     * spending it in the wrong place -- and noise would average out into a
-     * perfect match, which would make the feature look like it does nothing.
+     * Love languages taken, Jungian scales not, so the badge wall shows both states.
+     * You want acts and give words; they want time and give touch (a deliberate mismatch).
      */
     private fun instrumentRuns(today: LocalDate) = listOf(
         InstrumentRun(

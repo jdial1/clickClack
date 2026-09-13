@@ -18,24 +18,12 @@ import com.ampersand.model.BrickShape
 import com.ampersand.ui.theme.Stud
 import com.ampersand.ui.theme.Wordmark
 
-/** Two 2-stud bricks in running bond. The app's mark, everywhere it appears. */
+/** The 2-stud brick used in the app's mark. */
 private val Tile = BrickShape(2, BrickHeight.MEDIUM)
 
 /**
- * The name, written on the thing the name is about.
- *
- * Two bricks with a word each, read top to bottom: *Click*, then *Clack*. A
- * wordmark set beside a picture of two bricks is a logo with an illustration
- * next to it; a wordmark set *on* them is the object saying its own name, which
- * is the only version of this mark worth having.
- *
- * The same composable animates on the splash and sits still on the sign-in
- * screen. They were two different marks before -- a falling pair on one and a
- * twelve-stud slab with a line of type across it on the other -- which meant
- * the first two screens of the app disagreed about what it was called.
- *
- * Offsets are in *courses* rather than dp, so a brick starting five of its own
- * heights up falls at the same apparent speed on any screen.
+ * The app logo: two bricks in running bond labeled "Click" and "Clack".
+ * Used animated on the splash and static on sign-in. Offsets are in courses, not dp.
  */
 @Composable
 fun BrickMark(
@@ -81,9 +69,7 @@ fun BrickMark(
             )
         }
 
-        // Each word sits on its own brick's *body*, which starts below that
-        // brick's nub -- centring through the nub would ride the type up onto
-        // the studs.
+        // Center each word on the brick body, below the nub.
         Word(
             text = "Click",
             slug = you.slug,
@@ -120,9 +106,7 @@ private fun Word(
             text = text,
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontFamily = Wordmark,
-                // Sized from the brick rather than from the type scale: the
-                // mark has to hold together at 46dp on the splash and at 34 on
-                // the sign-in screen, and a fixed sp would overflow one of them.
+                // Scaled from the stud size so the mark fits at any size.
                 fontSize = (stud.value * 0.46f).sp,
                 letterSpacing = (-0.5).sp,
             ),

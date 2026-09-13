@@ -28,13 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import com.ampersand.R
 
-/**
- * The two personal colours, and the colour they make together.
- *
- * This is the identity of the app. Your surfaces lean your hue, theirs lean
- * theirs, and the hero surfaces are painted in the gradient *between* the two --
- * which is the whole idea of the product, said in colour.
- */
+/** Both partners' colors and their [blend], which drives the theme. */
 @Immutable
 data class DuoColors(
     val you: Color,
@@ -75,15 +69,12 @@ fun AmpersandTheme(
 }
 
 // --- Scheme ------------------------------------------------------------------
-// Surfaces are filled and layered rather than outlined. Contrast comes from
-// stacking tones, not from hairlines -- outlines at 1dp read as "form", and this
-// should read as "app".
+// Surfaces separate by tone, not outlines.
 
 private fun darkSchemeFrom(duo: DuoColors): ColorScheme {
     val blend = duo.blend
     return darkColorScheme(
-        // Not tinted lighter: the blend is already clamped to a lightness that
-        // carries white text, and lifting it here would undo that.
+        // Untinted: the blend is already clamped to a lightness that carries white text.
         primary = blend,
         onPrimary = duo.inkOn(blend),
         primaryContainer = blend.shade(0.45f),
@@ -99,8 +90,7 @@ private fun darkSchemeFrom(duo: DuoColors): ColorScheme {
 
         background = NightBase.mixWith(blend, 0.06f),
         onBackground = NightInk,
-        // The card tone. Deliberately well above the background so a filled card
-        // separates with no border at all.
+        // Card tone, well above the background so cards need no border.
         surface = NightCard.mixWith(blend, 0.07f),
         onSurface = NightInk,
         surfaceVariant = NightCardHigh.mixWith(blend, 0.09f),
@@ -142,17 +132,8 @@ private fun lightSchemeFrom(duo: DuoColors): ColorScheme {
 }
 
 /**
- * The wordmark face, and only the wordmark.
- *
- * Lilita One: heavy, rounded, and slightly squashed, which is as close to the
- * feel of moulded plastic as a free face gets. Deliberately *not* the typeface
- * the obvious toy company uses -- that one is theirs, and an app built entirely
- * on CC0 art specifically to stay clear of them should not put their letters on
- * its front door. This is SIL Open Font Licensed, so it can simply ship.
- *
- * Scoped to the splash on purpose. A display face reads as a logo for two
- * words and as a novelty for a paragraph, and the rest of the app is
- * paragraphs.
+ * Wordmark font (Lilita One, SIL Open Font License), used only on the splash.
+ * Chosen to avoid any toy company's trademark typeface, like the CC0 art.
  */
 val Wordmark = FontFamily(Font(R.font.lilita_one, FontWeight.Normal))
 
@@ -167,17 +148,8 @@ val AmpersandShapes = Shapes(
 )
 
 /**
- * How big a stud is, in one place.
- *
- * Eleven hard-coded sizes had accreted across nine files -- 12, 13 and 14dp
- * were three answers to one question (a marker), and 24 turned up twice by
- * coincidence rather than by agreement. Four numbers is the whole vocabulary.
- *
- * Surfaces are not in here on purpose. Anything that fills its width derives
- * its own stud by dividing: **the page is twelve studs**, the nav bar is
- * eleven because four two-stud tabs and three joiners come to eleven, and the
- * ten-week plate is seven because a week is. Those are ratios, not sizes, and
- * pinning them to a dp would break the moment a phone got wider.
+ * Fixed stud sizes. Full-width surfaces compute their stud from the width
+ * instead (the page is 12 studs wide).
  */
 object Stud {
     /** Markers and pips: depth dots, score pips, a person's initial. */
@@ -189,7 +161,7 @@ object Stud {
     /** A brick you press that hugs its own label. */
     val chip = 30.dp
 
-    /** The splash, and nothing else in the app is this size. */
+    /** The splash only. */
     val hero = 46.dp
 }
 
@@ -199,35 +171,26 @@ object Radius {
 }
 
 /**
- * How long things take, in one place.
- *
- * The register is *physical, not showy*: everything in this app is a brick, and
- * a brick has weight, a short travel and a hard stop. Nothing here celebrates.
- * If a number below grows past its comment the app stops feeling like objects
- * and starts feeling like a slideshow, which is the failure mode to watch for.
- *
- * Two springs, not a family of easings. [settle] is a thing arriving and
- * bedding in -- it overshoots a little, the way the splash bricks recoil.
- * [glide] is a thing moving that never stopped -- a ghost following a finger,
- * a row shuffling past another. Almost everything is one or the other.
+ * Animation durations and springs. [settle] overshoots slightly (arrivals);
+ * [glide] has no bounce (following a finger, reflow, anything feeding alpha).
  */
 object Motion {
-    /** A key going down is instant; coming back up is allowed to be seen. */
+    /** Press-down duration. */
     const val PressMs = 60
 
-    /** One surface replacing another: a screen, a panel, a question. */
+    /** One screen or panel replacing another. */
     const val SwapMs = 200
 
-    /** The beat between children arriving in a staggered group. */
+    /** Delay between children in a staggered group. */
     const val StaggerMs = 70
 
-    /** The beat between courses as a tower builds itself. */
+    /** Delay between courses as a tower builds. */
     const val BrickMs = 90
 
-    /** Refusing something. Two cycles, and over before it is a cartoon. */
+    /** Rejection shake duration. */
     const val ShakeMs = 180
 
-    /** One nub of travel. More than this and buttons read as squashy. */
+    /** Press travel distance. */
     val Depth = 3.dp
 
     val settle: SpringSpec<Float> = spring(
@@ -241,20 +204,11 @@ object Motion {
     )
 }
 
-// --- Colour helpers ----------------------------------------------------------
+// --- Color helpers -----------------------------------------------------------
 
 /**
- * The midpoint of two colours, in HSL rather than RGB.
- *
- * Averaging channels is the obvious way to blend and it is wrong here: two
- * near-complementary colours (terracotta and teal, say) average to grey, so the
- * couple whose colours sit opposite each other on the wheel gets a mud-coloured
- * app while everyone else gets a vivid one. That is a lottery, not a design.
- *
- * So: walk the *shorter* arc between the two hues and land halfway, keep the
- * mean saturation with a floor under it, and keep the mean lightness. Coral and
- * indigo then meet at magenta instead of at sludge, and every pair produces a
- * hero gradient worth looking at.
+ * Midpoint of two colors in HSL (shorter hue arc, clamped saturation and lightness).
+ * RGB averaging turns near-complementary pairs gray.
  */
 private fun vividBlend(a: Color, b: Color): Color {
     val hslA = FloatArray(3).also { ColorUtils.colorToHSL(a.toArgb(), it) }
@@ -265,11 +219,8 @@ private fun vividBlend(a: Color, b: Color): Color {
     if (delta < -180f) delta += 360f
 
     val hue = (hslA[0] + delta / 2f + 360f) % 360f
-    // Floor stops two washed-out picks producing a washed-out blend.
     val sat = ((hslA[1] + hslB[1]) / 2f).coerceAtLeast(0.45f)
-    // Ceiling kept low deliberately. The blend is the hero background and the
-    // selected-tab fill, and both carry white text -- a lighter magenta looks
-    // punchier in isolation and drops the contrast under 3:1 in use.
+    // Low ceiling keeps white text on the blend above 3:1 contrast.
     val light = ((hslA[2] + hslB[2]) / 2f).coerceIn(0.34f, 0.56f)
 
     return Color(ColorUtils.HSLToColor(floatArrayOf(hue, sat, light)))
@@ -282,16 +233,14 @@ internal fun Color.shade(t: Float): Color = lerp(this, Color(0xFF080B18), t)
 internal fun Color.mixWith(other: Color, t: Float): Color = lerp(this, other, t)
 
 /**
- * 0xAARRGGBB as a Long, which is what the model stores and what Firestore will
- * hold. Not `Color.value` -- that is a packed float representation carrying a
- * colour space, and it does not round-trip through `Color(Long)`.
+ * 0xAARRGGBB as a Long, as stored in the model and Firestore. Not `Color.value`,
+ * which doesn't round-trip through `Color(Long)`.
  */
 fun Color.toArgbLong(): Long = toArgb().toLong() and 0xFFFFFFFFL
 
 // --- Base palette ------------------------------------------------------------
 
-/** Coral and indigo. Their blend is an orchid, and the gradient between them
- *  is the app's signature surface. */
+/** Default colors before a couple's colors load. */
 internal val DefaultYou = Color(0xFFF54E4F)   // pack red
 internal val DefaultThem = Color(0xFF108BE2)  // pack blue
 
@@ -306,18 +255,10 @@ internal val DayCard = Color(0xFFE8EBF7)
 internal val DayInk = Color(0xFF11152B)
 internal val DayMuted = Color(0xFF6A7299)
 
-/**
- * The only four colours, taken from [com.ampersand.model.BrickColor].
- *
- * Not a free picker any more: the bricks exist in these colourways and nothing
- * else, so offering arbitrary hues meant the chrome could never match the art.
- */
+/** The four pickable colors, from [com.ampersand.model.BrickColor] (brick art exists only in these). */
 val ColorChoices: List<Color> = com.ampersand.model.BrickColor.entries.map { Color(it.argb) }
 
 // --- Type --------------------------------------------------------------------
-// Geometric sans, heavy where it matters. The references all lead with weight
-// and size rather than with a display face, and questions read as something the
-// app is asking rather than something printed.
 
 val AmpersandTypography = Typography().run {
     copy(

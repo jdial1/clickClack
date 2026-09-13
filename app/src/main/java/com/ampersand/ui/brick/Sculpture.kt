@@ -11,17 +11,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import com.ampersand.model.BuildPlate
 
 /**
- * A finished sculpture, drawn at any size.
- *
- * Cropped to [BuildPlate.builtHeight] rather than to the grid, because a plate
- * is fourteen rows tall and a week's work is rarely more than six -- drawn to
- * the full grid, every sculpture on the shelf would be two thirds empty sky and
- * they would all look identical.
- *
- * One Canvas, bottom row first so each nub is overlapped by whatever sits on
- * it. Deliberately has no baseplate, no stud grid and no landing hint: those
- * belong to the plate you are still building, and their absence is most of what
- * makes a shelved piece read as finished.
+ * A finished sculpture at any size, cropped to [BuildPlate.builtHeight].
+ * Drawn bottom row first so upper bricks cover lower nubs. No baseplate or grid.
  */
 @Composable
 fun Sculpture(
@@ -32,13 +23,7 @@ fun Sculpture(
     val rows = plate.builtHeight().coerceAtLeast(1)
     val atlas = rememberBricks(plate.placed.mapNotNull { plate.block(it.blockId)?.asset })
 
-    // Height measured from the width rather than left to `aspectRatio`.
-    //
-    // Inside a LazyColumn item the incoming height constraint is unbounded, and
-    // aspectRatio could resolve to nothing while the canvas still drew at full
-    // size -- so the sculpture printed straight over the caption beneath it.
-    // BoxWithConstraints gives a real width to divide, and clipToBounds means a
-    // miscalculation can never again reach a neighbour.
+    // Height from width, not `aspectRatio`: in a LazyColumn that could overlap the caption below.
     BoxWithConstraints(modifier) {
         val height = maxWidth / BrickArt.aspectWithNub(plate.gridW, rows)
 
@@ -47,9 +32,7 @@ fun Sculpture(
                 .fillMaxWidth()
                 .height(height)
                 .clipToBounds()
-                // Alpha on the layer, not per brick: a dimmed thumbnail drawn
-                // brick by brick shows the nubs of the course underneath
-                // through the one standing on it.
+                // Alpha on the layer, not per brick, so lower nubs do not show through.
                 .graphicsLayer { this.alpha = alpha },
         ) {
             val stud = size.width / plate.gridW

@@ -6,14 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.random.Random
 
-/**
- * Whether the signed-in person has a partner yet.
- *
- * [Inviting] is a distinct state rather than a flag on [Solo] because an
- * outstanding code has to survive leaving the screen. Someone reads the code
- * out, closes the app, and comes back -- if the code were regenerated each time
- * the screen opened, the one they already sent would be dead.
- */
+/** Whether the signed-in person has a partner yet. [Inviting] persists an outstanding code across screens. */
 sealed interface PairState {
 
     data object Loading : PairState
@@ -31,27 +24,17 @@ sealed interface PairState {
     ) : PairState
 }
 
-/** Why a code did not work, in terms a person can act on. */
+/** Why a code did not work, with a user-facing message. */
 enum class RedeemError(val message: String) {
-    UNKNOWN_CODE("No invite with that code. Check it and try again."),
-    EXPIRED("That code has expired. Ask them for a fresh one."),
-    OWN_CODE("That is your own code. Send it to them instead."),
+    UNKNOWN_CODE("We could not find that code. Check it and try again."),
+    EXPIRED("That code has expired. Ask for a new one."),
+    OWN_CODE("That is your own code. Send it to your partner."),
     ALREADY_PAIRED("You are already paired with someone."),
-    THEY_ARE_PAIRED("Whoever made that code is already paired. Ask for a fresh one."),
-    FAILED("Could not join. Try again in a moment."),
+    THEY_ARE_PAIRED("That code's owner is already paired. Ask for a new one."),
+    FAILED("Could not connect. Try again soon."),
 }
 
-/**
- * How long a code lives.
- *
- * An hour, because the realistic use is reading it out to the person next to
- * you or sending it while you are both looking at your phones. A code with no
- * expiry is a code that leaks: it sits in a message thread and still works
- * months later, and anyone who scrolls back can pair with you.
- *
- * The ceiling is enforced in the security rules as well, so a client cannot
- * mint a long-lived one.
- */
+/** How long an invite code lives. The security rules enforce the same ceiling. */
 const val INVITE_TTL_MINUTES = 60L
 
 class RedeemException(val reason: RedeemError) : Exception(reason.message)
@@ -60,13 +43,7 @@ interface PairingRepository {
 
     val state: StateFlow<PairState>
 
-    /**
-     * Make a code for your partner to type in.
-     *
-     * Returns the existing one if there already is an outstanding invite: two
-     * live codes for one person is a way to have the wrong one written on a
-     * piece of paper.
-     */
+    /** Make a code for your partner to type in, or return the outstanding one. */
     suspend fun createInvite(): Result<String>
 
     suspend fun redeem(code: String): Result<Unit>
@@ -75,12 +52,7 @@ interface PairingRepository {
     suspend fun unpair(): Result<Unit>
 }
 
-/**
- * Firestore pairing when there is a project behind it, in-memory when not.
- *
- * Same test as [createAuthRepository], so the two never disagree about which
- * world the app is running in.
- */
+/** Firestore pairing when there is a Firebase config, in-memory otherwise. Same check as [createAuthRepository]. */
 fun createPairingRepository(
     context: Context,
     uid: String,
@@ -93,13 +65,8 @@ fun createPairingRepository(
     }
 
 /**
- * Codes people read out loud.
- *
- * No I, O, 0, 1 -- they are the pairs that get misheard and mistyped, and a
- * code is worthless if it cannot survive being said down a phone. Eight
- * characters from a 32-symbol alphabet is 2^40, which matters because the
- * security rules deliberately allow any signed-in user to `get` an invite by
- * id: the code is the secret, so it has to be one.
+ * Invite codes: 8 chars from a 32-symbol alphabet without I, O, 0, 1 (2^40).
+ * Rules let any signed-in user `get` an invite by id, so the code is the secret.
  */
 internal object InviteCode {
     private const val ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -108,19 +75,12 @@ internal object InviteCode {
     fun next(random: Random = Random.Default): String =
         (1..LENGTH).map { ALPHABET[random.nextInt(ALPHABET.length)] }.joinToString("")
 
-    /** Accepts what a person actually types: spaces, dashes, lower case. */
+    /** Uppercases and strips spaces, dashes and other non-alphabet characters. */
     fun normalise(input: String): String =
         input.uppercase().filter { it in ALPHABET }.take(LENGTH)
 }
 
-/**
- * In-memory pairing, for designing the screens.
- *
- * Starts **paired**, with the couple the mock data describes. The fake exists
- * so the whole product is reachable with no backend, and starting solo would
- * put a pairing wall in front of every screen that is still being designed.
- * The scaffold panel has an unpair chip for reaching this screen on purpose.
- */
+/** In-memory pairing for builds without Firebase. Starts paired with the mock couple. */
 class FakePairingRepository(
     private val selfUid: String = "u_justin",
 ) : PairingRepository {

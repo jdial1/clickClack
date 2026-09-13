@@ -32,64 +32,28 @@ import kotlin.math.roundToInt
 
 private val DarkInk = Color(0xFF15121F)
 
-/** Readable text colour for a brick of [slug]. The pale bricks need dark ink. */
+/** Readable text color for a brick of [slug]. Pale bricks need dark ink. */
 fun inkOnBrick(slug: String?): Color =
     if (slug == null || slug == "yellow") DarkInk else Color.White
 
-/**
- * Ink for a surface built from **two** colours, where one line of text has to
- * cross both.
- *
- * Dark unless both halves want white. White on pack yellow is about 1.8:1,
- * which fails even the large-text bar, so a single yellow brick anywhere in the
- * surface decides it for the whole thing. Dark ink is the safer default anyway:
- * on pack red it measures about 5.5:1 against white's 3.2:1.
- */
+/** Ink for text crossing two brick colors: white only if both want white (white on yellow fails contrast). */
 fun inkOnBricks(a: String?, b: String?): Color =
     if (inkOnBrick(a) == Color.White && inkOnBrick(b) == Color.White) Color.White else DarkInk
 
-/**
- * The brick that reads as *quiet* against the current ground.
- *
- * The pack's neutral brick is `#DBDBDB`, so a marker drawn in it disappears
- * against a pale background and reads perfectly on a dark one. Black is the
- * exact opposite. Neither is "the neutral brick" in any absolute sense, and
- * hard-coding either is why depth pips, score pips and list bullets all
- * vanished in light mode.
- */
+/** A low-emphasis brick slug for the current background: gray on dark, black on light. */
 @Composable
 fun quietSlug(): String? =
     if (MaterialTheme.colorScheme.background.luminance() < 0.5f) null else "black"
 
-/**
- * The brick that reads as *structure* against the current ground: the inverse.
- *
- * Used for the nav bar joiners, which have to separate the tabs rather than
- * recede into the wall behind them.
- */
+/** The inverse of [quietSlug], for elements that must stand out (nav bar joiners). */
 @Composable
 fun structureSlug(): String? =
     if (MaterialTheme.colorScheme.background.luminance() < 0.5f) "black" else null
 
-/**
- * The same frosting, for text sitting on the wall rather than on a slab.
- *
- * The wall is brick too. It is quieter than a slab, which made it easy to
- * forget, but it still has a seam and a shadow every course and a run of studs
- * across the top of each one -- and a line of type crossing those is a line of
- * type with a stripe through it. In light mode the wall's pale bands run right
- * behind a paragraph and the eye keeps trying to read the brick.
- *
- * Keyed to the ground's own ink, so it darkens under light type and lightens
- * under dark type without anyone choosing.
- */
+/** A scrim behind text on the brick wall background, so seams do not cut through the text. */
 @Composable
 fun Modifier.onWall(corner: Dp = 14.dp, strength: Float = 1f): Modifier {
-    // Decided from the ground, not by comparing the ink to a known constant:
-    // the slab version does that and it is right there, because a brick's ink
-    // is one of exactly two colours. The background's is not -- it is built
-    // from the couple's palette -- so the comparison silently failed and light
-    // mode got a black scrim under black type.
+    // Use background luminance; the themed ink is not a fixed constant to compare against.
     val light = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val pane = if (light) Color.White else Color.Black
     val shape = RoundedCornerShape(corner)
@@ -100,21 +64,8 @@ fun Modifier.onWall(corner: Dp = 14.dp, strength: Float = 1f): Modifier {
 }
 
 /**
- * A frosted panel to sit text on, when the text is on brick.
- *
- * Brick art is not a flat colour: every course has a seam and a shadow, and a
- * line of type that crosses one gets a stripe through it. On the stat cards it
- * read as a strikethrough.
- *
- * This is a scrim rather than a true backdrop blur. Compose's `Modifier.blur`
- * blurs the composable it is applied to, not what is behind it, and there is no
- * backdrop filter short of a `RuntimeShader` on API 33+. What a scrim does get
- * is the part that matters: it flattens the seams under the text and lifts
- * contrast, with a hairline top edge so it still reads as a pane laid on the
- * brick rather than a painted rectangle.
- *
- * Tinted from the ink it is carrying -- dark ink wants a light pane, white ink
- * a dark one -- so it works on any colour brick in either theme.
+ * A translucent panel behind text on brick, tinted opposite to [ink], with a hairline border.
+ * A scrim, not a real blur: Compose has no backdrop blur below API 33.
  */
 @Composable
 fun Modifier.glass(
@@ -131,32 +82,17 @@ fun Modifier.glass(
         .border(1.dp, (if (dark) Color.White else Color.White).copy(alpha = 0.18f * strength), shape)
 }
 
-/** As [glass], for a surface whose ink is decided by its brick colour. */
+/** As [glass], using the ink for [slug]. */
 @Composable
 fun Modifier.glassOn(slug: String?, corner: Dp = 16.dp): Modifier =
     glass(inkOnBrick(slug), corner)
 
 /**
- * A wide surface built out of real bricks.
+ * A full-width surface built from courses of real bricks ([BrickArt.runOf]), with
+ * alternate courses reversed so seams stagger.
  *
- * The pack only ships 1, 2, 4 and 6 stud widths, so a full-width button or card
- * cannot be a single image. The earlier answer was `brickFace`, which *drew* a
- * rounded panel with stud-shaped dots along the top — and that is exactly what
- * still read as "clean modern card" rather than brick.
- *
- * This lays real courses instead: [BrickArt.runOf] decomposes the width into
- * stock bricks (12 studs becomes a 6, a 4 and a 2), and alternate courses lay
- * that run in reverse so seams stagger like real bond rather than stacking into
- * a visible column.
- *
- * Height comes from the **content**, rounded up to a whole number of courses.
- * That rounding is why this is a custom [Layout] rather than a Box: a plain
- * content-sized box gives a short slab a course count that does not divide its
- * height, and the top course is then drawn *above* the slab, over whatever is
- * laid out there. On the sign-in screen that was the button covering the line
- * of copy above it.
- *
- * [slugs] cycles, so passing two colours gives a surface built from both of you.
+ * Height is the content height rounded up to whole courses. A custom [Layout] so
+ * the top course never draws outside the slab. [slugs] cycles per brick.
  */
 @Composable
 fun BrickSlab(
@@ -184,16 +120,13 @@ fun BrickSlab(
                 val nubPx = studPx * BrickArt.NUB_RATIO
                 if (coursePx <= 0f) return@drawBehind
 
-                // Exact, because the measure pass made the height a whole
-                // number of courses. Rounding rather than ceiling so a float
-                // hair over the boundary does not add a course that overflows.
+                // Height is whole courses; round (not ceil) to absorb float error.
                 val courses = ((size.height - nubPx) / coursePx).roundToInt().coerceAtLeast(1)
                 var n = 0
 
                 translucent(alpha) {
                 for (course in 0 until courses) {
-                    // Reverse alternate courses: [6,4,2] then [2,4,6]. Without
-                    // this every seam lines up and the slab reads as tiles.
+                    // Reverse alternate courses so seams stagger.
                     val widths = if (course % 2 == 0) run else run.reversed()
                     var x = 0f
                     widths.forEach { w ->
@@ -224,41 +157,21 @@ fun BrickSlab(
 
         val placeable = measurables.first().measure(constraints.copy(minHeight = 0))
 
-        // Round the height UP to a whole number of courses, plus the nub the
-        // top course sticks above its body.
-        //
-        // This is the whole point of the custom layout. With a content-sized
-        // box, a short slab -- a button, say -- gets a course count that does
-        // not divide its height, and the top course is simply drawn above the
-        // slab, over whatever is laid out there. On the sign-in screen that was
-        // the button eating the line of copy above it.
+        // Round up to whole courses plus the top nub, so nothing draws above the slab.
         val needed = max(placeable.height.toFloat(), coursePx + nubPx)
         val courses = ceil((needed - nubPx) / coursePx).toInt().coerceAtLeast(1)
         val slabHeight = (courses * coursePx + nubPx).roundToInt()
 
         layout(width, slabHeight) {
-            // Centred in the slack the rounding created. Placed at the top, a
-            // button whose label needs a course and a half sits against the
-            // nubs with an empty course under it.
+            // Center content vertically in the rounded height.
             placeable.place(0, ((slabHeight - placeable.height) / 2).coerceAtLeast(0))
         }
     }
 }
 
 /**
- * [BrickSlab]'s content-width sibling: a real brick that hugs what is on it.
- *
- * The slab takes the width it is given and divides it into studs. A chip cannot
- * do that -- "Reflect" and "This or that" are not the same width and neither is
- * a whole number of anything -- so this works the other way round: the stud is
- * a fixed size, the content is measured, and the brick is however many studs it
- * takes to cover it. Labels therefore snap to 1, 2, 4 and 6 stud widths, which
- * is not a compromise: it is what a box of bricks actually contains.
- *
- * The stud count is recovered in the draw pass by dividing the final width by
- * the stud, rather than hoisted into state. The measure pass set that width to
- * exactly `studs * studPx`, so the division is exact and there is no frame
- * where the art and the layout disagree.
+ * A content-sized brick chip: fixed [studSize], width rounded up to whole studs.
+ * The draw pass recovers the stud count from the measured width (exactly `studs * studPx`).
  */
 @Composable
 fun BrickPill(
@@ -270,8 +183,7 @@ fun BrickPill(
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     val studPx = with(LocalDensity.current) { studSize.toPx() }
-    // Every stock width, because which ones are needed is not known until the
-    // content has been measured.
+    // Load every width, since the needed ones are only known after measuring.
     val atlas = rememberBricks(
         remember(slug, height) {
             BrickArt.WIDTHS.map { BrickArt.assetFor(slug, BrickShape(it, height)) }
@@ -306,10 +218,7 @@ fun BrickPill(
             }
             }
         },
-        // The nub is reserved as padding on the content rather than fixed up
-        // afterwards in the placement, so it is part of what gets measured. Done
-        // the other way round, a label taller than one course centres through
-        // the nub and sits on the studs.
+        // Reserve the nub as top padding so content is measured and centered below it.
         content = {
             Box(Modifier.padding(top = studSize * BrickArt.NUB_RATIO), content = content)
         },
@@ -336,10 +245,8 @@ fun BrickPill(
 }
 
 /**
- * Draws [block] onto one offscreen layer faded as a whole.
- *
- * Fading each brick separately let the nubs of a lower course show through the
- * course laid over them. The layer is only paid for when something is faded.
+ * Draws [block] on one offscreen layer faded as a whole, so lower nubs do not show
+ * through. No layer when [alpha] is 1.
  */
 private inline fun DrawScope.translucent(alpha: Float, block: DrawScope.() -> Unit) {
     if (alpha >= 1f) return block()

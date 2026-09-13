@@ -6,12 +6,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/**
- * A league, its token in question text, and the months it is worth asking about.
- *
- * Months rather than exact dates: seasons drift by a week or two each year, and
- * a hockey question in the first week of October is not wrong, just early.
- */
+/** A league, its token in question text, and its season months (approximate). */
 enum class League(val token: String, val months: Set<Int>) {
     MLB("{mlb}", (3..10).toSet()),
     NFL("{nfl}", setOf(9, 10, 11, 12, 1, 2)),
@@ -24,7 +19,7 @@ enum class League(val token: String, val months: Set<Int>) {
     fun inSeason(date: java.time.LocalDate): Boolean = date.monthValue in months
 }
 
-/** What a person would tick: "Hockey (NHL)". */
+/** Display label, e.g. "Hockey (NHL)". */
 val League.label: String
     get() = when (this) {
         League.MLB -> "Baseball (MLB)"
@@ -36,10 +31,8 @@ val League.label: String
     }
 
 /**
- * Which sport questions the draw may use: leagues one of you follows, that have
- * a local team in season. And whether sports belongs in the daily question at
- * all -- not by default: only once one of you follows something, or asked for
- * more sports outright.
+ * Which leagues the draw may use (followed and locally in season), and whether sports
+ * questions are hidden (yes until one of you follows a league or asks for sports).
  */
 object Following {
     fun leagues(active: Set<League>, followed: Set<League>): Set<League> = active intersect followed
@@ -52,14 +45,7 @@ object Following {
 data class Team(val nickname: String, val city: String, val league: League, val lat: Double, val lon: Double)
 
 /**
- * The local team, by distance to the ballpark.
- *
- * Not the broadcast territories: MLB's blackout map is MLB's own data and is
- * not published as a dataset anywhere we could use. Nearest stadium is the
- * honest approximation -- right for almost everyone, and wrong mostly in the
- * places where people already argue about it (a Queens couple gets the Mets,
- * the Bronx gets the Yankees).
- *
+ * Local teams by distance to the home field (broadcast territories are not public data).
  * Coordinates are each home field's, as of the 2026 season.
  */
 object Teams {
@@ -224,8 +210,7 @@ object Teams {
         Team("Toronto FC", "Toronto", League.MLS, 43.633, -79.419),
         Team("Vancouver Whitecaps", "Vancouver", League.MLS, 49.277, -123.112),
 
-        // Major-conference college football, by school. `city` holds the
-        // school name, which is what a question says: "Ohio State football".
+        // Major-conference college football. `city` holds the school name.
         Team("Crimson Tide", "Alabama", League.COLLEGE, 33.208, -87.550),
         Team("Razorbacks", "Arkansas", League.COLLEGE, 36.068, -94.179),
         Team("Tigers", "Auburn", League.COLLEGE, 32.602, -85.489),
@@ -296,14 +281,14 @@ object Teams {
         Team("Fighting Irish", "Notre Dame", League.COLLEGE, 41.698, -86.234),
     )
 
-    /** Farther than this and the nearest team is not a local team, just the least far one. */
+    /** Max distance for the nearest team to count as local. */
     const val LocalMiles = 300.0
 
     /** The nearest team in [league], if it is close enough to count as local. */
     fun local(place: Place, league: League): Team? =
         nearest(place, league).takeIf { milesBetween(place.lat, place.lon, it.lat, it.lon) <= LocalMiles }
 
-    /** Leagues with a local team that are in season on [date]. What decides which team questions can be asked. */
+    /** Leagues with a local team that are in season on [date]. */
     fun activeLeagues(place: Place, date: java.time.LocalDate): Set<League> =
         League.entries.filter { it.inSeason(date) && local(place, it) != null }.toSet()
 

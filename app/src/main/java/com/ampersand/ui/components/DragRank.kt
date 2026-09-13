@@ -68,22 +68,11 @@ private val Gap = 8.dp
 private val RankShape = BrickShape(6, BrickHeight.MEDIUM)
 
 /**
- * Drag to put things in order — a stack of 6-stud bricks, one per item.
+ * Drag-to-reorder list of 6-stud bricks, one per item.
  *
- * Notes on why it is built this way, because the obvious version does not work:
- *
- * - Rows are wrapped in [key] so a row keeps its identity across a reorder.
- *   Without that, Compose reuses slots positionally and every row visually
- *   teleports instead of moving.
- * - The gesture is keyed on the *item*, not on the list. Keying on the list
- *   restarts `pointerInput` the instant the order changes, which cancels the
- *   drag on the first swap -- the single most common bug in hand-rolled
- *   reorderable lists.
- * - The live list is read through [rememberUpdatedState] so the gesture always
- *   resolves the item's current index rather than the one captured at drag
- *   start.
- * - Everything except the row under the finger animates its placement, so the
- *   stack reflows rather than snapping.
+ * - Rows are wrapped in [key] so they keep identity across a reorder.
+ * - `pointerInput` is keyed on the item, not the list; keying on the list cancels the drag on the first swap.
+ * - [rememberUpdatedState] gives the gesture the item's current index.
  */
 @Composable
 fun AmpDragRank(
@@ -99,10 +88,7 @@ fun AmpDragRank(
     var dragging by remember { mutableStateOf<String?>(null) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
-    // One colour per item, fixed by the order the items first arrived in. It
-    // used to be one colour per position, so a brick changed colour as it
-    // moved and the word you were dragging no longer matched the brick. Keyed
-    // on the set, which a reorder does not change.
+    // Color per item (not per position), keyed on the set so reorders don't recolor.
     val colorOf = remember(items.toSet()) {
         items.withIndex().associate { (i, item) -> item to BrickColor.at(i) }
     }
@@ -155,9 +141,6 @@ fun AmpDragRank(
                                     offsetY = 0f
                                 },
                                 onDragCancel = {
-                                    // A dropped drag is still a drop. It used to
-                                    // end in silence, which reads as the row
-                                    // having been lost rather than let go.
                                     sounds.play(Sfx.PLACE)
                                     feel.play(Feel.REJECT)
                                     dragging = null
@@ -177,8 +160,7 @@ fun AmpDragRank(
                                             latest.toMutableList()
                                                 .apply { add(to, removeAt(from)) },
                                         )
-                                        // Keep the row under the finger: its slot
-                                        // just moved by (to - from).
+                                        // Keep the row under the finger after its slot moved.
                                         offsetY -= (to - from) * slotPx
                                     }
                                 },
@@ -258,12 +240,7 @@ private fun RankRow(
     }
 }
 
-/**
- * Animates a child to its new position whenever layout moves it.
- *
- * Compose has no built-in equivalent outside lazy lists, and this is what makes
- * the reorder read as movement rather than a jump.
- */
+/** Animates a child to its new position when layout moves it (no built-in outside lazy lists). */
 private fun Modifier.animatePlacement(): Modifier = composed {
     val scope = rememberCoroutineScope()
     var target by remember { mutableStateOf(IntOffset.Zero) }

@@ -51,20 +51,7 @@ import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Stud
 
-/**
- * The whole pool, grouped by what it wants from you.
- *
- * Every deck is always available -- nothing is locked, nothing is rationed --
- * but "available" and "in no particular order" are different things. Sorted by
- * filename, the deck your partner finished on Sunday and is waiting on you for
- * looks exactly like the six neither of you has opened, and the only way to
- * find it is to remember it exists. Grouped by state, the list answers "what
- * should we do next" on its own.
- *
- * Finished decks stay in the list rather than disappearing into a history
- * screen, because a finished deck is not spent: the result is the reason you
- * played it, and it should be one tap from where you played it.
- */
+/** All decks, filterable, grouped by [DeckState]. Finished decks stay listed so their results are one tap away. */
 @Composable
 fun DeckList(
     decks: List<Quiz>,
@@ -72,17 +59,12 @@ fun DeckList(
     onOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Deliberately not saveable. A filter is a way of looking at the shelf for a
-    // minute, not a setting: coming back to Decks to find two thirds of the pool
-    // hidden, with no memory of having hidden it, is worse than picking the
-    // bricks again.
+    // Not saveable on purpose: filters reset when you leave so decks never stay hidden.
     var themes by remember { mutableStateOf(emptySet<QuizTheme>()) }
     var types by remember { mutableStateOf(emptySet<QuestionType>()) }
     var sorting by remember { mutableStateOf(false) }
 
-    // A deck matches a type if it *contains* one, because a type belongs to a
-    // question and the thing being filtered is a deck. "Decks with something to
-    // drag in them" is the question someone is actually asking.
+    // A deck matches a type if any of its questions has that type.
     val shown = remember(decks, themes, types) {
         decks.filter { deck ->
             (themes.isEmpty() || deck.theme in themes) &&
@@ -90,8 +72,6 @@ fun DeckList(
         }
     }
 
-    // Grouped and ordered once per change rather than filtered four times in
-    // the layout.
     val grouped = remember(shown, state.quizRuns) {
         shown.groupBy { state.deckState(it.id) }
             .mapValues { (group, inGroup) -> inGroup.sortedWith(order(group, state)) }
@@ -112,7 +92,7 @@ fun DeckList(
 
         if (shown.isEmpty()) {
             Spacer(Modifier.height(20.dp))
-            QuietNote("No deck has all of that in it. Try fewer bricks.")
+            QuietNote("No decks match. Try fewer filters.")
             return@Column
         }
 
@@ -123,11 +103,8 @@ fun DeckList(
             Spacer(Modifier.height(18.dp))
             SectionLabel(
                 when (group) {
-                    // Naming the person is the difference between a label and a
-                    // nudge, and this is the only group that is asking for
-                    // something.
-                    DeckState.WAITING_ON_YOU -> "${state.them.name} is waiting on you"
-                    DeckState.WAITING_ON_THEM -> "Waiting on ${state.them.name}"
+                    DeckState.WAITING_ON_YOU -> "${state.them.name} is waiting for you"
+                    DeckState.WAITING_ON_THEM -> "Waiting for ${state.them.name}"
                     else -> group.heading
                 },
             )
@@ -145,18 +122,8 @@ private fun <T> Set<T>.toggle(value: T): Set<T> =
     if (value in this) this - value else this + value
 
 /**
- * Two rows of bricks, for two different questions about a deck.
- *
- * Categories wear the app's own colours, because here a category *is* a
- * colour: the deck rows below are already yellow for everyday and blue for
- * deep, so the brick you press is the brick you are looking for. Question types
- * have no colour of their own and get the plain one instead -- they are a fact
- * about the shape of a deck rather than its subject, and dressing them like
- * categories would imply a choice between the two rows when they actually
- * stack: spicy *and* something to put in order.
- *
- * Folded away until asked for. Sixteen bricks above the list is a control
- * panel, and the list is the point -- most days nobody wants to sort anything.
+ * Collapsible filters: category chips (in each category's color) and question-type chips (plain).
+ * The two rows combine with AND.
  */
 @Composable
 private fun SortBricks(
@@ -179,16 +146,15 @@ private fun SortBricks(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BrickChip(
-            label = if (active == 0) "Sort" else "Sort  ·  $active",
+            label = if (active == 0) "Filter" else "Filter  ·  $active",
             on = open || active > 0,
             color = null,
             onClick = onToggleOpen,
         )
         if (active > 0) {
-            // The count doubles as the way out. A separate "clear" brick would
-            // be a seventeenth brick to say the thing this already says.
+            // Tapping the count clears all filters.
             Text(
-                text = "$matching of $total  ·  clear",
+                text = "$matching of $total  ·  Clear",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.clickable(
@@ -220,7 +186,7 @@ private fun SortBricks(
     }
 
     Spacer(Modifier.height(18.dp))
-    SectionLabel("What it asks of you")
+    SectionLabel("Question type")
     Spacer(Modifier.height(8.dp))
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -237,17 +203,7 @@ private fun SortBricks(
     }
 }
 
-/**
- * One brick you can press in.
- *
- * Drawn with [brickFace] rather than laid with pack art: these are labelled in
- * words of wildly different lengths and the real bricks only come in 1, 2, 4
- * and 6 studs, so a run of them would either clip or lie about its width.
- *
- * Pressed-in is the selected state, which is already what a chosen answer looks
- * like in a question. A chip that lit up instead would be a second word for the
- * same idea.
- */
+/** Toggle chip drawn as a brick pill; selected is full brightness, unselected is faded. */
 @Composable
 internal fun BrickChip(
     label: String,
@@ -258,10 +214,7 @@ internal fun BrickChip(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
-    // A category keeps its colour whether or not it is pressed, so the row
-    // reads as the colours you are hunting for; on and off is brightness, the
-    // same as the nav bar and the reaction row. Real art has no third state
-    // between a colour and grey, and faking one was the drawn brick's job.
+    // Color stays constant; on/off is shown by alpha only.
     val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "chipLift")
 
     BrickPill(
@@ -288,16 +241,8 @@ internal fun BrickChip(
 }
 
 /**
- * Newest first, by whichever run made the deck land in this group.
- *
- * "Waiting on you" sorts by *their* submission, because that is the thing that
- * put it there and the one they are counting the days on. "Waiting on them"
- * sorts by yours, for the mirror reason. Finished sorts by whichever of the two
- * came last, which is the moment the result appeared.
- *
- * Not-started keeps pool order. Those runs do not exist, so there is nothing to
- * sort by, and the order the decks are written in is a curated one worth
- * keeping rather than replacing with alphabetical.
+ * Newest first by the run that put the deck in this group: theirs for waiting-on-you,
+ * yours for waiting-on-them, the later of both for finished. Not-started keeps pool order.
  */
 private fun order(group: DeckState, state: CoupleState): Comparator<Quiz> = when (group) {
     DeckState.WAITING_ON_YOU ->
@@ -327,8 +272,8 @@ private fun DeckRow(
     val ink = inkOnBrick(slug)
 
     val detail = when (group) {
-        DeckState.WAITING_ON_YOU -> "${deck.size} questions  ·  they have already played"
-        DeckState.WAITING_ON_THEM -> "Yours is in. Nothing opens until theirs is."
+        DeckState.WAITING_ON_YOU -> "${deck.size} questions  ·  ${state.them.name} is done"
+        DeckState.WAITING_ON_THEM -> "You're done. Opens when you both finish."
         DeckState.FINISHED -> finishedDetail(deck, state)
         DeckState.NOT_STARTED -> "${deck.size} questions  ·  about ${deck.minutes} min"
     }
@@ -337,8 +282,7 @@ private fun DeckRow(
         slugs = listOf(slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
-        // Half-lit while it is out of your hands. Everything else is available
-        // to open right now, and a finished deck still has its result in it.
+        // Dimmed while waiting on them.
         alpha = if (group == DeckState.WAITING_ON_THEM) 0.5f else 1f,
         modifier = Modifier
             .fillMaxWidth()
@@ -368,19 +312,13 @@ private fun DeckRow(
     }
 }
 
-/**
- * A finished deck says how it went, not just that it happened.
- *
- * The two scores rather than a combined one, for the same reason the chart
- * shows two towers: the lopsided ones are the interesting ones, and averaging
- * them is what hides that.
- */
+/** Both scores for a finished deck, kept separate rather than combined. */
 @Composable
 private fun finishedDetail(deck: Quiz, state: CoupleState): String {
     val mine = state.myRun(deck.id) ?: return "Finished"
     val theirs = state.theirRun(deck.id) ?: return "Finished"
     val result = QuizResult.of(deck, mine, theirs)
-    if (result.possible == 0) return "Finished  ·  nothing to score"
+    if (result.possible == 0) return "Finished  ·  No score"
     return "You ${result.youKnewThem}  ·  ${state.them.name} ${result.theyKnewYou}" +
         "  ·  of ${result.possible}"
 }

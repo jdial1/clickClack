@@ -4,10 +4,9 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.Taste
 
 /**
- * The lean on the daily draw, from two things you did on purpose: topics you
- * asked for more of, and days you said came up again in the last fortnight.
- *
- * A pure function of shared state, so both phones land on the same question.
+ * Weights for the daily draw: topics the couple asked for, plus categories they
+ * marked as talked about in the last two weeks.
+ * Pure function of shared state, so both phones pick the same question.
  */
 object Profiles {
 
@@ -23,7 +22,7 @@ object Profiles {
             .distinct()
         if (talked.isNotEmpty()) {
             talked.forEach { themes[it] = 3 }
-            reasons += "More " + talked.joinToString(" and ") { it.lowercase() } + ", because it came up again."
+            reasons += "More " + talked.joinToString(" and ") { it.lowercase() } + ", since you talked about it."
         }
 
         if (state.interests.isNotEmpty()) {
@@ -37,6 +36,6 @@ object Profiles {
         return Taste(themes = themes, tags = tags, reasons = reasons)
     }
 
-    /** How far back "came up again" reaches. */
+    /** Lookback window in days for talked-about days. */
     private const val Fortnight = 14L
 }

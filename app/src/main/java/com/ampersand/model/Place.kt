@@ -1,13 +1,6 @@
 package com.ampersand.model
 
-/**
- * The part of the country a couple lives in, for questions that only make sense
- * there: which team, which storm, which way you say soda.
- *
- * Six rather than the Census's four. "The South" is one region to the Census
- * and several to anyone who lives in it, but six is as far as the questions
- * can honestly go before they start pretending to know your town.
- */
+/** US region of the couple's home, for region-specific questions. */
 enum class UsRegion(val label: String, val states: Set<String>) {
     NEW_ENGLAND("New England", setOf("ME", "NH", "VT", "MA", "RI", "CT")),
     MID_ATLANTIC("Mid-Atlantic", setOf("NY", "NJ", "PA", "DE", "MD", "DC")),
@@ -28,14 +21,11 @@ data class Place(val zip: String, val lat: Double, val lon: Double, val state: S
 }
 
 /**
- * Every ZIP the Census Bureau maps, bundled, so turning a ZIP into a forecast
- * needs no location permission and no second service.
+ * Bundled ZIP to location table, so forecasts need no location permission.
  *
  * Built from the 2023 ZCTA gazetteer (centroids) and the 2020 ZCTA-to-county
- * relationship file (state), both public domain. A ZCTA is not quite a postal
- * ZIP -- PO-box-only ZIPs have none -- so an unknown ZIP falls back to the
- * first mapped one sharing its first three digits, which is the same sorting
- * area and close enough for weather.
+ * relationship file (state), both public domain. PO-box-only ZIPs have no ZCTA,
+ * so unknown ZIPs fall back to the first entry sharing the 3-digit prefix.
  */
 class ZipTable(private val places: Map<String, Place>) {
 
@@ -63,21 +53,15 @@ class ZipTable(private val places: Map<String, Place>) {
     }
 }
 
-/**
- * The brick shown beside the forecast on Today. Finer than [WeatherKind],
- * which only picks questions; this is just what the sky looks like.
- */
+/** The weather brick shown on Today. [WeatherKind] is the coarser one used to pick questions. */
 enum class WeatherBrick { SUNNY, PARTLY_CLOUDY, CLOUDY, RAINY, STORMY, SNOWY, WINDY, FOGGY, HOT, COLD, CLEAR_NIGHT }
 
-/** The four kinds of day worth a question of their own. */
+/** Weather that gets its own questions. */
 enum class WeatherKind(val label: String) { SNOW("Snow"), RAIN("Rain"), HOT("Hot"), COLD("Cold") }
 
 /**
- * The day's forecast, as saved on the day so both phones read the same one.
- *
- * [kind] is worked out from the words and the temperature, in that order:
- * snow outranks rain, and either outranks a number, because a hot rainy day is
- * a rainy day to anyone deciding whether to go out.
+ * The day's forecast, saved on the day so both phones read the same one.
+ * [kind] checks snow, then rain, then temperature.
  */
 data class DayWeather(
     val tempF: Int,
@@ -100,11 +84,7 @@ data class DayWeather(
             }
         }
 
-    /**
-     * Storms, then snow and rain, then what hides the sky, then the
-     * temperature, then the sky itself. A cold clear night is Cold: the
-     * icicles say more than the moon does.
-     */
+    /** Priority: storms, snow, rain, fog, wind, temperature, then sky cover. */
     val brick: WeatherBrick?
         get() {
             val words = summary.lowercase()
@@ -123,8 +103,7 @@ data class DayWeather(
                 has("partly", "mostly sunny", "mostly clear") -> WeatherBrick.PARTLY_CLOUDY
                 has("cloudy") -> WeatherBrick.CLOUDY
                 has("sunny", "clear", "fair") -> WeatherBrick.SUNNY
-                // "Chance showers" and the like: the sky is doing something,
-                // just not enough to call it rain.
+                // e.g. "Chance showers" below the likely threshold.
                 else -> WeatherBrick.PARTLY_CLOUDY
             }
         }

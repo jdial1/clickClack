@@ -1,9 +1,6 @@
 package com.ampersand.model
 
-/**
- * How you are today. One tap, shown to the other person, gone tomorrow.
- * Plain names; the brick art carries the fun (see MoodArt).
- */
+/** Today's mood, shown to your partner and cleared tomorrow. Art is in MoodArt. */
 enum class Mood(val label: String, val kind: Kind) {
     SNAPPED_IN("Happy", Kind.FACE),
     CLICKED("Content", Kind.FACE),
@@ -21,21 +18,18 @@ enum class Mood(val label: String, val kind: Kind) {
     STEPPED_ON_ONE("Annoyed", Kind.BUILT);
 
     enum class Kind {
-        /** A character brick, in a colour of your choosing. */
+        /** A character brick, in a color you choose. */
         FACE,
 
         /** One of the pack's special bricks. */
         SPECIAL,
 
-        /** Plain bricks arranged, in your own colour. */
+        /** Plain bricks arranged, in your own color. */
         BUILT,
     }
 }
 
-/**
- * A mood as saved: which, the day it was set, and for a face the colour it was
- * worn in (null is the face's own pack colour). Only today's counts.
- */
+/** A saved mood, the day it was set, and a face's color (null = pack color). Only today's counts. */
 data class MoodEntry(val mood: Mood, val on: java.time.LocalDate, val color: BrickColor? = null) {
     fun current(today: java.time.LocalDate): Mood? = mood.takeIf { on == today }
 }

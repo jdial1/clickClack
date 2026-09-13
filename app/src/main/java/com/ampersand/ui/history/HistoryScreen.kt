@@ -87,15 +87,7 @@ private val LongDate = DateTimeFormatter.ofPattern("d MMMM yyyy")
 private const val WeeksShown = 10
 private const val DaysPerWeek = 7
 
-/**
- * What the two of you have left behind: the sculptures, the anniversaries, and
- * every day you answered.
- *
- * This used to be the answered list with a grid above it, which is a log rather
- * than a memory. The order here is deliberate and emotional rather than
- * chronological: the thing you did not expect to see comes first, then the
- * things you made, then the shape of the habit, and only then the index.
- */
+/** History tab: on-this-day cards, the shelf of sculptures, the ten-week plate, then every day. */
 @Composable
 fun HistoryScreen(
     state: CoupleState,
@@ -144,18 +136,12 @@ fun HistoryScreen(
     }
 }
 
-/**
- * A day from six months or a year back, brought forward unasked.
- *
- * Shows both answers rather than a link to them. Making you tap to find out
- * what you said would turn the best thing on this screen into a chore, and the
- * whole value is in reading it by accident.
- */
+/** A past day (months or years back) with both answers shown inline. */
 @Composable
 private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
-    // The card is a wall of both colours and the text crosses it.
+    // Text sits over both colors, so pick ink that reads on either.
     val ink = inkOnBricks(you.slug, them.slug)
 
     val sounds = LocalSounds.current
@@ -206,7 +192,7 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
     }
 }
 
-/** The reactions left on a day, as pack art rather than glyphs. */
+/** Reaction images left on a day. */
 @Composable
 private fun ReactionMarks(marks: List<Reaction>, size: Dp) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -230,13 +216,7 @@ private fun Said(name: String, what: String?, ink: Color) {
     )
 }
 
-/**
- * How long ago, in the units a person would actually use.
- *
- * Days are never mentioned: [CoupleState.onThisDay] only surfaces entries more
- * than a month old, so "42 days ago" could never come up, and "a year ago
- * today" is the phrase that makes someone stop scrolling.
- */
+/** "N months/years ago today". No day units: [CoupleState.onThisDay] only returns entries a month or older. */
 private fun ago(then: LocalDate, now: LocalDate): String {
     val months = ChronoUnit.MONTHS.between(then, now).toInt()
     val years = months / 12
@@ -249,27 +229,8 @@ private fun ago(then: LocalDate, now: LocalDate): String {
 }
 
 /**
- * Finished sculptures, newest first, with the one you are looking at shown big.
- *
- * The large piece is the point and the strip is the index, not the other way
- * round: a row of thumbnails alone would make a week's build look like a
- * decoration rather than the thing you spent the week making.
- */
-/**
- * Who built how much of it.
- *
- * One stud per brick earned, in each person's colour. Not a bar chart of a
- * ratio -- an actual row you can count, which is the same trick the plate
- * plays: the quantity is the picture.
- *
- * The two slabs take weights equal to their counts, so a stud is the same width
- * in both halves and the row reads as one continuous strip rather than two bars
- * at different scales.
- *
- * The heights are **not** set here. BrickSlab rounds its own height up to a
- * whole number of courses and ignores an incoming height constraint, which is
- * exactly what it is for -- asking it for a 14dp strip got a 70dp slab drawn
- * straight over the caption underneath.
+ * One stud per brick each person earned, weighted by count so studs match width in both halves.
+ * Don't set a height here: BrickSlab rounds up to whole courses and overdraws the caption.
  */
 @Composable
 private fun Contribution(plate: BuildPlate, state: CoupleState) {
@@ -307,6 +268,7 @@ private fun Contribution(plate: BuildPlate, state: CoupleState) {
     }
 }
 
+/** Finished sculptures, newest first: the selected one large, the rest in a strip below. */
 @Composable
 private fun Shelf(
     shelf: List<BuildPlate>,
@@ -316,28 +278,23 @@ private fun Shelf(
 ) {
     if (shelf.isEmpty()) {
         Text(
-            text = "Nothing sealed yet. Your first sculpture lands at the end of the week.",
+            text = "No sculptures yet. Your first one arrives at the end of the week.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         return
     }
 
-    // By id, so a note landing (which replaces the plate) keeps the same week
-    // selected instead of jumping back to the newest.
+    // Select by id so a saved note (which replaces the plate) keeps the same week selected.
     var selectedId by remember { mutableStateOf(shelf.first().id) }
     val selected = shelf.firstOrNull { it.id == selectedId } ?: shelf.first()
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
     Column(Modifier.fillMaxWidth()) {
-        // Dissolved in place rather than crossfaded. Sculpture sizes itself from
-        // how tall the piece actually is, so two plates are two heights and a
-        // Crossfade would size its box to the larger -- the column would grow
-        // and shrink as you browsed the shelf.
+        // Not Crossfade: plates differ in height and Crossfade would size to the larger one.
         Sculpture(selected, Modifier.fillMaxWidth().arrive(selected.id, rise = 0.dp))
-        // A neutral course under the piece, so it stands on something rather
-        // than floating in the middle of the screen.
+        // Neutral base under the sculpture.
         BrickSlab(
             slugs = listOf(null),
             modifier = Modifier.height(16.dp),
@@ -350,7 +307,7 @@ private fun Shelf(
             Text(it, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
         }
         Text(
-            text = "Sealed ${selected.completedOn?.format(LongDate).orEmpty()}",
+            text = "Finished ${selected.completedOn?.format(LongDate).orEmpty()}",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -390,10 +347,7 @@ private fun Shelf(
     }
 }
 
-/**
- * Each of you picks a describing word and a thing; the name appears above once
- * both have. Your words are yours to see until then, theirs stay hidden.
- */
+/** Each partner picks a describing word and a thing; the name shows once both have picked. */
 @Composable
 private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, NameWords) -> Unit) {
     if (plate.name(state.you.uid, state.them.uid) != null) return
@@ -414,7 +368,7 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
     var describing by remember(plate.id) { mutableStateOf<String?>(null) }
     var thing by remember(plate.id) { mutableStateOf<String?>(null) }
     Text(
-        "Pick two words. ${state.them.name} picks two. You see the name when you both have.",
+        "Pick two words. ${state.them.name} picks two. The name shows when you both finish.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground,
     )
@@ -436,13 +390,7 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
     }
 }
 
-/**
- * A line from each of you about the week: "the week we...".
- *
- * Yours can be written or rewritten; theirs is shown once they have written it,
- * and nudged at by name until then. Nothing is sealed here -- the week already
- * is, and this is what you each remember of it.
- */
+/** One editable line from each partner about the week. Theirs shows once written. */
 @Composable
 private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, String) -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -470,7 +418,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
             placeholder = "The week we...",
         )
         Spacer(Modifier.height(8.dp))
-        AmpButton(label = "Keep this line", slug = you.slug, enabled = draft.isNotBlank()) {
+        AmpButton(label = "Save",slug = you.slug, enabled = draft.isNotBlank()) {
             onNote(plate.id, draft.trim())
             editing = false
         }
@@ -478,7 +426,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
     if (theirs == null) {
         Spacer(Modifier.height(6.dp))
         Text(
-            "${state.them.name} has not written theirs yet.",
+            "Waiting for ${state.them.name}.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -486,15 +434,8 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
 }
 
 /**
- * Ten weeks as a wall of 1-stud bricks, two to a day.
- *
- * Yours on the left, theirs on the right, each lit in its owner's colour when
- * that person answered the day's question or finished a deck that day. One
- * brick per day used to alternate colours by position, which said nothing
- * about who had actually turned up. See [DayPips].
- *
- * One Canvas for all 70 cells, with hit-testing in the same coordinates rather
- * than seventy clickable boxes.
+ * Ten weeks, two 1-stud bricks per day (you left, them right), lit when that person did something. See [DayPips].
+ * One Canvas with manual hit-testing instead of 70 clickable boxes.
  */
 @Composable
 private fun StudPlate(
@@ -536,9 +477,7 @@ private fun StudPlate(
                             feel.play(Feel.TAP)
                             onOpenDay(entry)
                         } else {
-                            // A day neither of you answered. Said by feel and
-                            // not out loud: nothing happened, and announcing
-                            // that with a noise is just noise.
+                            // Nothing to open: haptic only, no sound.
                             feel.play(Feel.REJECT)
                         }
                     }
@@ -546,8 +485,7 @@ private fun StudPlate(
         ) {
             val cw = size.width / DaysPerWeek
             val ch = size.height / WeeksShown
-            // Two pips side by side, with a hair between them and a wider gap
-            // between days so each pair reads as one day.
+            // Small gap within a day's pair, wider gap between days.
             val studPx = cw * 0.38f
             val gap = cw * 0.04f
             val inset = (cw - studPx * 2 - gap) / 2f

@@ -78,14 +78,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import kotlin.math.floor
 
-/**
- * The form kit, in brick.
- *
- * One rule keeps it coherent: **everything is a brick**. Things you press have
- * a darker lip underneath that shortens when pressed, like a key going down.
- * Things you type into are laid a brick at a time as the text grows -- they were
- * recessed studless sockets once, and were the last grey rectangles in the app.
- */
+/** Form controls drawn as bricks: text field, radio, checkbox, dropdown, scale, button. */
 
 private val Pad = 18.dp
 private val Corner = 20.dp
@@ -93,22 +86,9 @@ private val Corner = 20.dp
 // --- Text input --------------------------------------------------------------
 
 /**
- * A text box built out of bricks, growing as you write.
- *
- * It starts as a single four-stud brick. Once the line's text runs past that
- * brick a second one is laid beside it, and when the text wraps a new course
- * starts underneath with one brick again -- so an answer builds a little wall
- * as it gets longer, and a one-word answer stays one brick. It was the last
- * control in the app that was a rounded grey rectangle.
- *
- * Each line of text is one course, which only works because the line height
- * is set from the brick rather than from the type scale. The bricks are drawn
- * from the text's own layout on every change, so they always cover exactly the
- * text you can see -- including the placeholder, which is why a long
- * placeholder starts out as two bricks rather than overhanging one.
- *
- * Height follows the content, so there is no `minLines`. A box that opens
- * four empty courses tall is a box that looks already built.
+ * Text field drawn as bricks that grow with the text (see [FieldCourses]).
+ * Line height is set from the brick so each text line is one course; the
+ * placeholder's layout sizes the bricks while empty. Height follows content.
  */
 @Composable
 fun AmpField(
@@ -125,26 +105,22 @@ fun AmpField(
     val focused by interaction.collectIsFocusedAsState()
     LaunchedEffect(focused) { if (focused) { sounds.play(Sfx.FOCUS); feel.play(Feel.FOCUS) } }
 
-    // Picked up, a couple of dp, while you are typing in it. The old socket
-    // showed focus with a coloured ring; a brick shows it the way a brick would.
+    // Lifts slightly while focused.
     val lift by animateFloatAsState(if (focused) 1f else 0f, Motion.glide, label = "fieldLift")
 
-    // Ink from the brick, so it is white on red, blue and green and dark on
-    // yellow -- the text now sits on the brick itself, not on a panel.
+    // Text color contrasts with the brick color.
     val ink = inkOnBrick(color.slug)
     val asset = BrickArt.assetFor(color.slug, FieldBrick)
     val atlas = rememberBricks(listOf(asset))
 
-    // What the visible text lays out to: its lines, and how far the last reaches.
+    // Line count and last line's right edge of the visible text.
     var lines by remember { mutableIntStateOf(1) }
     var lastRight by remember { mutableFloatStateOf(0f) }
 
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val density = LocalDensity.current
         val studPx = constraints.maxWidth.toFloat() / (FieldCourses.Studs * FieldCourses.PerLine)
-        // Rounded down, so a brick's art is never shorter than the line it
-        // covers: an overlap is hidden by the course drawn over it, where a
-        // gap would let the wall show through between two lines.
+        // Rounded down so courses overlap rather than leave a gap.
         val coursePx = floor(studPx * FieldBrick.h * BrickArt.ROW_RATIO)
         val nubPx = studPx * BrickArt.NUB_RATIO
         val insetPx = studPx * FieldInset
@@ -170,16 +146,13 @@ fun AmpField(
                 .fillMaxWidth()
                 .graphicsLayer {
                     translationY = -lift * FieldLift.toPx()
-                    // One layer for the lot, never alpha per brick: drawn
-                    // translucent one at a time, a lower course's nubs show
-                    // through the course stacked on it.
+                    // Alpha on one offscreen layer, or lower nubs show through translucent bricks.
                     alpha = if (enabled) 1f else 0.5f
                     compositingStrategy = CompositingStrategy.Offscreen
                 },
         ) {
             Canvas(Modifier.matchParentSize()) {
-                // Bottom course first, so each course above covers the nubs of
-                // the one below and only the top row's studs show.
+                // Bottom course first, so each course covers the nubs below it.
                 for (row in courses.indices.reversed()) {
                     repeat(courses[row]) { brick ->
                         drawBrickArt(
@@ -203,8 +176,7 @@ fun AmpField(
                 textStyle = style,
                 cursorBrush = SolidColor(ink),
                 onTextLayout = { layout ->
-                    // While empty the placeholder is what is visible, so it is
-                    // the placeholder's layout that sizes the bricks.
+                    // While empty, the placeholder's layout sizes the bricks.
                     if (value.isNotEmpty()) {
                         lines = layout.lineCount
                         lastRight = layout.getLineRight(layout.lineCount - 1)
@@ -227,28 +199,21 @@ fun AmpField(
     }
 }
 
-/** Every brick in a text box: four studs, two rows, one course per line of text. */
+/** Brick shape for text fields: four studs, one course per line. */
 private val FieldBrick = BrickShape(FieldCourses.Studs, BrickHeight.MEDIUM)
 
-/** Text keeps clear of the brick's shaded side edges, as a fraction of a stud. */
+/** Horizontal text inset, as a fraction of a stud. */
 private const val FieldInset = 0.4f
 
-/** How close text may get to the first brick's right edge before a second is laid. */
+/** Margin before the first brick's right edge that triggers a second brick, in studs. */
 private const val FieldEdge = 0.2f
 
-/** How far the box lifts while you are typing in it. */
+/** Lift distance while focused. */
 private val FieldLift = 2.dp
 
 // --- Radio -------------------------------------------------------------------
 
-/**
- * Single choice, one 1-stud brick per option.
- *
- * Each option gets its own colour from the palette so the group reads as a
- * handful of loose bricks rather than a list. The unpicked ones are the same
- * brick at low alpha — dimmed, not greyed, so the colour still identifies the
- * option.
- */
+/** Single choice. Each option has its own palette color; unselected options are dimmed. */
 @Composable
 fun AmpRadioGroup(
     options: List<String>,
@@ -283,8 +248,7 @@ fun AmpRadioGroup(
                         indication = null,
                         enabled = enabled,
                     ) {
-                        // A radio cannot be switched off, so tapping the
-                        // chosen one is not a deselect and says nothing.
+                        // Tapping the selected option does nothing.
                         if (!on) {
                             sounds.play(Sfx.SELECT)
                             feel.play(Feel.SELECT)
@@ -330,9 +294,7 @@ fun AmpCheckboxGroup(
     max: Int? = null,
     onToggle: (String) -> Unit,
 ) {
-    // Bumped on every refused tap, which is what restarts the shake. A counter
-    // rather than a boolean: tapping a second blocked row should shake again,
-    // and a boolean that is already true does nothing.
+    // Incremented on each blocked tap to retrigger the shake.
     var refused by remember { mutableIntStateOf(0) }
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -384,7 +346,7 @@ private fun CheckBox(on: Boolean, ink: Color) {
             style = Stroke(width = stroke),
         )
         if (progress > 0f) {
-            // Two legs drawn in proportion, so the tick appears to be written.
+            // Draw the two legs of the check in sequence.
             val w = size.width
             val p1 = Offset(w * 0.27f, w * 0.52f)
             val p2 = Offset(w * 0.44f, w * 0.69f)
@@ -421,10 +383,7 @@ private fun ChoiceRow(
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
-    // A real brick in your colour when it is chosen, the neutral one when it is
-    // not. Both are pack art: the drawn stand-in this used to use painted stud
-    // shapes onto a rounded rectangle, and at every size it read as a card with
-    // dots on it rather than as a brick.
+    // Accent brick when selected, neutral brick otherwise.
     val slug = if (selected) BrickColor.of(accent.toArgbLong()).slug else structureSlug()
     val ink = inkOnBrick(slug)
 
@@ -432,14 +391,10 @@ private fun ChoiceRow(
         slugs = listOf(slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
-        // Blocked is said by the brick fading, never by the text: faded ink on
-        // the black brick is grey on black.
         alpha = if (enabled) 1f else 0.45f,
         modifier = Modifier
             .fillMaxWidth()
-            // Blocked rows stay tappable and say no. Leaving them disabled meant
-            // the tap was swallowed whole -- no ripple (suppressed), no sound,
-            // no message -- which reads as the app having crashed quietly.
+            // Blocked rows stay clickable so they can give reject feedback.
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -474,10 +429,7 @@ private fun ChoiceRow(
 
 // --- Dropdown ----------------------------------------------------------------
 
-/**
- * Built on a plain [DropdownMenu] rather than ExposedDropdownMenuBox, so the
- * anchor is entirely ours and matches the other controls exactly.
- */
+/** Dropdown on a plain [DropdownMenu] so the anchor can be a brick like other controls. */
 @Composable
 fun AmpDropdown(
     options: List<String>,
@@ -573,13 +525,8 @@ private fun Caret(color: Color, modifier: Modifier = Modifier) {
 // --- Scale -------------------------------------------------------------------
 
 /**
- * A rating you build rather than tick: drag the run of bricks out from 1 stud to
- * [steps].
- *
- * The pack has no 3- or 5-stud brick, so a run of that length is assembled the
- * way you would out of the box -- a 2 and a 1 -- via [BrickArt.runOf]. Empty
- * studs show as sockets on the baseplate behind, so the full range is always
- * visible and the target is the whole strip rather than a small handle.
+ * Rating from 1 to [steps]: tap or drag along a strip of sockets to size a run of bricks.
+ * Lengths without a matching brick are built from smaller ones via [BrickArt.runOf].
  */
 @Composable
 fun AmpScale(
@@ -594,8 +541,7 @@ fun AmpScale(
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
-    // The gesture outlives recompositions; without this a deck moving to the
-    // next scale question kept writing to the previous question's answer.
+    // The gesture outlives recompositions; without this it wrote to the previous question.
     val select by rememberUpdatedState(onSelect)
     val brick = remember(accent) { BrickColor.of(accent.toArgbLong()) }
     val assets = remember(brick) { BrickArt.WIDTHS.map { brick.asset(BrickShape(it, BrickHeight.MEDIUM)) } }
@@ -603,8 +549,6 @@ fun AmpScale(
     val socket = MaterialTheme.colorScheme.surfaceVariant
     val socketInk = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
 
-    // Live value follows the finger; the committed value only changes on a
-    // stud boundary, which is what makes the drag feel like it snaps.
     val current = (value ?: 1).coerceIn(1, steps)
 
     Column(modifier.fillMaxWidth()) {
@@ -620,12 +564,8 @@ fun AmpScale(
                 Modifier
                     .fillMaxWidth()
                     .height(height)
-                    // One gesture loop, not detectHorizontalDragGestures plus
-                    // detectTapGestures: two pointerInput blocks on the same
-                    // node fight over the down event and neither wins, so the
-                    // strip rendered correctly but ignored every drag. Handling
-                    // press and drag in one place also means a tap is simply a
-                    // drag of zero distance.
+                    // One gesture loop for tap and drag: separate tap/drag detectors
+                    // on one node fight over the down event and drags get ignored.
                     .pointerInput(enabled, steps, studPx) {
                         if (!enabled) return@pointerInput
                         awaitEachGesture {
@@ -647,7 +587,6 @@ fun AmpScale(
                                     if (next != last) {
                                         last = next
                                         sounds.play(Sfx.TAP)
-                                        // One notch crossed, not a new choice.
                                         feel.play(Feel.TICK)
                                         select(next)
                                     }
@@ -677,7 +616,7 @@ fun AmpScale(
                     )
                 }
 
-                // The run itself, largest bricks first.
+                // The selected run, largest bricks first.
                 var x = 0f
                 BrickArt.runOf(current).forEach { w ->
                     drawBrickArt(
@@ -717,10 +656,8 @@ fun AmpScale(
 }
 
 /**
- * The primary action, laid as a real course of bricks.
- *
- * [slug] must be a pack colourway; the theme's `primary` is the blend of the two
- * of you and has no artwork, so callers pass one of the four instead.
+ * Primary button drawn as a brick. [slug] must be a brick asset color; the
+ * theme's blended `primary` has no artwork.
  */
 @Composable
 fun AmpButton(
@@ -728,7 +665,7 @@ fun AmpButton(
     slug: String?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    /** Null when the caller makes its own noise, timed to its own animation. */
+    /** Null when the caller plays its own sound. */
     sfx: Sfx? = Sfx.RELEASE,
     feelOnClick: Feel = Feel.RELEASE,
     onClick: () -> Unit,
@@ -738,15 +675,7 @@ fun AmpButton(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
 
-    // Click on the way down, clack on the way up -- which is the name of the
-    // app, and the reason `Sfx.RELEASE` has sat unused since the pack was
-    // imported. A button that only makes a noise in one direction is a picture
-    // of a button.
-    //
-    // The down cue is the generic keypress, so a press that is dragged off and
-    // cancelled says "you pressed something" and nothing more. The *meaning* --
-    // the seal on an answer -- rides on the click, which only fires if the
-    // press actually completes.
+    // Generic press sound on down; [sfx] plays on click, which only fires if the press completes.
     LaunchedEffect(pressed) {
         if (pressed) {
             sounds.play(Sfx.PRESS)
@@ -754,23 +683,13 @@ fun AmpButton(
         }
     }
 
-    // Disabled is a real brick, and the *quiet* brick for whichever ground it
-    // sits on: black on navy, neutral on a pale background. Two wrong answers
-    // were tried first. A faded slab became a ghost that bled into the control
-    // above it. A neutral brick in both themes made the disabled button the
-    // brightest thing on a dark screen.
-    //
-    // The label is drawn at full opacity, not faded. Fading it is what produces
-    // grey text on a black brick, and the brick is already saying the control is
-    // off -- the words do not have to be hard to read as well.
+    // Disabled uses the theme's structure brick at full opacity, label included.
     val offSlug = structureSlug()
 
     BrickSlab(
         slugs = listOf(if (enabled) slug else offSlug),
         studs = 12,
         height = BrickHeight.HIGH,
-        // Softer than it was: 3dp of travel plus a fifth of the light is two
-        // effects saying the same thing, and the pair read as a glitch.
         alpha = if (pressed) 0.90f else 1f,
         modifier = modifier
             .fillMaxWidth()

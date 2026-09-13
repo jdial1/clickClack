@@ -74,31 +74,16 @@ private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
 private const val DRAFTS = "drafts"
 
-/** Ten weeks, which is what the Shelf draws. */
+/** Days of history to load (ten weeks, what the Shelf shows). */
 private const val HistoryDays = 70L
 
-/** A sculpture is a week. Short enough that you finish one and start again. */
+/** Plate length in days. */
 private const val PeriodDays = 7
 
 /**
- * The real one.
- *
- * Everything a person creates lives in Firestore and comes back keyed to their
- * account: answers, reactions, colours, bricks and sealed sculptures. Two
- * phones signed into two profiles see each other's contributions, which is what
- * makes this testable at all.
- *
- * Today's question comes from the bundled [QuestionPool], picked by date.
- * Picking rather than storing matters more than it looks: both phones must land
- * on the same question before either has written anything, or whoever opens the
- * app second gets a different one.
- *
- * The document layout is in README.md, under "Firestore model".
- *
- * One listener per source, all writing into [_state] through [recompose],
- * because a [CoupleState] is a whole picture and updating it field by field
- * from callbacks arriving in any order is how you get a screen that is briefly
- * wrong.
+ * Firestore-backed repository. Document layout: README.md, "Firestore model".
+ * Today's question is computed from the bundled [QuestionPool] so both phones agree before any write.
+ * Each listener stores its raw piece and calls [recompose], which rebuilds the whole [CoupleState].
  */
 class FirestoreCoupleRepository(
     private val coupleId: String,
@@ -110,8 +95,7 @@ class FirestoreCoupleRepository(
 ) : CoupleRepository {
 
     private val _state = MutableStateFlow(
-        // A believable empty picture, so the UI has something to draw before
-        // the first snapshot lands rather than flashing a spinner.
+        // Placeholder state until the first snapshots arrive.
         CoupleState(
             you = Member(myUid, "You", 0xFFF54E4F),
             them = Member(partnerUid, "Them", 0xFF108BE2),
@@ -123,8 +107,7 @@ class FirestoreCoupleRepository(
 
     private val regs = mutableListOf<ListenerRegistration>()
 
-    // Raw pieces, assembled by recompose(). Nullable so "not arrived yet" is
-    // distinguishable from "arrived and empty".
+    // Raw pieces for recompose(). Null means not arrived yet.
     private var me: DocumentSnapshot? = null
     private var them: DocumentSnapshot? = null
     private var todayDoc: DocumentSnapshot? = null
@@ -133,31 +116,24 @@ class FirestoreCoupleRepository(
     private var historyDocs: List<DocumentSnapshot> = emptyList()
     private var plates: List<BuildPlate> = emptyList()
 
-    /**
-     * Whether the plates listener has answered yet.
-     *
-     * Until it has, an empty [plates] means "not arrived", and awarding or
-     * sealing against it laid bricks on a fresh plate that then shadowed the
-     * real week.
-     */
+    /** Whether plates have loaded. Awarding or sealing before this writes to a wrong, empty plate. */
     private var platesLoaded = false
     private var anniversary: LocalDate? = null
     private var coupleDoc: DocumentSnapshot? = null
 
-    /** Whether the day listener has answered, so "no weather" means none saved. */
+    /** Whether the day doc has loaded, so missing weather means none saved. */
     private var todayLoaded = false
     private var specialDates: List<SpecialDate> = emptyList()
 
-    /** Every wildcard either of you has written, used or not. */
+    /** All wildcards, used or not. */
     private var allWildcards: List<Wildcard> = emptyList()
 
-    /** The shared bucket list. */
     private var bucket: List<BucketItem> = emptyList()
 
-    /** The day today's question came back from, on a capsule day. */
+    /** The past day today's question repeats, on a capsule day. */
     private var capsuleSource: DayEntry? = null
 
-    /** Month rollups of who called whom, for as long as the two of you have played. */
+    /** Monthly guess-hit rollups. */
     private var knowing: Knowing = Knowing()
 
     private val couple get() = db.collection(COUPLES).document(coupleId)
@@ -193,22 +169,14 @@ class FirestoreCoupleRepository(
         regs += dayRef.addSnapshotListener { d, _ ->
             todayDoc = d
             todayLoaded = true
-            // Only once the seal is off is the other answer readable at all,
-            // so that is the first moment the listener for it can exist.
+            // The partner's answer is only readable after reveal.
             if (d?.getBoolean("revealed") == true) watchPartnerAnswer()
             liftSealIfBothIn()
             recompose()
         }
 
-        // Your own answer document by name -- never the collection.
-        //
-        // A query over the answers is refused outright while the day is sealed,
-        // even when the only document in it is your own. The rule turns on
-        // *which* document is being asked for, and Firestore will not run a
-        // query whose safety it cannot establish before looking at the data. So
-        // the listener died on its very first snapshot and never came back:
-        // answering wrote the document successfully, and then nothing on the
-        // screen moved, with no error anywhere to say why.
+        // Listen to your own answer doc by id, not the collection: rules deny a
+        // collection query while sealed, and the listener dies silently.
         regs += dayRef.collection(ANSWERS).document(myUid)
             .addSnapshotListener { d, _ -> putAnswer(myUid, d) }
 
@@ -226,10 +194,7 @@ class FirestoreCoupleRepository(
                 recompose()
             }
 
-        // Every run either of you has written. Before a deck is revealed the
-        // rules deny the partner's document, so this returns one run per deck;
-        // afterwards it returns two. Nothing in the UI has to know the
-        // difference -- a deck with one run is simply still waiting.
+        // Deck docs. Your run is watched per deck; the partner's only after reveal (rules).
         regs += couple.collection(QUIZZES)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
@@ -244,10 +209,7 @@ class FirestoreCoupleRepository(
                 }
             }
 
-        // Instruments, sealed exactly like decks. One document per person, so
-        // the partner's forty ratings are genuinely unreadable until both are
-        // in -- and a half-open sitting is simply a run with one set of
-        // responses in it, which the badge wall already draws as unclaimed.
+        // Instruments, sealed like decks: one run doc per person, partner's readable after reveal.
         regs += couple.collection(INSTRUMENTS)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
@@ -289,9 +251,7 @@ class FirestoreCoupleRepository(
                 recompose()
             }
 
-        // One document per month, holding a map keyed by day. Writing the same
-        // day twice writes the same values, so two phones noticing the same
-        // reveal cannot double-count -- which a running total would.
+        // One doc per month, keyed by day, so repeated writes cannot double-count.
         regs += couple.collection(KNOWING)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
@@ -318,25 +278,15 @@ class FirestoreCoupleRepository(
             }
     }
 
-    /**
-     * Assemble the whole picture from whatever has arrived.
-     *
-     * Safe to call from any listener at any time; missing pieces fall back to
-     * their defaults rather than blanking the screen.
-     */
+    /** Rebuilds state from whatever has arrived. Safe to call from any listener; missing pieces use defaults. */
     private fun recompose() {
         val current = _state.value
         val waiting = allWildcards.filter { it.usedOn == null }.sortedBy { it.createdAtMillis }
-        // Only a wildcard written before today can be today's question. One
-        // written this morning waits for tomorrow, as promised, instead of
-        // replacing the question while somebody is halfway through answering.
-        // A pending server timestamp reads as 0 and waits too.
+        // Only wildcards created before today are eligible. A pending server timestamp reads as 0 and waits.
         val startOfToday = today.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         val ready = waiting.filter { it.createdAtMillis in 1 until startOfToday }
 
-        // Mapped here rather than in the history listener, so a past wildcard
-        // day resolves once the wildcards arrive instead of showing whatever
-        // pool question happened to fall on that date.
+        // History is mapped here (not in its listener) so past wildcard days resolve once wildcards load.
         val homeZip = coupleDoc?.getString("homeZip")
         val place = homeZip?.let { pool.places.lookup(it) }
         history = historyDocs
@@ -360,9 +310,7 @@ class FirestoreCoupleRepository(
                 draft = instrumentDrafts[id].orEmpty(),
             )
         }
-        // What today's question is drawn from: everything that has arrived, not
-        // the previous state. Reading the previous state meant a history that
-        // landed last was ignored until some unrelated listener fired.
+        // Draw from freshly assembled data, not the previous state, or late history is ignored.
         val basis = current.copy(
             you = you,
             them = partner,
@@ -372,16 +320,8 @@ class FirestoreCoupleRepository(
             knowing = knowing,
         )
 
-        // Pinned first, always: whoever answered first decided what today is,
-        // and re-deciding it on the second phone is how two people end up
-        // answering two different questions.
-        // What the profile tests found, as a lean on the pool.
-        //
-        // Computed from shared state, which is the requirement: both phones
-        // have to reach the same question before either has written anything.
-        // They can disagree for a moment if one has synced a sitting the other
-        // has not -- and it self-corrects, because the first answer pins the
-        // question and the pin outranks everything below.
+        // Inputs come from shared state so both phones pick the same question. A pinned
+        // questionId (written on first answer) always wins, which fixes any brief mismatch.
         val taste = Profiles.of(basis)
         val recent = recentlyAsked(basis)
         val picked = Turns.themeFor(today, history, myUid, partnerUid)
@@ -401,7 +341,7 @@ class FirestoreCoupleRepository(
         val pinned = todayDoc?.getString("questionId")
         val question = when {
             pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
-            // A question one of you wrote outranks one a stranger wrote.
+            // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
             else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
@@ -422,9 +362,7 @@ class FirestoreCoupleRepository(
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
             ?: emptyPlate(today)
 
-        // The period is over, so the sculpture is dated. Driven by the calendar
-        // rather than by a button: a week ends whether or not anyone opened the
-        // app that day.
+        // Auto-seal a plate whose period has ended.
         if (platesLoaded && live.isSealed.not() && live.placed.isNotEmpty() && live.endsOn() < today) {
             sealPlate()
         }
@@ -435,8 +373,7 @@ class FirestoreCoupleRepository(
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
             anniversary = anniversary,
             streak = Streaks.run(history, todayEntry),
-            // Only a capsule if today really is asking the old question again.
-            // The ladder can find a day whose question the pin then overrode.
+            // Only a capsule if today's question matches (a pin can override it).
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
             bucket = bucket,
@@ -459,15 +396,9 @@ class FirestoreCoupleRepository(
             specialDates = specialDates,
         )
 
-        // The assignment. Without it every listener in this class computed the
-        // right answer and dropped it on the floor: the screen kept the
-        // placeholder the constructor built and nothing anyone did ever showed
-        // up, with no error to explain it.
         _state.value = next
 
-        // Earning is done here rather than in the write that caused it, because
-        // a day or a deck opens when the *other* person submits -- which this
-        // phone learns from a listener, not from anything it did.
+        // Awards run here because a reveal is often triggered by the partner, seen via a listener.
         if (todayDoc?.getBoolean("revealed") == true) {
             if (platesLoaded) awardForToday()
             recordKnowing(todayEntry)
@@ -480,13 +411,8 @@ class FirestoreCoupleRepository(
     }
 
     /**
-     * Questions not to ask today: the last six weeks of days, and any deck the
-     * two of you both finished in that time.
-     *
-     * Both runs, not just yours. Your own run is readable the moment you finish,
-     * your partner's only once the deck opens -- so counting a deck as soon as
-     * one of you had played it would give the two phones different sets, and
-     * they would each land on a different question.
+     * Question ids to skip: recent days, plus decks both partners finished in that window.
+     * Requires both runs so each phone computes the same set.
      */
     private fun recentlyAsked(s: CoupleState): Set<String> {
         val since = today.minusDays(QuestionPool.RecentDays)
@@ -501,13 +427,7 @@ class FirestoreCoupleRepository(
         return (fromDays + fromDecks).toSet()
     }
 
-    /**
-     * Lay the next-morning piece for any day either of you said came up again.
-     *
-     * Checked against every plate ever built, not just this week's, because the
-     * day being talked about usually belongs to a week that has already sealed
-     * -- and a piece is never laid twice.
-     */
+    /** Awards bricks for talked-about days. Checks all plates, since the day is often in a sealed week. */
     private fun awardForTalks(s: CoupleState) {
         val plate = s.plate
         if (plate.isSealed) return
@@ -523,10 +443,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * A brick each for anything ticked off the list. By id, and checked against
-     * every plate, so a tick is paid once however many phones see it.
-     */
+    /** Awards a brick each for done bucket items, deduped by id across all plates. */
     private fun awardForBucket(s: CoupleState) {
         val plate = s.plate
         if (plate.isSealed) return
@@ -547,7 +464,7 @@ class FirestoreCoupleRepository(
     /** quiz id -> uid -> run, so one listener per person cannot clobber the other. */
     private var runs: Map<String, Map<String, QuizRun>> = emptyMap()
 
-    /** The deck documents themselves, so a run landing can ask to open one. */
+    /** quiz id -> deck document. */
     private var quizDocs: Map<String, DocumentSnapshot> = emptyMap()
 
     private val instrumentRegs = mutableMapOf<String, ListenerRegistration>()
@@ -556,20 +473,13 @@ class FirestoreCoupleRepository(
     private var instrumentResponses: Map<String, Map<String, List<Int>>> = emptyMap()
     private var instrumentDocs: Map<String, DocumentSnapshot> = emptyMap()
 
-    /** instrument id -> uid -> how many answered, sealed or not. */
+    /** instrument id -> uid -> answered count, sealed or not. */
     private var instrumentProgress: Map<String, Map<String, Int>> = emptyMap()
 
-    /** Your own half-finished answers. There is nowhere for theirs to come from. */
+    /** instrument id -> your draft responses. */
     private var instrumentDrafts: Map<String, List<Int>> = emptyMap()
 
-    /**
-     * Your draft, and only ever yours.
-     *
-     * The rules refuse a read of anybody else's, which is the same protection
-     * the sealed run has -- a draft is unsealed answers and is the one thing
-     * that must not leak early. What crosses between the two of you is the
-     * count on the parent document.
-     */
+    /** Watches your own draft. Rules deny reading the partner's; only the count on the parent is shared. */
     private fun watchInstrumentDraft(id: String) {
         val key = "draft/" + id
         if (key in instrumentRegs) return
@@ -587,13 +497,7 @@ class FirestoreCoupleRepository(
             }
     }
 
-    /**
-     * One listener per person per instrument.
-     *
-     * Keyed by both, unlike the deck version which needed two maps, because an
-     * instrument has no partner-specific bookkeeping -- there is nothing to
-     * read but the numbers.
-     */
+    /** One listener per instrument and uid. */
     private fun watchInstrumentRun(id: String, uid: String) {
         val key = "$id/$uid"
         if (key in instrumentRegs) return
@@ -613,7 +517,7 @@ class FirestoreCoupleRepository(
         recompose()
     }
 
-    /** Ask the rules to open it; refusal means the other half is not in yet. */
+    /** Requests reveal; a rules refusal means the partner has not submitted. */
     private fun liftInstrumentSealIfBothIn(id: String) {
         val doc = instrumentDocs[id] ?: return
         if (doc.getBoolean("revealed") == true) return
@@ -622,14 +526,14 @@ class FirestoreCoupleRepository(
         openSeal(couple.collection(INSTRUMENTS).document(id))
     }
 
-    /** Your own run, by name. A query over the runs is denied while sealed. */
+    /** Watches your own run by id; a query over runs is denied while sealed. */
     private fun watchRuns(quizId: String) {
         if (quizId in runRegs) return
         runRegs[quizId] = runRef(quizId, myUid)
             .addSnapshotListener { d, _ -> putRun(quizId, myUid, d) }
     }
 
-    /** Theirs, once the deck has opened and there is anything to read. */
+    /** Watches the partner's run, after reveal. */
     private fun watchPartnerRun(quizId: String) {
         if (quizId in partnerRunRegs) return
         partnerRunRegs[quizId] = runRef(quizId, partnerUid)
@@ -648,7 +552,7 @@ class FirestoreCoupleRepository(
         recompose()
     }
 
-    /** The deck's own version of [liftSealIfBothIn], asked for the same way. */
+    /** Deck version of [liftSealIfBothIn]. */
     private fun liftQuizSealIfBothIn(quizId: String) {
         val quiz = quizDocs[quizId] ?: return
         if (quiz.getBoolean("revealed") == true) return
@@ -669,10 +573,7 @@ class FirestoreCoupleRepository(
     private fun putAnswer(uid: String, doc: DocumentSnapshot?) {
         val answer = doc?.toAnswer()
         todayAnswers = todayAnswers - uid + listOfNotNull(answer).associateBy { it.uid }
-        // The second of the two moments a day can become ready to open. Without
-        // it, the phone that answers second asks too early -- off its own local
-        // echo, before its answer has reached the server -- is refused, and
-        // then has nothing left to ask from.
+        // Also ask here: the second answerer's first ask can precede its server write and be refused.
         liftSealIfBothIn()
         recompose()
     }
@@ -680,8 +581,7 @@ class FirestoreCoupleRepository(
     // --- Writes --------------------------------------------------------------
 
     override fun bindLocalUser(uid: String, displayName: String) {
-        // Firestore already knows who you are; this only keeps the name fresh
-        // for the partner, who reads it off your user document.
+        // Keeps displayName current for the partner.
         db.collection(USERS).document(myUid).set(
             mapOf("displayName" to displayName),
             SetOptions.merge(),
@@ -692,18 +592,12 @@ class FirestoreCoupleRepository(
     override fun submitToday(values: List<String>, guess: List<String>?) {
         if (_state.value.today.answerFor(myUid) != null) return
 
-        // The day document first, so the question is pinned before either
-        // answer exists. Without it, a day answered either side of midnight in
-        // two timezones could be two different questions.
+        // Pin the question on the day doc before writing the answer.
         dayRef.set(
             mapOf(
                 "questionId" to _state.value.today.question.id,
                 "revealed" to (todayDoc?.getBoolean("revealed") ?: false),
-                // A breadcrumb, not the mechanism. Neither of you can see the
-                // other's answer before the reveal, so this is the only record
-                // on a readable document of who is in -- but it is the client's
-                // account of the truth rather than the truth, and trusting it
-                // is what stranded two people who had both answered.
+                // Informational only; reveal is decided by rules checking the answer docs.
                 "submitted" to FieldValue.arrayUnion(myUid),
             ),
             SetOptions.merge(),
@@ -717,9 +611,7 @@ class FirestoreCoupleRepository(
             ),
         )
 
-        // Asked, so it leaves the queue. Stamped here rather than when it is
-        // chosen, because being chosen is a guess about today until someone
-        // actually answers it.
+        // Mark a wildcard used once it is answered, not when drawn.
         val asked = _state.value.today.question.id
         if (Wildcard.isWildcard(asked)) {
             couple.collection(WILDCARDS).document(Wildcard.idOf(asked))
@@ -728,59 +620,31 @@ class FirestoreCoupleRepository(
     }
 
     /**
-     * Ask for the day to be opened, and let the rules decide.
-     *
-     * It used to decide here, by checking the day's `submitted` list for both
-     * names -- and a list the client maintains is a second copy of the truth
-     * that is free to be wrong. It was: a day document written before that list
-     * existed can never come to hold both names, so two people who had both
-     * genuinely answered sat forever on "has not answered yet", each looking at
-     * their own answer, with nothing in the data able to fix itself.
-     *
-     * The rules already hold the real answer and are the only thing that can be
-     * trusted with it: `revealed = true` is refused unless both answer
-     * documents actually exist. So the client asks whenever it has skin in the
-     * game, and a refusal is not an error -- it is "not yet".
-     *
-     * Asked through [openSeal], never a plain set: see there for why a plain
-     * set made the day flicker between open and sealed.
-     *
-     * Properly this belongs in a Cloud Function. The rule is what makes the
-     * client version honest.
+     * Requests today's reveal once you have answered. Rules refuse `revealed = true` unless
+     * both answer docs exist, so a refusal just means "not yet". Do not trust the `submitted`
+     * list for this; old day docs may never contain both uids.
+     * Uses [openSeal], not a plain set. Ideally a Cloud Function.
      */
     private fun liftSealIfBothIn() {
         val doc = todayDoc ?: return
         if (doc.getBoolean("revealed") == true) return
-        // Nothing to ask for until I am actually in.
         if (todayAnswers[myUid] == null) return
 
-        // The run goes down with the seal, so a streak past the ten weeks of
-        // history the phones load still has something to count from.
-        // Counted with today as open, which is what this write makes it. The
-        // state still holds the moment before, so it was always one short.
+        // Store the streak on reveal so it survives past the loaded history. Count today as
+        // opened, since state has not updated yet (otherwise it is one short).
         val s = _state.value
         val run = Streaks.run(s.history, s.today.copy(opened = true))
         openSeal(dayRef, mapOf("run" to run))
     }
 
-    /** Documents with an ask in flight, so a burst of snapshots asks once. */
+    /** Paths with a reveal request in flight, to dedupe bursts of snapshots. */
     private val opening = mutableSetOf<String>()
 
     /**
-     * Ask the rules to open a sealed day, deck or sitting, in a transaction.
-     *
-     * Not a plain `set`. Firestore applies a set to the local cache before the
-     * server rules on it, so a refused `revealed = true` showed on screen as
-     * open, was rolled back when the server said no, and the rollback was
-     * itself a snapshot that asked again. For as long as the screen was up the
-     * day blinked between "Open it" and "has not answered yet", and every blink
-     * was a round trip. A transaction is applied only once the server accepts
-     * it, so a refusal changes nothing here and there is nothing to ask again
-     * from.
-     *
-     * A refusal straight after your own answer can just mean the answer has
-     * not reached the server yet, so it tries twice more, a little later. After
-     * that, the next real change to the document asks again.
+     * Sets `revealed = true` on a day, deck or instrument doc in a transaction.
+     * A plain set is applied to the local cache first, so a refusal rolls back and
+     * re-triggers the listener in a loop (UI flicker). Retries twice with backoff,
+     * since your own answer may not have reached the server yet.
      */
     private fun openSeal(ref: DocumentReference, extra: Map<String, Any> = emptyMap(), attempt: Int = 0) {
         if (attempt == 0 && !opening.add(ref.path)) return
@@ -801,13 +665,7 @@ class FirestoreCoupleRepository(
         }
     }
 
-    /**
-     * Both answered, so both earn a brick.
-     *
-     * Idempotent through the block id, which is `date_uid`: running this twice
-     * on the same day writes the same two entries. It has to be, because both
-     * clients will call it the moment the seal lifts.
-     */
+    /** Awards today's bricks to both. Idempotent via `date_uid` block ids, since both phones call it. */
     private fun awardForToday() {
         val s = _state.value
         val plate = s.plate
@@ -823,20 +681,12 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * Both people earn for a finished deck, each sized by their own accuracy.
-     *
-     * Called from recompose, because a deck reveals when the *partner* submits
-     * and this phone finds out through a listener rather than through an action
-     * it took.
-     */
+    /** Awards bricks to both for finished decks, sized by each person's accuracy. */
     private fun awardForQuizzes(s: CoupleState) {
         val plate = s.plate
         if (plate.isSealed) return
 
-        // Every plate ever built, not just this one. Checking only this week's
-        // plate meant that when a week sealed, every deck the two of you had
-        // ever finished was paid out again on the new one.
+        // Check all plates, or decks get re-awarded on every new plate.
         val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
         val fresh = pool.playable.flatMap { quiz ->
             val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
@@ -859,7 +709,7 @@ class FirestoreCoupleRepository(
     }
 
     override fun noteWeek(plateId: String, text: String) {
-        // Merged into the map, so writing yours never touches theirs.
+        // Merge keeps the partner's note.
         couple.collection(PLATES).document(plateId)
             .set(mapOf("notes" to mapOf(myUid to text)), SetOptions.merge())
     }
@@ -906,14 +756,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * Record who called whom, once a day has opened.
-     *
-     * Keyed by uid rather than by "you" and "them", because both phones write
-     * this document and each one's idea of "you" is the other's idea of "them".
-     * The first version of this flipped the scoreboard every time the second
-     * person's app noticed the reveal.
-     */
+    /** Records each partner's guess hit for a revealed day. Keyed by uid, since both phones write it. */
     private fun recordKnowing(day: DayEntry) {
         if (!day.isRevealed || !day.question.isScored) return
         val mine = day.answerFor(myUid) ?: return
@@ -931,22 +774,8 @@ class FirestoreCoupleRepository(
     }
 
     /**
-     * Find a day worth asking again, and read it back in full.
-     *
-     * The ladder runs a year, six months, three, then one. A couple three weeks
-     * in has no year to look back on, and a feature that only switches on after
-     * six months is a feature nobody ever sees working.
-     *
-     * **How often is a function of how much there is to look back on.** The pool
-     * is ninety-nine questions and it will run out; that is arithmetic rather
-     * than a bug, and the second lap is not something to be ashamed of. A
-     * question the two of you answered a year ago, shown beside what you said
-     * then, is a better thing than a question neither of you has seen -- so as
-     * the history fills, the capsule stops being a Sunday treat and becomes a
-     * regular part of the week.
-     *
-     * It never takes more than half the days. Every day would make the app a
-     * quiz about itself, and the rest of the pool would stop arriving.
+     * On capsule days, looks for a revealed day 12, 6, 3, then 1 months ago and loads its answers.
+     * See [capsuleDays] for how often.
      */
     private fun loadCapsule() {
         if (today.dayOfWeek !in capsuleDays()) return
@@ -954,25 +783,17 @@ class FirestoreCoupleRepository(
     }
 
     /**
-     * Which days of the week may look backwards, widening with the archive.
-     *
-     * Counted in sealed plates rather than in days, for two reasons. `history`
-     * is capped at seventy days by its own query, so it can never answer "how
-     * long have you been doing this" -- it would have sat at the first rung
-     * forever. And a plate is a week by construction, so the number is already
-     * the unit the question is about.
-     *
-     * Fixed sets rather than a draw: the day has to come out the same on both
-     * phones, and both phones count the same plates.
+     * Weekdays that may show a capsule, more as sealed plates (weeks) accumulate.
+     * Uses plates because loaded history is capped at 70 days. Fixed sets so both phones agree.
      */
     private fun capsuleDays(): Set<DayOfWeek> {
         val weeks = plates.count { it.isSealed }
         return when {
-            // Two years in. The past is now the better half of the pool.
+            // Two years.
             weeks >= 104 -> setOf(
                 DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.MONDAY,
             )
-            // Around the point the pool has been round once.
+            // About when the pool has cycled once.
             weeks >= 26 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
             weeks >= 12 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY)
             else -> setOf(DayOfWeek.SUNDAY)
@@ -1013,13 +834,12 @@ class FirestoreCoupleRepository(
         }
     }
 
-    /** A pool question, or one of you wrote it. */
+    /** Looks up a pool question or wildcard by id. */
     private fun resolveQuestion(id: String?, date: LocalDate = today): Question? = when {
         id == null -> null
         Wildcard.isWildcard(id) ->
             allWildcards.firstOrNull { it.id == Wildcard.idOf(id) }?.asQuestion()
-        // Team questions are filled in wherever a question is looked up, so a
-        // past day opened on the reveal names the teams too.
+        // Fill in team names here so past days show them too.
         else -> pool.question(id)?.forPlace(coupleDoc?.getString("homeZip")?.let { pool.places.lookup(it) }, date)
     }
 
@@ -1042,12 +862,11 @@ class FirestoreCoupleRepository(
 
     override fun setTopicHidden(topic: Topic, hidden: Boolean) {
         val mine = _state.value.yourHiddenTopics.let { if (hidden) it + topic else it - topic }
-        // Merged by uid, so writing yours leaves theirs alone.
+        // Merged by uid, leaving the partner's alone.
         couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
     }
 
     override fun setMood(mood: Mood?, color: BrickColor?) {
-        // Your own document, which only you may write and your partner may read.
         db.collection(USERS).document(myUid).set(
             mapOf("mood" to mood?.let { mapOf("id" to it.name, "on" to today.toString(), "color" to color?.slug) }),
             SetOptions.merge(),
@@ -1067,22 +886,17 @@ class FirestoreCoupleRepository(
     override fun setHomeZip(zip: String): Boolean {
         pool.places.lookup(zip) ?: return false
         couple.set(mapOf("homeZip" to zip.trim()), SetOptions.merge())
-        // A new home is a new forecast, if today's has not been saved yet.
+        // Allow a new fetch if today's weather is not saved yet.
         weatherTried = false
         return true
     }
 
-    /** Once per repository: one fetch, however many listeners fire. */
+    /** Fetch weather at most once per repository instance. */
     private var weatherTried = false
 
     /**
-     * Fetch today's forecast once and save it on the day, so the other phone
-     * reads the same weather instead of fetching its own a minute later and
-     * landing on a different question.
-     *
-     * Only when the day has no weather yet, and never blocking: a failed or
-     * slow fetch is an ordinary day. Saved in a transaction so two phones
-     * fetching at the same moment keep the first.
+     * Fetches today's forecast on a background thread and saves it on the day doc, so both
+     * phones use the same weather. Transaction keeps the first write. Failures are ignored.
      */
     private fun maybeFetchWeather(place: Place?, saved: DayWeather?) {
         if (weatherTried || place == null || saved != null || !todayLoaded) return
@@ -1109,7 +923,7 @@ class FirestoreCoupleRepository(
     }
 
     override fun setColor(colorArgb: Long) {
-        // Theirs is theirs. The picker already refuses it; this is the backstop.
+        // Backstop: cannot take the partner's color.
         if (BrickColor.of(colorArgb) == BrickColor.of(_state.value.them.colorArgb)) return
         db.collection(USERS).document(myUid).set(
             mapOf("colorArgb" to colorArgb),
@@ -1117,10 +931,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * On the couple document, not yours: it is a fact about the pair, and both
-     * of you have to see the same one.
-     */
+    /** Stored on the couple doc so both partners share it. */
     override fun setAnniversary(date: LocalDate) {
         couple.set(mapOf("anniversary" to date.toString()), SetOptions.merge())
     }
@@ -1147,10 +958,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * Additive, via arrayUnion, so two phones marking the same day cannot
-     * clobber each other and nobody has to hold a read-modify-write.
-     */
+    /** Uses arrayUnion so concurrent marks do not clobber each other. */
     override fun markTalkedAbout(date: LocalDate) {
         val ref = if (date == today) dayRef else couple.collection(DAYS).document(date.toString())
         ref.set(
@@ -1159,11 +967,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /**
-     * Tonight's pick for tomorrow. Written once: the phone checks it is your
-     * turn and nothing is picked, and tomorrow ignores a pick by the wrong
-     * person, so a race between two phones cannot change what the day is.
-     */
+    /** Writes tomorrow's theme if it is your turn. Tomorrow ignores a pick by the wrong person. */
     override fun pickTomorrow(theme: String) {
         val day = _state.value.today
         if (!Turns.canPick(day, myUid, partnerUid)) return
@@ -1181,24 +985,17 @@ class FirestoreCoupleRepository(
             plate.toMap() + ("completedOn" to today.toString()),
             SetOptions.merge(),
         )
-        // Unplaced bricks carry over. They were earned by answering.
+        // Unplaced bricks carry over.
         val carried = plate.tray(myUid) + plate.tray(partnerUid)
         val next = emptyPlate(today).copy(blocks = carried)
-        // A fixed id, so two phones sealing the same week write one next plate
-        // instead of two that each carry the same bricks.
+        // Date-based id, so two phones sealing at once write the same next plate.
         plateRef(next).set(
             next.toMap() + ("blocks" to next.blocks.map { it.toMap() }),
             SetOptions.merge(),
         )
     }
 
-    /**
-     * Submit a run through a deck.
-     *
-     * Same shape as a day, and sealed the same way: your run is its own
-     * document, the partner's is unreadable until the quiz document says both
-     * are in, and the rules enforce that rather than the app.
-     */
+    /** Writes your run as its own doc. Rules hide the partner's until the deck is revealed. */
     override fun submitQuizRun(
         quizId: String,
         answers: Map<String, List<String>>,
@@ -1225,8 +1022,7 @@ class FirestoreCoupleRepository(
 
     override fun submitInstrument(instrumentId: String, responses: List<Int>) {
         val doc = couple.collection(INSTRUMENTS).document(instrumentId)
-        // As it stands, not false: a retake of an open sitting would otherwise
-        // shut it on both phones until the seal was asked open again.
+        // Keep the current value; writing false on a retake would re-seal it.
         val revealed = instrumentDocs[instrumentId]?.getBoolean("revealed") ?: false
 
         doc.set(
@@ -1243,8 +1039,7 @@ class FirestoreCoupleRepository(
                 "completedAt" to FieldValue.serverTimestamp(),
             ),
         )
-        // The draft has done its job. Leaving it would keep a second, editable
-        // copy of answers that are now supposed to be immutable.
+        // Delete the draft now that answers are submitted.
         doc.collection(DRAFTS).document(myUid).delete()
     }
 
@@ -1255,8 +1050,7 @@ class FirestoreCoupleRepository(
         doc.set(
             mapOf(
                 "revealed" to revealed,
-                // A count, not the answers. This is the half that is meant to
-                // be visible to the other person.
+                // Count only; this is visible to the partner.
                 "progress" to mapOf(myUid to responses.count { it > 0 }),
             ),
             SetOptions.merge(),
@@ -1405,13 +1199,10 @@ private fun DocumentSnapshot.toAnswer(): Answer? {
 
 private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?, LocalDate) -> Question?): DayEntry? {
     val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
-    // A day document can exist with nobody having answered: the forecast is
-    // saved on it first thing. That is not a day anyone played.
+    // Skip day docs that only hold weather.
     if (getString("questionId") == null && getBoolean("revealed") != true && toSubmitted().isEmpty()) return null
     val question = resolve(getString("questionId"), date) ?: pool.daily(date)
-    // History carries no answers: they live in a subcollection that would need
-    // a read each. The Shelf shows questions, dates and reactions, so this is
-    // what it needs; the Reveal screen loads a single day in full.
+    // No answers here (subcollection read per day); the Reveal screen loads them.
     return DayEntry(
         date = date,
         question = question,
@@ -1513,8 +1304,7 @@ private fun BuildPlate.toMap(): Map<String, Any?> = mapOf(
     "gridW" to gridW,
     "gridH" to gridH,
 ) + (
-    // Written only when set. A merge carrying completedOn: null from a stale
-    // copy of the plate un-sealed a week the other phone had just sealed.
+    // Only when set: merging completedOn = null from a stale plate would un-seal it.
     completedOn?.let { mapOf("completedOn" to it.toString()) } ?: emptyMap()
 )
 

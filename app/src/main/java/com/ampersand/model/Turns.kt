@@ -3,17 +3,8 @@ package com.ampersand.model
 import java.time.LocalDate
 
 /**
- * The part of a day that belongs to one of you.
- *
- * Everything else in the app is symmetrical -- the same question, the same seal,
- * the same reveal -- which is fair and also means neither of you ever has
- * anything to do that is yours. This is the one thing that is: once today is
- * open, one person picks what tomorrow is about, and the other finds out in the
- * morning along with the question.
- *
- * Whose turn it is comes from the date and the two uids, nothing stored, so
- * both phones agree without asking each other. It alternates day to day, so
- * nobody gets two in a row and nobody is left out for a week.
+ * Who picks tomorrow's theme once today is open.
+ * Alternates daily, computed from the date and both uids so both phones agree with nothing stored.
  */
 object Turns {
 
@@ -24,11 +15,8 @@ object Turns {
     }
 
     /**
-     * The theme somebody picked yesterday for [today], if they did.
-     *
-     * Only a pick made by that day's chooser counts. Rules cannot check whose
-     * turn it was, so the phones do: a pick written by the wrong person is left
-     * where it is and ignored.
+     * The theme picked yesterday for [today], if any.
+     * Rules cannot check whose turn it was, so picks by the wrong person are ignored here.
      */
     fun themeFor(today: LocalDate, history: List<DayEntry>, a: String, b: String): String? {
         val yesterday = today.minusDays(1)

@@ -7,13 +7,9 @@ import com.ampersand.model.Source
 import com.ampersand.model.Subscale
 
 /**
- * Where everything in the app came from.
- *
- * Licences are spelled out rather than summarised, because "free to use" is a
- * thing people say about research instruments and is almost never a licence.
- * Two of these have a real one. The rest are ordinary journal articles whose
- * item text belongs to their authors, which is fine for two phones and is not
- * fine for a listing -- see [Source.fidelity] and the note on each.
+ * Content sources and their licenses, spelled out.
+ * Journal articles without an open license keep item text rights with their
+ * authors, so check [Source.fidelity] and each note before any public listing.
  */
 object Sources {
 
@@ -29,12 +25,8 @@ object Sources {
     )
 
     /**
-     * The design is Mostova's; the twenty behaviours are Egbert and Polk's.
-     *
-     * PLOS ONE is CC BY, so the method can be reproduced with attribution -- but
-     * the *items* originate in a paywalled Communication Research Reports paper
-     * and are not covered by it. So the behaviours below are ours, which is why
-     * this is [Fidelity.INSPIRED] and why the credit line names both.
+     * Method from Mostova (PLOS ONE, CC BY); behaviors after Egbert and Polk, whose
+     * paywalled items are not covered, so ours are rewritten ([Fidelity.INSPIRED]).
      */
     val LOVE_LANGUAGES = Source(
         id = "lovelang",
@@ -49,12 +41,8 @@ object Sources {
     )
 
     /**
-     * Shortened by us, so the credit names the construct and not the text.
-     *
-     * The Fetzer Institute's freely distributed compendium reproduces all 42
-     * items and flags per-instrument where an author's permission is required;
-     * this entry carries no such flag. That is normal practice for private,
-     * non-commercial use with attribution, and it is not a licence.
+     * Shortened by us. The Fetzer Institute compendium reproduces all 42 items with
+     * no permission flag for this one; fine for non-commercial use with attribution, not a license.
      */
     val LOVE_ATTITUDES = Source(
         id = "loveattitudes",
@@ -90,13 +78,9 @@ object Sources {
     )
 
     /**
-     * The one source whose item text is free for any use.
-     *
-     * The daily-ipip decks draw on the IPIP-NEO facets, IPIP-VIA character
-     * strengths, IPIP-HEXACO, Barchard's emotional-intelligence components and
-     * the Oregon vocational and avocational interest scales: first person,
-     * spread across every question type, with the accusatory, clinical and
-     * political items left out. Public domain needs no credit; it gets one anyway.
+     * Public domain item text. The daily-ipip decks use IPIP-NEO facets, IPIP-VIA,
+     * IPIP-HEXACO, Barchard's emotional-intelligence components and the Oregon
+     * interest scales, minus clinical and political items. Credited anyway.
      */
     val IPIP = Source(
         id = "ipip",
@@ -109,11 +93,7 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
-    /**
-     * Everyday activities, from the lexicon the Bureau of Labor Statistics uses
-     * to code the American Time Use Survey. A federal work, so public domain;
-     * the activity names are reworded into things a person would say.
-     */
+    /** American Time Use Survey activity lexicon (BLS). Public domain; names reworded. */
     val ATUS = Source(
         id = "atus",
         authors = "US Bureau of Labor Statistics",
@@ -125,11 +105,7 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
-    /**
-     * The one source here that requires credit. The article and its item table
-     * are CC BY 4.0; the items are reworded to speak to your partner, which the
-     * licence allows as long as it says so.
-     */
+    /** CC BY 4.0: credit required, and the rewording must be stated. */
     val HAREL = Source(
         id = "harel2024",
         authors = "Harel & Koslowsky",
@@ -193,43 +169,25 @@ object Sources {
 }
 
 /**
- * The instruments, whole.
- *
- * Nothing here may be shuffled, subset, or drip-fed into the daily pool. The
- * item order is the published order because the scoring keys index into it, and
- * `Instrument.length` responses is the only input the arithmetic accepts.
+ * The instruments, in published item order (scoring keys index into it).
+ * Never shuffle, subset, or mix these into the daily pool.
  */
 object Instruments {
 
     /**
-     * Jorgenson's Open Extended Jungian Type Scales 1.2, verbatim.
+     * Jorgenson's Open Extended Jungian Type Scales 1.2, verbatim: 32 pole pairs,
+     * four axes of eight items scored 8..40, cut at 24.
      *
-     * Thirty-two pairs of opposed descriptions, each rated 1 to 5 for where you
-     * sit between them. Four axes of eight items, each scored 8 to 40 by a
-     * signed equation with a constant, cut at 24. Four comparisons, four
-     * letters, one type -- in four minutes, which makes it the obvious one to
-     * ship first.
-     *
-     * **This is not the MBTI.** Myers-Briggs is a trademark and a proprietary,
-     * per-administration instrument; the OEJTS is an independent open
-     * implementation of the same Jungian axes and the app must never call it
-     * anything else.
-     *
-     * Two departures from the PDF, both cosmetic and both noted here so the
-     * [Fidelity.VERBATIM] claim stays honest: "sceptical" is spelled the
-     * American way, and the original's "where ever" is closed up.
+     * Not the MBTI (a trademark); never call it that.
+     * Cosmetic departures from the PDF: "sceptical" -> "skeptical", "where ever" -> "wherever".
      */
     val JUNGIAN = Instrument(
         id = "oejts",
         sourceId = "oejts",
         title = "Type",
-        // Carries the wall heading as well as the top of the sitting, so it
-        // has to say what the test asks *and* what comes out of it. A badge
-        // reading "INTJ" is a result with no question attached to it, and
-        // nobody remembers in April what they answered in January.
-        blurb = "Thirty-two either-ors: makes lists or relies on memory, " +
-            "energetic or mellow. Eight of them on each of four axes, and where " +
-            "you land on all four is the four letters.",
+        // Shown under the wall heading and atop the sitting. Tests require > 60 chars.
+        blurb = "Thirty-two this-or-that pairs, like makes lists or relies on memory. " +
+            "Your answers add up to a four-letter type.",
         minutes = 4,
         items = listOf(
             InstrumentItem("makes lists", "relies on memory"),                                  // 1
@@ -271,8 +229,7 @@ object Instruments {
             InstrumentItem("likes to perform in front of other people", "avoids public speaking"), // 31
             InstrumentItem("likes to know \"who?\", \"what?\", \"when?\"", "likes to know \"why?\""), // 32
         ),
-        // The published equations, translated to 0-based indices. Signs and
-        // constants are exactly as printed -- do not "simplify" these.
+        // Published equations with 0-based indices. Signs and constants exactly as printed; do not simplify.
         subscales = listOf(
             // IE = 30 - Q3 - Q7 - Q11 + Q15 - Q19 + Q23 + Q27 - Q31
             Subscale(
@@ -302,35 +259,19 @@ object Instruments {
     )
 
     /**
-     * Love languages, in both directions.
+     * Love languages: 20 behaviors (four per language) rated twice, for [FELT] and [GIVEN].
      *
-     * Twenty behaviours, four per language, answered twice: once for what makes
-     * you feel loved and once for what you actually do. Mostova and colleagues
-     * ran it this way across a hundred couples and found the *mismatch* -- the
-     * gap between what one partner wants and what the other gives -- correlated
-     * with relationship satisfaction (r about -.36 and -.40). That gap is the
-     * whole reason this is here: it is the only source in the app whose headline
-     * finding is already a two-person calculation rather than one person's score.
-     *
-     * The behaviours are written here rather than lifted. The five-category
-     * model itself is shakier than its popularity suggests -- Impett, Park and
-     * Muise (2024) found little support for the claims that each person has one
-     * language, that there are five, or that matching is what drives
-     * satisfaction, and proposed love as a balanced diet of needs instead. So
-     * the UI shows all five as a shape and names the highest as a headline,
-     * rather than telling anybody what they *are*. The mismatch number survives
-     * that critique regardless, because it measures the gap and not the label.
-     *
-     * Items are subject-free noun phrases on purpose: the same twenty have to
-     * read correctly under both stems without changing a pronoun.
+     * Mostova et al. found the want/give mismatch correlated with satisfaction
+     * (r about -.36 and -.40). Impett, Park and Muise (2024) question the five-category
+     * model, so the UI shows all five rather than one label.
+     * Items are subject-free phrases so they read under both stems.
      */
     val LOVE_LANGUAGES = Instrument(
         id = "lovelang",
         sourceId = "lovelang",
         title = "Love language",
-        blurb = "Twenty small things, rated twice: once for what makes you feel " +
-            "loved, once for what you tend to do for them. The part that matters " +
-            "is the gap between what one of you wants and what the other gives.",
+        blurb = "Twenty small things, rated twice: what makes you feel loved, and " +
+            "what you do for them. Then see how well those match up.",
         minutes = 6,
         passes = listOf(
             "This is what makes me feel loved",
@@ -374,29 +315,17 @@ object Instruments {
 
 
     /**
-     * Four of Hendrick and Hendrick's six love styles.
+     * Four of Hendrick and Hendrick's six love styles ([Fidelity.ADAPTED]), 28 items.
      *
-     * [Fidelity.ADAPTED], not verbatim, and the reason is worth stating: the
-     * Ludus and Mania subscales are not shipped at all. Ludus asks you to rate
-     * "I have sometimes had to keep two of my lovers from finding out about
-     * each other"; Mania item 30 asks about suicidal thinking after a breakup.
-     * Those are legitimate research items and a daily couples app is the wrong
-     * room for both -- particularly the second, which this app has no way to
-     * respond to. Answering all six and hiding two in the result was the
-     * earlier plan and it was wrong: hiding a result does not unask a question.
-     *
-     * That leaves 28 items and a four-way profile, which is our shortened
-     * instrument and not the Hendricks', so it makes no claim on their
-     * psychometrics. "My lover" is "my partner" throughout for the same reason
-     * -- once it is adapted, it may as well read like the app it is in.
+     * Ludus and Mania are left out entirely: they include infidelity and suicidal-thinking
+     * items that are not appropriate here. "My lover" is reworded to "my partner".
      */
     val LOVE_ATTITUDES = Instrument(
         id = "loveattitudes",
         sourceId = "loveattitudes",
         title = "Love style",
-        blurb = "Twenty-eight statements about how you love rather than how " +
-            "much. Four styles: the immediate kind, the kind that grew out of " +
-            "friendship, the kind that thinks ahead, and the kind that gives way.",
+        blurb = "Twenty-eight statements about how you love. Four styles: " +
+            "love at first sight, friends first, thought through, and giving way.",
         minutes = 5,
         items = listOf(
             // Eros -- passionate, immediate, physical. Original items 1-7.
@@ -432,12 +361,8 @@ object Instruments {
             like("When my partner gets angry with me, I still love them fully and unconditionally."),
             like("I would endure all things for the sake of my partner."),
         ),
-        // Plain positive sums, 7..35. The published coding runs the other way
-        // -- 1 is *strongly agree* -- so the anchors below are reversed and the
-        // stored number is `6 - published`. Summing that is arithmetically the
-        // same as subtracting the published sum from 42, and it means every
-        // scale in this app rises to the right, which a person switching
-        // between two tests in one sitting will thank us for.
+        // Plain sums, 7..35. The published coding has 1 = strongly agree; ours is reversed
+        // (stored = 6 - published) so every scale in the app rises to the right.
         subscales = listOf(
             Subscale("eros", "Straight away", terms = (0..6).associateWith { 1 }),
             Subscale("storge", "Friends first", terms = (7..13).associateWith { 1 }),
@@ -449,7 +374,7 @@ object Instruments {
     /** A statement rated for how true it is, rising to the right. */
     private fun like(text: String) = InstrumentItem("Not like me", "Very like me", text)
 
-    /** Shortest first: the four-minute one is the one people actually finish. */
+    /** Shortest first. */
     val all = listOf(JUNGIAN, LOVE_ATTITUDES, LOVE_LANGUAGES)
 
     operator fun get(id: String?): Instrument? = all.firstOrNull { it.id == id }

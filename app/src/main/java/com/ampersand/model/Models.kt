@@ -2,21 +2,15 @@ package com.ampersand.model
 
 import java.time.LocalDate
 
-/**
- * How a question is answered, which also decides whether it can be scored.
- *
- * REFLECT is deliberately unscored: the whole point of those days is the
- * conversation, and attaching a number to "how close did you feel to me" would
- * be the wrong incentive.
- */
+/** How a question is answered, which also decides whether it can be scored. */
 enum class QuestionType {
-    /** One open answer each. No right answer, nothing scored. */
+    /** One open answer each. Not scored. */
     REFLECT,
 
     /** Open answer for yourself, plus a prediction of your partner. */
     GUESS_ME,
 
-    /** Two options, radio-style. Fast, and what keeps a streak alive. */
+    /** Two options, radio-style. */
     THIS_OR_THAT,
 
     /** Three or more options, pick one. */
@@ -35,7 +29,7 @@ enum class QuestionType {
     DROPDOWN,
 }
 
-/** 1 = light, safe for a tired Tuesday. 3 = the ones worth a real evening. */
+/** 1 = light, 3 = deep. */
 @JvmInline
 value class Depth(val level: Int) {
     init { require(level in 1..3) { "depth must be 1..3, was $level" } }
@@ -54,27 +48,14 @@ data class Question(
     /** SCALE only. */
     val lowLabel: String = "Not at all",
     val highLabel: String = "Completely",
-    /**
-     * What the question is actually about -- "planning", "touch", "money".
-     *
-     * Finer than [category], which is only ever the deck's theme. A lean toward
-     * planning used to mean "more of the Future deck", most of which is not
-     * about planning; with tags it reaches the questions that are, wherever
-     * they happen to sit.
-     */
+    /** Subject tags like "planning", "touch", "money". Finer than [category], which is the deck theme. */
     val tags: Set<String> = emptySet(),
 ) {
     val isScored: Boolean get() = type != QuestionType.REFLECT
 
     /**
-     * Whether a prediction counted as a hit. Per type, because "right" means
-     * something different for each:
-     *
-     * - RANK scores on the top choice alone. Exact-order matching on four items
-     *   is almost never achieved, and a scoreboard nobody can move is a
-     *   scoreboard nobody looks at. "Did you know what matters most to them" is
-     *   the interesting question anyway.
-     * - MULTI_SELECT compares sets, so order does not matter.
+     * Whether a prediction counted as a hit. MULTI_SELECT compares sets; every
+     * other type (including RANK) compares the first value only.
      */
     fun guessHit(guess: List<String>?, actual: List<String>): Boolean {
         if (guess.isNullOrEmpty() || actual.isEmpty()) return false
@@ -90,26 +71,17 @@ data class Question(
 }
 
 /**
- * What you can say back once the seal lifts, without it becoming a chat.
+ * Reactions to a revealed answer.
  *
- * Maps **meaning** to art, the same way `Sfx` maps meaning to file: the label is
- * the sentence the picture stands in for, so swapping the artwork later does not
- * change what a stored reaction meant.
- *
- * [icon] is a name, not a resource id, because this file deliberately has no
- * Android imports -- the UI resolves it. These were emoji until it became clear
- * that an emoji is somebody else's art direction rendered by somebody else's
- * font, and looks different on every phone the couple owns.
- *
- * Six, deliberately. The reveal is meant to send you into the other room to
- * talk, so a reaction is a nudge and a receipt that they read it -- not a reply.
+ * [icon] is an art name the UI resolves (no Android imports here). Stored by
+ * enum name, so the art and label can change freely.
  */
 enum class Reaction(val icon: String, val label: String) {
-    LOVE("heart", "That is lovely"),
-    LAUGH("laugh", "Of course you did"),
-    MELT("hearts", "Oh"),
-    SURPRISE("exclamation", "I did not know that"),
-    CURIOUS("question", "Say more tonight"),
+    LOVE("heart", "Love it"),
+    LAUGH("laugh", "Of course"),
+    MELT("hearts", "Aww"),
+    SURPRISE("exclamation", "I didn't know that"),
+    CURIOUS("question", "Tell me more tonight"),
     KNEW_IT("star", "Knew it"),
 }
 
@@ -125,12 +97,7 @@ data class Member(
     val mood: MoodEntry? = null,
 )
 
-/**
- * One person's submission.
- *
- * [values] is a list for every type, even the single-answer ones, so RANK and
- * MULTI_SELECT do not need a parallel field or a delimiter hack.
- */
+/** One person's submission. [values] is a list for every type, so RANK and MULTI_SELECT fit. */
 data class Answer(
     val uid: String,
     val values: List<String>,
@@ -141,7 +108,7 @@ data class Answer(
     val guessText: String? get() = guess?.joinToString(", ")
 
     companion object {
-        /** For the single-value types, which is most of them. */
+        /** For the single-value types. */
         fun of(uid: String, response: String, guess: String? = null) =
             Answer(uid, listOf(response), guess?.let(::listOf))
     }
@@ -150,65 +117,36 @@ data class Answer(
 /**
  * One day for one couple.
  *
- * [answers] is keyed by uid and is the sealed part: in the real Firestore model
- * each entry is its own document, because security rules are per-document and
- * cannot hide a field inside a shared one.
+ * [answers] is keyed by uid. In Firestore each answer is its own document,
+ * because rules are per-document and cannot hide a field.
  */
 data class DayEntry(
     val date: LocalDate,
     val question: Question,
     val answers: Map<String, Answer> = emptyMap(),
-    /**
-     * One reaction each, keyed by uid, and only ever set after the reveal.
-     *
-     * Unlike [answers] this is not sealed -- there is nothing left to spoil --
-     * and unlike an answer it *can* be changed, because it is a gesture rather
-     * than a statement. That is also why it lives on the day document instead
-     * of in the per-person subcollection: no rule has to hide it.
-     */
+    /** One reaction each, keyed by uid, set after the reveal. Changeable; stored on the day doc. */
     val reactions: Map<String, Reaction> = emptyMap(),
-    /**
-     * Who has said this one came up again, away from the phone.
-     *
-     * The app's whole intent is that the reveal sends you into the other room
-     * to talk, and until now it had no way of being told whether that ever
-     * happened -- the single most interesting fact about a day, and the only
-     * one it never collected. One tap, the following morning.
-     *
-     * Not sealed and not scored. It is a report about the two of you rather
-     * than an answer, so there is nothing to spoil and nothing to be right
-     * about, and either of you saying so is enough.
-     */
+    /** Uids who marked that this day came up again in conversation. Not sealed, not scored. */
     val talkedAbout: Set<String> = emptySet(),
     /**
-     * The day document says both answers are in, whether or not they are loaded.
+     * The day doc's `revealed` flag: both answers are in, even when not loaded.
      *
-     * Past days are read without their answers -- the answers live in a
-     * subcollection that would cost a read per day -- so counting [answers] on
-     * a past day always came to zero. Every past day looked unopened, which
-     * kept the next-morning prompt from ever appearing and made the streak
-     * count reactions instead of answering. The rules only let `revealed` turn
-     * true once both answer documents exist, so it is safe to trust.
+     * Past days are read without their answer subcollection, so counting [answers]
+     * gives zero. Rules only allow `revealed` once both answer docs exist.
      */
     val opened: Boolean = false,
     /** Who has answered, from the day document. Read on past days, which carry no answers. */
     val submitted: Set<String> = emptySet(),
-    /**
-     * What tomorrow is about, picked tonight by whoever's turn it was.
-     *
-     * Not sealed: it is a small surprise rather than an answer, and the screen
-     * keeps it from the other person until the morning instead of a rule doing
-     * so. See [Turns].
-     */
+    /** Tomorrow's theme, picked tonight. Hidden from the partner by the UI, not rules. See [Turns]. */
     val nextTheme: String? = null,
     val nextThemeBy: String? = null,
     /**
      * The run this day made, written by whichever phone opened it. Zero when
-     * nothing was written, which is every day before this existed. See [Streaks].
+     * nothing was written (older days). See [Streaks].
      */
     val recordedRun: Int = 0,
 ) {
-    /** Either of you marked it. One person remembering is the whole event. */
+    /** Either of you marked it. */
     val wasTalkedAbout: Boolean get() = talkedAbout.isNotEmpty()
 
     /** The seal only lifts once both have submitted. */
@@ -239,21 +177,15 @@ data class CoupleState(
     val them: Member,
     val today: DayEntry,
     val plate: BuildPlate,
-    /** Sealed sculptures, newest first. Each one is a finished period. */
+    /** Sealed sculptures, newest first. */
     val shelf: List<BuildPlate> = emptyList(),
     val history: List<DayEntry> = emptyList(),
     /** Both people's runs through any deck either of them has started. */
     val quizRuns: List<QuizRun> = emptyList(),
-    /** The day the two of you started, once someone has told the app. */
+    /** The day the two of you started, if set. */
     val anniversary: LocalDate? = null,
     val streak: Int = 0,
-    /**
-     * The day today's question came back from, when today is a capsule.
-     *
-     * Null on an ordinary day. When it is set, the two of you answered this
-     * exact question once before and the reveal has four answers in it rather
-     * than two.
-     */
+    /** The earlier day today's question repeats, when today is a capsule. Null otherwise. */
     val capsule: DayEntry? = null,
     /** Questions the two of you wrote, oldest first, none of them asked yet. */
     val wildcards: List<Wildcard> = emptyList(),
@@ -274,15 +206,12 @@ data class CoupleState(
     /** The couple's home ZIP, and where that is. */
     val homeZip: String? = null,
     val region: UsRegion? = null,
-    /** The nearest baseball and football teams, said as "Pirates and Steelers". */
+    /** The nearest baseball and football teams, e.g. "Pirates and Steelers". */
     val localTeams: String? = null,
     /** Leagues either of you follows. Sports questions stay out until there is one. */
     val following: Set<League> = emptySet(),
     val yourFollowing: Set<League> = emptySet(),
-    /**
-     * Whether you have been through the interests questions. Null until your
-     * profile has loaded, so nobody is shown them again while it loads.
-     */
+    /** Whether you have seen the interests questions. Null until your profile loads. */
     val interestsAsked: Boolean? = null,
     /** The home ZIP's state, for holidays that belong to a place. */
     val homeState: String? = null,
@@ -291,26 +220,12 @@ data class CoupleState(
     val why: String? = null,
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */
     val weather: DayWeather? = null,
-    /**
-     * Sittings with the whole-instrument tests, oldest first.
-     *
-     * Kept apart from [history] on purpose. A day is one question and a run is
-     * thirty-two, and the moment an instrument can be reached through the same
-     * list as a daily question is the moment one of them gets shuffled into a
-     * Tuesday and the citation on it becomes false.
-     */
+    /** Instrument sittings, oldest first. Kept apart from [history] so tests never mix with daily questions. */
     val instrumentRuns: List<InstrumentRun> = emptyList(),
-    /** How often each of you has called the other, for as long as you have played. */
+    /** How often each of you has called the other, all time. */
     val knowing: Knowing = Knowing(),
 ) {
-    /**
-     * Answered days falling on today's date in an earlier month or year.
-     *
-     * Matching on day-of-month rather than exact anniversaries means there is
-     * something to show more than once a year, and the screen can say how long
-     * ago it was. Anything inside the last month is excluded: "three weeks ago
-     * today" is not a memory, it is just recent.
-     */
+    /** Answered days on today's day-of-month in earlier months, excluding the last 27 days. */
     fun onThisDay(on: LocalDate = today.date): List<DayEntry> =
         history.filter { it.date.dayOfMonth == on.dayOfMonth && it.date < on.minusDays(27) }
             .sortedByDescending { it.date }
@@ -336,7 +251,7 @@ data class CoupleState(
         }
     }
 
-    /** How many decks are sitting waiting for you specifically. */
+    /** How many decks are waiting on you. */
     fun decksAwaitingYou(quizIds: List<String>): Int =
         quizIds.count { deckState(it) == DeckState.WAITING_ON_YOU }
 

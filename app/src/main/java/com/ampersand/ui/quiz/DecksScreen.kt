@@ -45,13 +45,8 @@ import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Stud
 
 /**
- * Everything to play besides the day's question.
- *
- * What is waiting on one of you comes first, then tomorrow's theme once today
- * is open, then a row of themes -- each brick says how many decks it holds and
- * how many are waiting on you -- and every deck. Writing your own question for
- * the other person is last. The three longer tests and their results live on
- * Us, though a half-finished one still shows up under Waiting.
+ * Decks tab: Waiting, tomorrow's theme (once today is revealed), theme filter, all decks, then Your own.
+ * Longer tests live on Us but unfinished ones still show under Waiting.
  */
 @Composable
 fun DecksScreen(
@@ -84,7 +79,7 @@ fun DecksScreen(
         Text("Decks", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(4.dp))
         Text(
-            "One question a day is the habit. These are for an evening.",
+            "Longer sets of questions to play together.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -140,7 +135,7 @@ fun DecksScreen(
 
 
         Spacer(Modifier.height(28.dp))
-        SectionLabel(theme?.let { "${it.label} decks" } ?: "Every deck")
+        SectionLabel(theme?.let { "${it.label} decks" } ?: "All decks")
         DeckList(decks = shown, state = state, onOpen = onOpenDeck)
 
         Spacer(Modifier.height(32.dp))

@@ -13,26 +13,12 @@ import com.ampersand.model.Standing
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-/**
- * The Us page's results, one heading per test.
- *
- * Grouped by the sitting that produced them rather than laid out as peers.
- * Love languages yields three courses on its own -- what you want, what you
- * give, and the fit between them -- and as three sibling rows they read as
- * three unrelated tests sharing a word, when in fact the third only means
- * anything because the first two exist.
- *
- * Every badge needs both of you. A course fills when the second person
- * finishes, never before. A wall of half-filled rows would read as nagging; a
- * wall where every filled row means you both showed up reads as the thing the
- * app is for.
- */
+/** Builds the Us page's test results, one group per test. Results appear only once both have finished. */
 object BadgeWall {
 
     fun groups(runs: List<InstrumentRun>, you: Member, them: Member): List<BadgeGroup> = listOf(
         group(runs, Instruments.JUNGIAN, you, them) {
-            // One course, so no sub-label: a heading above a single row that
-            // repeats the group's own name is noise.
+            // Single row, so no sub-label.
             listOf(typeRow(it, you, them))
         },
         group(runs, Instruments.LOVE_ATTITUDES, you, them) {
@@ -75,12 +61,7 @@ object BadgeWall {
     private fun List<InstrumentRun>.of(instrument: Instrument): InstrumentRun? =
         lastOrNull { it.instrumentId == instrument.id }
 
-    /**
-     * Where each of you has got to with one test.
-     *
-     * Returned even when nobody has started, so the caller never has to reason
-     * about nulls to decide what a brick says.
-     */
+    /** How far [uid] has got with one test. Never null, even before anyone starts. */
     fun standing(
         runs: List<InstrumentRun>,
         instrument: Instrument,
@@ -90,16 +71,7 @@ object BadgeWall {
         return instrument.standingOf(run.answeredBy(uid, instrument.length))
     }
 
-    /**
-     * The line on an unclaimed brick, which is the only place the two of you
-     * can see each other mid-sitting.
-     *
-     * Six states, and the one worth the trouble is the last: both of you have
-     * finished round one of love languages and neither has started round two.
-     * Before this, that looked identical to neither of you having opened it --
-     * two people each waiting for the other to go first on something they had
-     * both already half done.
-     */
+    /** (progress line, action label) for a test, from both people's progress. */
     fun caption(yours: Standing, theirs: Standing, them: String): Pair<String, String> = when {
         yours.finished && theirs.inProgress ->
             (them + " is " + at(theirs)) to ("Waiting on " + them)
@@ -107,9 +79,7 @@ object BadgeWall {
         yours.finished ->
             "You are done" to ("Waiting on " + them)
 
-        // Said once when you are in the same place. Spelling out both sides
-        // produced "Both of you are on round 2 of 2, on round 2 of 2", which is
-        // the sentence a template writes and nobody reads back.
+        // Same place: say it once instead of repeating it for each person.
         yours.inProgress && theirs.inProgress && at(yours) == at(theirs) ->
             ("Both of you are " + at(yours)) to "Carry on"
 
@@ -159,15 +129,14 @@ object BadgeWall {
                 BadgeBar(
                     label = r.subscale.label,
                     fraction = r.fraction,
-                    // The margin, said plainly. A letter won 25 to 24 must not
-                    // look like one won 39 to 8.
+                    // Show the score so close calls are visible.
                     value = "${r.letter} · ${r.value} of ${r.subscale.range.last}",
                 )
             },
             note = readings.minByOrNull { it.margin }?.let {
                 if (it.margin > 0.12f) null
-                else "${it.subscale.label} was close to a coin toss. " +
-                    "That letter would likely come out the other way on another day."
+                else "${it.subscale.label} was very close. " +
+                    "That letter could go the other way another day."
             },
             instrumentId = kit.id,
             minutes = kit.minutes,
@@ -185,14 +154,7 @@ object BadgeWall {
         ),
     )
 
-    /**
-     * How somebody loves, rather than how much.
-     *
-     * The headline is the leading style and the note names the runner-up,
-     * because the whole claim the scale supports is that these are separate
-     * dimensions you can be high on two of at once -- reporting one word and
-     * stopping would be asserting the opposite of what the paper found.
-     */
+    /** Love style badge: the top style as the result, and the runner-up in the note. */
     private fun styleBadge(run: InstrumentRun?, of: Member, owner: Owner): Badge {
         val kit = Instruments.LOVE_ATTITUDES
         val open = run?.isOpen == true
@@ -212,7 +174,7 @@ object BadgeWall {
                 val second = it.getOrNull(1) ?: return@let null
                 if (top.value == second.value) {
                     "${top.subscale.label.lowercase()} and ${second.subscale.label.lowercase()}, " +
-                        "evenly. Nobody is only one of these."
+                        "equally. Nobody is only one of these."
                 } else {
                     "Mostly ${top.subscale.label.lowercase()}, then " +
                         "${second.subscale.label.lowercase()}. Nobody is only one of these."
@@ -256,13 +218,12 @@ object BadgeWall {
             slotId = "language.$slot.${owner.name.lowercase()}",
             owner = owner,
             who = of.name,
-            // The highest, named as a headline -- not as a category anybody is
-            // being told they belong to. The bars under it are the real answer.
+            // Highest score as the headline; the bars show all five.
             result = readings?.maxByOrNull { it.value }?.subscale?.label,
             detail = readings.orEmpty().map { r ->
                 BadgeBar(r.subscale.label, r.fraction, "${r.value} of ${r.subscale.range.last}")
             },
-            note = readings?.let { "Shown highest-first. All five matter; this is the loudest." },
+            note = readings?.let { "Highest first. All five matter." },
             instrumentId = kit.id,
             minutes = kit.minutes,
             waitingOnThem = run != null && !open && run.has(of.uid),
@@ -272,16 +233,8 @@ object BadgeWall {
     // ---- the gap ---------------------------------------------------------
 
     /**
-     * What one of you wants against what the other actually does.
-     *
-     * This is the finding, not a derived nicety: Mostova and colleagues computed
-     * exactly this discrepancy and it was what correlated with satisfaction.
-     * Both directions are measured, because they are different numbers -- you
-     * can be well served and still be badly serving.
-     *
-     * "Lined up" is a gap of four points or less on a scale of four to twenty,
-     * which is a quarter of the range. The threshold is ours; the research
-     * reports a continuous correlation and offers no cut-off.
+     * The fit between what each of you wants and what the other gives (Mostova et al.),
+     * measured in both directions. [ALIGNED] is our own cut-off; the research has none.
      */
     private fun fitRow(run: InstrumentRun?, you: Member, them: Member): BadgeRow {
         val kit = Instruments.LOVE_LANGUAGES
@@ -294,13 +247,8 @@ object BadgeWall {
 
         val bars = mutableListOf<BadgeBar>()
         var alignedCount = 0
-        // label, shortfall, whose. Tracked separately from the bars because the
-        // bars are the research's measure and this is the actionable sentence,
-        // and they are not the same arithmetic. Mostova's discrepancy is
-        // absolute -- any gap in either direction counts against the fit -- but
-        // "you want touch more than they give it" and "you give twice the
-        // words they need" are opposite problems, and only one of them is a
-        // shortfall. An earlier version reported over-giving as neglect.
+        // (label, shortfall, theyAreShort). Bars use the absolute gap; the note only
+        // counts shortfalls, so over-giving is not reported as neglect.
         var worst: Triple<String, Int, Boolean>? = null
 
         if (open && yourFelt.isNotEmpty()) {
@@ -311,13 +259,12 @@ object BadgeWall {
                 if (gap <= ALIGNED) alignedCount++
                 bars += BadgeBar(
                     label = scale.label,
-                    // Full bar is a perfect match, empty is the widest possible miss.
+                    // Full bar = perfect match, empty = widest possible gap.
                     fraction = 1f - (gap / SPAN.toFloat()).coerceIn(0f, 1f),
                     value = if (gap <= ALIGNED) "lines up" else "off by $gap",
                 )
 
-                // Signed, and floored at zero: wanting less than you are given
-                // is not a shortfall and there is nothing to act on.
+                // Floored at zero: getting more than you want is not a shortfall.
                 val youShort = (yourFelt[i].value - theirGiven[i].value).coerceAtLeast(0)
                 val theyShort = (theirFelt[i].value - yourGiven[i].value).coerceAtLeast(0)
                 val short = maxOf(youShort, theyShort)
@@ -336,7 +283,7 @@ object BadgeWall {
             note = when {
                 !open || bars.isEmpty() -> null
                 worst == null ->
-                    "Nobody is going short. Whatever you are both doing, keep doing it."
+                    "You are both getting what you need. Keep it up."
                 worst!!.third ->
                     "${them.name} wants ${worst!!.first.lowercase()} more than you tend to give it."
                 else ->
@@ -346,7 +293,7 @@ object BadgeWall {
             minutes = kit.minutes,
             waitingOnThem = run != null && !open,
         )
-        return BadgeRow("How well those two line up", listOf(badge))
+        return BadgeRow("How well you match", listOf(badge))
     }
 
     private fun readings(run: InstrumentRun?, uid: String, pass: Int): List<Reading> =
@@ -359,7 +306,7 @@ object BadgeWall {
     /** The widest a gap can be on a 4..20 subscale. */
     private const val SPAN = 16
 
-    /** Percent, for anywhere that wants one number instead of five bars. */
+    /** Overall fit as a percent. */
     fun fitPercent(run: InstrumentRun?, you: Member, them: Member): Int? {
         val kit = Instruments.LOVE_LANGUAGES
         val yourFelt = readings(run, you.uid, Instruments.FELT)

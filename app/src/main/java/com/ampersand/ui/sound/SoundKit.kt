@@ -13,17 +13,12 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import com.ampersand.R
 
-/**
- * Every noise the UI can make, by meaning rather than by filename.
- *
- * Swapping a sound is a one-line change here, which matters because these were
- * chosen from the pack by name, not by ear.
- */
+/** UI sounds by meaning, with their clip and volume. */
 enum class Sfx(val res: Int, val volume: Float) {
     /** Any ordinary tap: a button, a pip, a menu row. */
     TAP(R.raw.sfx_click1, 0.5f),
 
-    /** Moving between tabs. Quieter -- it fires often. */
+    /** Moving between tabs. Quieter because it fires often. */
     NAV(R.raw.sfx_click3, 0.32f),
 
     /** A choice turning on, and the same choice turning back off. */
@@ -36,39 +31,24 @@ enum class Sfx(val res: Int, val volume: Float) {
     /** Lifting a brick out of the tray. */
     PICK_UP(R.raw.sfx_rollover1, 0.6f),
 
-    /** A brick snapping onto the plate. The one that should feel good. */
+    /** A brick snapping into place. */
     PLACE(R.raw.sfx_switch11, 0.85f),
 
     /** Pressing and letting go of something chunky. */
     PRESS(R.raw.sfx_mouseclick1, 0.5f),
     RELEASE(R.raw.sfx_mouserelease1, 0.45f),
 
-    /** Sealing the day, and the seal lifting. The two big moments. */
+    /** Submitting an answer. */
     SEAL(R.raw.sfx_switch33, 0.9f),
 
-    /**
-     * The two halves of the app's name, and the only sounds picked by ear
-     * rather than by filename.
-     *
-     * Chosen by measuring the pack instead of guessing: every clip's duration
-     * and bytes-per-second was read out of its Ogg pages, and these two are the
-     * shortest and the most and least dense of the short ones -- 28ms bright
-     * for the click, 37ms duller for the clack. Short means percussive; the
-     * density gap is what makes them audibly a pair rather than the same sound
-     * twice.
-     */
+    /** Splash "click" (28ms, bright) and "clack" (37ms, duller). */
     CLICK(R.raw.sfx_brick_click, 0.75f),
     CLACK(R.raw.sfx_brick_clack, 0.8f),
 }
 
 /**
- * Thin wrapper over [SoundPool].
- *
- * SoundPool rather than MediaPlayer because these are short, need to overlap,
- * and must not stall the UI thread. Sounds are decoded once up front; a play
- * before the pool finishes loading is dropped rather than queued, which is the
- * right trade for UI chirps -- a click that arrives late is worse than one that
- * never arrives.
+ * Thin wrapper over [SoundPool] for short, overlapping clips. All clips load up
+ * front; [play] drops a clip that isn't loaded yet instead of queuing it.
  */
 class SoundKit(context: Context) {
 
@@ -104,15 +84,8 @@ class SoundKit(context: Context) {
     }
 
     /**
-     * Wait for a clip to finish decoding, up to [timeoutMs].
-     *
-     * [play] drops anything not yet loaded, which is right for a tap -- a click
-     * that arrives late is worse than one that never arrives -- and wrong for
-     * the splash, where the sound *is* the thing and the animation can afford
-     * to wait. On a cold start the pool is still decoding a dozen clips when
-     * the first brick lands, so the launch was silent every time.
-     *
-     * Returns false on timeout rather than blocking the splash forever.
+     * Waits up to [timeoutMs] for a clip to load; returns false on timeout.
+     * Used by the splash, which was silent on cold starts because clips weren't loaded yet.
      */
     suspend fun awaitReady(sfx: Sfx, timeoutMs: Long = 2000): Boolean {
         val id = loaded[sfx] ?: return false
@@ -130,10 +103,7 @@ class SoundKit(context: Context) {
     }
 }
 
-/**
- * No-op by default so previews and tests never touch the audio system, and any
- * composable can call [LocalSounds.current.play] without a null check.
- */
+/** Null by default (previews, tests); use the null-safe [play] extension. */
 val LocalSounds = staticCompositionLocalOf<SoundKit?> { null }
 
 @Composable

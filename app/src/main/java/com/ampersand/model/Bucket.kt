@@ -2,20 +2,14 @@ package com.ampersand.model
 
 import java.time.LocalDate
 
-/** The three kinds of thing worth doing together someday. */
+/** Bucket list categories. */
 enum class BucketGroup(val label: String) {
     GOALS("Goals"),
     MOMENTS("Moments"),
     GETAWAYS("Getaways"),
 }
 
-/**
- * One thing the two of you want to do, and whether you have.
- *
- * Either of you adds one; either of you ticks it off. Ticking is the part that
- * matters: it is the first thing in the app that starts as words and ends as
- * something the two of you actually did, so it earns a brick for both.
- */
+/** One bucket list item. Either partner can add or tick it; ticking earns both a brick. */
 data class BucketItem(
     val id: String,
     val text: String,
@@ -36,9 +30,8 @@ object BucketList {
     }
 
     /**
-     * The brick a ticked-off item earns [member]: a 4-stud flat, laid the day
-     * it was ticked. One per person per item, by id, so ticking twice or on
-     * two phones never lays it again.
+     * The brick a ticked item earns [member]: a 4-stud flat dated the day it was
+     * ticked. The id is per person per item, so ticking twice never lays it again.
      */
     fun reward(item: BucketItem, member: Member): Block? {
         val on = item.doneOn ?: return null

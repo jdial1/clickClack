@@ -85,14 +85,7 @@ import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.theme.Stud
 import java.time.format.DateTimeFormatter
 
-/**
- * The two of you: who, how long, what each of you has put in, and what is
- * coming up.
- *
- * Everything that is a setting rather than a fact about the couple -- colours,
- * sound, appearance, credits, signing out -- is one tap away behind Settings,
- * so this screen is about the people and not the phone.
- */
+/** The couple screen: header, stats, profiles, dates, bucket list and guess history. Settings are separate. */
 @Composable
 fun UsScreen(
     state: CoupleState,
@@ -142,13 +135,7 @@ fun UsScreen(
     }
 }
 
-/**
- * The list of things the two of you want to do someday.
- *
- * Add in one line, tick off with one tap. Ticking lays a brick for each of you
- * on this week's plate, which is the point: the list is the one place in the
- * app where something you said turns into something you did.
- */
+/** Shared bucket list. Ticking an item off lays a brick for each partner on this week's plate. */
 @Composable
 private fun BucketSection(
     state: CoupleState,
@@ -166,7 +153,7 @@ private fun BucketSection(
     SectionLabel("Someday")
     Spacer(Modifier.height(6.dp))
     Text(
-        "Things to do together. Ticking one off lays a brick for each of you.",
+        "Things to do together. Check one off to add a brick for each of you.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -184,14 +171,14 @@ private fun BucketSection(
         placeholder = "Something to do together",
     )
     Spacer(Modifier.height(10.dp))
-    AmpButton(label = "Add to the list", slug = you.slug, enabled = draft.isNotBlank()) {
+    AmpButton(label = "Add", slug = you.slug, enabled = draft.isNotBlank()) {
         onAdd(draft.trim(), group)
         draft = ""
     }
 
     Spacer(Modifier.height(16.dp))
     if (todo.isEmpty() && done.isEmpty()) {
-        QuietNote("Nothing on it yet.")
+        QuietNote("Nothing here yet.")
         return
     }
     todo.forEach { item ->
@@ -295,7 +282,7 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
             Spacer(Modifier.height(4.dp))
             Text(
                 state.anniversary?.let { "Together ${timeTogether(it, state.today.date).lowercase()}" }
-                    ?: "Add the day you started, below.",
+                    ?: "Add your anniversary in Settings.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -324,16 +311,11 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
     }
 }
 
-/**
- * The same three counts for each of you, one row each, in your own colour.
- *
- * Counts of what you each did. There is no "won" column: the app does not keep
- * score of one of you against the other.
- */
+/** Three counts per partner, one row each, in their color. */
 @Composable
 private fun SideBySideTable(state: CoupleState) {
     val rows = listOf(state.you, state.them).map { it to SideBySide.of(state, it.uid) }
-    val headers = listOf("Days", "Guesses landed", "Decks")
+    val headers = listOf("Days", "Right guesses", "Decks")
 
     SectionLabel("Side by side")
     Spacer(Modifier.height(10.dp))
@@ -374,7 +356,7 @@ private fun SideBySideTable(state: CoupleState) {
         }
     }
     Text(
-        "Days either of you answered or finished a deck, out of the last ten weeks.",
+        "Days you answered or finished a deck in the last 10 weeks.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -382,12 +364,7 @@ private fun SideBySideTable(state: CoupleState) {
 
 private val NameColumn = 44.dp
 
-/**
- * Everything on the phone rather than about the two of you.
- *
- * Reached from the Us header. Leaving (sign out, unpair) stays folded away at
- * the bottom, closed by default.
- */
+/** Settings, opened from the Us header. Sign out and unpair sit in a collapsed Advanced section. */
 @Composable
 fun SettingsScreen(
     state: CoupleState,
@@ -453,7 +430,7 @@ fun SettingsScreen(
         SectionLabel("Your colors")
         Spacer(Modifier.height(6.dp))
         Text(
-            "Everything you share is painted in the blend of the two.",
+            "Shared things use both your colors.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -466,9 +443,7 @@ fun SettingsScreen(
             onPick = onPickColor,
         )
         Spacer(Modifier.height(20.dp))
-        // Theirs is shown, not offered. A colour belongs to the person whose
-        // bricks it paints, and the rules refuse a write to their profile
-        // anyway -- so a picker here was a control that could only fail.
+        // Read-only: Firestore rules refuse writes to the partner's profile.
         PartnerColor(name = state.them.name, current = Color(state.them.colorArgb))
 
         Spacer(Modifier.height(32.dp))
@@ -484,8 +459,7 @@ fun SettingsScreen(
 
         if (onSignOut != null) {
             Spacer(Modifier.height(32.dp))
-            // Leaving lives behind a fold, closed by default. These are the two
-            // controls on the screen nobody should meet by scrolling past.
+            // Collapsed by default so sign out and unpair aren't hit by accident.
             var advanced by rememberSaveable { mutableStateOf(false) }
             Row(
                 Modifier
@@ -512,8 +486,7 @@ fun SettingsScreen(
                 )
                 Spacer(Modifier.height(12.dp))
             }
-            // Black, not the user's colour. Leaving is structure, not a choice
-            // -- the same reason the nav joiners are black.
+            // Black (structure color), not the user's color.
             AmpButton(label = "Sign out", slug = "black", onClick = onSignOut)
 
             if (onUnpair != null) {
@@ -521,13 +494,12 @@ fun SettingsScreen(
                 SectionLabel("${state.you.name} and ${state.them.name}")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "Unpairing ends it for both of you. Nothing you have made is deleted.",
+                    "Unpairing ends it for both of you. Nothing is deleted.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(12.dp))
-                // Two taps. It ends the couple on both phones, and one stray
-                // tap on a settings screen should not be able to do that.
+                // Two taps, since unpairing affects both phones.
                 var confirming by remember { mutableStateOf(false) }
                 AmpButton(
                     label = if (confirming) "Tap again to unpair" else "Unpair",
@@ -543,16 +515,10 @@ fun SettingsScreen(
     }
 }
 
-/**
- * Where the questions and tests came from.
- *
- * Required, not decoration: the CC BY and MIT sources need their credit where
- * the people using the app can see it, and the rest are named because they
- * earned it.
- */
+/** Source credits. Required: CC BY and MIT sources must be credited where users can see them. */
 @Composable
 private fun Credits() {
-    SectionLabel("Where the questions come from")
+    SectionLabel("Credits")
     Spacer(Modifier.height(10.dp))
     Sources.all.forEach { source ->
         Column(Modifier.fillMaxWidth().padding(bottom = 14.dp)) {
@@ -601,8 +567,7 @@ private fun ColorRow(
         ) {
             BrickColor.entries.forEach { choice ->
                 val selected = Color(choice.argb) == current
-                // Your partner's colour is shown with their initial and cannot
-                // be picked: two people in one colour is one person on the wall.
+                // Partner's color shows their initial and can't be picked.
                 val theirs = choice == taken
                 Box(
                     Modifier
@@ -623,26 +588,14 @@ private fun ColorRow(
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            "${taken.label} is $takenBy's.",
+            "${taken.label} is taken by $takenBy.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
 
-/**
- * How well you have known each other, kept.
- *
- * Every day already worked this out and then threw it away: you saw "nailed
- * it" on Tuesday and by Friday it was gone. Six months of that is the only
- * thing in the app that could say something neither of you would have noticed
- * -- that one of you is better at this, and by how much, and whether it is
- * changing.
- *
- * Two rows of studs per month rather than a percentage, for the same reason
- * the deck result is two towers: the lopsided months are the interesting ones
- * and one number hides exactly that.
- */
+/** Guess accuracy over time: totals, a one-line verdict, and a stud bar per partner for recent months. */
 @Composable
 private fun Knowing(state: CoupleState) {
     val knowing = state.knowing
@@ -654,8 +607,8 @@ private fun Knowing(state: CoupleState) {
 
     if (knowing.isEmpty) {
         QuietNote(
-            "Nothing to count yet. Every day the two of you both answer a " +
-                "scored question adds one to this.",
+            "Nothing yet. This fills in as you both answer " +
+                "guessing questions.",
         )
         return
     }
@@ -691,24 +644,19 @@ private fun Knowing(state: CoupleState) {
     }
 }
 
-/**
- * Who is ahead, said once, in a sentence rather than a league table.
- *
- * Deliberately generous when it is close: a scoreboard that declares a winner
- * over three guesses is a scoreboard people start playing to.
- */
+/** One-line summary of who guesses right more; "even" when within 10%. */
 @Composable
 private fun verdict(state: CoupleState, knowing: com.ampersand.model.Knowing): String {
     val gap = knowing.youHits - knowing.theyHits
     val share = knowing.scored.takeIf { it > 0 } ?: return ""
     return when {
-        kotlin.math.abs(gap) <= share / 10 -> "About even, which is rarer than it sounds."
-        gap > 0 -> "${state.you.name} calls it more often."
-        else -> "${state.them.name} calls it more often."
+        kotlin.math.abs(gap) <= share / 10 -> "You're about even."
+        gap > 0 -> "${state.you.name} guesses right more often."
+        else -> "${state.them.name} guesses right more often."
     }
 }
 
-/** Ten studs, filled to the share. A bar made of the thing the app is made of. */
+/** Ten studs, lit in proportion to hits / of. */
 @Composable
 private fun StudBar(hits: Int, of: Int, color: BrickColor) {
     val lit = if (of == 0) 0 else ((hits * StudsInBar + of / 2) / of).coerceIn(0, StudsInBar)
@@ -726,15 +674,7 @@ private fun StudBar(hits: Int, of: Int, color: BrickColor) {
 private const val StudsInBar = 10
 private val MonthLabel: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")
 
-/**
- * The two switches worth having on this screen.
- *
- * Two rather than one, because the pair is wanted in every combination: a phone
- * face-down in a quiet room still wants to feel the brick land, and someone who
- * finds vibration unpleasant still wants the click. Keeping them apart also
- * closes a small dead end -- turning *sound* off could never confirm itself, for
- * the obvious reason, and now the phone answers by feel instead.
- */
+/** Separate sound and vibration toggles; each confirms itself with the other channel when needed. */
 @Composable
 private fun FeedbackToggles(you: BrickColor) {
     val sounds = LocalSounds.current
@@ -743,12 +683,11 @@ private fun FeedbackToggles(you: BrickColor) {
     SwitchSlab(
         on = sounds?.enabled ?: false,
         title = { if (it) "Sound on" else "Sound off" },
-        subtitle = "Clicks, snaps and the seal.",
+        subtitle = "Taps and clicks.",
         you = you,
     ) {
         sounds?.let { it.enabled = !it.enabled }
-        // Toggled before the confirming click plays, so turning sound *on* is
-        // audible; the other order would silently enable it and feel broken.
+        // Toggle first so turning sound on plays the confirming click.
         if (sounds?.enabled == true) sounds.play(Sfx.SELECT)
         feel.play(if (sounds?.enabled == true) Feel.SELECT else Feel.DESELECT)
     }
@@ -758,25 +697,18 @@ private fun FeedbackToggles(you: BrickColor) {
     SwitchSlab(
         on = feel?.enabled ?: false,
         title = { if (it) "Vibration on" else "Vibration off" },
-        subtitle = "The weight of a brick going down.",
+        subtitle = "A buzz when you tap.",
         you = you,
     ) {
         feel?.let { it.enabled = !it.enabled }
         val nowOn = feel?.enabled == true
         sounds.play(if (nowOn) Sfx.SELECT else Sfx.DESELECT)
-        // Only the *on* direction can confirm itself here, the mirror of sound.
+        // Only turning vibration on can confirm by feel.
         if (nowOn) feel.play(Feel.SELECT)
     }
 }
 
-/**
- * Light, dark, or the phone's own mind.
- *
- * Three bricks rather than a switch, because there are genuinely three answers
- * and a two-way toggle has to swallow one of them. "Automatic" is not a
- * fallback here -- a phone that goes dark at sunset is a preference, and an app
- * that overrides it on the first tap is one you set back the next evening.
- */
+/** Theme picker: one brick per [ThemeMode] (light, dark, system). */
 @Composable
 private fun ThemeBricks(you: BrickColor) {
     val appearance = LocalAppearance.current
@@ -866,12 +798,10 @@ private fun SwitchSlab(
     }
 }
 
-/** Shows the two colours meeting: one course of both. */
+/** One brick course in both partners' colors. */
 @Composable
 private fun BlendStrip(you: BrickColor, them: BrickColor) {
-    // Was a rounded gradient bar. A real course of both colours says the same
-    // thing and is made of the same bricks as everything else.
-    // No content, so the slab has nothing to take its height from.
+    // No content, so the height must be set explicitly.
     BrickSlab(
         slugs = listOf(you.slug, them.slug),
         studs = 12,
@@ -896,7 +826,7 @@ private fun PreviewUsDark() = AmpersandTheme(darkTheme = true) {
 }
 
 
-/** Their colour, shown. Only they can change it. */
+/** Partner's color, read-only. */
 @Composable
 private fun PartnerColor(name: String, current: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -909,7 +839,7 @@ private fun PartnerColor(name: String, current: Color) {
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
-                text = "Theirs to pick",
+                text = "Only $name can change this",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -919,13 +849,7 @@ private fun PartnerColor(name: String, current: Color) {
     }
 }
 
-/**
- * What the app knows about the two of you, and what it may ask about.
- *
- * A list of four things with where each stands, and each opens in place. No
- * percentage and no progress ring: nothing here is required, and a ring would
- * turn "tell us if you like" into a chore to finish.
- */
+/** Profile sections (about you, the couple, topics) that each expand in place. All optional. */
 @Composable
 private fun RelationshipProfile(
     state: CoupleState,
@@ -975,7 +899,7 @@ private fun RelationshipProfile(
     }
 
     ProfileRow(
-        title = "The two of you",
+        title = "Your relationship",
         status = listOfNotNull(
             state.relationship?.label,
             state.anniversary?.let { "since ${it.format(LongDay)}" },
@@ -995,7 +919,7 @@ private fun RelationshipProfile(
                 options = RelationshipStatus.entries.map { it.label },
                 selected = status?.label,
                 accent = Color(you.argb),
-                placeholder = "How you would describe it",
+                placeholder = "Relationship status",
                 onSelect = { label -> status = RelationshipStatus.entries.first { it.label == label } },
             )
             Spacer(Modifier.height(12.dp))
@@ -1007,10 +931,10 @@ private fun RelationshipProfile(
                 value = zip,
                 onValueChange = { zip = it.filter(Char::isDigit).take(5); zipRefused = false },
                 color = you,
-                placeholder = "For the weather and questions about where you live",
+                placeholder = "Used for weather and local questions",
             )
             if (zipRefused) {
-                Text("That is not a ZIP we know.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                Text("We don't recognize that ZIP.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
             Spacer(Modifier.height(12.dp))
             SectionLabel("Together since")
@@ -1040,15 +964,15 @@ private fun RelationshipProfile(
         status = listOfNotNull(
             state.interests.takeIf { it.isNotEmpty() }?.let { t -> "More ${t.joinToString(", ") { it.label.lowercase() }}" },
             state.hiddenTopics.takeIf { it.isNotEmpty() }?.let { t -> "leaving out ${t.joinToString(", ") { it.label.lowercase() }}" },
-        ).joinToString("; ").replaceFirstChar { it.uppercase() }.ifEmpty { "Everything is in, nothing extra" },
+        ).joinToString("; ").replaceFirstChar { it.uppercase() }.ifEmpty { "All topics, no changes" },
         done = true,
         open = open == "topics",
     ) { toggle("topics") }
     AnimatedVisibility(visible = open == "topics") {
         Column(Modifier.padding(bottom = 16.dp)) {
             Text(
-                "More of something makes it come up more often. Anything either of you leaves out stays out of " +
-                    "the daily question for both. Decks are not affected.",
+                "More makes a topic come up more often. If either of you leaves a topic out, it's out of " +
+                    "the daily question for both. Decks aren't affected.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1058,7 +982,7 @@ private fun RelationshipProfile(
                 val more = topic in state.yourInterests
                 val theirs = when {
                     topic == Topic.SPORTS && state.following.isEmpty() && !more ->
-                        "Out until one of you follows a sport, below."
+                        "Off until one of you follows a sport below."
                     topic in state.hiddenTopics && !hidden -> "${state.them.name} left this out."
                     topic in state.interests && !more -> "${state.them.name} asked for more of this."
                     else -> null
@@ -1090,8 +1014,8 @@ private fun RelationshipProfile(
             SectionLabel("Sports you follow")
             Spacer(Modifier.height(6.dp))
             Text(
-                if (state.following.isEmpty()) "Nothing yet, so there are no sports questions."
-                else "Between you: ${state.following.joinToString(", ") { it.label }}.",
+                if (state.following.isEmpty()) "None yet, so no sports questions."
+                else "You follow: ${state.following.joinToString(", ") { it.label }}.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1109,7 +1033,7 @@ private fun RelationshipProfile(
     }
 }
 
-/** One line of the profile: what, where it stands, and a way in. */
+/** A profile row: title, status, and Add/Edit/Close. */
 @Composable
 private fun ProfileRow(title: String, status: String, done: Boolean, open: Boolean, onClick: () -> Unit) {
     val slug = structureSlug()
@@ -1148,10 +1072,8 @@ private fun ProfileRow(title: String, status: String, done: Boolean, open: Boole
 }
 
 /**
- * Every yearly date the two of you have, soonest first, and a way to add one.
- *
- * Birthdays come from your profiles, the anniversary and wedding from the two
- * of you; anything else is added here with a name.
+ * Yearly dates, soonest first, plus a form to add one. Birthdays, anniversary
+ * and wedding come from profiles; others are added here.
  */
 @Composable
 private fun DatesSection(
@@ -1166,7 +1088,7 @@ private fun DatesSection(
     SectionLabel("Dates")
     Spacer(Modifier.height(10.dp))
     if (upcoming.isEmpty()) {
-        QuietNote("No dates yet. Add the day you started above, or any date below.")
+        QuietNote("No dates yet. Add one below.")
     }
     upcoming.forEachIndexed { i, d ->
         if (i > 0) Spacer(Modifier.height(8.dp))
@@ -1191,7 +1113,7 @@ private fun DatesSection(
 
     Occasion.next(state.today.date.plusDays(1), state.anniversary, state.homeState)?.let { (occasion, day) ->
         Text(
-            "Next day with its own question: ${occasion.label}, ${day.format(ShortDay)}.",
+            "Next special question: ${occasion.label}, ${day.format(ShortDay)}.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -1209,7 +1131,7 @@ private fun DatesSection(
         options = DateKind.entries.map { it.label },
         selected = kind?.label,
         accent = Color(you.argb),
-        placeholder = "What kind of day",
+        placeholder = "Type of date",
         onSelect = { picked ->
             val k = DateKind.entries.first { it.label == picked }
             if (label.isBlank() || DateKind.entries.any { it.label == label }) label = if (k == DateKind.OTHER) "" else k.label
@@ -1229,11 +1151,8 @@ private fun DatesSection(
 }
 
 /**
- * Day, month and year from three of our own dropdowns.
- *
- * Not a platform date picker: a Material dialog would look like a different
- * app, and these are the same control the questions use. Reports a date only
- * once the three make a real one on or before today.
+ * Day, month and year dropdowns. Reports a date only when the three form a
+ * valid date on or before today, otherwise null.
  */
 @Composable
 private fun DateFields(
@@ -1251,8 +1170,7 @@ private fun DateFields(
     val accent = MaterialTheme.colorScheme.primary
 
     fun report() {
-        // Parsed rather than trusted: the thirty-first of February is
-        // selectable from three independent dropdowns and is not a date.
+        // Invalid combos like Feb 31 are selectable, so parse and drop failures.
         val parsed = runCatching {
             java.time.LocalDate.of(year!!.toInt(), months.indexOf(month!!) + 1, day!!.toInt())
         }.getOrNull()?.takeIf { it <= today }
@@ -1278,10 +1196,7 @@ private fun DateFields(
 private val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 private val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM")
 
-/**
- * A date as one flat row: a low brick with the day on it, what it is, and how
- * far off. Flat because a list of dates is read down, not admired one by one.
- */
+/** A date row: day on a low brick, title, detail, and countdown. */
 @Composable
 private fun DateCard(
     day: java.time.LocalDate,

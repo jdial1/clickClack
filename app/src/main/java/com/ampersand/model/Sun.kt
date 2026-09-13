@@ -15,7 +15,7 @@ import kotlin.math.sin
 data class Daylight(val sunrise: LocalTime, val sunset: LocalTime) {
     val length: Duration get() = Duration.between(sunrise, sunset)
 
-    /** "7:42 pm" -- the way a person reads a clock, US style. */
+    /** e.g. "7:42 pm". */
     val sunsetText: String get() = sunset.format(Clock).lowercase()
     val sunriseText: String get() = sunrise.format(Clock).lowercase()
 
@@ -28,19 +28,10 @@ data class Daylight(val sunrise: LocalTime, val sunset: LocalTime) {
     }
 }
 
-/**
- * The kinds of day the light makes worth a question: the longest and shortest,
- * and the stretches where it is dark before dinner or light well past it.
- */
+/** Daylight conditions that get their own questions. */
 enum class SunKind { LONGEST, SHORTEST, EARLY_DARK, LATE_LIGHT }
 
-/**
- * Sunrise and sunset from latitude and longitude, on the phone.
- *
- * The sunrise equation as the NOAA solar calculator uses it, to within a minute
- * or two -- plenty for "the sun goes down at 7:42". Worked out in UTC and shown
- * in [zone], the phone's own, which is the couple's for anyone at home.
- */
+/** Sunrise and sunset from latitude and longitude (NOAA sunrise equation, within a minute or two). */
 object Sun {
 
     fun daylight(date: LocalDate, lat: Double, lon: Double, zone: ZoneId = ZoneId.systemDefault()): Daylight? {
@@ -63,7 +54,7 @@ object Sun {
         )
     }
 
-    /** What kind of day [daylight] makes, if it is one worth a question. */
+    /** The [SunKind] for this day, if any. */
     fun kind(date: LocalDate, daylight: Daylight): SunKind? = when {
         date.monthValue == 6 && date.dayOfMonth in 20..22 -> SunKind.LONGEST
         date.monthValue == 12 && date.dayOfMonth in 20..22 -> SunKind.SHORTEST
