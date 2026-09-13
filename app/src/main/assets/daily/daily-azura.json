@@ -1,0 +1,333 @@
+{
+  "id": "daily-azura",
+  "title": "Worth asking",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only.",
+  "source": "Adapted from OperationAzura/questionServer, MIT License, Copyright (c) 2023 OperationAzura.",
+  "questions": [
+    {
+      "id": "oa1",
+      "text": "What was my favorite memory from being a kid?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "oa2",
+      "text": "What is the best book I have ever read?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "oa3",
+      "text": "What is the biggest thing you are carrying right now?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa4",
+      "text": "What do you love most about us?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "oa5",
+      "text": "Which trip we have taken together would I pick as the best?",
+      "type": "PICK_ONE",
+      "options": [
+        "The first one",
+        "The longest one",
+        "The one that went wrong",
+        "The shortest one"
+      ],
+      "depth": 1,
+      "tags": [
+        "past",
+        "planning"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "oa6",
+      "text": "What am I proudest of from this past year?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "work",
+        "past"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "oa7",
+      "text": "What was the last thing that made me laugh out loud?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "oa8",
+      "text": "What have I been wanting to try and not had the chance to?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "oa9",
+      "text": "What is my favorite thing about our home?",
+      "type": "PICK_ONE",
+      "options": [
+        "The quiet",
+        "The kitchen",
+        "The light",
+        "That you are in it"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "oa10",
+      "text": "What are you looking forward to most in the next year?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "oa11",
+      "text": "What makes me feel really loved?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "words",
+        "acts"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "oa12",
+      "text": "What have you always wanted to tell me, and not yet?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa13",
+      "text": "What do I wish you knew about me?",
+      "type": "GUESS_ME",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa14",
+      "text": "What is the best compliment I have ever been given?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "words",
+        "past"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "oa15",
+      "text": "What is my favorite kind of weather?",
+      "type": "DROPDOWN",
+      "options": [
+        "Hot and sunny",
+        "A thunderstorm",
+        "First snow",
+        "Cool and cloudy",
+        "A warm rainy day",
+        "Crisp and clear"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "oa16",
+      "text": "A rainy day is best spent:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Under a blanket",
+        "Out in it"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "oa17",
+      "text": "What is the most important thing you have learned about love so far?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa18",
+      "text": "Put these in order of what I need most when I am stressed.",
+      "type": "RANK",
+      "options": [
+        "Quiet",
+        "A plan",
+        "A hug",
+        "Someone to vent to"
+      ],
+      "depth": 2,
+      "tags": [
+        "words",
+        "touch"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa19",
+      "text": "If you could go back to one moment of ours, which would you pick?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "oa20",
+      "text": "What first drew me to you?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "oa21",
+      "text": "If we could spend a whole day anywhere with no limits, where would I take us?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "oa22",
+      "text": "If we took a class together, which would I choose?",
+      "type": "DROPDOWN",
+      "options": [
+        "Dancing",
+        "Cooking",
+        "Pottery",
+        "A language",
+        "Painting",
+        "Rock climbing"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "oa23",
+      "text": "Pick what I would put on our list of things to do together someday.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "See the northern lights",
+        "Learn to dance",
+        "Live abroad for a while",
+        "Build something",
+        "Run a race together"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "oa24",
+      "text": "How have we changed each other, for the better?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "past",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "oa25",
+      "text": "What historical figure would I most like to have dinner with?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "oa26",
+      "text": "What cause would you want the two of us to give time to?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "acts",
+        "planning"
+      ],
+      "category": "Future"
+    }
+  ]
+}

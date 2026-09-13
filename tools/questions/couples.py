@@ -203,12 +203,98 @@ DEEP = [
     R("deep40", "What is a good thing that happened to you this week that you have not really told me about?", 2, ["words"]),
 ]
 
+def at(category, q):
+    q["category"] = category
+    return q
+
+
+# ---- adapted from open sources ----------------------------------------------
+#
+# Proust's confession-album answers (c. 1886 and 1891) and Karl Marx's
+# "Confession" (1865): public domain by age. Only the original album questions
+# were used, never the later magazine rewrites. Turned from "your favorite
+# virtue" into questions two people ask each other.
+ALBUM = [
+    at("Know me", G("pr1", "What is my idea of perfect happiness?", 2, ["words"])),
+    at("Deep", G("pr2", "What would I call real misery?", 3, ["words"])),
+    at("Know me", P("pr3", "Which virtue do I admire most?", ["Kindness", "Honesty", "Courage", "Patience"], 1, ["words"])),
+    at("Know me", P("pr4", "Which fault am I most willing to forgive?", ["Being late", "Being stubborn", "Being messy", "Being a little vain"], 1, ["words"])),
+    at("Know me", G("pr5", "If I could not be myself, who would I want to be?", 1, ["fun"])),
+    at("Know me", G("pr6", "Who is my hero in real life?", 2, ["past", "family"])),
+    at("Playful", G("pr7", "Who is my favorite hero or heroine from a book or a movie?", 1, ["fun"])),
+    at("Know me", D("pr8", "Which natural talent would I most like to have?", ["Singing", "Painting", "Speaking any language", "Playing an instrument", "Making people laugh", "Building anything"], 1, ["fun"])),
+    at("Know me", G("pr9", "What is my motto, even if I have never said it out loud?", 2, ["words"])),
+    at("Know me", T("pr10", "My favorite occupation is:", "Making something", "Doing nothing at all", 1, ["time"])),
+    at("Deep", R("pr11", "What is your present state of mind, honestly?", 2, ["words"])),
+    at("Know me", G("pr12", "What do I dislike more than almost anything?", 1, ["words"])),
+    at("Travel", G("pr13", "Where would I most like to live, if it could be anywhere?", 1, ["planning", "home"])),
+    at("Know me", M("pr14", "Pick the qualities I value most in a friend.", ["Loyalty", "Humor", "Honesty", "Showing up", "Remembering things"], 1, ["friends"], 2)),
+    at("Food", G("pr15", "What is my favorite dish of all time?", 1, ["fun"])),
+]
+
+# Military OneSource, "What to Ask Your Partner Before Marriage": a US
+# government page, public domain. Reworded for a couple already together, and
+# the military-specific questions left out.
+ONESOURCE = [
+    at("Deep", S("mo1", "How much do I trust you with the big decisions?", 3, ["planning", "words"], "Not yet", "Completely")),
+    at("Deep", T("mo2", "When we disagree, we usually:", "Talk it through", "Let it go and move on", 2, ["words"])),
+    at("Deep", S("mo3", "How well do I think we argue?", 3, ["words"], "Badly", "Really well")),
+    at("Future", S("mo4", "How easy is it for us to talk about money?", 2, ["money", "words"], "Very hard", "Very easy")),
+    at("Future", G("mo5", "What is one thing I still want to learn or study?", 1, ["planning", "work"])),
+    at("Future", T("mo6", "In five years, I picture us both:", "Working as much as now", "Working less and living more", 2, ["work", "planning"])),
+    at("Deep", R("mo7", "Which value of ours do you think matters most to how we live?", 3, ["words", "home"])),
+    at("Future", R("mo8", "What do you picture when you imagine us very old together?", 3, ["planning"])),
+]
+
+# OperationAzura/questionServer (MIT License, Copyright (c) 2023 OperationAzura):
+# a hand-picked handful, rewritten short and into this app's voice.
+AZURA = [
+    at("Know me", G("oa1", "What was my favorite memory from being a kid?", 1, ["past", "family"])),
+    at("Know me", G("oa2", "What is the best book I have ever read?", 1, ["fun"])),
+    at("Deep", R("oa3", "What is the biggest thing you are carrying right now?", 3, ["words"])),
+    at("Romantic", R("oa4", "What do you love most about us?", 2, ["romance", "words"])),
+    at("Travel", P("oa5", "Which trip we have taken together would I pick as the best?", ["The first one", "The longest one", "The one that went wrong", "The shortest one"], 1, ["past", "planning"])),
+    at("Know me", G("oa6", "What am I proudest of from this past year?", 2, ["work", "past"])),
+    at("Playful", G("oa7", "What was the last thing that made me laugh out loud?", 1, ["fun"])),
+    at("Future", G("oa8", "What have I been wanting to try and not had the chance to?", 1, ["planning", "fun"])),
+    at("Everyday", P("oa9", "What is my favorite thing about our home?", ["The quiet", "The kitchen", "The light", "That you are in it"], 1, ["home"])),
+    at("Future", R("oa10", "What are you looking forward to most in the next year?", 1, ["planning"])),
+    at("Romantic", G("oa11", "What makes me feel really loved?", 2, ["romance", "words", "acts"])),
+    at("Deep", R("oa12", "What have you always wanted to tell me, and not yet?", 3, ["words"])),
+    at("Deep", G("oa13", "What do I wish you knew about me?", 3, ["words"])),
+    at("Know me", G("oa14", "What is the best compliment I have ever been given?", 1, ["words", "past"])),
+    at("Everyday", D("oa15", "What is my favorite kind of weather?", ["Hot and sunny", "A thunderstorm", "First snow", "Cool and cloudy", "A warm rainy day", "Crisp and clear"], 1, ["fun"])),
+    at("Everyday", T("oa16", "A rainy day is best spent:", "Under a blanket", "Out in it", 1, ["time", "home"])),
+    at("Deep", R("oa17", "What is the most important thing you have learned about love so far?", 3, ["romance", "past"])),
+    at("Deep", K("oa18", "Put these in order of what I need most when I am stressed.", ["Quiet", "A plan", "A hug", "Someone to vent to"], 2, ["words", "touch"])),
+    at("Romantic", R("oa19", "If you could go back to one moment of ours, which would you pick?", 2, ["romance", "past"])),
+    at("Romantic", G("oa20", "What first drew me to you?", 1, ["romance", "past"])),
+    at("Travel", G("oa21", "If we could spend a whole day anywhere with no limits, where would I take us?", 1, ["planning", "time"])),
+    at("Playful", D("oa22", "If we took a class together, which would I choose?", ["Dancing", "Cooking", "Pottery", "A language", "Painting", "Rock climbing"], 1, ["fun", "time"])),
+    at("Future", M("oa23", "Pick what I would put on our list of things to do together someday.", ["See the northern lights", "Learn to dance", "Live abroad for a while", "Build something", "Run a race together"], 1, ["planning", "fun"], 3)),
+    at("Deep", R("oa24", "How have we changed each other, for the better?", 3, ["past", "words"])),
+    at("Playful", G("oa25", "What historical figure would I most like to have dinner with?", 1, ["fun"])),
+    at("Future", R("oa26", "What cause would you want the two of us to give time to?", 2, ["acts", "planning"])),
+]
+
 DECKS = [
     ("daily-us-funny", "Just for laughs", "PLAYFUL", "Playful", FUNNY),
     ("daily-us-romantic", "Still falling", "ROMANTIC", "Romantic", ROMANTIC),
     ("daily-us-spicy", "Turned up", "SPICY", "Spicy", SPICY),
     ("daily-us-deep", "Further in", "DEEP", "Deep", DEEP),
+    ("daily-album", "The old album", "KNOW_ME", "Know me", ALBUM),
+    ("daily-onesource", "Before and after", "DEEP", "Deep", ONESOURCE),
+    ("daily-azura", "Worth asking", "KNOW_ME", "Know me", AZURA),
 ]
+
+SOURCES = {
+    "daily-album": "Adapted from the confession-album questions answered by Marcel Proust "
+                   "(c. 1886, 1891) and Karl Marx (1865). Public domain.",
+    "daily-onesource": "Adapted from Military OneSource, What to Ask Your Partner Before Marriage "
+                       "(US Department of Defense). Public domain.",
+    "daily-azura": "Adapted from OperationAzura/questionServer, MIT License, "
+                   "Copyright (c) 2023 OperationAzura.",
+}
 
 # ---- validation, mirroring QuizJson ----------------------------------------------
 ours = {d[0] for d in DECKS}
@@ -222,7 +308,8 @@ for f in glob.glob(os.path.join(ASSETS, "quizzes", "*.json")) + glob.glob(os.pat
 
 ids = set()
 for deck_id, title, theme, category, qs in DECKS:
-    assert len(qs) == 40, (deck_id, len(qs))
+    if deck_id.startswith("daily-us-"):
+        assert len(qs) == 40, (deck_id, len(qs))
     for q in qs:
         assert q["id"] not in ids and q["id"] not in existing_ids, q["id"]
         ids.add(q["id"])
@@ -235,11 +322,11 @@ for deck_id, title, theme, category, qs in DECKS:
         assert len({o.lower() for o in opts}) == len(opts), q
         if "maxChoices" in q: assert 1 <= q["maxChoices"] <= len(opts)
         assert set(q["tags"]) <= TAGS, q
-        q["category"] = category
+        q.setdefault("category", category)
 
 for deck_id, title, theme, category, qs in DECKS:
     deck = dict(id=deck_id, title=title, theme=theme, blurb="Daily only.",
-                source="Written for Click Clack", questions=qs)
+                source=SOURCES.get(deck_id, "Written for Click Clack"), questions=qs)
     with io.open(os.path.join(OUT, deck_id + ".json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(deck, f, indent=2, ensure_ascii=False)
         f.write("\n")

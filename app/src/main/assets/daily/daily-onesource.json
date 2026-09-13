@@ -1,0 +1,108 @@
+{
+  "id": "daily-onesource",
+  "title": "Before and after",
+  "theme": "DEEP",
+  "blurb": "Daily only.",
+  "source": "Adapted from Military OneSource, What to Ask Your Partner Before Marriage (US Department of Defense). Public domain.",
+  "questions": [
+    {
+      "id": "mo1",
+      "text": "How much do I trust you with the big decisions?",
+      "type": "SCALE",
+      "lowLabel": "Not yet",
+      "highLabel": "Completely",
+      "depth": 3,
+      "tags": [
+        "planning",
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "mo2",
+      "text": "When we disagree, we usually:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Talk it through",
+        "Let it go and move on"
+      ],
+      "depth": 2,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "mo3",
+      "text": "How well do I think we argue?",
+      "type": "SCALE",
+      "lowLabel": "Badly",
+      "highLabel": "Really well",
+      "depth": 3,
+      "tags": [
+        "words"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "mo4",
+      "text": "How easy is it for us to talk about money?",
+      "type": "SCALE",
+      "lowLabel": "Very hard",
+      "highLabel": "Very easy",
+      "depth": 2,
+      "tags": [
+        "money",
+        "words"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "mo5",
+      "text": "What is one thing I still want to learn or study?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "work"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "mo6",
+      "text": "In five years, I picture us both:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Working as much as now",
+        "Working less and living more"
+      ],
+      "depth": 2,
+      "tags": [
+        "work",
+        "planning"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "mo7",
+      "text": "Which value of ours do you think matters most to how we live?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "words",
+        "home"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "mo8",
+      "text": "What do you picture when you imagine us very old together?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "planning"
+      ],
+      "category": "Future"
+    }
+  ]
+}

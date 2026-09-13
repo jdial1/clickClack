@@ -152,7 +152,42 @@ object Sources {
         fidelity = Fidelity.INSPIRED,
     )
 
-    private val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP, ATUS, HAREL, CFPB)
+    val ALBUM = Source(
+        id = "album",
+        authors = "Marcel Proust and Karl Marx",
+        year = 1886,
+        title = "Confession-album questions (Proust c. 1886 and 1891; Marx 1865)",
+        venue = "Victorian parlor albums",
+        url = "https://en.wikipedia.org/wiki/Proust_Questionnaire",
+        licence = "Public domain. Original album questions, reworded for two.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    val ONESOURCE = Source(
+        id = "onesource",
+        authors = "Military OneSource, US Department of Defense",
+        year = 2024,
+        title = "What to Ask Your Partner Before Marriage",
+        venue = "militaryonesource.mil",
+        url = "https://www.militaryonesource.mil/relationships/married-domestic-partner/questions-to-ask-before-marriage/",
+        licence = "Public domain (US federal work). Reworded.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    /** MIT, so the notice travels with the questions: see licenses/README.md. */
+    val AZURA = Source(
+        id = "azura",
+        authors = "OperationAzura",
+        year = 2023,
+        title = "questionServer",
+        venue = "GitHub",
+        url = "https://github.com/OperationAzura/questionServer",
+        licence = "MIT License, Copyright (c) 2023 OperationAzura. Selected and reworded.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    /** Everything credited, in the order the credits screen lists them. */
+    val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP, ATUS, HAREL, CFPB, ALBUM, ONESOURCE, AZURA)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }
