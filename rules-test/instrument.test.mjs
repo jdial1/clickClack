@@ -117,6 +117,11 @@ await check('a submitted run cannot be edited', async () => {
   await assertFails(setDoc(runRef(as('alice'), 'alice'), { responses: Array(32).fill(5) }))
 })
 
+await check('a sitting cannot be created already open', async () => {
+  await seed()
+  await assertFails(setDoc(kitRef(as('alice')), { revealed: true }))
+})
+
 await check('an ended couple cannot start a new sitting', async () => {
   await seed({ ended: new Date() })
   await assertFails(submit(as('alice'), 'alice'))

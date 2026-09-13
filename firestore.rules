@@ -21,6 +21,24 @@ service cloud.firestore {
       return isMember(cid) && couple(cid).endedAt == null;
     }
 
+    // Both halves of a sealed thing exist: `sub` holds one document per member
+    // under couples/{cid}/{coll}/{id}.
+    function bothIn(cid, coll, id, sub) {
+      return exists(/databases/$(database)/documents/couples/$(cid)/$(coll)/$(id)/$(sub)/$(couple(cid).members[0]))
+        && exists(/databases/$(database)/documents/couples/$(cid)/$(coll)/$(id)/$(sub)/$(couple(cid).members[1]));
+    }
+
+    // The seal, for days, decks and sittings alike. A document is born shut,
+    // and only opens once both halves exist. Once open it stays open: without
+    // that last clause a phone could shut an opened day again.
+    function bornShut() {
+      return request.resource.data.get('revealed', false) == false;
+    }
+    function sealHolds(cid, coll, id, sub) {
+      return (bornShut() && resource.data.get('revealed', false) == false)
+        || bothIn(cid, coll, id, sub);
+    }
+
     // Redeeming an invite has to land in *both* user documents at once --
     // otherwise the person who made the code is never told it was taken -- and
     // a user document is writable only by its owner, which is precisely the
@@ -102,24 +120,21 @@ service cloud.firestore {
       // lives here rather than on each user document precisely so that one
       // person can end it for both -- a user document is writable only by its
       // owner, which is what made unpairing one-sided.
+      // And never after it has ended: that write is how an ended couple used
+      // to come back to life for one of the two.
       allow update: if isMember(cid)
+        && resource.data.endedAt == null
         && request.resource.data.members == resource.data.members;
       allow delete: if false;
 
       match /days/{day} {
         allow read: if isMember(cid);
-        allow create: if isLive(cid);
 
         // `revealed` is the seal, so a client must not be able to flip it
-        // early and read the other answer. It may only become true once both
-        // answer documents actually exist.
-        allow update: if isLive(cid) && (
-          request.resource.data.revealed == false ||
-          (
-            exists(/databases/$(database)/documents/couples/$(cid)/days/$(day)/answers/$(couple(cid).members[0])) &&
-            exists(/databases/$(database)/documents/couples/$(cid)/days/$(day)/answers/$(couple(cid).members[1]))
-          )
-        );
+        // early and read the other answer. Not on create either: creating
+        // tomorrow's day already open used to leave it open.
+        allow create: if isLive(cid) && bornShut();
+        allow update: if isLive(cid) && sealHolds(cid, 'days', day, 'answers');
         allow delete: if false;
 
         // The sealed part, and the reason answers are one document per person:
@@ -140,14 +155,8 @@ service cloud.firestore {
       // reason answers are not two fields on one document.
       match /quizzes/{quizId} {
         allow read: if isMember(cid);
-        allow create: if isLive(cid);
-        allow update: if isLive(cid) && (
-          request.resource.data.revealed == false ||
-          (
-            exists(/databases/$(database)/documents/couples/$(cid)/quizzes/$(quizId)/runs/$(couple(cid).members[0])) &&
-            exists(/databases/$(database)/documents/couples/$(cid)/quizzes/$(quizId)/runs/$(couple(cid).members[1]))
-          )
-        );
+        allow create: if isLive(cid) && bornShut();
+        allow update: if isLive(cid) && sealHolds(cid, 'quizzes', quizId, 'runs');
         allow delete: if false;
 
         match /runs/{uid} {
@@ -167,14 +176,8 @@ service cloud.firestore {
       // measuring if neither could see the answer while giving theirs.
       match /instruments/{instrumentId} {
         allow read: if isMember(cid);
-        allow create: if isLive(cid);
-        allow update: if isLive(cid) && (
-          request.resource.data.revealed == false ||
-          (
-            exists(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)/runs/$(couple(cid).members[0])) &&
-            exists(/databases/$(database)/documents/couples/$(cid)/instruments/$(instrumentId)/runs/$(couple(cid).members[1]))
-          )
-        );
+        allow create: if isLive(cid) && bornShut();
+        allow update: if isLive(cid) && sealHolds(cid, 'instruments', instrumentId, 'runs');
         allow delete: if false;
 
         match /runs/{uid} {

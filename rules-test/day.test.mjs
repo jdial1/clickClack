@@ -150,6 +150,34 @@ await check('a sealed day cannot be marked as talked about', async () => {
   )
 })
 
+// ---- the seal cannot be sidestepped -----------------------------------------
+
+await check('a day cannot be created already open', async () => {
+  await seed()
+  await assertFails(setDoc(dayRef(as('alice')), { questionId: 'q', revealed: true }))
+})
+
+await check('an opened day cannot be shut again', async () => {
+  await seed({
+    dayDoc: { questionId: 'q', revealed: true },
+    given: { alice: { values: ['a'] } },
+  })
+  await assertFails(setDoc(dayRef(as('alice')), { revealed: false }, { merge: true }))
+})
+
+await check('an ended couple cannot be brought back', async () => {
+  await env.clearFirestore()
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'couples', CID), { members: ['alice', 'bob'], endedAt: new Date() })
+  })
+  await assertFails(setDoc(doc(as('alice'), 'couples', CID), { endedAt: null }, { merge: true }))
+})
+
+await check('a live couple can still be ended by either of you', async () => {
+  await seed()
+  await assertSucceeds(setDoc(doc(as('bob'), 'couples', CID), { endedAt: new Date() }, { merge: true }))
+})
+
 await env.cleanup()
 for (const r of results) console.log(r[0].padEnd(5), r[1], r[2] ? '\n      ' + r[2] : '')
 process.exit(results.some((r) => r[0] === 'FAIL') ? 1 : 0)
