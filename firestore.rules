@@ -219,6 +219,20 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // Dates worth a countdown. Either of you adds or removes one; nobody
+      // edits one in place, which keeps "who changed the date" out of it.
+      match /dates/{id} {
+        allow read: if isMember(cid);
+        allow create: if isLive(cid)
+          && request.resource.data.byUid == me()
+          && request.resource.data.label is string
+          && request.resource.data.label.size() > 0
+          && request.resource.data.label.size() <= 60
+          && request.resource.data.date is string;
+        allow update: if false;
+        allow delete: if isLive(cid);
+      }
+
       // The shared bucket list. Either of you adds and ticks; nobody rewrites
       // what an item says or who added it, a ticked item stays ticked, and
       // only the person who added something may take it off, before it is done.

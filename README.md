@@ -582,10 +582,11 @@ about 3:1.
 ## Firestore model
 
 ```
-users/{uid}                        displayName, colorArgb, coupleId, inviteCode,
+users/{uid}                        displayName, colorArgb, gender, birthday, coupleId, inviteCode,
                                    inviteExpiresAt, fcmToken
 invites/{code}                     fromUid, fromName, createdAt, expiresAt
-couples/{cid}                      members[2], createdAt, endedAt, anniversary
+couples/{cid}                      members[2], createdAt, endedAt, anniversary,
+                                   relationship, marriedOn, hiddenTopics{uid: []}
   days/{yyyy-mm-dd}                questionId, revealed, submitted[], reactions{uid},
                                    talkedAbout[], nextTheme, nextThemeBy, run
     answers/{uid}                  values[], guess[], submittedAt   <- sealed
@@ -597,6 +598,7 @@ couples/{cid}                      members[2], createdAt, endedAt, anniversary
   wildcards/{id}                   text, type, options[], byUid, byName, createdAt, usedOn
   knowing/{yyyy-mm}                per-day hit maps
   bucket/{id}                      text, group, byUid, createdAt, doneOn, doneBy
+  dates/{id}                       label, date, byUid
   plates/{yyyy-mm-dd start}        startedOn, periodDays, gridW, gridH, notes{uid},
                                    completedOn, blocks[], placed[]
 ```

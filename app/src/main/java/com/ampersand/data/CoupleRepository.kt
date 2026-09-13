@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.SpecialDate
+import com.ampersand.model.Topic
+import com.ampersand.model.RelationshipStatus
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
@@ -53,6 +56,19 @@ interface CoupleRepository {
 
     /** The day the two of you started. Either of you may set it. */
     fun setAnniversary(date: LocalDate)
+
+    /** About you. Your own document, so only you. */
+    fun setProfile(gender: String?, birthday: LocalDate?)
+
+    /** About the two of you. Either of you. */
+    fun setRelationship(status: RelationshipStatus, marriedOn: LocalDate?)
+
+    /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
+    fun setTopicHidden(topic: Topic, hidden: Boolean)
+
+    fun addSpecialDate(label: String, date: LocalDate)
+
+    fun removeSpecialDate(id: String)
 
     /** Put an earned brick on the shared plate. Ignored if the spot is illegal. */
     fun placeBlock(blockId: String, x: Int, y: Int)
@@ -351,6 +367,27 @@ class FakeCoupleRepository(
     }
 
     override fun setAnniversary(date: LocalDate) = mutate { it.copy(anniversary = date) }
+
+    override fun setProfile(gender: String?, birthday: LocalDate?) = mutate {
+        it.copy(you = it.you.copy(gender = gender, birthday = birthday))
+    }
+
+    override fun setRelationship(status: RelationshipStatus, marriedOn: LocalDate?) = mutate {
+        it.copy(relationship = status, marriedOn = marriedOn.takeIf { status == RelationshipStatus.MARRIED })
+    }
+
+    override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
+        val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
+        it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun addSpecialDate(label: String, date: LocalDate) = mutate {
+        it.copy(specialDates = it.specialDates + SpecialDate("sd${it.specialDates.size + 1}", label, date))
+    }
+
+    override fun removeSpecialDate(id: String) = mutate {
+        it.copy(specialDates = it.specialDates.filterNot { d -> d.id == id })
+    }
 
     override fun addWildcard(text: String, type: QuestionType, options: List<String>) =
         mutate { current ->

@@ -118,6 +118,9 @@ data class Member(
     val name: String,
     /** 0xAARRGGBB. Drives this member's half of the blended theme. */
     val colorArgb: Long,
+    /** One of [GenderChoices], if they said. Shown, never used to choose questions. */
+    val gender: String? = null,
+    val birthday: LocalDate? = null,
 )
 
 /**
@@ -254,6 +257,14 @@ data class CoupleState(
     val wildcards: List<Wildcard> = emptyList(),
     /** The shared bucket list, done and not. */
     val bucket: List<BucketItem> = emptyList(),
+    val relationship: RelationshipStatus? = null,
+    /** Asked for only when [relationship] is married. */
+    val marriedOn: LocalDate? = null,
+    /** Topics you have taken out of the daily question. */
+    val yourHiddenTopics: Set<Topic> = emptySet(),
+    /** Hidden by either of you; this is what the draw uses. */
+    val hiddenTopics: Set<Topic> = emptySet(),
+    val specialDates: List<SpecialDate> = emptyList(),
     /**
      * Sittings with the whole-instrument tests, oldest first.
      *

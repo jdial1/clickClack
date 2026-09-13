@@ -1,5 +1,9 @@
 package com.ampersand.ui.us
 
+import com.ampersand.model.GenderChoices
+import com.ampersand.model.Dates
+import com.ampersand.model.Topic
+import com.ampersand.model.RelationshipStatus
 import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
@@ -94,6 +98,11 @@ fun UsScreen(
     onAddToBucket: (String, BucketGroup) -> Unit = { _, _ -> },
     onTickBucket: (String) -> Unit = {},
     onRemoveFromBucket: (String) -> Unit = {},
+    onSetProfile: (String?, java.time.LocalDate?) -> Unit = { _, _ -> },
+    onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
+    onSetTopicHidden: (Topic, Boolean) -> Unit = { _, _ -> },
+    onAddSpecialDate: (String, java.time.LocalDate) -> Unit = { _, _ -> },
+    onRemoveSpecialDate: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -115,7 +124,10 @@ fun UsScreen(
         SideBySideTable(state)
 
         Spacer(Modifier.height(32.dp))
-        Anniversary(state, onSetAnniversary)
+        RelationshipProfile(state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden)
+
+        Spacer(Modifier.height(32.dp))
+        DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
 
         Spacer(Modifier.height(32.dp))
         BucketSection(state, onAddToBucket, onTickBucket, onRemoveFromBucket)
@@ -893,114 +905,281 @@ private fun PartnerColor(name: String, current: Color) {
 }
 
 /**
- * The day the two of you started, and how long that has been.
+ * What the app knows about the two of you, and what it may ask about.
  *
- * Built from three of our own dropdowns rather than a platform date picker.
- * A Material dialog would be quicker and would look like a different app --
- * and these are the same control the questions use, so there is one less thing
- * to learn.
+ * A list of four things with where each stands, and each opens in place. No
+ * percentage and no progress ring: nothing here is required, and a ring would
+ * turn "tell us if you like" into a chore to finish.
  */
 @Composable
-private fun Anniversary(state: CoupleState, onSet: ((java.time.LocalDate) -> Unit)?) {
-    val since = state.anniversary
+private fun RelationshipProfile(
+    state: CoupleState,
+    onSetProfile: (String?, java.time.LocalDate?) -> Unit,
+    onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit,
+    onSetAnniversary: ((java.time.LocalDate) -> Unit)?,
+    onSetTopicHidden: (Topic, Boolean) -> Unit,
+) {
+    var open by rememberSaveable { mutableStateOf<String?>(null) }
+    fun toggle(key: String) { open = if (open == key) null else key }
+    val you = BrickColor.of(state.you.colorArgb)
+
+    SectionLabel("Your profile")
+    Spacer(Modifier.height(10.dp))
+
+    ProfileRow(
+        title = "About you",
+        status = listOfNotNull(state.you.gender, state.you.birthday?.format(LongDay)).joinToString("  ·  ")
+            .ifEmpty { "Not added" },
+        done = state.you.gender != null || state.you.birthday != null,
+        open = open == "you",
+    ) { toggle("you") }
+    AnimatedVisibility(visible = open == "you") {
+        Column(Modifier.padding(bottom = 16.dp)) {
+            var gender by remember { mutableStateOf(state.you.gender) }
+            var birthday by remember { mutableStateOf(state.you.birthday) }
+            AmpDropdown(
+                options = GenderChoices,
+                selected = gender,
+                accent = Color(you.argb),
+                placeholder = "Gender",
+                onSelect = { gender = it },
+            )
+            Spacer(Modifier.height(12.dp))
+            SectionLabel("Birthday")
+            Spacer(Modifier.height(6.dp))
+            DateFields(state.today.date, initial = birthday, yearsBack = 100) { birthday = it }
+            Spacer(Modifier.height(12.dp))
+            AmpButton(label = "Save", slug = you.slug) {
+                onSetProfile(gender, birthday)
+                open = null
+            }
+        }
+    }
+
+    ProfileRow(
+        title = "The two of you",
+        status = listOfNotNull(
+            state.relationship?.label,
+            state.anniversary?.let { "since ${it.format(LongDay)}" },
+        ).joinToString(", ").replaceFirstChar { it.uppercase() }.ifEmpty { "Not added" },
+        done = state.relationship != null && state.anniversary != null,
+        open = open == "us",
+    ) { toggle("us") }
+    AnimatedVisibility(visible = open == "us") {
+        Column(Modifier.padding(bottom = 16.dp)) {
+            var status by remember { mutableStateOf(state.relationship) }
+            var since by remember { mutableStateOf(state.anniversary) }
+            var married by remember { mutableStateOf(state.marriedOn) }
+            AmpDropdown(
+                options = RelationshipStatus.entries.map { it.label },
+                selected = status?.label,
+                accent = Color(you.argb),
+                placeholder = "How you would describe it",
+                onSelect = { label -> status = RelationshipStatus.entries.first { it.label == label } },
+            )
+            Spacer(Modifier.height(12.dp))
+            SectionLabel("Together since")
+            Spacer(Modifier.height(6.dp))
+            DateFields(state.today.date, initial = since) { since = it }
+            if (status == RelationshipStatus.MARRIED) {
+                Spacer(Modifier.height(12.dp))
+                SectionLabel("Married on")
+                Spacer(Modifier.height(6.dp))
+                DateFields(state.today.date, initial = married) { married = it }
+            }
+            Spacer(Modifier.height(12.dp))
+            AmpButton(label = "Save", slug = you.slug, enabled = status != null) {
+                status?.let { onSetRelationship(it, married) }
+                since?.takeIf { it != state.anniversary }?.let { onSetAnniversary?.invoke(it) }
+                open = null
+            }
+        }
+    }
+
+    ProfileRow(
+        title = "Topics",
+        status = if (state.hiddenTopics.isEmpty()) "Everything is in" else
+            "Leaving out ${state.hiddenTopics.joinToString(", ") { it.label.lowercase() }}",
+        done = true,
+        open = open == "topics",
+    ) { toggle("topics") }
+    AnimatedVisibility(visible = open == "topics") {
+        Column(Modifier.padding(bottom = 16.dp)) {
+            Text(
+                "Anything either of you leaves out stays out of the daily question for both. Decks are not affected.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(12.dp))
+            Topic.entries.forEach { topic ->
+                val mine = topic in state.yourHiddenTopics
+                val theirs = topic in state.hiddenTopics && !mine
+                SwitchSlab(
+                    on = !mine && !theirs,
+                    title = { if (it) topic.label else "${topic.label}: left out" },
+                    subtitle = if (theirs) "${state.them.name} left this out." else topic.detail,
+                    you = you,
+                ) { onSetTopicHidden(topic, !mine) }
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+    }
+}
+
+/** One line of the profile: what, where it stands, and a way in. */
+@Composable
+private fun ProfileRow(title: String, status: String, done: Boolean, open: Boolean, onClick: () -> Unit) {
+    val slug = structureSlug()
+    val ink = inkOnBrick(slug)
+    BrickSlab(
+        slugs = listOf(slug),
+        studs = 12,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp)
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+                .glassOn(slug, corner = 14.dp)
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, color = ink)
+                Text(status, style = MaterialTheme.typography.bodySmall, color = ink)
+            }
+            Text(
+                when {
+                    open -> "Close"
+                    done -> "Edit"
+                    else -> "Add"
+                },
+                style = MaterialTheme.typography.labelLarge,
+                color = ink,
+            )
+        }
+    }
+}
+
+/**
+ * Every yearly date the two of you have, soonest first, and a way to add one.
+ *
+ * Birthdays come from your profiles, the anniversary and wedding from the two
+ * of you; anything else is added here with a name.
+ */
+@Composable
+private fun DatesSection(
+    state: CoupleState,
+    onAdd: (String, java.time.LocalDate) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val upcoming = remember(state) { Dates.upcoming(state) }
+    var adding by rememberSaveable { mutableStateOf(false) }
 
     SectionLabel("Dates")
     Spacer(Modifier.height(10.dp))
-
-    if (since != null) {
-        val nextAnniversary = since.withYear(state.today.date.year).let {
-            if (it < state.today.date) it.plusYears(1) else it
-        }
+    if (upcoming.isEmpty()) {
+        QuietNote("No dates yet. Add the day you started above, or any date below.")
+    }
+    upcoming.forEach { d ->
+        val added = state.specialDates.firstOrNull { it.label == d.label && it.date == d.since }
         DateCard(
-            day = nextAnniversary,
-            title = "Your anniversary",
-            detail = "Since ${since.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
-            countdown = until(state.today.date, nextAnniversary),
-            brick = BrickColor.of(state.you.colorArgb),
+            day = d.next,
+            title = d.label,
+            detail = "Since ${d.since.format(LongDay)}",
+            countdown = until(state.today.date, d.next),
+            brick = if (d.label.startsWith(state.them.name)) BrickColor.of(state.them.colorArgb) else you,
         )
-        Occasion.next(state.today.date.plusDays(1), since)
-            ?.takeIf { (_, day) -> day != nextAnniversary }
-            ?.let { (occasion, day) ->
-                Spacer(Modifier.height(10.dp))
-                DateCard(
-                    day = day,
-                    title = occasion.label,
-                    detail = "It gets its own question that day.",
-                    countdown = until(state.today.date, day),
-                    brick = BrickColor.of(state.them.colorArgb),
-                )
-            }
-        return
+        if (added != null) {
+            Text(
+                "Remove",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { onRemove(added.id) }.padding(vertical = 6.dp),
+            )
+        }
+        Spacer(Modifier.height(10.dp))
     }
 
-    if (onSet == null) return
+    Occasion.next(state.today.date.plusDays(1), state.anniversary)?.let { (occasion, day) ->
+        Text(
+            "Next day with its own question: ${occasion.label}, ${day.format(ShortDay)}.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(12.dp))
+    }
 
-    Text(
-        "Tell us when you started and this day gets its own questions every year.",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Spacer(Modifier.height(14.dp))
+    if (!adding) {
+        AmpButton(label = "Add a date", slug = you.slug) { adding = true }
+        return
+    }
+    var label by rememberSaveable { mutableStateOf("") }
+    var date by remember { mutableStateOf<java.time.LocalDate?>(null) }
+    AmpField(value = label, onValueChange = { label = it.take(60) }, color = you, placeholder = "What it is, like our first date")
+    Spacer(Modifier.height(10.dp))
+    DateFields(state.today.date, initial = null, yearsBack = 100) { date = it }
+    Spacer(Modifier.height(12.dp))
+    AmpButton(label = "Save the date", slug = you.slug, enabled = label.isNotBlank() && date != null) {
+        onAdd(label.trim(), date!!)
+        label = ""
+        adding = false
+    }
+}
 
+/**
+ * Day, month and year from three of our own dropdowns.
+ *
+ * Not a platform date picker: a Material dialog would look like a different
+ * app, and these are the same control the questions use. Reports a date only
+ * once the three make a real one on or before today.
+ */
+@Composable
+private fun DateFields(
+    today: java.time.LocalDate,
+    initial: java.time.LocalDate?,
+    yearsBack: Int = 60,
+    onDate: (java.time.LocalDate?) -> Unit,
+) {
     val months = java.time.Month.entries.map {
         it.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault())
     }
-    val thisYear = state.today.date.year
-    var day by remember { mutableStateOf<String?>(null) }
-    var month by remember { mutableStateOf<String?>(null) }
-    var year by remember { mutableStateOf<String?>(null) }
+    var day by remember { mutableStateOf(initial?.dayOfMonth?.toString()) }
+    var month by remember { mutableStateOf(initial?.let { months[it.monthValue - 1] }) }
+    var year by remember { mutableStateOf(initial?.year?.toString()) }
     val accent = MaterialTheme.colorScheme.primary
 
-    AmpDropdown(
-        options = (1..31).map { it.toString() },
-        selected = day,
-        accent = accent,
-        placeholder = "Day",
-        onSelect = { day = it },
-    )
-    Spacer(Modifier.height(10.dp))
-    AmpDropdown(
-        options = months,
-        selected = month,
-        accent = accent,
-        placeholder = "Month",
-        onSelect = { month = it },
-    )
-    Spacer(Modifier.height(10.dp))
-    AmpDropdown(
-        options = (thisYear downTo thisYear - 60).map { it.toString() },
-        selected = year,
-        accent = accent,
-        placeholder = "Year",
-        onSelect = { year = it },
-    )
+    fun report() {
+        // Parsed rather than trusted: the thirty-first of February is
+        // selectable from three independent dropdowns and is not a date.
+        val parsed = runCatching {
+            java.time.LocalDate.of(year!!.toInt(), months.indexOf(month!!) + 1, day!!.toInt())
+        }.getOrNull()?.takeIf { it <= today }
+        onDate(parsed)
+    }
 
-    Spacer(Modifier.height(14.dp))
-    // Parsed rather than trusted: the thirty-first of February is selectable
-    // from three independent dropdowns and is not a date.
-    val parsed = runCatching {
-        java.time.LocalDate.of(
-            year!!.toInt(),
-            months.indexOf(month!!) + 1,
-            day!!.toInt(),
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        AmpDropdown(
+            options = (1..31).map { it.toString() }, selected = day, accent = accent, placeholder = "Day",
+            modifier = Modifier.weight(1f), onSelect = { day = it; report() },
         )
-    }.getOrNull()
-
-    AmpButton(
-        label = "Save",
-        slug = BrickColor.of(state.you.colorArgb).slug,
-        enabled = parsed != null && parsed <= state.today.date,
-    ) { parsed?.let(onSet) }
-
-    if (day != null && month != null && year != null && parsed == null) {
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "That is not a day.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.error,
+        AmpDropdown(
+            options = months, selected = month, accent = accent, placeholder = "Month",
+            modifier = Modifier.weight(1.6f), onSelect = { month = it; report() },
+        )
+        AmpDropdown(
+            options = (today.year downTo today.year - yearsBack).map { it.toString() }, selected = year,
+            accent = accent, placeholder = "Year", modifier = Modifier.weight(1.2f), onSelect = { year = it; report() },
         )
     }
 }
+
+private val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+private val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM")
 
 /** A date as a brick: the day and month on the left, what it is and how far off. */
 @Composable

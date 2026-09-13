@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.SpecialDate
+import com.ampersand.model.Topic
+import com.ampersand.model.RelationshipStatus
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
@@ -51,6 +54,7 @@ private const val QUIZZES = "quizzes"
 private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
 private const val BUCKET = "bucket"
+private const val DATES = "dates"
 private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
 private const val DRAFTS = "drafts"
@@ -123,6 +127,8 @@ class FirestoreCoupleRepository(
      */
     private var platesLoaded = false
     private var anniversary: LocalDate? = null
+    private var coupleDoc: DocumentSnapshot? = null
+    private var specialDates: List<SpecialDate> = emptyList()
 
     /** Every wildcard either of you has written, used or not. */
     private var allWildcards: List<Wildcard> = emptyList()
@@ -146,8 +152,23 @@ class FirestoreCoupleRepository(
             .addSnapshotListener { d, _ -> them = d; recompose() }
 
         regs += couple.addSnapshotListener { d, _ ->
+            coupleDoc = d
             anniversary = d?.getString("anniversary")
                 ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            recompose()
+        }
+
+        regs += couple.collection(DATES).addSnapshotListener { snap, error ->
+            if (error != null) {
+                Log.w(TAG, "dates listener failed", error)
+                return@addSnapshotListener
+            }
+            specialDates = snap?.documents.orEmpty().mapNotNull { doc ->
+                val label = doc.getString("label")?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                val date = doc.getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                    ?: return@mapNotNull null
+                SpecialDate(doc.id, label, date)
+            }
             recompose()
         }
 
@@ -344,14 +365,16 @@ class FirestoreCoupleRepository(
         val recent = recentlyAsked(basis)
         val picked = Turns.themeFor(today, history, myUid, partnerUid)
         val milestone = Milestones.on(today, history) != null
+        val hiddenByUid = coupleDoc.hiddenTopics()
+        val hidden = hiddenByUid.values.flatten().toSet()
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden)
             // A question one of you wrote outranks one a stranger wrote.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone)
+            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden)
         }
 
         val todayEntry = DayEntry(
@@ -387,6 +410,12 @@ class FirestoreCoupleRepository(
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
             bucket = bucket,
+            relationship = coupleDoc?.getString("relationship")
+                ?.let { s -> RelationshipStatus.entries.firstOrNull { it.name == s } },
+            marriedOn = coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            yourHiddenTopics = hiddenByUid[myUid].orEmpty(),
+            hiddenTopics = hidden,
+            specialDates = specialDates,
         )
 
         // The assignment. Without it every listener in this class computed the
@@ -913,6 +942,37 @@ class FirestoreCoupleRepository(
         else -> pool.question(id)
     }
 
+    override fun setProfile(gender: String?, birthday: LocalDate?) {
+        db.collection(USERS).document(myUid).set(
+            mapOf("gender" to gender, "birthday" to birthday?.toString()),
+            SetOptions.merge(),
+        )
+    }
+
+    override fun setRelationship(status: RelationshipStatus, marriedOn: LocalDate?) {
+        couple.set(
+            mapOf(
+                "relationship" to status.name,
+                "marriedOn" to marriedOn?.takeIf { status == RelationshipStatus.MARRIED }?.toString(),
+            ),
+            SetOptions.merge(),
+        )
+    }
+
+    override fun setTopicHidden(topic: Topic, hidden: Boolean) {
+        val mine = _state.value.yourHiddenTopics.let { if (hidden) it + topic else it - topic }
+        // Merged by uid, so writing yours leaves theirs alone.
+        couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
+    }
+
+    override fun addSpecialDate(label: String, date: LocalDate) {
+        couple.collection(DATES).add(mapOf("label" to label, "date" to date.toString(), "byUid" to myUid))
+    }
+
+    override fun removeSpecialDate(id: String) {
+        couple.collection(DATES).document(id).delete()
+    }
+
     override fun setColor(colorArgb: Long) {
         // Theirs is theirs. The picker already refuses it; this is the backstop.
         if (BrickColor.of(colorArgb) == BrickColor.of(_state.value.them.colorArgb)) return
@@ -1100,7 +1160,15 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     uid = uid,
     name = this?.getString("displayName")?.takeIf { it.isNotBlank() } ?: fallback.name,
     colorArgb = this?.getLong("colorArgb") ?: fallback.colorArgb,
+    gender = this?.getString("gender"),
+    birthday = this?.getString("birthday")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
 )
+
+private fun DocumentSnapshot?.hiddenTopics(): Map<String, Set<Topic>> =
+    (this?.get("hiddenTopics") as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
+        val key = uid as? String ?: return@mapNotNull null
+        key to (names as? List<*>).orEmpty().mapNotNull { n -> Topic.entries.firstOrNull { it.name == n } }.toSet()
+    }.toMap()
 
 private fun DocumentSnapshot?.toSubmitted(): Set<String> =
     (this?.get("submitted") as? List<*>).orEmpty().filterIsInstance<String>().toSet()

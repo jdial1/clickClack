@@ -657,6 +657,11 @@ private fun SignedInApp(
                             onAddToBucket = vm.repo::addToBucket,
                             onTickBucket = vm.repo::tickBucket,
                             onRemoveFromBucket = vm.repo::removeFromBucket,
+                            onSetProfile = vm.repo::setProfile,
+                            onSetRelationship = vm.repo::setRelationship,
+                            onSetTopicHidden = vm.repo::setTopicHidden,
+                            onAddSpecialDate = vm.repo::addSpecialDate,
+                            onRemoveSpecialDate = vm.repo::removeSpecialDate,
                         )
                     }
                     }

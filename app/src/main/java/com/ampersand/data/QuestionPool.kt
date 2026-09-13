@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.Topic
 import android.content.Context
 import com.ampersand.model.Occasion
 import com.ampersand.model.Question
@@ -112,8 +113,11 @@ class QuestionPool(
          * to the ordinary rules when none are left.
          */
         deeper: Boolean = false,
+        /** Topics either of you took out. A filter, because you asked for one. */
+        hidden: Set<Topic> = emptySet(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
+        val open = all.filter { q -> hidden.none { it.matches(q) } }.ifEmpty { all }
 
         // A day that is not like the others gets its own question. Rotated by
         // year, so the same holiday does not ask the same thing every time.
@@ -128,15 +132,15 @@ class QuestionPool(
         fun deep(q: Question) = q.depth.level >= 3
 
         theme?.let { t ->
-            val themed = all.filter { it.category == t }
+            val themed = open.filter { it.category == t }
             if (deeper) walk(themed.filter(::deep), date, weekend, taste, recent)?.let { return it }
             val picked = themed.filter(::fits).ifEmpty { themed }
             if (picked.isNotEmpty()) walk(picked, date, weekend, taste, recent)?.let { return it }
         }
 
-        if (deeper) walk(all.filter(::deep), date, weekend, taste, recent)?.let { return it }
+        if (deeper) walk(open.filter(::deep), date, weekend, taste, recent)?.let { return it }
 
-        val candidates = all.filter(::fits).ifEmpty { all }
+        val candidates = open.filter(::fits).ifEmpty { open }
         return walk(candidates, date, weekend, taste, recent)
             ?: slot(tiltedOrNot(candidates, taste), date, weekend).let { (draw, start) -> draw[start] }
     }
