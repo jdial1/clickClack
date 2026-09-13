@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.google.firebase.firestore.DocumentReference
+import android.os.Looper
+import android.os.Handler
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import com.ampersand.model.Following
@@ -614,9 +617,7 @@ class FirestoreCoupleRepository(
         if (doc.getBoolean("revealed") == true) return
         if (instrumentResponses[id]?.get(myUid) == null) return
 
-        couple.collection(INSTRUMENTS).document(id)
-            .set(mapOf("revealed" to true), SetOptions.merge())
-            .addOnFailureListener { Log.d(TAG, "instrument not ready to open yet", it) }
+        openSeal(couple.collection(INSTRUMENTS).document(id))
     }
 
     /** Your own run, by name. A query over the runs is denied while sealed. */
@@ -651,9 +652,7 @@ class FirestoreCoupleRepository(
         if (quiz.getBoolean("revealed") == true) return
         if (runs[quizId]?.get(myUid) == null) return
 
-        couple.collection(QUIZZES).document(quizId)
-            .set(mapOf("revealed" to true), SetOptions.merge())
-            .addOnFailureListener { Log.d(TAG, "deck not ready to open yet", it) }
+        openSeal(couple.collection(QUIZZES).document(quizId))
     }
 
     private var partnerAnswerReg: ListenerRegistration? = null
@@ -741,10 +740,8 @@ class FirestoreCoupleRepository(
      * documents actually exist. So the client asks whenever it has skin in the
      * game, and a refusal is not an error -- it is "not yet".
      *
-     * Asking cannot loop, because a refused write changes no document and so
-     * produces no new snapshot to ask again from. The two moments that *do*
-     * produce one are exactly the two that matter: the other person touching
-     * the day, and your own answer landing.
+     * Asked through [openSeal], never a plain set: see there for why a plain
+     * set made the day flicker between open and sealed.
      *
      * Properly this belongs in a Cloud Function. The rule is what makes the
      * client version honest.
@@ -761,8 +758,45 @@ class FirestoreCoupleRepository(
         // state still holds the moment before, so it was always one short.
         val s = _state.value
         val run = Streaks.run(s.history, s.today.copy(opened = true))
-        dayRef.set(mapOf("revealed" to true, "run" to run), SetOptions.merge())
-            .addOnFailureListener { Log.d(TAG, "day not ready to open yet", it) }
+        openSeal(dayRef, mapOf("run" to run))
+    }
+
+    /** Documents with an ask in flight, so a burst of snapshots asks once. */
+    private val opening = mutableSetOf<String>()
+
+    /**
+     * Ask the rules to open a sealed day, deck or sitting, in a transaction.
+     *
+     * Not a plain `set`. Firestore applies a set to the local cache before the
+     * server rules on it, so a refused `revealed = true` showed on screen as
+     * open, was rolled back when the server said no, and the rollback was
+     * itself a snapshot that asked again. For as long as the screen was up the
+     * day blinked between "Open it" and "has not answered yet", and every blink
+     * was a round trip. A transaction is applied only once the server accepts
+     * it, so a refusal changes nothing here and there is nothing to ask again
+     * from.
+     *
+     * A refusal straight after your own answer can just mean the answer has
+     * not reached the server yet, so it tries twice more, a little later. After
+     * that, the next real change to the document asks again.
+     */
+    private fun openSeal(ref: DocumentReference, extra: Map<String, Any> = emptyMap(), attempt: Int = 0) {
+        if (attempt == 0 && !opening.add(ref.path)) return
+        db.runTransaction { txn ->
+            if (txn.get(ref).getBoolean("revealed") != true) {
+                txn.set(ref, mapOf("revealed" to true) + extra, SetOptions.merge())
+            }
+            null
+        }.addOnSuccessListener {
+            opening.remove(ref.path)
+        }.addOnFailureListener { e ->
+            if (attempt < 2) {
+                Handler(Looper.getMainLooper()).postDelayed({ openSeal(ref, extra, attempt + 1) }, 2000L shl attempt)
+            } else {
+                opening.remove(ref.path)
+                Log.d(TAG, "not ready to open yet: ${ref.path}", e)
+            }
+        }
     }
 
     /**
@@ -1182,10 +1216,13 @@ class FirestoreCoupleRepository(
 
     override fun submitInstrument(instrumentId: String, responses: List<Int>) {
         val doc = couple.collection(INSTRUMENTS).document(instrumentId)
+        // As it stands, not false: a retake of an open sitting would otherwise
+        // shut it on both phones until the seal was asked open again.
+        val revealed = instrumentDocs[instrumentId]?.getBoolean("revealed") ?: false
 
         doc.set(
             mapOf(
-                "revealed" to false,
+                "revealed" to revealed,
                 "submitted" to FieldValue.arrayUnion(myUid),
                 "progress" to mapOf(myUid to responses.size),
             ),
@@ -1204,10 +1241,11 @@ class FirestoreCoupleRepository(
 
     override fun saveInstrumentDraft(instrumentId: String, responses: List<Int>) {
         val doc = couple.collection(INSTRUMENTS).document(instrumentId)
+        val revealed = instrumentDocs[instrumentId]?.getBoolean("revealed") ?: false
 
         doc.set(
             mapOf(
-                "revealed" to false,
+                "revealed" to revealed,
                 // A count, not the answers. This is the half that is meant to
                 // be visible to the other person.
                 "progress" to mapOf(myUid to responses.count { it > 0 }),
