@@ -28,15 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ampersand.data.Instruments
-import com.ampersand.data.MockCouple
 import com.ampersand.data.Sources
 import com.ampersand.model.BrickColor
-import com.ampersand.model.CoupleState
 import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentItem
 import com.ampersand.ui.brick.BrickDot

@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,8 +55,6 @@ import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.Sculpture
 import com.ampersand.ui.brick.drawBrickArt
-import com.ampersand.ui.brick.glass
-import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.brick.rememberBricks

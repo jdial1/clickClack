@@ -3,7 +3,6 @@ package com.ampersand.data
 import com.ampersand.model.CoupleState
 import com.ampersand.model.Instrument
 import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Member
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
 import com.ampersand.model.Taste

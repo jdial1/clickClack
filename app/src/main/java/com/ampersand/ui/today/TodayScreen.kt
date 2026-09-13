@@ -15,7 +15,6 @@ import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -59,7 +57,6 @@ import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.unit.sp
 import com.ampersand.model.CoupleState
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
@@ -80,7 +77,6 @@ import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.quietSlug
-import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
 import com.ampersand.ui.components.AnswerValues
@@ -95,9 +91,7 @@ import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
-import com.ampersand.ui.theme.Duo
 import com.ampersand.ui.theme.Radius
-import com.ampersand.ui.theme.glow
 import com.ampersand.ui.theme.Stud
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

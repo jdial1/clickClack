@@ -27,14 +27,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ampersand.data.MockCouple
 import com.ampersand.data.QuizJson
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.CoupleState
 import com.ampersand.model.Question
-import com.ampersand.model.QuestionType
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
 import com.ampersand.model.label
