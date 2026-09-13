@@ -153,15 +153,22 @@ fun TodayScreen(
         // nothing to say.
         state.weather?.let { weather ->
             Spacer(Modifier.height(6.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // On glass, like every other line of text laid over the wall.
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 weather.brick?.let {
                     WeatherBrickArt(it, Modifier.size(28.dp))
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(
                     weather.line,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
             }
         }
