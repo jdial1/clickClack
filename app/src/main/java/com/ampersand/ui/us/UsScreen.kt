@@ -1,5 +1,9 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.MoodArt
+import com.ampersand.ui.notify.parseHour
+import com.ampersand.ui.notify.Hours
+import com.ampersand.model.QuestionSource
 import com.ampersand.model.DateKind
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.components.AmpCheckboxGroup
@@ -381,9 +385,12 @@ fun SettingsScreen(
     onSetTopicInterest: (Topic, Boolean) -> Unit = { _, _ -> },
     onSetFollowing: (Set<League>) -> Unit = {},
     onSetHomeZip: (String) -> Boolean = { true },
+    onSetSource: (QuestionSource, Boolean) -> Unit = { _, _ -> },
+    onRetake: (String) -> Unit = {},
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     Column(
         modifier
             .fillMaxWidth()
@@ -455,6 +462,28 @@ fun SettingsScreen(
         ThemeBricks(you = BrickColor.of(state.you.colorArgb))
 
         Spacer(Modifier.height(32.dp))
+        SectionLabel("Mood faces")
+        Spacer(Modifier.height(10.dp))
+        MoodFaceRow(BrickColor.of(state.you.colorArgb))
+
+        Spacer(Modifier.height(32.dp))
+        SectionLabel("Daily reminder")
+        Spacer(Modifier.height(10.dp))
+        var reminder by remember {
+            mutableStateOf(com.ampersand.notify.Reminder.time(context)?.let { (h, _) -> Hours.firstOrNull { parseHour(it) == h } } ?: "Off")
+        }
+        AmpDropdown(
+            options = listOf("Off") + Hours,
+            selected = reminder,
+            accent = Color(state.you.colorArgb),
+            onSelect = { picked ->
+                reminder = picked
+                if (picked == "Off") com.ampersand.notify.Reminder.cancel(context)
+                else com.ampersand.notify.Reminder.schedule(context, parseHour(picked), 0)
+            },
+        )
+
+        Spacer(Modifier.height(32.dp))
         Credits()
 
         if (onSignOut != null) {
@@ -486,6 +515,46 @@ fun SettingsScreen(
                 )
                 Spacer(Modifier.height(12.dp))
             }
+            Text(
+                "Version ${com.ampersand.BuildConfig.VERSION_NAME}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(16.dp))
+
+            SectionLabel("Question sources")
+            Spacer(Modifier.height(10.dp))
+            QuestionSource.entries.forEach { source ->
+                SwitchSlab(
+                    on = source !in state.sourcesOff,
+                    title = { source.label + if (it) " on" else " off" },
+                    subtitle = source.detail,
+                    you = BrickColor.of(state.you.colorArgb),
+                ) { onSetSource(source, source in state.sourcesOff) }
+                Spacer(Modifier.height(8.dp))
+            }
+
+            Spacer(Modifier.height(16.dp))
+            SectionLabel("Topics")
+            Spacer(Modifier.height(10.dp))
+            AmpButton(label = "Reset topics and sports", slug = "black") {
+                state.yourHiddenTopics.forEach { onSetTopicHidden(it, false) }
+                state.yourInterests.forEach { onSetTopicInterest(it, false) }
+                onSetFollowing(emptySet())
+            }
+
+            val done = com.ampersand.data.BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.yourTurn }
+            if (done.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                SectionLabel("Retake a test")
+                Spacer(Modifier.height(10.dp))
+                done.forEach { g ->
+                    AmpButton(label = "Retake ${g.title}", slug = "black") { onRetake(g.instrumentId) }
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
             // Black (structure color), not the user's color.
             AmpButton(label = "Sign out", slug = "black", onClick = onSignOut)
 
@@ -744,6 +813,28 @@ private fun ThemeBricks(you: BrickColor) {
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }
+        }
+    }
+}
+
+/** The default colour for mood faces: each face's own colour, or one of the four brick colours. */
+@Composable
+private fun MoodFaceRow(you: BrickColor) {
+    val appearance = LocalAppearance.current
+    val sounds = LocalSounds.current
+    val current = appearance?.moodFace
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        (listOf<BrickColor?>(null) + BrickColor.entries).forEach { c ->
+            MoodArt(
+                com.ampersand.model.Mood.SNAPPED_IN,
+                you,
+                faceColor = c,
+                size = if (c == current) 48.dp else 36.dp,
+                modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                    sounds.play(Sfx.SELECT)
+                    appearance?.chooseMoodFace(c)
+                },
+            )
         }
     }
 }

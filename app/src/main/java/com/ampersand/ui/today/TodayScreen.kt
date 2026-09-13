@@ -1,5 +1,7 @@
 package com.ampersand.ui.today
 
+import com.ampersand.model.DayEntry
+import com.ampersand.ui.theme.LocalAppearance
 import com.ampersand.model.Wildcard
 import com.ampersand.ui.components.WeatherBrickArt
 import com.ampersand.ui.components.MoodArt
@@ -13,14 +15,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.ampersand.model.Turn
 import com.ampersand.model.InboxItem
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
@@ -112,7 +106,6 @@ fun TodayScreen(
     onSubmit: (values: List<String>, guess: List<String>?) -> Unit,
     onOpenReveal: () -> Unit,
     modifier: Modifier = Modifier,
-    onTalkedAbout: (LocalDate) -> Unit = {},
     onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
 ) {
     val you = Color(state.you.colorArgb)
@@ -135,43 +128,15 @@ fun TodayScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SectionLabel(day.date.format(DayFormat))
-            StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
+            StreakStuds(
+                days = state.streak,
+                you = BrickColor.of(state.you.colorArgb),
+                milestone = remember(state.history, day.date) { Milestones.on(day.date, state.history) != null },
+            )
         }
 
-        // Saved forecast; absent when no home ZIP is set or the service returned nothing.
-        state.weather?.let { weather ->
-            Spacer(Modifier.height(6.dp))
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .glass(inkOnBrick(structureSlug()), corner = 12.dp)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                weather.brick?.let {
-                    WeatherBrickArt(it, Modifier.size(28.dp))
-                    Spacer(Modifier.width(8.dp))
-                }
-                Text(
-                    weather.line,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-            }
-        }
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         Moods(state, onSetMood)
-
-        // Shown the morning after a run ends.
-        val ended = remember(state.history, day.date) { Milestones.ended(day.date, state.history) }
-        ended?.let { run ->
-            Spacer(Modifier.height(14.dp))
-            QuietNote("Your $run-day run ended. Start a new one today.")
-        }
-
-        Spacer(Modifier.height(14.dp))
-        DidYouTalk(state, onTalkedAbout)
 
         Spacer(Modifier.height(18.dp))
         QuestionHero(
@@ -180,7 +145,6 @@ fun TodayScreen(
                 Wildcard.isWildcard(question.id) -> "Your own"
                 else -> pickedBy(state)?.let { if (it == "You") "Your pick" else "$it's pick" } ?: state.why
             },
-            milestone = remember(state.history, day.date) { Milestones.on(day.date, state.history) },
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -238,8 +202,6 @@ private fun QuestionHero(
     them: BrickColor,
     /** Why this question today, shown as a tag: "Weather", "First date", "Tasia's pick". */
     why: String? = null,
-    /** The run today makes, when that is one of [Milestones.Runs]. */
-    milestone: Int? = null,
     /** Whose move it is, said on the card itself. */
     status: HeroStatus? = null,
 ) {
@@ -286,16 +248,6 @@ private fun QuestionHero(
             }
         }
 
-        milestone?.let { run ->
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = Milestones.headline(run) +
-                    if (question.depth.level >= 3) " Today's question goes deep." else "",
-                style = MaterialTheme.typography.titleSmall,
-                color = ink,
-            )
-        }
-
         Spacer(Modifier.height(14.dp))
         SelectionContainer {
             Text(
@@ -334,6 +286,23 @@ private fun QuestionHero(
     }
 }
 
+/** What you are asked next: tomorrow's theme once today is open, and a question of your own. */
+@Composable
+internal fun ShapeTomorrow(
+    state: CoupleState,
+    themes: List<QuizTheme>,
+    onPick: (String) -> Unit,
+    onWrite: () -> Unit,
+) {
+    SectionLabel("Shape tomorrow")
+    Spacer(Modifier.height(10.dp))
+    if (state.today.isRevealed && themes.isNotEmpty()) {
+        TomorrowPick(state, themes, onPick)
+        Spacer(Modifier.height(14.dp))
+    }
+    WriteOne(state, onWrite)
+}
+
 /** Button to write your own question, plus a note on how many are already queued. */
 @Composable
 internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
@@ -342,10 +311,8 @@ internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
     val mine = queued.count { it.byUid == state.you.uid }
     val theirs = queued.size - mine
 
-    SectionLabel("Your own")
-    Spacer(Modifier.height(10.dp))
     AmpButton(
-        label = if (queued.isEmpty()) "Write one for ${state.them.name}" else "Write another",
+        label = if (queued.isEmpty()) "Write a question for ${state.them.name}" else "Write another",
         slug = you.slug,
         onClick = onWrite,
     )
@@ -379,17 +346,11 @@ internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
     }
 }
 
-/**
- * One-tap prompt marking yesterday's question as talked about. Not undoable.
- * Shown only when yesterday was revealed and not already marked.
- */
+/** One-tap "we talked about it" for a revealed day. Not undoable; hidden once marked. */
 @Composable
-private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
-    val yesterday = remember(state.history, state.today.date) {
-        state.history.firstOrNull {
-            it.date == state.today.date.minusDays(1) && it.isRevealed && !it.wasTalkedAbout
-        }
-    } ?: return
+internal fun DidYouTalk(state: CoupleState, day: DayEntry, onTalkedAbout: (LocalDate) -> Unit) {
+    if (!day.isRevealed || day.wasTalkedAbout) return
+    val yesterday = day
 
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
@@ -413,7 +374,7 @@ private fun DidYouTalk(state: CoupleState, onTalkedAbout: (LocalDate) -> Unit) {
         BrickDot(slug = you.slug, studSize = Stud.pip)
         Column(Modifier.weight(1f)) {
             Text(
-                "Did you talk about yesterday's question?",
+                "Did you talk about this one?",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -461,8 +422,6 @@ internal fun TomorrowPick(
     val picked = day.nextTheme
 
     Column(Modifier.fillMaxWidth()) {
-        SectionLabel("Tomorrow")
-        Spacer(Modifier.height(6.dp))
         Text(
             text = when {
                 yours && picked == null -> "Your turn to pick tomorrow's theme."
@@ -497,7 +456,7 @@ internal fun TomorrowPick(
  * Wraps every seven days so the row never grows.
  */
 @Composable
-private fun StreakStuds(days: Int, you: BrickColor) {
+private fun StreakStuds(days: Int, you: BrickColor, milestone: Boolean = false) {
     val lit = if (days <= 0) 0 else ((days - 1) % StreakWeek) + 1
     val shape = BrickShape(1, BrickHeight.LOW)
     val quiet = quietSlug()
@@ -509,10 +468,11 @@ private fun StreakStuds(days: Int, you: BrickColor) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (days > 0) {
+            // A milestone day (see Milestones.Runs) shows the count large, in your colour.
             Text(
-                text = "$days",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = if (milestone) "$days days" else "$days",
+                style = if (milestone) MaterialTheme.typography.titleSmall else MaterialTheme.typography.labelSmall,
+                color = if (milestone) Color(you.argb) else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(end = 8.dp),
             )
         }
@@ -724,7 +684,6 @@ private fun SealedPanel(
 ) {
     val day = state.today
     val yours = day.answerFor(state.you.uid)!!
-    val bothIn = day.isRevealed
 
     Column(
         Modifier
@@ -754,20 +713,6 @@ private fun SealedPanel(
         }
     }
 
-    Spacer(Modifier.height(20.dp))
-
-    AnimatedVisibility(visible = !bothIn, enter = fadeIn(), exit = fadeOut()) {
-        WaitingLine(state.them.name)
-    }
-
-    AnimatedVisibility(visible = bothIn, enter = fadeIn(), exit = fadeOut()) {
-        AmpButton(
-            label = "See answers",
-            slug = BrickColor.of(state.you.colorArgb).slug,
-            sfx = Sfx.SEAL,
-            onClick = onOpenReveal,
-        )
-    }
 }
 
 /** Decks and tests one partner finished and the other hasn't, filtered by whose turn. */
@@ -854,9 +799,8 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
     val mine = state.you.mood?.takeIf { it.current(today) != null }
     val theirs = state.them.mood?.takeIf { it.current(today) != null }
     var picking by rememberSaveable { mutableStateOf(false) }
-    // Index into [null] + BrickColor.entries, so it survives rotation.
-    var tint by rememberSaveable { mutableStateOf((mine?.color?.ordinal ?: -1) + 1) }
-    val faceColor = BrickColor.entries.getOrNull(tint - 1)
+    // The default face colour is set in Settings.
+    val faceColor = LocalAppearance.current?.moodFace
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
@@ -868,40 +812,29 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
         picking = false
     }
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        MoodChip(
-            modifier = Modifier.weight(1f),
-            who = "You",
-            entry = mine,
-            color = you,
-            empty = "Set your mood",
-        ) { picking = !picking }
+    // One strip: the weather on the left, both moods on the right.
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+            state.weather?.let { weather ->
+                weather.brick?.let { WeatherBrickArt(it, Modifier.size(30.dp)) }
+                Spacer(Modifier.width(6.dp))
+                Text("${weather.tempF}°", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+            }
+        }
+        MoodChip(who = "You", entry = mine, color = you, empty = "Set mood") { picking = !picking }
         theirs?.let {
-            MoodChip(modifier = Modifier.weight(1f), who = state.them.name, entry = it, color = them, empty = "", onClick = null)
+            Spacer(Modifier.width(10.dp))
+            MoodChip(who = state.them.name, entry = it, color = them, empty = "", onClick = null)
         }
     }
     AnimatedVisibility(visible = picking) {
         Column(Modifier.fillMaxWidth().padding(top = 10.dp)) {
-            Row(
-                Modifier.fillMaxWidth().glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(horizontal = 10.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Face color", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
-                (listOf<BrickColor?>(null) + BrickColor.entries).forEachIndexed { i, c ->
-                    MoodArt(
-                        Mood.SNAPPED_IN,
-                        you,
-                        faceColor = c,
-                        size = if (i == tint) 40.dp else 30.dp,
-                        modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                            sounds.play(Sfx.PLACE)
-                            tint = i
-                        },
-                    )
-                }
-            }
-            Spacer(Modifier.height(8.dp))
             MoodTiles(Mood.entries.filter { it.kind == Mood.Kind.FACE }, you, faceColor, ::pick)
             Spacer(Modifier.height(8.dp))
             MoodTiles(Mood.entries.filter { it.kind != Mood.Kind.FACE }, you, null, ::pick)
@@ -940,81 +873,30 @@ private fun MoodTiles(moods: List<Mood>, you: BrickColor, faceColor: BrickColor?
 
 @Composable
 private fun MoodChip(
-    modifier: Modifier,
     who: String,
     entry: MoodEntry?,
     color: BrickColor,
     empty: String,
     onClick: (() -> Unit)?,
 ) {
-    Row(
-        modifier
-            .glass(inkOnBrick(structureSlug()), corner = 12.dp)
-            .then(
-                if (onClick == null) Modifier
-                else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
-            )
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        Modifier.then(
+            if (onClick == null) Modifier
+            else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (entry != null) {
-            MoodArt(entry.mood, color, size = 34.dp, faceColor = entry.color)
-            Spacer(Modifier.width(8.dp))
-            Column {
-                Text(who, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(entry.mood.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
-            }
+            MoodArt(entry.mood, color, size = 30.dp, faceColor = entry.color)
+            Text("$who: ${entry.mood.label}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
         } else {
-            Text(empty, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+            Text(empty, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
 
 /** What the question card says about the day, and where tapping it goes. */
 private data class HeroStatus(val title: String, val detail: String, val onClick: (() -> Unit)? = null)
-
-/** Waiting state: "Click." solid, "Clack." pulsing until the partner answers. */
-@Composable
-private fun WaitingLine(theirName: String) {
-    val pending by rememberInfiniteTransition(label = "clack").animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1800, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "clackFade",
-    )
-
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clip(Radius.control)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(vertical = 26.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Click.",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(Modifier.size(10.dp))
-            Text(
-                text = "Clack.",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = pending),
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = "$theirName has not answered yet.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
 
 
 @Composable

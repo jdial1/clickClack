@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.QuestionSource
 import com.ampersand.model.NameWords
 import com.ampersand.model.DateKind
 import com.ampersand.model.MoodEntry
@@ -114,6 +115,9 @@ interface CoupleRepository {
 
     /** Sets your two words toward a sealed week's name. */
     fun nameWeek(plateId: String, words: NameWords)
+
+    /** Turn a question source on or off for both of you. */
+    fun setSource(source: QuestionSource, on: Boolean)
 
     fun addToBucket(text: String, group: BucketGroup)
 
@@ -358,6 +362,10 @@ class FakeCoupleRepository(
                 if (it.id == plateId && it.isSealed) it.copy(notes = it.notes + (current.you.uid to text)) else it
             },
         )
+    }
+
+    override fun setSource(source: QuestionSource, on: Boolean) = mutate {
+        it.copy(sourcesOff = if (on) it.sourcesOff - source else it.sourcesOff + source)
     }
 
     override fun nameWeek(plateId: String, words: NameWords) = mutate { current ->

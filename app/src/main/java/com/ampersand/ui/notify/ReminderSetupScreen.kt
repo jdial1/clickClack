@@ -114,12 +114,12 @@ fun ReminderSetupScreen(
 }
 
 /** Whole-hour options; labels are parsed by [parseHour]. */
-private val Hours = listOf(
+internal val Hours = listOf(
     "7 am", "8 am", "9 am", "12 pm", "5 pm", "6 pm",
     "7 pm", "8 pm", "9 pm", "10 pm",
 )
 
-private fun parseHour(label: String?): Int {
+internal fun parseHour(label: String?): Int {
     val text = label ?: return 20
     val value = text.substringBefore(' ').toIntOrNull() ?: return 20
     val pm = text.endsWith("pm")

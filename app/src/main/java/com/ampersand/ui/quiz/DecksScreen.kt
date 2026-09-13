@@ -1,11 +1,12 @@
 package com.ampersand.ui.quiz
 
-import com.ampersand.ui.today.WriteOne
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Row
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.brick.glass
+import com.ampersand.data.BadgeWall
+import com.ampersand.ui.today.ShapeTomorrow
 import com.ampersand.ui.today.Waiting
-import com.ampersand.ui.today.TomorrowPick
-import com.ampersand.model.Instrument
-import com.ampersand.model.InboxKind
-import com.ampersand.model.Inbox
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -44,10 +45,7 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Stud
 
-/**
- * Decks tab: Waiting, tomorrow's theme (once today is revealed), theme filter, all decks, then Your own.
- * Longer tests live on Us but unfinished ones still show under Waiting.
- */
+/** Decks tab: shape tomorrow, the longer tests, then every deck with your-turn decks first. Results are on Us. */
 @Composable
 fun DecksScreen(
     state: CoupleState,
@@ -56,18 +54,14 @@ fun DecksScreen(
     modifier: Modifier = Modifier,
     themes: List<QuizTheme> = emptyList(),
     onPickTomorrow: (String) -> Unit = {},
-    sittings: List<Instrument> = emptyList(),
     onTakeInstrument: (String) -> Unit = {},
     onWrite: () -> Unit = {},
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     var theme by rememberSaveable { mutableStateOf<QuizTheme?>(null) }
-    val themes = remember(decks) { QuizTheme.entries.filter { t -> decks.any { it.theme == t } } }
+    val deckThemes = remember(decks) { QuizTheme.entries.filter { t -> decks.any { it.theme == t } } }
     val shown = remember(decks, theme) { theme?.let { t -> decks.filter { it.theme == t } } ?: decks }
-    val waiting = remember(state.quizRuns, state.instrumentRuns, decks, sittings) {
-        Inbox.of(state, decks, sittings)
-    }
 
     Column(
         modifier
@@ -84,26 +78,17 @@ fun DecksScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        if (waiting.isNotEmpty()) {
-            Spacer(Modifier.height(24.dp))
-            Waiting(state, waiting) { item ->
-                when (item.kind) {
-                    InboxKind.DECK -> onOpenDeck(item.id)
-                    InboxKind.SITTING -> onTakeInstrument(item.id)
-                }
-            }
-        }
+        Spacer(Modifier.height(24.dp))
+        ShapeTomorrow(state, themes, onPickTomorrow, onWrite)
 
-        if (state.today.isRevealed && themes.isNotEmpty()) {
-            Spacer(Modifier.height(24.dp))
-            TomorrowPick(state, themes, onPickTomorrow)
-        }
+        Spacer(Modifier.height(28.dp))
+        LongerTests(state, onTakeInstrument)
 
         Spacer(Modifier.height(28.dp))
         SectionLabel("Themes")
         Spacer(Modifier.height(10.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(themes, key = { it.name }) { t ->
+            items(deckThemes, key = { it.name }) { t ->
                 val on = theme == t
                 val inTheme = decks.filter { it.theme == t }
                 val waiting = inTheme.count { state.deckState(it.id) == DeckState.WAITING_ON_YOU }
@@ -138,9 +123,52 @@ fun DecksScreen(
         SectionLabel(theme?.let { "${it.label} decks" } ?: "All decks")
         DeckList(decks = shown, state = state, onOpen = onOpenDeck)
 
-        Spacer(Modifier.height(32.dp))
-        WriteOne(state, onWrite)
-
         Spacer(Modifier.height(48.dp))
+    }
+}
+
+/** The three profile tests: start or continue yours. Finished ones point to Us. */
+@Composable
+private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
+    val groups = remember(state.instrumentRuns, state.you, state.them) {
+        BadgeWall.groups(state.instrumentRuns, state.you, state.them)
+    }
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    SectionLabel("Longer tests")
+    Spacer(Modifier.height(10.dp))
+    groups.forEach { g ->
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                .then(
+                    if (!g.yourTurn) Modifier
+                    else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                        sounds.play(Sfx.PRESS)
+                        feel.play(Feel.PRESS)
+                        onTake(g.instrumentId)
+                    },
+                )
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(g.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    when {
+                        g.isEarned -> "Done. Results are on Us."
+                        !g.yourTurn -> "Waiting for ${state.them.name}"
+                        else -> g.standing.ifBlank { "${g.minutes} min each" }
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+            if (g.yourTurn) {
+                Text(g.action, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+            }
+        }
     }
 }

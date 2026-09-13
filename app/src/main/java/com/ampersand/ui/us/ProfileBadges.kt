@@ -1,6 +1,5 @@
 package com.ampersand.ui.us
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,9 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ampersand.data.BadgeWall
-import com.ampersand.data.Instruments
 import com.ampersand.data.Profiles
-import com.ampersand.data.Sources
 import com.ampersand.model.Badge
 import com.ampersand.model.BadgeGroup
 import com.ampersand.model.BadgeRow
@@ -79,7 +76,9 @@ fun ProfileBadges(
         SectionLabel("Profiles")
         Spacer(Modifier.height(12.dp))
 
-        groups.forEachIndexed { i, group ->
+        val earned = groups.filter { it.isEarned }
+        if (earned.isEmpty()) QuietNote("Take the longer tests on Decks to see results here.")
+        earned.forEachIndexed { i, group ->
             if (i > 0) Spacer(Modifier.height(30.dp))
             WallGroup(
                 group = group,
@@ -121,25 +120,6 @@ private fun WallGroup(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            // Retake once you've done yours; before that, show the duration.
-            if (!group.yourTurn) {
-                Text(
-                    "Retake",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.clickable(interactionSource = interaction, indication = null) {
-                        sounds.play(Sfx.PRESS)
-                        feel.play(Feel.PRESS)
-                        onTake(group.instrumentId)
-                    },
-                )
-            } else if (!group.isEarned) {
-                Text(
-                    "${group.minutes} min",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
 
         Spacer(Modifier.height(12.dp))

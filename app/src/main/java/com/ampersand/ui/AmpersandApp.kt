@@ -532,6 +532,10 @@ private fun SignedInApp(
                             onReact = { vm.repo.react(day.date, it) },
                             animateIn = openedReveal != day.date.toString(),
                             onOpened = { openedReveal = day.date.toString() },
+                            onTalkedAbout = vm.repo::markTalkedAbout,
+                            themes = QuizTheme.entries.filter { it.label in pool.themes },
+                            onPickTomorrow = vm.repo::pickTomorrow,
+                            onWrite = { writing = true },
                         )
 
                         screen is Screen.Wildcard -> WildcardScreen(
@@ -554,6 +558,8 @@ private fun SignedInApp(
                             onSetTopicInterest = vm.repo::setTopicInterest,
                             onSetFollowing = vm.repo::setFollowing,
                             onSetHomeZip = vm.repo::setHomeZip,
+                            onSetSource = vm.repo::setSource,
+                            onRetake = { settings = false; sitting = it },
                         )
 
                         screen !is Screen.Main -> Unit
@@ -562,7 +568,6 @@ private fun SignedInApp(
                             state = state,
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
-                            onTalkedAbout = vm.repo::markTalkedAbout,
                             onSetMood = vm.repo::setMood,
                         )
 
@@ -572,7 +577,6 @@ private fun SignedInApp(
                             onOpenDeck = { openDeck = it },
                             themes = QuizTheme.entries.filter { it.label in pool.themes },
                             onPickTomorrow = vm.repo::pickTomorrow,
-                            sittings = Instruments.all,
                             onTakeInstrument = { sitting = it },
                             onWrite = { writing = true },
                         )

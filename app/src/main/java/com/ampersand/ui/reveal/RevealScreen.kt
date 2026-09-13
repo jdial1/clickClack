@@ -1,5 +1,8 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.ui.today.ShapeTomorrow
+import com.ampersand.ui.today.DidYouTalk
+import com.ampersand.model.QuizTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.style.TextAlign
 import com.ampersand.data.MockCouple
 import com.ampersand.model.BrickColor
 import com.ampersand.model.CoupleState
@@ -64,6 +66,10 @@ fun RevealScreen(
     /** Pass false if this day was already opened, to skip the entrance animation. */
     animateIn: Boolean = true,
     onOpened: () -> Unit = {},
+    onTalkedAbout: (java.time.LocalDate) -> Unit = {},
+    themes: List<QuizTheme> = emptyList(),
+    onPickTomorrow: (String) -> Unit = {},
+    onWrite: () -> Unit = {},
 ) {
     val youColor = Color(state.you.colorArgb)
     val themColor = Color(state.them.colorArgb)
@@ -204,14 +210,13 @@ fun RevealScreen(
             QuietNote("${state.them.name} hasn't reacted yet.")
         }
 
-        Spacer(Modifier.height(30.dp))
-        Text(
-            text = "Talk about it together.",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        Spacer(Modifier.height(24.dp))
+        DidYouTalk(state, day, onTalkedAbout)
+
+        if (day.date == state.today.date) {
+            Spacer(Modifier.height(30.dp))
+            ShapeTomorrow(state, themes, onPickTomorrow, onWrite)
+        }
         Spacer(Modifier.height(40.dp))
     }
 }

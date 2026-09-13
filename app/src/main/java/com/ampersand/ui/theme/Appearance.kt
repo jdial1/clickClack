@@ -1,5 +1,6 @@
 package com.ampersand.ui.theme
 
+import com.ampersand.model.BrickColor
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 
 private const val PREFS = "appearance"
 private const val KEY_MODE = "mode"
+private const val KEY_MOOD_FACE = "moodFace"
 
 /** Theme mode. [SYSTEM] (follow the phone) is the default. */
 enum class ThemeMode(val label: String) {
@@ -24,6 +26,19 @@ class Appearance(private val context: Context) {
 
     var mode: ThemeMode by mutableStateOf(read(context))
         private set
+
+    /** Colour your mood faces are drawn in; null is each face's own colour. */
+    var moodFace: BrickColor? by mutableStateOf(
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_MOOD_FACE, null)
+            ?.let { n -> BrickColor.entries.firstOrNull { it.name == n } },
+    )
+        private set
+
+    fun chooseMoodFace(next: BrickColor?) {
+        moodFace = next
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(KEY_MOOD_FACE, next?.name).apply()
+    }
 
     fun set(next: ThemeMode) {
         mode = next

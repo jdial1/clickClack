@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.QuestionSource
 import com.ampersand.model.NameWords
 import com.ampersand.model.Dates
 import com.ampersand.model.DateKind
@@ -9,7 +10,6 @@ import android.os.Handler
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import com.ampersand.model.Following
-import com.ampersand.model.Sun
 import com.ampersand.model.League
 import com.ampersand.model.Teams
 import com.ampersand.model.forPlace
@@ -46,7 +46,6 @@ import com.ampersand.model.Wildcard
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
 import com.ampersand.model.Slope
-import com.ampersand.model.Milestones
 import com.ampersand.model.Streaks
 import com.ampersand.model.Turns
 import com.google.firebase.firestore.DocumentSnapshot
@@ -338,13 +337,14 @@ class FirestoreCoupleRepository(
         val leagues = Following.leagues(place?.let { Teams.activeLeagues(it, today) }.orEmpty(), following)
         maybeFetchWeather(place, weather)
 
+        val off = QuestionSource.entries.filter { coupleDoc?.getBoolean(it.field) == false }.toSet()
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), dateKinds = dateKinds)
             // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind, region = place?.region, state = place?.state, leagues = leagues, dateKinds = dateKinds)
+            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), dateKinds = dateKinds)
         }.forPlace(place, today)
 
         val todayEntry = DayEntry(
@@ -390,7 +390,8 @@ class FirestoreCoupleRepository(
             homeZip = homeZip,
             region = place?.region,
             homeState = place?.state,
-            why = pool.why(question, today, anniversary, place?.state, dateKinds, interests),
+            why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests),
+            sourcesOff = off,
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
@@ -712,6 +713,10 @@ class FirestoreCoupleRepository(
         // Merge keeps the partner's note.
         couple.collection(PLATES).document(plateId)
             .set(mapOf("notes" to mapOf(myUid to text)), SetOptions.merge())
+    }
+
+    override fun setSource(source: QuestionSource, on: Boolean) {
+        couple.set(mapOf(source.field to on), SetOptions.merge())
     }
 
     override fun nameWeek(plateId: String, words: NameWords) {

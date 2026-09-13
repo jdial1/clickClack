@@ -216,6 +216,8 @@ data class CoupleState(
     /** The home ZIP's state, for holidays that belong to a place. */
     val homeState: String? = null,
     /** Sunrise and sunset at home today. */
+    /** Question sources either of you can turn off in Advanced settings. Shared, so both phones agree. */
+    val sourcesOff: Set<QuestionSource> = emptySet(),
     /** Why today's question was chosen, for the tag on its card: "Weather", "First date", "Family". */
     val why: String? = null,
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */
@@ -262,4 +264,11 @@ data class CoupleState(
             if (scored.isEmpty()) return 0
             return (scored.sum() * 100) / (scored.size * 2)
         }
+}
+
+/** Optional places the daily question can come from. Stored on the couple document by [field]. */
+enum class QuestionSource(val field: String, val label: String, val detail: String) {
+    WEATHER("weatherQuestions", "Weather questions", "On notable weather days."),
+    LOCAL("localQuestions", "Local questions", "Your region and local teams."),
+    HOLIDAYS("stateHolidays", "State holidays", "Days that belong to your state."),
 }
