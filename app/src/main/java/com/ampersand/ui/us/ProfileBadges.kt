@@ -1,5 +1,7 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.IconAction
+import com.ampersand.ui.components.UiIcon
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -120,6 +122,9 @@ private fun WallGroup(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
+            group.rows.firstOrNull()?.badges?.firstOrNull { it.isEarned }?.let { first ->
+                IconAction(UiIcon.DETAILS, "Details", onClick = { onTap(first) })
+            }
         }
 
         Spacer(Modifier.height(12.dp))

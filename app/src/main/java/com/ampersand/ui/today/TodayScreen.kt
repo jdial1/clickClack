@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.UiIcon
 import com.ampersand.model.DayEntry
 import com.ampersand.ui.theme.LocalAppearance
 import com.ampersand.model.Wildcard
@@ -310,6 +311,7 @@ internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
 
     AmpButton(
         label = if (queued.isEmpty()) "Write a question for ${state.them.name}" else "Write another",
+        icon = UiIcon.WRITE,
         slug = you.slug,
         onClick = onWrite,
     )

@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,7 +85,7 @@ fun InterestsSetupScreen(
                             onToggle = { leagues = if (it in leagues) leagues - it else leagues + it },
                         )
                         Spacer(Modifier.height(20.dp))
-                        AmpButton(label = "Next", slug = color.slug) { step = 2 }
+                        AmpButton(label = "Next", slug = color.slug, icon = UiIcon.NEXT) { step = 2 }
                     }
 
                     else -> {
@@ -101,7 +102,7 @@ fun InterestsSetupScreen(
                             onToggle = { leaveOut = if (it in leaveOut) leaveOut - it else leaveOut + it },
                         )
                         Spacer(Modifier.height(20.dp))
-                        AmpButton(label = "Done", slug = color.slug) { finish() }
+                        AmpButton(label = "Done", slug = color.slug, icon = UiIcon.DONE) { finish() }
                     }
                 }
             }

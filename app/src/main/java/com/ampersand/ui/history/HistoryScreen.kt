@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.ui.quiz.BrickChip
 import com.ampersand.model.name
@@ -380,7 +381,7 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
         }
     }
     Spacer(Modifier.height(10.dp))
-    AmpButton(label = "Done", slug = you.slug, enabled = describing != null && thing != null) {
+    AmpButton(label = "Done", slug = you.slug, enabled = describing != null && thing != null, icon = UiIcon.DONE) {
         onName(plate.id, NameWords(describing!!, thing!!))
     }
 }
@@ -413,7 +414,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
             placeholder = "The week we...",
         )
         Spacer(Modifier.height(8.dp))
-        AmpButton(label = "Save",slug = you.slug, enabled = draft.isNotBlank()) {
+        AmpButton(label = "Save", slug = you.slug, enabled = draft.isNotBlank(), icon = UiIcon.DONE) {
             onNote(plate.id, draft.trim())
             editing = false
         }

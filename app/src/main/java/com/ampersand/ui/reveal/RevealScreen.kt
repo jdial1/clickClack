@@ -1,5 +1,8 @@
 package com.ampersand.ui.reveal
 
+import androidx.compose.foundation.layout.width
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.UiIcon
 import com.ampersand.ui.today.ShapeTomorrow
 import com.ampersand.ui.today.DidYouTalk
 import com.ampersand.model.QuizTheme
@@ -105,7 +108,7 @@ fun RevealScreen(
                 onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
             ) {
-                Text("Back")
+                Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

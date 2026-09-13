@@ -1,5 +1,7 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -186,6 +188,7 @@ private fun DeckPlayer(
 
         AmpButton(
             label = if (last) "Done" else "Next",
+            icon = if (last) UiIcon.DONE else UiIcon.NEXT,
             slug = you.slug,
             enabled = ready,
             // Last question uses the seal sound and haptic.
@@ -252,7 +255,7 @@ private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modif
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(30.dp))
-        AmpButton(label = "Back", slug = BrickColor.BLUE.slug, onClick = onBack)
+        AmpButton(label = "Back", slug = BrickColor.BLUE.slug, icon = UiIcon.BACK, onClick = onBack)
     }
 }
 
@@ -274,7 +277,7 @@ private fun DeckResult(
     ) {
         Spacer(Modifier.height(12.dp))
         TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
-            Text("Back")
+            Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
         }
 
         Spacer(Modifier.height(8.dp))

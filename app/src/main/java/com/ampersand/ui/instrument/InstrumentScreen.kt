@@ -1,5 +1,8 @@
 package com.ampersand.ui.instrument
 
+import androidx.compose.foundation.layout.width
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.UiIcon
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -172,6 +175,7 @@ fun InstrumentScreen(
                     endsPass -> "Next round"
                     else -> "Next"
                 },
+                icon = if (last) UiIcon.DONE else UiIcon.NEXT,
                 slug = you.slug,
                 enabled = ready,
                 sfx = if (last) Sfx.SEAL else Sfx.PRESS,
@@ -325,7 +329,13 @@ private fun StickyHeader(
             TextButton(
                 onClick = onBack,
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            ) { Text(if (page.index > 0) "Back" else "Leave") }
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBrick(UiIcon.BACK, size = 20.dp)
+                    Spacer(Modifier.width(6.dp))
+                    Text(if (page.index > 0) "Back" else "Leave")
+                }
+            }
 
             if (instrument.needsProgress) {
                 SectionLabel("$answered of ${instrument.length}", panel = false)

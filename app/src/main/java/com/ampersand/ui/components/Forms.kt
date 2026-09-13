@@ -668,11 +668,14 @@ fun AmpButton(
     /** Null when the caller plays its own sound. */
     sfx: Sfx? = Sfx.RELEASE,
     feelOnClick: Feel = Feel.RELEASE,
+    /** An action icon. Buttons with one are grey rather than [slug], to keep colour for what matters. */
+    icon: UiIcon? = null,
     onClick: () -> Unit,
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     val interaction = remember { MutableInteractionSource() }
+    val lit: String? = if (icon != null) null else slug
     val pressed by interaction.collectIsPressedAsState()
 
     // Generic press sound on down; [sfx] plays on click, which only fires if the press completes.
@@ -687,7 +690,7 @@ fun AmpButton(
     val offSlug = structureSlug()
 
     BrickSlab(
-        slugs = listOf(if (enabled) slug else offSlug),
+        slugs = listOf(if (enabled) lit else offSlug),
         studs = 12,
         height = BrickHeight.HIGH,
         alpha = if (pressed) 0.90f else 1f,
@@ -700,14 +703,22 @@ fun AmpButton(
                 enabled = enabled,
             ) { sfx?.let(sounds::play); feel.play(feelOnClick); onClick() },
     ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.titleMedium,
-            color = inkOnBrick(if (enabled) slug else offSlug),
-            modifier = Modifier
+        Row(
+            Modifier
                 .align(Alignment.Center)
                 .padding(top = 14.dp, bottom = 22.dp),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            icon?.let {
+                IconBrick(it, size = 26.dp)
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(
+                label,
+                style = MaterialTheme.typography.titleMedium,
+                color = inkOnBrick(if (enabled) lit else offSlug),
+            )
+        }
     }
 }
 

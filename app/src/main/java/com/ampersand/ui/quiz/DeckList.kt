@@ -1,5 +1,8 @@
 package com.ampersand.ui.quiz
 
+import androidx.compose.foundation.layout.width
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.UiIcon
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -148,6 +151,7 @@ private fun SortBricks(
             label = if (active == 0) "Filter" else "Filter  ·  $active",
             on = open || active > 0,
             color = null,
+            icon = UiIcon.FILTER,
             onClick = onToggleOpen,
         )
         if (active > 0) {
@@ -208,6 +212,7 @@ internal fun BrickChip(
     label: String,
     on: Boolean,
     color: BrickColor?,
+    icon: UiIcon? = null,
     onClick: () -> Unit,
 ) {
     val sounds = LocalSounds.current
@@ -230,12 +235,13 @@ internal fun BrickChip(
             onClick()
         },
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            color = inkOnBrick(color?.slug),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        )
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            icon?.let {
+                IconBrick(it, size = 20.dp)
+                Spacer(Modifier.width(6.dp))
+            }
+            Text(text = label, style = MaterialTheme.typography.labelLarge, color = inkOnBrick(color?.slug))
+        }
     }
 }
 

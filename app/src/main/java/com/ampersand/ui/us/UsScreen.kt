@@ -1,5 +1,8 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.IconAction
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.UiIcon
 import com.ampersand.ui.components.MoodArt
 import com.ampersand.ui.notify.parseHour
 import com.ampersand.ui.notify.Hours
@@ -135,7 +138,7 @@ fun UsScreen(
         Spacer(Modifier.height(10.dp))
         var someday by rememberSaveable { mutableStateOf(false) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            BrickChip(label = "Coming up", on = !someday, color = you, onClick = { someday = false })
+            BrickChip(label = "Coming up", on = !someday, color = you, icon = UiIcon.DATES, onClick = { someday = false })
             BrickChip(label = "Someday", on = someday, color = you, onClick = { someday = true })
         }
         Spacer(Modifier.height(14.dp))
@@ -183,7 +186,7 @@ private fun BucketSection(
         placeholder = "Something to do together",
     )
     Spacer(Modifier.height(10.dp))
-    AmpButton(label = "Add", slug = you.slug, enabled = draft.isNotBlank()) {
+    AmpButton(label = "Add", slug = you.slug, enabled = draft.isNotBlank(), icon = UiIcon.ADD) {
         onAdd(draft.trim(), group)
         draft = ""
     }
@@ -245,14 +248,7 @@ private fun BucketRow(
                 )
             }
             if (onRemove != null) {
-                Text(
-                    "Remove",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = ink,
-                    modifier = Modifier
-                        .clickable(onClick = onRemove)
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                )
+                IconAction(UiIcon.CLOSE, "Remove", Modifier.padding(horizontal = 8.dp), color = ink, onClick = onRemove)
             }
             if (action != null) {
                 BrickPill(
@@ -321,12 +317,7 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
                 onOpenSettings()
             },
         ) {
-            Text(
-                "Settings",
-                style = MaterialTheme.typography.labelLarge,
-                color = inkOnBrick(structureSlug()),
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            )
+            IconAction(UiIcon.SETTINGS, "Settings", Modifier.padding(horizontal = 12.dp, vertical = 2.dp), color = inkOnBrick(structureSlug()))
         }
     }
 }
@@ -423,12 +414,7 @@ fun SettingsScreen(
                     onBack()
                 },
             ) {
-                Text(
-                    "Back",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = inkOnBrick(structureSlug()),
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                )
+                IconAction(UiIcon.BACK, "Back", Modifier.padding(horizontal = 12.dp, vertical = 2.dp), color = inkOnBrick(structureSlug()))
             }
             Spacer(Modifier.width(14.dp))
             Text(
@@ -478,7 +464,11 @@ fun SettingsScreen(
         MoodFaceRow(BrickColor.of(state.you.colorArgb))
 
         Spacer(Modifier.height(32.dp))
-        SectionLabel("Daily reminder")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBrick(UiIcon.REMINDER)
+            Spacer(Modifier.width(8.dp))
+            SectionLabel("Daily reminder")
+        }
         Spacer(Modifier.height(10.dp))
         var reminder by remember {
             mutableStateOf(com.ampersand.notify.Reminder.time(context)?.let { (h, _) -> Hours.firstOrNull { parseHour(it) == h } } ?: "Off")
@@ -509,11 +499,7 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SectionLabel("Advanced", Modifier.weight(1f))
-                Text(
-                    if (advanced) "Hide" else "Show",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                IconAction(UiIcon.SHOW_MORE, if (advanced) "Hide" else "Show", turned = advanced)
             }
             AnimatedVisibility(visible = advanced) {
             Column {
@@ -560,14 +546,14 @@ fun SettingsScreen(
                 SectionLabel("Retake a test")
                 Spacer(Modifier.height(10.dp))
                 done.forEach { g ->
-                    AmpButton(label = "Retake ${g.title}", slug = "black") { onRetake(g.instrumentId) }
+                    AmpButton(label = "Retake ${g.title}", slug = "black", icon = UiIcon.RETAKE) { onRetake(g.instrumentId) }
                     Spacer(Modifier.height(8.dp))
                 }
             }
 
             Spacer(Modifier.height(16.dp))
             // Black (structure color), not the user's color.
-            AmpButton(label = "Sign out", slug = "black", onClick = onSignOut)
+            AmpButton(label = "Sign out", slug = "black", icon = UiIcon.SIGN_OUT, onClick = onSignOut)
 
             if (onUnpair != null) {
                 Spacer(Modifier.height(28.dp))
@@ -949,7 +935,7 @@ private fun RelationshipProfile(
             Spacer(Modifier.height(6.dp))
             DateFields(state.today.date, initial = birthday, yearsBack = 100) { birthday = it }
             Spacer(Modifier.height(12.dp))
-            AmpButton(label = "Save", slug = you.slug) {
+            AmpButton(label = "Save", slug = you.slug, icon = UiIcon.DONE) {
                 onSetProfile(gender, birthday)
                 open = null
             }
@@ -1005,7 +991,7 @@ private fun RelationshipProfile(
                 DateFields(state.today.date, initial = married) { married = it }
             }
             Spacer(Modifier.height(12.dp))
-            AmpButton(label = "Save", slug = you.slug, enabled = status != null || zip.length == 5) {
+            AmpButton(label = "Save", slug = you.slug, enabled = status != null || zip.length == 5, icon = UiIcon.DONE) {
                 status?.let { onSetRelationship(it, married) }
                 since?.takeIf { it != state.anniversary }?.let { onSetAnniversary?.invoke(it) }
                 if (zip != state.homeZip.orEmpty() && zip.isNotEmpty() && !onSetHomeZip(zip)) {
@@ -1116,13 +1102,17 @@ private fun ProfileRow(title: String, status: String, done: Boolean, open: Boole
                 Text(title, style = MaterialTheme.typography.titleMedium, color = ink)
                 Text(status, style = MaterialTheme.typography.bodySmall, color = ink)
             }
-            Text(
-                when {
+            IconAction(
+                icon = when {
+                    open -> UiIcon.CLOSE
+                    done -> UiIcon.WRITE
+                    else -> UiIcon.ADD
+                },
+                label = when {
                     open -> "Close"
                     done -> "Edit"
                     else -> "Add"
                 },
-                style = MaterialTheme.typography.labelLarge,
                 color = ink,
             )
         }
@@ -1157,12 +1147,7 @@ private fun DatesSection(
             brick = if (d.label.startsWith(state.them.name)) BrickColor.of(state.them.colorArgb) else you,
         )
         if (added != null) {
-            Text(
-                "Remove",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.clickable { onRemove(added.id) }.padding(vertical = 6.dp),
-            )
+            IconAction(UiIcon.CLOSE, "Remove", onClick = { onRemove(added.id) })
         }
     }
     if (upcoming.isNotEmpty()) Spacer(Modifier.height(12.dp))
@@ -1177,7 +1162,7 @@ private fun DatesSection(
     }
 
     if (!adding) {
-        AmpButton(label = "Add a date", slug = you.slug) { adding = true }
+        AmpButton(label = "Add a date", slug = you.slug, icon = UiIcon.ADD) { adding = true }
         return
     }
     var label by rememberSaveable { mutableStateOf("") }
@@ -1199,7 +1184,7 @@ private fun DatesSection(
     Spacer(Modifier.height(10.dp))
     DateFields(state.today.date, initial = null, yearsBack = 100) { date = it }
     Spacer(Modifier.height(12.dp))
-    AmpButton(label = "Save", slug = you.slug, enabled = label.isNotBlank() && date != null && kind != null) {
+    AmpButton(label = "Save", slug = you.slug, enabled = label.isNotBlank() && date != null && kind != null, icon = UiIcon.DONE) {
         onAdd(label.trim(), date!!, kind!!)
         label = ""
         adding = false
