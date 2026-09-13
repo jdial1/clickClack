@@ -69,8 +69,8 @@ interface CoupleRepository {
     /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
     fun setTopicHidden(topic: Topic, hidden: Boolean)
 
-    /** How you are today. Null clears it. */
-    fun setMood(mood: Mood?)
+    /** How you are today, and for a face the colour it is in. Null clears it. */
+    fun setMood(mood: Mood?, color: BrickColor? = null)
 
     /** The sports you follow, and that you have been asked. Empty means none. */
     fun setFollowing(leagues: Set<League>)
@@ -399,8 +399,8 @@ class FakeCoupleRepository(
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
     }
 
-    override fun setMood(mood: Mood?) = mutate {
-        it.copy(you = it.you.copy(mood = mood?.let { m -> MoodEntry(m, it.today.date) }))
+    override fun setMood(mood: Mood?, color: BrickColor?) = mutate {
+        it.copy(you = it.you.copy(mood = mood?.let { m -> MoodEntry(m, it.today.date, color) }))
     }
 
     override fun setFollowing(leagues: Set<League>) = mutate {

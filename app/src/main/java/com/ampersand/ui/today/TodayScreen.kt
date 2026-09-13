@@ -1,6 +1,7 @@
 package com.ampersand.ui.today
 
 import com.ampersand.ui.components.MoodArt
+import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.brick.glassOn
@@ -121,7 +122,7 @@ fun TodayScreen(
     onPickTomorrow: (String) -> Unit = {},
     sittings: List<Instrument> = emptyList(),
     onTakeInstrument: (String) -> Unit = {},
-    onSetMood: (Mood?) -> Unit = {},
+    onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -953,68 +954,104 @@ private fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxIt
 /**
  * How each of you is today, in bricks, and the way to say yours.
  *
- * Yours opens a picker of ten; tapping one sets it and closes. Theirs is shown
- * as they left it, and nothing when they have not said -- no "Tasia has not set
- * a mood", because not saying is an answer too.
+ * Yours opens a picker: the five faces, in whichever colour you tap in the row
+ * above them, then the pack's other bricks. Tapping one sets it and closes.
+ * Theirs is shown as they left it, and nothing when they have not said -- no
+ * "Tasia has not set a mood", because not saying is an answer too.
  */
 @Composable
-private fun Moods(state: CoupleState, onSet: (Mood?) -> Unit) {
+private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit) {
     val today = state.today.date
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
-    val mine = state.you.mood?.current(today)
-    val theirs = state.them.mood?.current(today)
+    val mine = state.you.mood?.takeIf { it.current(today) != null }
+    val theirs = state.them.mood?.takeIf { it.current(today) != null }
     var picking by rememberSaveable { mutableStateOf(false) }
+    // Index into [null] + BrickColor.entries, so it survives rotation.
+    var tint by rememberSaveable { mutableStateOf((mine?.color?.ordinal ?: -1) + 1) }
+    val faceColor = BrickColor.entries.getOrNull(tint - 1)
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
+
+    fun pick(mood: Mood) {
+        sounds.play(Sfx.PLACE)
+        feel.play(Feel.PLACE)
+        val color = faceColor.takeIf { mood.kind == Mood.Kind.FACE }
+        onSet(if (mood == mine?.mood && color == mine.color) null else mood, color)
+        picking = false
+    }
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         MoodChip(
             modifier = Modifier.weight(1f),
             who = "You",
-            mood = mine,
+            entry = mine,
             color = you,
             empty = "How are you, in bricks?",
         ) { picking = !picking }
         theirs?.let {
-            MoodChip(modifier = Modifier.weight(1f), who = state.them.name, mood = it, color = them, empty = "", onClick = null)
+            MoodChip(modifier = Modifier.weight(1f), who = state.them.name, entry = it, color = them, empty = "", onClick = null)
         }
     }
     AnimatedVisibility(visible = picking) {
-        FlowRow(
-            Modifier.fillMaxWidth().padding(top = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Mood.entries.forEach { mood ->
-                Column(
-                    Modifier
-                        .width(96.dp)
-                        .glass(inkOnBrick(structureSlug()), corner = 12.dp)
-                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+        Column(Modifier.fillMaxWidth().padding(top = 10.dp)) {
+            Row(
+                Modifier.fillMaxWidth().glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(horizontal = 10.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Faces in", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
+                (listOf<BrickColor?>(null) + BrickColor.entries).forEachIndexed { i, c ->
+                    MoodArt(
+                        Mood.SNAPPED_IN,
+                        you,
+                        faceColor = c,
+                        size = if (i == tint) 40.dp else 30.dp,
+                        modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
                             sounds.play(Sfx.PLACE)
-                            feel.play(Feel.PLACE)
-                            onSet(if (mood == mine) null else mood)
-                            picking = false
-                        }
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    MoodArt(mood, you)
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        mood.label,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        mood.plain,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
+                            tint = i
+                        },
                     )
                 }
+            }
+            Spacer(Modifier.height(8.dp))
+            MoodTiles(Mood.entries.filter { it.kind == Mood.Kind.FACE }, you, faceColor, ::pick)
+            Spacer(Modifier.height(8.dp))
+            MoodTiles(Mood.entries.filter { it.kind != Mood.Kind.FACE }, you, null, ::pick)
+        }
+    }
+}
+
+@Composable
+private fun MoodTiles(moods: List<Mood>, you: BrickColor, faceColor: BrickColor?, onPick: (Mood) -> Unit) {
+    FlowRow(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        moods.forEach { mood ->
+            Column(
+                Modifier
+                    .width(96.dp)
+                    .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onPick(mood) }
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                MoodArt(mood, you, faceColor = faceColor)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    mood.label,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    mood.plain,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }
@@ -1024,7 +1061,7 @@ private fun Moods(state: CoupleState, onSet: (Mood?) -> Unit) {
 private fun MoodChip(
     modifier: Modifier,
     who: String,
-    mood: Mood?,
+    entry: MoodEntry?,
     color: BrickColor,
     empty: String,
     onClick: (() -> Unit)?,
@@ -1039,12 +1076,12 @@ private fun MoodChip(
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (mood != null) {
-            MoodArt(mood, color, size = 34.dp)
+        if (entry != null) {
+            MoodArt(entry.mood, color, size = 34.dp, faceColor = entry.color)
             Spacer(Modifier.width(8.dp))
             Column {
                 Text(who, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(mood.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                Text(entry.mood.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
             }
         } else {
             Text(empty, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)

@@ -18,7 +18,8 @@ class MoodTest {
 
     @Test
     fun `every mood has a name and a plain line, and none repeat`() {
-        assertEquals(10, Mood.entries.size)
+        assertEquals(14, Mood.entries.size)
+        assertEquals(5, Mood.entries.count { it.kind == Mood.Kind.FACE })
         assertEquals(Mood.entries.size, Mood.entries.map { it.label }.toSet().size)
         assertTrue(Mood.entries.all { it.plain.isNotBlank() && '!' !in it.label + it.plain })
     }

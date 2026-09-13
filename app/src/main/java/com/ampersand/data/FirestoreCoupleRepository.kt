@@ -1003,10 +1003,10 @@ class FirestoreCoupleRepository(
         couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
     }
 
-    override fun setMood(mood: Mood?) {
+    override fun setMood(mood: Mood?, color: BrickColor?) {
         // Your own document, which only you may write and your partner may read.
         db.collection(USERS).document(myUid).set(
-            mapOf("mood" to mood?.let { mapOf("id" to it.name, "on" to today.toString()) }),
+            mapOf("mood" to mood?.let { mapOf("id" to it.name, "on" to today.toString(), "color" to color?.slug) }),
             SetOptions.merge(),
         )
     }
@@ -1257,7 +1257,7 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     mood = (this?.get("mood") as? Map<*, *>)?.let { m ->
         val mood = Mood.entries.firstOrNull { it.name == m["id"] } ?: return@let null
         val on = (m["on"] as? String)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@let null
-        MoodEntry(mood, on)
+        MoodEntry(mood, on, BrickColor.entries.firstOrNull { it.slug == m["color"] })
     },
 )
 

@@ -16,64 +16,92 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.BrickShape
 import com.ampersand.model.Mood
-import com.ampersand.ui.brick.BrickArt
 import com.ampersand.ui.brick.BrickTile
 import com.ampersand.ui.brick.rememberBricks
 
 /**
- * A mood as a small arrangement of real bricks, in the person's own colour.
+ * A mood as a brick.
  *
- * Each is the picture the name describes: two bricks pressed together, one on
- * its side, one upside down with its studs in the air, a gap where a piece
- * should be. Three use the pack's crates, which already look like a box you
- * have not opened and a box you should not drop.
+ * Faces are the pack's character bricks in [faceColor] (null: the face's own
+ * pack colour; the others come from tools/moods/faces.py). Special bricks are
+ * drawn as the pack draws them. Built moods are plain bricks in [color], the
+ * person's own: one on its side, one upside down, a gap where a piece should be.
  */
 @Composable
-fun MoodArt(mood: Mood, color: BrickColor, modifier: Modifier = Modifier, size: Dp = 44.dp) {
-    val two = BrickShape(2, BrickHeight.MEDIUM)
-    val one = BrickShape(1, BrickHeight.MEDIUM)
-    val atlas = rememberBricks(listOf(color.asset(two), color.asset(one)))
-    val stud = size / 3
-    val course = stud * (2 * BrickArt.ROW_RATIO)
-
-    @Composable
-    fun Tile(shape: BrickShape, m: Modifier = Modifier) = BrickTile(shape, color, stud, atlas, m)
-
+fun MoodArt(
+    mood: Mood,
+    color: BrickColor,
+    modifier: Modifier = Modifier,
+    size: Dp = 44.dp,
+    faceColor: BrickColor? = null,
+) {
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
-        when (mood) {
-            Mood.SNAPPED_IN -> {
-                Tile(two, Modifier.offset(y = course / 2))
-                Tile(two, Modifier.offset(y = -course / 2))
-            }
-            Mood.BUILDING -> {
-                // Kept inside the box: the picker does not clip, so a step that
-                // climbs out of it lands on the next mood over.
-                Tile(one, Modifier.offset(x = -stud * 0.9f, y = course * 0.7f))
-                Tile(one, Modifier.offset(x = 0.dp, y = 0.dp))
-                Tile(one, Modifier.offset(x = stud * 0.9f, y = -course * 0.7f))
-            }
-            Mood.NEW_SET -> Crate(R.drawable.extra_box_exclamation, size)
-            Mood.STILL_IN_THE_BOX -> Crate(R.drawable.extra_crate, size)
-            Mood.HANDLE_WITH_CARE -> Crate(R.drawable.extra_crate_explosive, size)
-            Mood.SORTING -> {
-                Tile(one, Modifier.offset(x = -stud * 0.7f, y = -course * 0.4f).rotate(-18f))
-                Tile(one, Modifier.offset(x = stud * 0.6f, y = -course * 0.6f).rotate(22f))
-                Tile(one, Modifier.offset(x = -stud * 0.3f, y = course * 0.7f).rotate(8f))
-                Tile(one, Modifier.offset(x = stud * 0.7f, y = course * 0.5f).rotate(-30f))
-            }
-            Mood.LOOSE -> Tile(two, Modifier.rotate(14f))
-            Mood.MISSING_A_PIECE -> {
-                Tile(one, Modifier.offset(x = -stud))
-                Tile(one, Modifier.offset(x = stud))
-            }
-            Mood.KNOCKED_OVER -> Tile(two, Modifier.rotate(90f))
-            // Two studs, not one: a single upside-down stud is too small to read.
-            Mood.STEPPED_ON_ONE -> Tile(two, Modifier.rotate(180f))
+        when (mood.kind) {
+            Mood.Kind.FACE -> Sprite(face(mood, faceColor), size)
+            Mood.Kind.SPECIAL -> Sprite(special(mood), size)
+            Mood.Kind.BUILT -> Built(mood, color, size)
         }
     }
 }
 
 @Composable
-private fun Crate(id: Int, size: Dp) {
+private fun Built(mood: Mood, color: BrickColor, size: Dp) {
+    val two = BrickShape(2, BrickHeight.MEDIUM)
+    val one = BrickShape(1, BrickHeight.MEDIUM)
+    val atlas = rememberBricks(listOf(color.asset(two), color.asset(one)))
+    val stud = size / 3
+
+    @Composable
+    fun Tile(shape: BrickShape, m: Modifier = Modifier) = BrickTile(shape, color, stud, atlas, m)
+
+    when (mood) {
+        Mood.MISSING_A_PIECE -> {
+            Tile(one, Modifier.offset(x = -stud))
+            Tile(one, Modifier.offset(x = stud))
+        }
+        Mood.KNOCKED_OVER -> Tile(two, Modifier.rotate(90f))
+        // Two studs, not one: a single upside-down stud is too small to read.
+        Mood.STEPPED_ON_ONE -> Tile(two, Modifier.rotate(180f))
+        else -> Unit
+    }
+}
+
+@Composable
+private fun Sprite(id: Int, size: Dp) {
     Image(painterResource(id), contentDescription = null, modifier = Modifier.size(size * 0.8f))
 }
+
+private fun special(mood: Mood): Int = when (mood) {
+    Mood.SOMETHING_TO_TELL -> R.drawable.extra_box_exclamation
+    Mood.RARE_PIECE -> R.drawable.extra_box_coin
+    Mood.SOLID_GROUND -> R.drawable.extra_dirt_top
+    Mood.STILL_IN_THE_BOX -> R.drawable.extra_crate
+    Mood.HEAVY -> R.drawable.extra_stone_detail
+    else -> R.drawable.extra_crate_explosive
+}
+
+/** Each face's own colour first, then red, yellow, green, blue in [BrickColor] order. */
+private val faces = mapOf(
+    Mood.SNAPPED_IN to listOf(
+        R.drawable.extra_character_a, R.drawable.extra_character_a_red, R.drawable.extra_character_a_yellow,
+        R.drawable.extra_character_a_green, R.drawable.extra_character_a_blue,
+    ),
+    Mood.FLAT_PLATE to listOf(
+        R.drawable.extra_character_b, R.drawable.extra_character_b_red, R.drawable.extra_character_b_yellow,
+        R.drawable.extra_character_b_green, R.drawable.extra_character_b_blue,
+    ),
+    Mood.CLICKED to listOf(
+        R.drawable.extra_character_c, R.drawable.extra_character_c_red, R.drawable.extra_character_c_yellow,
+        R.drawable.extra_character_c_green, R.drawable.extra_character_c_blue,
+    ),
+    Mood.PLAYING_IT_COOL to listOf(
+        R.drawable.extra_character_d, R.drawable.extra_character_d_red, R.drawable.extra_character_d_yellow,
+        R.drawable.extra_character_d_green, R.drawable.extra_character_d_blue,
+    ),
+    Mood.NEW_SET to listOf(
+        R.drawable.extra_character_e, R.drawable.extra_character_e_red, R.drawable.extra_character_e_yellow,
+        R.drawable.extra_character_e_green, R.drawable.extra_character_e_blue,
+    ),
+)
+
+private fun face(mood: Mood, color: BrickColor?): Int = faces.getValue(mood)[(color?.ordinal ?: -1) + 1]
