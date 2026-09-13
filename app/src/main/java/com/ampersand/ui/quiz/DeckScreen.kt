@@ -1,5 +1,7 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.components.IconAction
+import com.ampersand.model.Kept
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.Arrangement
@@ -69,6 +71,7 @@ fun DeckScreen(
     onBack: () -> Unit,
     onSubmit: (answers: Map<String, List<String>>, guesses: Map<String, List<String>>) -> Unit,
     modifier: Modifier = Modifier,
+    onKeep: (String, String?) -> Unit = { _, _ -> },
 ) {
     val mine = state.myRun(quiz.id)
     val theirs = state.theirRun(quiz.id)
@@ -79,6 +82,7 @@ fun DeckScreen(
             state = state,
             onBack = onBack,
             modifier = modifier,
+            onKeep = onKeep,
         )
 
         mine != null -> DeckWaiting(quiz, state.them.name, onBack, modifier)
@@ -265,6 +269,7 @@ private fun DeckResult(
     state: CoupleState,
     onBack: () -> Unit,
     modifier: Modifier,
+    onKeep: (String, String?) -> Unit,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
@@ -276,8 +281,15 @@ private fun DeckResult(
             .padding(horizontal = 24.dp),
     ) {
         Spacer(Modifier.height(12.dp))
-        TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
+            }
+            val key = Kept.deck(result.quiz.id)
+            val isKept = key in state.kept
+            IconAction(UiIcon.KEEP, if (isKept) "Kept" else "Keep", onClick = {
+                onKeep(key, if (isKept) null else result.quiz.title)
+            })
         }
 
         Spacer(Modifier.height(8.dp))

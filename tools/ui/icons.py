@@ -137,6 +137,11 @@ def signout(ink, body):
     line(d, [CX + 16, CY - 14, CX + 30, CY, CX + 16, CY + 14])
 
 
+def bookmark(ink, body):
+    d = ink.layer(W)
+    d.polygon(P(CX - 22, CY - 34, CX + 22, CY - 34, CX + 22, CY + 36, CX, CY + 18, CX - 22, CY + 36), fill=255)
+
+
 ICONS = [
     ("Settings", gear, "Us header, Settings"),
     ("Details", info, "Results detail, What is this"),
@@ -152,6 +157,7 @@ ICONS = [
     ("Reminder", bell, "Daily reminder"),
     ("Dates", calendar, "Plans, special dates"),
     ("Sign out", signout, "Advanced"),
+    ("Keep", bookmark, "Kept days and decks"),
 ]
 
 SLATE = 0x5B6384

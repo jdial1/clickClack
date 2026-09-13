@@ -38,6 +38,7 @@ enum class UiIcon(@DrawableRes val res: Int) {
     REMINDER(R.drawable.icon_reminder),
     DATES(R.drawable.icon_dates),
     SIGN_OUT(R.drawable.icon_sign_out),
+    KEEP(R.drawable.icon_keep),
 }
 
 @Composable

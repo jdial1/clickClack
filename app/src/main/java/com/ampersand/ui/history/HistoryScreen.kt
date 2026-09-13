@@ -1,5 +1,9 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.components.IconBrick
+import com.ampersand.model.Kept
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.ui.quiz.BrickChip
@@ -95,6 +99,7 @@ fun HistoryScreen(
     onOpenDay: (DayEntry) -> Unit,
     onNoteWeek: (plateId: String, text: String) -> Unit = { _, _ -> },
     onNameWeek: (plateId: String, words: NameWords) -> Unit = { _, _ -> },
+    onOpenKept: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val byDate = remember(state.history) { state.history.associateBy { it.date } }
@@ -104,6 +109,38 @@ fun HistoryScreen(
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 40.dp),
     ) {
+        if (state.kept.isNotEmpty()) {
+            item {
+                SectionLabel("Kept")
+                Spacer(Modifier.height(10.dp))
+            }
+            val kept = state.kept.entries.sortedByDescending { Kept.dateOf(it.key) ?: java.time.LocalDate.MIN }
+            items(kept.map { it.key }, key = { "kept_$it" }) { key ->
+                val date = Kept.dateOf(key)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                        .clickable { onOpenKept(key) }
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconBrick(UiIcon.KEEP, size = 26.dp)
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            date?.format(LongDate) ?: "Deck",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Text(state.kept.getValue(key), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
+                    }
+                }
+            }
+            item { Spacer(Modifier.height(20.dp)) }
+        }
+
         if (anniversaries.isNotEmpty()) {
             item {
                 SectionLabel("On this day")

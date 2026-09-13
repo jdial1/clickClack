@@ -90,6 +90,9 @@ interface CoupleRepository {
     /** Load both answers for a past day, so it can be shown or recalled. */
     fun loadAnswers(date: LocalDate)
 
+    /** Keep a day or deck ([label] shown in the Kept list), or let it go when [label] is null. */
+    fun keep(key: String, label: String?)
+
     /** Answer a past day you missed. Opens it if your partner already answered. */
     fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?)
 
@@ -334,6 +337,10 @@ class FakeCoupleRepository(
     }
 
     override fun loadAnswers(date: LocalDate) = Unit
+
+    override fun keep(key: String, label: String?) = mutate {
+        it.copy(kept = if (label == null) it.kept - key else it.kept + (key to label))
+    }
 
     override fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?) = mutate { current ->
         current.withDay(date) { it.copy(answers = it.answers + (current.you.uid to Answer(current.you.uid, values, guess))) }

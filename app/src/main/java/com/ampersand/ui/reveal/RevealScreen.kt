@@ -1,5 +1,6 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.model.Kept
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -78,6 +79,7 @@ fun RevealScreen(
     onOpened: () -> Unit = {},
     onTalkedAbout: (java.time.LocalDate) -> Unit = {},
     onNote: (String) -> Unit = {},
+    onKeep: (String, String?) -> Unit = { _, _ -> },
     themes: List<QuizTheme> = emptyList(),
     onPickTomorrow: (String) -> Unit = {},
     onWrite: () -> Unit = {},
@@ -118,6 +120,11 @@ fun RevealScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
             }
+            val key = Kept.day(day.date)
+            val isKept = key in state.kept
+            IconAction(UiIcon.KEEP, if (isKept) "Kept" else "Keep", onClick = {
+                onKeep(key, if (isKept) null else day.question.text)
+            })
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,

@@ -224,6 +224,10 @@ data class CoupleState(
     val sourcesOff: Set<QuestionSource> = emptySet(),
     /** Why today's question was chosen, for the tag on its card: "Weather", "First date", "Family". */
     val why: String? = null,
+    /** Days and decks either of you kept, keyed by [Kept.day] or [Kept.deck], with a label to show. */
+    val kept: Map<String, String> = emptyMap(),
+    /** Opened days older than the loaded history, fetched on demand to show a kept or recalled day. */
+    val recalled: List<DayEntry> = emptyList(),
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */
     val weather: DayWeather? = null,
     /** Instrument sittings, oldest first. Kept apart from [history] so tests never mix with daily questions. */
@@ -275,4 +279,13 @@ enum class QuestionSource(val field: String, val label: String, val detail: Stri
     WEATHER("weatherQuestions", "Weather questions", "On notable weather days."),
     LOCAL("localQuestions", "Local questions", "Your region and local teams."),
     HOLIDAYS("stateHolidays", "State holidays", "Days that belong to your state."),
+}
+
+/** Keys for kept things, stored on the couple document. */
+object Kept {
+    fun day(date: java.time.LocalDate) = "day_$date"
+    fun deck(id: String) = "deck_$id"
+    fun dateOf(key: String): java.time.LocalDate? =
+        key.removePrefix("day_").takeIf { key.startsWith("day_") }?.let { runCatching { java.time.LocalDate.parse(it) }.getOrNull() }
+    fun deckOf(key: String): String? = key.removePrefix("deck_").takeIf { key.startsWith("deck_") }
 }

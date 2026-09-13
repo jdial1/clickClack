@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.google.firebase.firestore.FieldPath
 import com.ampersand.model.QuestionSource
 import com.ampersand.model.NameWords
 import com.ampersand.model.Dates
@@ -131,6 +132,9 @@ class FirestoreCoupleRepository(
 
     /** The past day today's question repeats, on a capsule day. */
     private var capsuleSource: DayEntry? = null
+
+    /** Day documents older than the loaded history, read on demand (see [loadAnswers]). */
+    private var recalledDocs: Map<LocalDate, DocumentSnapshot> = emptyMap()
 
     /** Answers read for past days on demand (see [loadAnswers]). */
     private var pastAnswers: Map<LocalDate, Map<String, Answer>> = emptyMap()
@@ -396,6 +400,12 @@ class FirestoreCoupleRepository(
             homeZip = homeZip,
             region = place?.region,
             homeState = place?.state,
+            kept = (coupleDoc?.get("kept") as? Map<*, *>).orEmpty().entries.mapNotNull { (k, v) ->
+                val label = (v as? Map<*, *>)?.get("label") as? String ?: return@mapNotNull null
+                (k as? String)?.let { it to label }
+            }.toMap(),
+            recalled = recalledDocs.values.mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
+                .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
             why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests),
             sourcesOff = off,
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
@@ -998,8 +1008,23 @@ class FirestoreCoupleRepository(
         dayRef.set(mapOf("moodReplies" to mapOf(myUid to text.take(80))), SetOptions.merge())
     }
 
+    override fun keep(key: String, label: String?) {
+        couple.update(
+            FieldPath.of("kept", key),
+            label?.let { mapOf("by" to myUid, "label" to it.take(200)) } ?: FieldValue.delete(),
+        )
+    }
+
     override fun loadAnswers(date: LocalDate) {
         if (date == today) return
+        if (historyDocs.none { it.id == date.toString() } && date !in recalledDocs) {
+            couple.collection(DAYS).document(date.toString()).get().addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    recalledDocs = recalledDocs + (date to doc)
+                    recompose()
+                }
+            }
+        }
         val answers = couple.collection(DAYS).document(date.toString()).collection(ANSWERS)
         answers.document(myUid).get().addOnSuccessListener { mine ->
             // Theirs is only readable once the day is open; a refusal just leaves yours.

@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.model.Kept
 import com.ampersand.ui.today.PastAnswerScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -503,7 +504,7 @@ private fun SignedInApp(
                         if (state.today.date == date) {
                             state.today
                         } else {
-                            state.history.firstOrNull { it.date == date }
+                            state.history.firstOrNull { it.date == date } ?: state.recalled.firstOrNull { it.date == date }
                         }
                     }
 
@@ -544,6 +545,7 @@ private fun SignedInApp(
                             onSubmit = { answers, guesses ->
                                 vm.repo.submitQuizRun(deck.id, answers, guesses)
                             },
+                            onKeep = vm.repo::keep,
                         )
 
                         day != null -> RevealScreen(
@@ -555,6 +557,7 @@ private fun SignedInApp(
                             onOpened = { openedReveal = day.date.toString() },
                             onTalkedAbout = vm.repo::markTalkedAbout,
                             onNote = { vm.repo.noteDay(day.date, it) },
+                            onKeep = vm.repo::keep,
                             themes = QuizTheme.entries.filter { it.label in pool.themes },
                             onPickTomorrow = vm.repo::pickTomorrow,
                             onWrite = { writing = true },
@@ -624,6 +627,10 @@ private fun SignedInApp(
                                     onOpenDay = { if (it.isRevealed) openDate = it.date },
                                     onNoteWeek = vm.repo::noteWeek,
                                     onNameWeek = vm.repo::nameWeek,
+                                    onOpenKept = { key ->
+                                        Kept.dateOf(key)?.let { openDate = it }
+                                        Kept.deckOf(key)?.let { openDeck = it }
+                                    },
                                 )
                             } else {
                                 BuildScreen(
