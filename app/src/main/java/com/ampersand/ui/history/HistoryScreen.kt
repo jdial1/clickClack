@@ -121,11 +121,6 @@ fun HistoryScreen(
             Shelf(state.shelf, state, onNoteWeek, onNameWeek)
             Spacer(Modifier.height(32.dp))
 
-            SectionLabel("The last ten weeks")
-            Spacer(Modifier.height(16.dp))
-            StudPlate(state, byDate, onOpenDay)
-            Spacer(Modifier.height(32.dp))
-
             SectionLabel("Every day")
             Spacer(Modifier.height(8.dp))
         }
@@ -438,7 +433,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
  * One Canvas with manual hit-testing instead of 70 clickable boxes.
  */
 @Composable
-private fun StudPlate(
+internal fun StudPlate(
     state: CoupleState,
     byDate: Map<LocalDate, DayEntry>,
     onOpenDay: (DayEntry) -> Unit,

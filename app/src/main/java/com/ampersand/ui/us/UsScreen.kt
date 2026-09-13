@@ -63,8 +63,6 @@ import com.ampersand.model.CoupleState
 import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
-import com.ampersand.ui.brick.BrickDot
-import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.BrickSlab
 import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.glassOn
@@ -102,6 +100,7 @@ fun UsScreen(
     onRemoveFromBucket: (String) -> Unit = {},
     onAddSpecialDate: (String, java.time.LocalDate, DateKind) -> Unit = { _, _, _ -> },
     onRemoveSpecialDate: (String) -> Unit = {},
+    onOpenDay: (com.ampersand.model.DayEntry) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
@@ -121,19 +120,30 @@ fun UsScreen(
 
         Spacer(Modifier.height(32.dp))
         SideBySideTable(state)
+        Spacer(Modifier.height(10.dp))
+        Knowing(state)
+        Spacer(Modifier.height(16.dp))
+        val byDate = remember(state.history) { state.history.associateBy { it.date } }
+        com.ampersand.ui.history.StudPlate(state, byDate, onOpenDay)
 
         Spacer(Modifier.height(32.dp))
         ProfileBadges(state = state, onTake = { onTakeInstrument?.invoke(it) })
 
         Spacer(Modifier.height(32.dp))
-        DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
-
-        Spacer(Modifier.height(32.dp))
-        BucketSection(state, onAddToBucket, onTickBucket, onRemoveFromBucket)
-
-        Spacer(Modifier.height(32.dp))
-        Knowing(state)
-
+        // Plans: dates coming up, and things to do someday.
+        SectionLabel("Plans")
+        Spacer(Modifier.height(10.dp))
+        var someday by rememberSaveable { mutableStateOf(false) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrickChip(label = "Coming up", on = !someday, color = you, onClick = { someday = false })
+            BrickChip(label = "Someday", on = someday, color = you, onClick = { someday = true })
+        }
+        Spacer(Modifier.height(14.dp))
+        if (someday) {
+            BucketSection(state, onAddToBucket, onTickBucket, onRemoveFromBucket)
+        } else {
+            DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
+        }
 
         Spacer(Modifier.height(48.dp))
     }
@@ -154,8 +164,6 @@ private fun BucketSection(
     var draft by rememberSaveable { mutableStateOf("") }
     val (todo, done) = remember(state.bucket) { BucketList.ordered(state.bucket) }
 
-    SectionLabel("Someday")
-    Spacer(Modifier.height(6.dp))
     Text(
         "Things to do together. Check one off to add a brick for each of you.",
         style = MaterialTheme.typography.bodySmall,
@@ -290,6 +298,14 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Dates.upcoming(state).firstOrNull()?.let { next ->
+                Text(
+                    if (next.next == state.today.date) "${next.label} is today"
+                    else "${next.label} ${until(state.today.date, next.next).replaceFirstChar { it.lowercase() }}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+            }
         }
         Spacer(Modifier.width(12.dp))
         BrickPill(
@@ -321,7 +337,7 @@ private fun SideBySideTable(state: CoupleState) {
     val rows = listOf(state.you, state.them).map { it to SideBySide.of(state, it.uid) }
     val headers = listOf("Days", "Right guesses", "Decks")
 
-    SectionLabel("Side by side")
+    SectionLabel("You two")
     Spacer(Modifier.height(10.dp))
     Row(Modifier.fillMaxWidth()) {
         Spacer(Modifier.width(NameColumn))
@@ -359,11 +375,6 @@ private fun SideBySideTable(state: CoupleState) {
             }
         }
     }
-    Text(
-        "Days you answered or finished a deck in the last 10 weeks.",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
 }
 
 private val NameColumn = 44.dp
@@ -668,48 +679,20 @@ private fun ColorRow(
 @Composable
 private fun Knowing(state: CoupleState) {
     val knowing = state.knowing
-    val you = BrickColor.of(state.you.colorArgb)
-    val them = BrickColor.of(state.them.colorArgb)
-
-    SectionLabel("How well you know each other")
-    Spacer(Modifier.height(10.dp))
-
-    if (knowing.isEmpty) {
-        QuietNote(
-            "Nothing yet. This fills in as you both answer " +
-                "guessing questions.",
-        )
-        return
-    }
-
+    if (knowing.isEmpty) return
+    val month = knowing.recent.firstOrNull()
     Text(
-        text = "${state.you.name} ${knowing.youHits}  ·  " +
-            "${state.them.name} ${knowing.theyHits}  ·  of ${knowing.scored}",
-        style = MaterialTheme.typography.titleMedium,
+        text = "Right guesses: ${state.you.name} ${knowing.youHits}, ${state.them.name} ${knowing.theyHits} of ${knowing.scored}. " +
+            verdict(state, knowing),
+        style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground,
     )
-    Spacer(Modifier.height(4.dp))
-    Text(
-        text = verdict(state, knowing),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-
-    Spacer(Modifier.height(18.dp))
-    knowing.recent.take(6).forEach { month ->
-        Row(
-            Modifier.fillMaxWidth().padding(bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SectionLabel(
-                month.month.format(MonthLabel),
-                modifier = Modifier.width(64.dp),
-            )
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                StudBar(month.youHits, month.scored, you)
-                StudBar(month.theyHits, month.scored, them)
-            }
-        }
+    month?.let {
+        Text(
+            "${it.month.format(MonthLabel)}: ${state.you.name} ${it.youHits}, ${state.them.name} ${it.theyHits} of ${it.scored}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
     }
 }
 
@@ -725,22 +708,6 @@ private fun verdict(state: CoupleState, knowing: com.ampersand.model.Knowing): S
     }
 }
 
-/** Ten studs, lit in proportion to hits / of. */
-@Composable
-private fun StudBar(hits: Int, of: Int, color: BrickColor) {
-    val lit = if (of == 0) 0 else ((hits * StudsInBar + of / 2) / of).coerceIn(0, StudsInBar)
-    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        repeat(StudsInBar) { i ->
-            BrickDot(
-                slug = if (i < lit) color.slug else quietSlug(),
-                studSize = Stud.pip,
-                filled = i < lit,
-            )
-        }
-    }
-}
-
-private const val StudsInBar = 10
 private val MonthLabel: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")
 
 /** Separate sound and vibration toggles; each confirms itself with the other channel when needed. */
@@ -1176,8 +1143,6 @@ private fun DatesSection(
     val upcoming = remember(state) { Dates.upcoming(state) }
     var adding by rememberSaveable { mutableStateOf(false) }
 
-    SectionLabel("Dates")
-    Spacer(Modifier.height(10.dp))
     if (upcoming.isEmpty()) {
         QuietNote("No dates yet. Add one below.")
     }

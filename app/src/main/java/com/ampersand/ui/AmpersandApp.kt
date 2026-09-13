@@ -1,5 +1,8 @@
 package com.ampersand.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import com.ampersand.ui.quiz.BrickChip
 import com.ampersand.ui.us.InterestsSetupScreen
 import com.ampersand.ui.quiz.DecksScreen
 import com.ampersand.ui.us.SettingsScreen
@@ -154,7 +157,6 @@ class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
 private enum class Tab(val label: String) {
     TODAY("Today"),
     DECKS("Decks"),
-    BUILD("Build"),
     // History screen; "Shelf" fits a 2-stud tile without shrinking the type.
     SHELF("Shelf"),
     US("Us"),
@@ -581,19 +583,34 @@ private fun SignedInApp(
                             onWrite = { writing = true },
                         )
 
-                        screen.tab == Tab.BUILD -> BuildScreen(
-                            state = state,
-                            plate = state.plate,
-                            onPlace = vm.repo::placeBlock,
-                        )
-
-                        screen.tab == Tab.SHELF -> HistoryScreen(
-                            state = state,
-                            // Only revealed days open.
-                            onOpenDay = { if (it.isRevealed) openDate = it.date },
-                            onNoteWeek = vm.repo::noteWeek,
-                            onNameWeek = vm.repo::nameWeek,
-                        )
+                        // This week's build and past weeks. A toggle rather than one
+                        // scrolling list: dragging bricks inside a scroll fights the scroll.
+                        screen.tab == Tab.SHELF -> Column(Modifier.fillMaxSize()) {
+                            var past by rememberSaveable { mutableStateOf(false) }
+                            Row(
+                                Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                BrickChip(label = "This week", on = !past, color = BrickColor.of(state.you.colorArgb), onClick = { past = false })
+                                BrickChip(label = "Past weeks", on = past, color = BrickColor.of(state.you.colorArgb), onClick = { past = true })
+                            }
+                            if (past) {
+                                HistoryScreen(
+                                    state = state,
+                                    // Only revealed days open.
+                                    onOpenDay = { if (it.isRevealed) openDate = it.date },
+                                    onNoteWeek = vm.repo::noteWeek,
+                                    onNameWeek = vm.repo::nameWeek,
+                                )
+                            } else {
+                                BuildScreen(
+                                    state = state,
+                                    plate = state.plate,
+                                    onPlace = vm.repo::placeBlock,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
+                        }
 
                         else -> UsScreen(
                             state = state,
@@ -605,6 +622,7 @@ private fun SignedInApp(
                             onRemoveFromBucket = vm.repo::removeFromBucket,
                             onAddSpecialDate = vm.repo::addSpecialDate,
                             onRemoveSpecialDate = vm.repo::removeSpecialDate,
+                            onOpenDay = { if (it.isRevealed) openDate = it.date },
                         )
                     }
                     }

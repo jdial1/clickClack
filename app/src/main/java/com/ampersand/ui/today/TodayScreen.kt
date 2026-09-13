@@ -8,12 +8,9 @@ import com.ampersand.ui.components.MoodArt
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import androidx.compose.foundation.layout.width
-import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.ampersand.model.Turn
-import com.ampersand.model.InboxItem
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import com.ampersand.model.BrickShape
@@ -713,78 +710,6 @@ private fun SealedPanel(
         }
     }
 
-}
-
-/** Decks and tests one partner finished and the other hasn't, filtered by whose turn. */
-@Composable
-internal fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxItem) -> Unit) {
-    val you = BrickColor.of(state.you.colorArgb)
-    val them = BrickColor.of(state.them.colorArgb)
-    val yours = items.count { it.turn == Turn.YOURS }
-    val theirs = items.size - yours
-    var filter by rememberSaveable { mutableStateOf(if (yours > 0) Turn.YOURS else Turn.THEIRS) }
-    val shown = items.filter { it.turn == filter }
-
-    SectionLabel("Waiting")
-    Spacer(Modifier.height(10.dp))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        BrickChip(label = "Your turn  $yours", on = filter == Turn.YOURS, color = you, onClick = { filter = Turn.YOURS })
-        BrickChip(label = "${state.them.name}'s turn  $theirs", on = filter == Turn.THEIRS, color = them, onClick = { filter = Turn.THEIRS })
-    }
-    Spacer(Modifier.height(12.dp))
-
-    if (shown.isEmpty()) {
-        QuietNote(if (filter == Turn.YOURS) "Nothing waiting on you." else "Nothing waiting on ${state.them.name}.")
-        return
-    }
-
-    val sounds = LocalSounds.current
-    val feel = LocalFeel.current
-    shown.forEach { item ->
-        BrickSlab(
-            slugs = listOf(structureSlug()),
-            studs = 12,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) {
-                    sounds.play(Sfx.NAV)
-                    feel.play(Feel.NAV)
-                    onOpen(item)
-                },
-        ) {
-            val ink = inkOnBrick(structureSlug())
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
-                    .glassOn(structureSlug(), corner = 14.dp)
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(item.kind.label.uppercase(), style = MaterialTheme.typography.labelSmall, color = ink)
-                    Text(item.title, style = MaterialTheme.typography.titleMedium, color = ink)
-                    Text(
-                        when (item.turn) {
-                            Turn.YOURS -> "${state.them.name} finished. Your turn."
-                            Turn.THEIRS -> "You finished. Waiting for ${state.them.name}."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = ink,
-                    )
-                }
-                Spacer(Modifier.width(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                    BrickDot(slug = if (item.youDone) you.slug else quietSlug(), studSize = Stud.pip, filled = item.youDone)
-                    BrickDot(slug = if (item.themDone) them.slug else quietSlug(), studSize = Stud.pip, filled = item.themDone)
-                }
-            }
-        }
-    }
 }
 
 /**
