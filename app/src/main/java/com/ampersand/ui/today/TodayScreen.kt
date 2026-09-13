@@ -16,7 +16,6 @@ import com.ampersand.ui.brick.drawBrickArt
 import com.ampersand.ui.brick.rememberBricks
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -73,7 +72,6 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickSlab
-import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.inkOnBricks

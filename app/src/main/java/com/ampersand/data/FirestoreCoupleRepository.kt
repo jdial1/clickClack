@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.BrickColor
 import android.util.Log
 import com.ampersand.auth.COUPLES
 import com.ampersand.auth.USERS
@@ -284,8 +285,12 @@ class FirestoreCoupleRepository(
             .filter { it.date != today }
             .sortedByDescending { it.date }
 
-        val you = me.toMember(myUid, current.you)
-        val partner = them.toMember(partnerUid, current.them)
+        val rawYou = me.toMember(myUid, current.you)
+        val rawThem = them.toMember(partnerUid, current.them)
+        val (yourColor, theirColor) =
+            BrickColor.distinct(myUid, rawYou.colorArgb, partnerUid, rawThem.colorArgb)
+        val you = rawYou.copy(colorArgb = yourColor)
+        val partner = rawThem.copy(colorArgb = theirColor)
         val quizRuns = runs.values.flatMap { it.values }
         val instrumentRuns = (instrumentResponses.keys + instrumentProgress.keys +
             instrumentDrafts.keys).map { id ->
@@ -339,6 +344,7 @@ class FirestoreCoupleRepository(
             reactions = todayDoc.toReactions(),
             talkedAbout = todayDoc.toTalkedAbout(),
             opened = todayDoc?.getBoolean("revealed") == true,
+            submitted = todayDoc.toSubmitted(),
             nextTheme = todayDoc?.getString("nextTheme"),
             nextThemeBy = todayDoc?.getString("nextThemeBy"),
         )
@@ -844,6 +850,8 @@ class FirestoreCoupleRepository(
     }
 
     override fun setColor(colorArgb: Long) {
+        // Theirs is theirs. The picker already refuses it; this is the backstop.
+        if (BrickColor.of(colorArgb) == BrickColor.of(_state.value.them.colorArgb)) return
         db.collection(USERS).document(myUid).set(
             mapOf("colorArgb" to colorArgb),
             SetOptions.merge(),
@@ -1030,6 +1038,9 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     colorArgb = this?.getLong("colorArgb") ?: fallback.colorArgb,
 )
 
+private fun DocumentSnapshot?.toSubmitted(): Set<String> =
+    (this?.get("submitted") as? List<*>).orEmpty().filterIsInstance<String>().toSet()
+
 private fun DocumentSnapshot?.toReactions(): Map<String, Reaction> {
     val raw = this?.get("reactions") as? Map<*, *> ?: return emptyMap()
     return raw.entries.mapNotNull { (k, v) ->
@@ -1097,6 +1108,7 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?) -
         reactions = toReactions(),
         talkedAbout = toTalkedAbout(),
         opened = getBoolean("revealed") == true,
+        submitted = toSubmitted(),
         nextTheme = getString("nextTheme"),
         nextThemeBy = getString("nextThemeBy"),
         recordedRun = getLong("run")?.toInt() ?: 0,

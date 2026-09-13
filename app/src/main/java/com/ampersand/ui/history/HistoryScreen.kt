@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import com.ampersand.model.DayPips
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -364,11 +365,12 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState) {
 }
 
 /**
- * Ten weeks as a wall of 1-stud bricks.
+ * Ten weeks as a wall of 1-stud bricks, two to a day.
  *
- * Was a grid of drawn top-down studs. Nothing else in the app is seen from
- * above, so they read as a different object at every size; these are the same
- * pack bricks as everything else, one per day.
+ * Yours on the left, theirs on the right, each lit in its owner's colour when
+ * that person answered the day's question or finished a deck that day. One
+ * brick per day used to alternate colours by position, which said nothing
+ * about who had actually turned up. See [DayPips].
  *
  * One Canvas for all 70 cells, with hit-testing in the same coordinates rather
  * than seventy clickable boxes.
@@ -408,7 +410,7 @@ private fun StudPlate(
                         }
                         val date = start.plusDays((row * DaysPerWeek + col).toLong())
                         val entry = byDate[date]
-                        if (entry != null) {
+                        if (entry != null && entry.isRevealed) {
                             sounds.play(Sfx.TAP)
                             feel.play(Feel.TAP)
                             onOpenDay(entry)
@@ -423,34 +425,31 @@ private fun StudPlate(
         ) {
             val cw = size.width / DaysPerWeek
             val ch = size.height / WeeksShown
-            val studPx = cw * 0.74f
-            val inset = (cw - studPx) / 2f
+            // Two pips side by side, with a hair between them and a wider gap
+            // between days so each pair reads as one day.
+            val studPx = cw * 0.38f
+            val gap = cw * 0.04f
+            val inset = (cw - studPx * 2 - gap) / 2f
 
             for (row in 0 until WeeksShown) {
                 for (col in 0 until DaysPerWeek) {
                     val date = start.plusDays((row * DaysPerWeek + col).toLong())
                     if (date.isAfter(today)) continue
 
-                    val entry = byDate[date]
-                    // Alternating owner colour reads as "both of us built this";
-                    // an unanswered day is the neutral brick, well faded.
-                    val slug = if (entry == null) {
-                        null
-                    } else if ((row * DaysPerWeek + col) % 2 == 0) {
-                        you.slug
-                    } else {
-                        them.slug
+                    val entry = if (date == today) state.today else byDate[date]
+                    listOf(state.you to you, state.them to them).forEachIndexed { side, (member, color) ->
+                        val did = DayPips.didSomething(member.uid, date, entry, state.quizRuns)
+                        drawBrickArt(
+                            atlas = atlas,
+                            asset = BrickArt.assetFor(if (did) color.slug else null, cellShape),
+                            studs = 1,
+                            rows = 1,
+                            left = col * cw + inset + side * (studPx + gap),
+                            bottom = (row + 1) * ch - inset,
+                            studPx = studPx,
+                            alpha = if (did) 1f else 0.16f,
+                        )
                     }
-                    drawBrickArt(
-                        atlas = atlas,
-                        asset = BrickArt.assetFor(slug, cellShape),
-                        studs = 1,
-                        rows = 1,
-                        left = col * cw + inset,
-                        bottom = (row + 1) * ch - inset,
-                        studPx = studPx,
-                        alpha = if (entry == null) 0.16f else 1f,
-                    )
                 }
             }
         }

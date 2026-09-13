@@ -1,5 +1,7 @@
 package com.ampersand.ui.us
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.animation.core.animateFloatAsState
@@ -115,6 +117,8 @@ fun UsScreen(
         ColorRow(
             name = state.you.name,
             current = Color(state.you.colorArgb),
+            taken = BrickColor.of(state.them.colorArgb),
+            takenBy = state.them.name,
             onPick = onPickColor,
         )
         Spacer(Modifier.height(20.dp))
@@ -146,7 +150,25 @@ fun UsScreen(
 
         if (onSignOut != null) {
             Spacer(Modifier.height(32.dp))
-            SectionLabel("Account")
+            // Leaving lives behind a fold, closed by default. These are the two
+            // controls on the screen nobody should meet by scrolling past.
+            var advanced by rememberSaveable { mutableStateOf(false) }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { advanced = !advanced }
+                    .padding(vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SectionLabel("Advanced", Modifier.weight(1f))
+                Text(
+                    if (advanced) "Hide" else "Show",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            AnimatedVisibility(visible = advanced) {
+            Column {
             Spacer(Modifier.height(10.dp))
             if (account != null) {
                 Text(
@@ -178,6 +200,8 @@ fun UsScreen(
                     slug = "black",
                     onClick = { if (confirming) onUnpair() else confirming = true },
                 )
+            }
+            }
             }
         }
 
@@ -222,7 +246,13 @@ private fun StatCard(
 }
 
 @Composable
-private fun ColorRow(name: String, current: Color, onPick: (Long) -> Unit) {
+private fun ColorRow(
+    name: String,
+    current: Color,
+    taken: BrickColor,
+    takenBy: String,
+    onPick: (Long) -> Unit,
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             PersonDot(name, current, size = 26)
@@ -236,19 +266,32 @@ private fun ColorRow(name: String, current: Color, onPick: (Long) -> Unit) {
         ) {
             BrickColor.entries.forEach { choice ->
                 val selected = Color(choice.argb) == current
+                // Your partner's colour is shown with their initial and cannot
+                // be picked: two people in one colour is one person on the wall.
+                val theirs = choice == taken
                 Box(
                     Modifier
-                        .clickable { onPick(choice.argb) }
+                        .clickable(enabled = !theirs) { onPick(choice.argb) }
                         .padding(4.dp),
                 ) {
                     ColorChip(
-                        label = if (selected) "\u2022" else " ",
+                        label = when {
+                            theirs -> takenBy.take(1).uppercase()
+                            selected -> "\u2022"
+                            else -> " "
+                        },
                         color = choice,
                         studSize = if (selected) 24.dp else 20.dp,
                     )
                 }
             }
         }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "${taken.label} is $takenBy's.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

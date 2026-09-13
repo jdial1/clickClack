@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -100,10 +99,14 @@ fun AmpDragRank(
     var dragging by remember { mutableStateOf<String?>(null) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
-    // One colour per position, so the stack reads as a set of loose bricks and
-    // a swap is obvious at a glance.
-    val colors = remember(items.size) { List(items.size) { BrickColor.at(it) } }
-    val atlas = rememberBricks(colors.map { it.asset(RankShape) })
+    // One colour per item, fixed by the order the items first arrived in. It
+    // used to be one colour per position, so a brick changed colour as it
+    // moved and the word you were dragging no longer matched the brick. Keyed
+    // on the set, which a reorder does not change.
+    val colorOf = remember(items.toSet()) {
+        items.withIndex().associate { (i, item) -> item to BrickColor.at(i) }
+    }
+    val atlas = rememberBricks(colorOf.values.map { it.asset(RankShape) })
 
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val studDp = maxWidth / RankShape.w
@@ -121,7 +124,7 @@ fun AmpDragRank(
                     RankRow(
                         position = index + 1,
                         label = item,
-                        brick = colors[index],
+                        brick = colorOf.getValue(item),
                         atlas = atlas,
                         rowHeight = rowHeight,
                         isDragging = isDragging,
@@ -135,7 +138,8 @@ fun AmpDragRank(
                                     Modifier.animatePlacement()
                                 },
                             ),
-                        handleModifier = Modifier.pointerInput(item, enabled) {
+                        // The whole brick is the handle.
+                        dragModifier = Modifier.pointerInput(item, enabled) {
                             if (!enabled) return@pointerInput
                             detectDragGestures(
                                 onDragStart = {
@@ -197,7 +201,7 @@ private fun RankRow(
     isDragging: Boolean,
     enabled: Boolean,
     modifier: Modifier,
-    handleModifier: Modifier,
+    dragModifier: Modifier,
 ) {
     val lift by animateFloatAsState(
         if (isDragging) 1f else 0f,
@@ -210,6 +214,7 @@ private fun RankRow(
         modifier
             .fillMaxWidth()
             .height(rowHeight)
+            .then(dragModifier)
             .graphicsLayer {
                 scaleX = 1f + 0.02f * lift
                 scaleY = 1f + 0.02f * lift
@@ -232,7 +237,7 @@ private fun RankRow(
             Modifier
                 .fillMaxSize()
                 // Clear the nubs along the top edge.
-                .padding(start = 16.dp, top = rowHeight * BrickArt.NUB_RATIO),
+                .padding(start = 16.dp, end = 16.dp, top = rowHeight * BrickArt.NUB_RATIO),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -249,29 +254,6 @@ private fun RankRow(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
-            Box(
-                handleModifier.size(52.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Grip(
-                    color = if (enabled) ink.copy(alpha = 0.7f) else ink.copy(alpha = 0.3f),
-                )
-            }
-        }
-    }
-}
-
-/** Six dots. The universally understood "you can move this". */
-@Composable
-private fun Grip(color: Color) {
-    Canvas(Modifier.size(width = 12.dp, height = 18.dp)) {
-        val r = 1.6.dp.toPx()
-        val colX = listOf(r, size.width - r)
-        val rowY = listOf(r, size.height / 2f, size.height - r)
-        colX.forEach { x ->
-            rowY.forEach { y ->
-                drawCircle(color = color, radius = r, center = Offset(x, y))
-            }
         }
     }
 }

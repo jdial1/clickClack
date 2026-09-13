@@ -186,6 +186,8 @@ data class DayEntry(
      * true once both answer documents exist, so it is safe to trust.
      */
     val opened: Boolean = false,
+    /** Who has answered, from the day document. Read on past days, which carry no answers. */
+    val submitted: Set<String> = emptySet(),
     /**
      * What tomorrow is about, picked tonight by whoever's turn it was.
      *

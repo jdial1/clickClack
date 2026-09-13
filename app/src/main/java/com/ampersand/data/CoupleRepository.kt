@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.BrickColor
 import com.ampersand.model.Answer
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
@@ -330,6 +331,7 @@ class FakeCoupleRepository(
     }
 
     override fun setColor(colorArgb: Long) = mutate { current ->
+        if (BrickColor.of(colorArgb) == BrickColor.of(current.them.colorArgb)) return@mutate current
         current.copy(you = current.you.copy(colorArgb = colorArgb))
     }
 
