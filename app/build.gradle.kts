@@ -51,6 +51,9 @@ fun webClientId(): String {
         ?: ""
 }
 
+val commitCount: Int = providers.exec { commandLine("git", "rev-list", "--count", "HEAD") }
+    .standardOutput.asText.get().trim().toIntOrNull() ?: 1
+
 android {
     namespace = "com.ampersand"
     compileSdk = 37
@@ -59,8 +62,11 @@ android {
         applicationId = "com.ampersand"
         minSdk = 26          // java.time without desugaring
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1.0"
+        // Counted from the commits, so every build of a newer commit installs
+        // as an upgrade and says which one it is. Read through providers.exec
+        // so the configuration cache notices a new commit.
+        versionCode = commitCount
+        versionName = "0.1.$commitCount"
         buildConfigField("String", "WEB_CLIENT_ID", "\"${webClientId()}\"")
     }
 
