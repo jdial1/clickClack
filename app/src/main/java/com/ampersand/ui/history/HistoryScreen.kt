@@ -1,5 +1,10 @@
 package com.ampersand.ui.history
 
+import androidx.compose.foundation.layout.FlowRow
+import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.model.name
+import com.ampersand.model.SculptureNames
+import com.ampersand.model.NameWords
 import com.ampersand.ui.components.AmpButton
 import com.ampersand.ui.components.AmpField
 import com.ampersand.model.DayPips
@@ -96,6 +101,7 @@ fun HistoryScreen(
     state: CoupleState,
     onOpenDay: (DayEntry) -> Unit,
     onNoteWeek: (plateId: String, text: String) -> Unit = { _, _ -> },
+    onNameWeek: (plateId: String, words: NameWords) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     val byDate = remember(state.history) { state.history.associateBy { it.date } }
@@ -120,7 +126,7 @@ fun HistoryScreen(
         item {
             SectionLabel("The shelf")
             Spacer(Modifier.height(12.dp))
-            Shelf(state.shelf, state, onNoteWeek)
+            Shelf(state.shelf, state, onNoteWeek, onNameWeek)
             Spacer(Modifier.height(32.dp))
 
             SectionLabel("The last ten weeks")
@@ -302,7 +308,12 @@ private fun Contribution(plate: BuildPlate, state: CoupleState) {
 }
 
 @Composable
-private fun Shelf(shelf: List<BuildPlate>, state: CoupleState, onNoteWeek: (String, String) -> Unit) {
+private fun Shelf(
+    shelf: List<BuildPlate>,
+    state: CoupleState,
+    onNoteWeek: (String, String) -> Unit,
+    onNameWeek: (String, NameWords) -> Unit,
+) {
     if (shelf.isEmpty()) {
         Text(
             text = "Nothing sealed yet. Your first sculpture lands at the end of the week.",
@@ -335,6 +346,9 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState, onNoteWeek: (Stri
         )
 
         Spacer(Modifier.height(14.dp))
+        selected.name(state.you.uid, state.them.uid)?.let {
+            Text(it, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+        }
         Text(
             text = "Sealed ${selected.completedOn?.format(LongDate).orEmpty()}",
             style = MaterialTheme.typography.titleSmall,
@@ -342,6 +356,9 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState, onNoteWeek: (Stri
         )
         Spacer(Modifier.height(10.dp))
         Contribution(selected, state)
+
+        Spacer(Modifier.height(14.dp))
+        NameWeek(selected, state, onNameWeek)
 
         Spacer(Modifier.height(14.dp))
         WeekNotes(selected, state, onNoteWeek)
@@ -370,6 +387,52 @@ private fun Shelf(shelf: List<BuildPlate>, state: CoupleState, onNoteWeek: (Stri
                 }
             }
         }
+    }
+}
+
+/**
+ * Each of you picks a describing word and a thing; the name appears above once
+ * both have. Your words are yours to see until then, theirs stay hidden.
+ */
+@Composable
+private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, NameWords) -> Unit) {
+    if (plate.name(state.you.uid, state.them.uid) != null) return
+    val you = BrickColor.of(state.you.colorArgb)
+    val mine = plate.words[state.you.uid]
+
+    SectionLabel("Name it")
+    Spacer(Modifier.height(8.dp))
+    if (mine != null) {
+        Text(
+            "You picked ${mine.describing} and ${mine.thing}. Waiting for ${state.them.name}.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        return
+    }
+
+    var describing by remember(plate.id) { mutableStateOf<String?>(null) }
+    var thing by remember(plate.id) { mutableStateOf<String?>(null) }
+    Text(
+        "Pick two words. ${state.them.name} picks two. You see the name when you both have.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onBackground,
+    )
+    Spacer(Modifier.height(10.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SculptureNames.offered(plate.id, state.you.uid, SculptureNames.Describing).forEach { w ->
+            BrickChip(label = w, on = describing == w, color = you, onClick = { describing = w })
+        }
+    }
+    Spacer(Modifier.height(10.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SculptureNames.offered(plate.id, state.you.uid, SculptureNames.Things).forEach { w ->
+            BrickChip(label = w, on = thing == w, color = you, onClick = { thing = w })
+        }
+    }
+    Spacer(Modifier.height(10.dp))
+    AmpButton(label = "Done", slug = you.slug, enabled = describing != null && thing != null) {
+        onName(plate.id, NameWords(describing!!, thing!!))
     }
 }
 

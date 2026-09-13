@@ -109,6 +109,8 @@ data class BuildPlate(
      * row of weeks somebody remembers.
      */
     val notes: Map<String, String> = emptyMap(),
+    /** The words each of you picked to name the week, keyed by uid. See [SculptureNames]. */
+    val words: Map<String, NameWords> = emptyMap(),
 ) {
     companion object {
         /** Width in studs. A brick is up to 6 wide, so this fits two side by side. */

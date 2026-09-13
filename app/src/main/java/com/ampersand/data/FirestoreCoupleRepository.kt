@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.NameWords
 import com.ampersand.model.Dates
 import com.ampersand.model.DateKind
 import com.google.firebase.firestore.DocumentReference
@@ -863,6 +864,13 @@ class FirestoreCoupleRepository(
             .set(mapOf("notes" to mapOf(myUid to text)), SetOptions.merge())
     }
 
+    override fun nameWeek(plateId: String, words: NameWords) {
+        couple.collection(PLATES).document(plateId).set(
+            mapOf("words" to mapOf(myUid to mapOf("describing" to words.describing, "thing" to words.thing))),
+            SetOptions.merge(),
+        )
+    }
+
     override fun addToBucket(text: String, group: BucketGroup) {
         couple.collection(BUCKET).add(
             mapOf(
@@ -1449,6 +1457,12 @@ private fun DocumentSnapshot.toPlate(): BuildPlate? {
         notes = (get("notes") as? Map<*, *>).orEmpty().entries
             .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
             .toMap(),
+        words = (get("words") as? Map<*, *>).orEmpty().entries.mapNotNull { (k, v) ->
+            val m = v as? Map<*, *> ?: return@mapNotNull null
+            val describing = m["describing"] as? String ?: return@mapNotNull null
+            val thing = m["thing"] as? String ?: return@mapNotNull null
+            (k as? String)?.let { it to NameWords(describing, thing) }
+        }.toMap(),
     )
 }
 

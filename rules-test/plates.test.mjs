@@ -52,6 +52,21 @@ await check('a line cannot smuggle a brick in with it', async () => {
   await assertFails(setDoc(plate(as('alice')), { notes: { alice: 'Hi' }, blocks: [{ id: 'x' }] }, { merge: true }))
 })
 
+await check('you may pick your two words for a sealed week', async () => {
+  await seed(sealed)
+  await assertSucceeds(setDoc(plate(as('alice')), { words: { alice: { describing: 'Wobbly', thing: 'Castle' } } }, { merge: true }))
+})
+
+await check('you may not pick their words', async () => {
+  await seed(sealed)
+  await assertFails(setDoc(plate(as('alice')), { words: { bob: { describing: 'Wobbly', thing: 'Castle' } } }, { merge: true }))
+})
+
+await check('words cannot carry anything else', async () => {
+  await seed(sealed)
+  await assertFails(setDoc(plate(as('alice')), { words: { alice: { describing: 'Wobbly', thing: 'Castle', extra: 1 } } }, { merge: true }))
+})
+
 await check('an open week still takes bricks', async () => {
   await seed({ ...sealed, completedOn: null })
   await assertSucceeds(setDoc(plate(as('alice')), { blocks: [{ id: 'x' }] }, { merge: true }))

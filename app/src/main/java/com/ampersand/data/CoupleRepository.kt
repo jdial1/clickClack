@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.NameWords
 import com.ampersand.model.DateKind
 import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
@@ -168,6 +169,9 @@ interface CoupleRepository {
 
     /** Your one line about a sealed week. Rewritable until you are happy with it. */
     fun noteWeek(plateId: String, text: String)
+
+    /** Your two words toward a sealed week's name. */
+    fun nameWeek(plateId: String, words: NameWords)
 
     /** Put something on the list the two of you share. */
     fun addToBucket(text: String, group: BucketGroup)
@@ -448,6 +452,14 @@ class FakeCoupleRepository(
         current.copy(
             shelf = current.shelf.map {
                 if (it.id == plateId && it.isSealed) it.copy(notes = it.notes + (current.you.uid to text)) else it
+            },
+        )
+    }
+
+    override fun nameWeek(plateId: String, words: NameWords) = mutate { current ->
+        current.copy(
+            shelf = current.shelf.map {
+                if (it.id == plateId && it.isSealed) it.copy(words = it.words + (current.you.uid to words)) else it
             },
         )
     }

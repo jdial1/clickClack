@@ -270,15 +270,25 @@ service cloud.firestore {
       match /plates/{pid} {
         allow read: if isMember(cid);
         allow create: if isLive(cid);
-        // Open plates take bricks. A sealed one takes only a line from each of
-        // you about the week, and only your own line.
+        // Open plates take bricks. A sealed one takes only your own line about
+        // the week and your own two words toward its name.
         allow update: if isLive(cid) && (
           resource.data.completedOn == null ||
           (
-            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notes']) &&
-            request.resource.data.notes.diff(resource.data.get('notes', {})).affectedKeys().hasOnly([me()]) &&
-            request.resource.data.notes[me()] is string &&
-            request.resource.data.notes[me()].size() <= 140
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notes', 'words']) &&
+            request.resource.data.get('notes', {}).diff(resource.data.get('notes', {})).affectedKeys().hasOnly([me()]) &&
+            request.resource.data.get('words', {}).diff(resource.data.get('words', {})).affectedKeys().hasOnly([me()]) &&
+            (!(me() in request.resource.data.get('notes', {})) || (
+              request.resource.data.notes[me()] is string &&
+              request.resource.data.notes[me()].size() <= 140
+            )) &&
+            (!(me() in request.resource.data.get('words', {})) || (
+              request.resource.data.words[me()].keys().hasOnly(['describing', 'thing']) &&
+              request.resource.data.words[me()].describing is string &&
+              request.resource.data.words[me()].describing.size() <= 24 &&
+              request.resource.data.words[me()].thing is string &&
+              request.resource.data.words[me()].thing.size() <= 24
+            ))
           )
         );
         allow delete: if false;
