@@ -9,7 +9,8 @@ could not be fetched from this machine -- the network here rejects
 raw.githubusercontent.com on certificate grounds -- so **`OFL-LilitaOne.txt`
 still has to be dropped in beside this file before any public release.**
 
-The Kenney art is CC0 and needs no notice.
+The Kenney art (bricks, sounds, emotes) is CC0 and needs no notice; only the
+files the app uses are in `app/src/main/res`.
 
 # Personality statements
 

@@ -22,6 +22,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "ampersand"
 
-// Single module on purpose. The Firebase layer will slot in behind the
-// CoupleRepository interface without needing a module split first.
+// Single module on purpose: Firebase sits behind the CoupleRepository
+// interface, and nothing here is big enough to need a split.
 include(":app")

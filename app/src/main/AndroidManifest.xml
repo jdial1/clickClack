@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Not used yet; the mock repository is in-memory. Firebase needs it. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- One local reminder a day. RECEIVE_BOOT_COMPLETED is what lets it come
