@@ -88,14 +88,15 @@ def pencil(ink, body):
 
 def retake(ink, body):
     d = ink.layer(W)
-    r = 24
-    # Clockwise from the top right round to the top left, arrowhead carrying on clockwise.
-    d.arc(P(CX - r, CY - r, CX + r, CY + r), start=-50, end=220, fill=255, width=9 * B.K)
-    t = math.radians(220)
+    r, w = 24, 9
+    # PIL draws an arc's stroke inside its box, so pad the box by half the width
+    # to keep the stroke centred on r, where the arrowhead sits.
+    d.arc(P(CX - r - w / 2, CY - r - w / 2, CX + r + w / 2, CY + r + w / 2), start=-40, end=225, fill=255, width=w * B.K)
+    t = math.radians(225)
     ex, ey = CX + math.cos(t) * r, CY + math.sin(t) * r
     tx, ty = -math.sin(t), math.cos(t)  # clockwise tangent on screen
     nx, ny = math.cos(t), math.sin(t)
-    d.polygon(P(ex + tx * 16, ey + ty * 16, ex + nx * 12, ey + ny * 12, ex - nx * 12, ey - ny * 12), fill=255)
+    d.polygon(P(ex + tx * 15, ey + ty * 15, ex + nx * 12 - tx * 3, ey + ny * 12 - ty * 3, ex - nx * 12 - tx * 3, ey - ny * 12 - ty * 3), fill=255)
 
 
 def filt(ink, body):
