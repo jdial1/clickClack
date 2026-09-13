@@ -634,16 +634,9 @@ private fun SignedInApp(
 
                         screen.tab == Tab.TODAY -> TodayScreen(
                             state = state,
-                            decks = pool.playable,
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
-                            onOpenDeck = { openDeck = it },
-                            onWrite = { writing = true },
                             onTalkedAbout = vm.repo::markTalkedAbout,
-                            themes = QuizTheme.entries.filter { it.label in pool.themes },
-                            onPickTomorrow = vm.repo::pickTomorrow,
-                            sittings = Instruments.all,
-                            onTakeInstrument = { sitting = it },
                             onSetMood = vm.repo::setMood,
                         )
 
@@ -651,6 +644,11 @@ private fun SignedInApp(
                             state = state,
                             decks = pool.playable,
                             onOpenDeck = { openDeck = it },
+                            themes = QuizTheme.entries.filter { it.label in pool.themes },
+                            onPickTomorrow = vm.repo::pickTomorrow,
+                            sittings = Instruments.all,
+                            onTakeInstrument = { sitting = it },
+                            onWrite = { writing = true },
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(

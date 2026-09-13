@@ -1,5 +1,11 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.today.WriteOne
+import com.ampersand.ui.today.Waiting
+import com.ampersand.ui.today.TomorrowPick
+import com.ampersand.model.Instrument
+import com.ampersand.model.InboxKind
+import com.ampersand.model.Inbox
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +45,13 @@ import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.Stud
 
 /**
- * Every deck you can sit down and play.
+ * Everything to play besides the day's question.
  *
- * A row of themes comes first -- each brick says how many decks it holds and
- * how many are waiting on you -- then every deck grouped by whose turn. The
- * three longer tests and their results live on Us.
+ * What is waiting on one of you comes first, then tomorrow's theme once today
+ * is open, then a row of themes -- each brick says how many decks it holds and
+ * how many are waiting on you -- and every deck. Writing your own question for
+ * the other person is last. The three longer tests and their results live on
+ * Us, though a half-finished one still shows up under Waiting.
  */
 @Composable
 fun DecksScreen(
@@ -51,12 +59,20 @@ fun DecksScreen(
     decks: List<Quiz>,
     onOpenDeck: (String) -> Unit,
     modifier: Modifier = Modifier,
+    themes: List<QuizTheme> = emptyList(),
+    onPickTomorrow: (String) -> Unit = {},
+    sittings: List<Instrument> = emptyList(),
+    onTakeInstrument: (String) -> Unit = {},
+    onWrite: () -> Unit = {},
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     var theme by rememberSaveable { mutableStateOf<QuizTheme?>(null) }
     val themes = remember(decks) { QuizTheme.entries.filter { t -> decks.any { it.theme == t } } }
     val shown = remember(decks, theme) { theme?.let { t -> decks.filter { it.theme == t } } ?: decks }
+    val waiting = remember(state.quizRuns, state.instrumentRuns, decks, sittings) {
+        Inbox.of(state, decks, sittings)
+    }
 
     Column(
         modifier
@@ -73,7 +89,24 @@ fun DecksScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Spacer(Modifier.height(16.dp))
+        if (waiting.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
+            Waiting(state, waiting) { item ->
+                when (item.kind) {
+                    InboxKind.DECK -> onOpenDeck(item.id)
+                    InboxKind.SITTING -> onTakeInstrument(item.id)
+                }
+            }
+        }
+
+        if (state.today.isRevealed && themes.isNotEmpty()) {
+            Spacer(Modifier.height(24.dp))
+            TomorrowPick(state, themes, onPickTomorrow)
+        }
+
+        Spacer(Modifier.height(28.dp))
+        SectionLabel("Themes")
+        Spacer(Modifier.height(10.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(themes, key = { it.name }) { t ->
                 val on = theme == t
@@ -109,6 +142,9 @@ fun DecksScreen(
         Spacer(Modifier.height(28.dp))
         SectionLabel(theme?.let { "${it.label} decks" } ?: "Every deck")
         DeckList(decks = shown, state = state, onOpen = onOpenDeck)
+
+        Spacer(Modifier.height(32.dp))
+        WriteOne(state, onWrite)
 
         Spacer(Modifier.height(48.dp))
     }

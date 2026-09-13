@@ -392,15 +392,39 @@ private fun WallRow(
             }
         }
 
-        row.badges.firstOrNull { it.slotId == openSlot }?.let { badge ->
-            AnimatedVisibility(visible = true) {
-                Detail(
-                    badge = badge,
-                    color = when (badge.owner) {
-                        Owner.THEM -> them
-                        else -> you
-                    },
-                )
+        // Tapping either brick opens both, each under its own. The point of
+        // the detail is the comparison: a four-letter type means more beside
+        // the other person's margins than it does alone.
+        if (row.badges.any { it.slotId == openSlot }) {
+            val earned = row.badges.filter { it.isEarned }
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    earned.forEach { badge ->
+                        Detail(
+                            badge = badge,
+                            color = if (badge.owner == Owner.THEM) them else you,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+                Sources[Instruments[earned.firstOrNull()?.instrumentId]?.sourceId]?.let { source ->
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "${source.credit} · ${source.licence}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                    )
+                }
             }
         }
     }
@@ -521,33 +545,32 @@ private fun takeLabel(badge: Badge): String =
     if (badge.waitingOnThem) "Waiting" else "Take it"
 
 /**
- * The shape behind the headline.
+ * The shape behind one person's headline, sized for half a row.
  *
  * Every bar is labelled with the number it stands for, because the whole reason
  * this exists is that a headline word is a rounding of a continuum and the app
- * should not pretend otherwise.
+ * should not pretend otherwise. The label sits on its own line above the bar,
+ * because half a phone is not wide enough for "Inward or outward" beside one.
  */
 @Composable
-private fun Detail(badge: Badge, color: BrickColor) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-    ) {
-        badge.detail.forEachIndexed { i, bar ->
-            if (i > 0) Spacer(Modifier.height(9.dp))
+private fun Detail(badge: Badge, color: BrickColor, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Text(
+            badge.who,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        badge.detail.forEach { bar ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                bar.label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(3.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    bar.label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.width(118.dp),
-                )
                 Meter(fraction = bar.fraction, color = color, modifier = Modifier.weight(1f))
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(8.dp))
                 Text(
                     bar.value,
                     style = MaterialTheme.typography.labelSmall,
@@ -557,20 +580,11 @@ private fun Detail(badge: Badge, color: BrickColor) {
         }
 
         badge.note?.let {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             Text(
                 it,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        Sources[Instruments[badge.instrumentId]?.sourceId]?.let { source ->
-            Spacer(Modifier.height(10.dp))
-            Text(
-                "${source.credit} · ${source.licence}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
             )
         }
     }

@@ -9,11 +9,8 @@ import com.ampersand.ui.brick.glassOn
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.ampersand.model.Instrument
 import com.ampersand.model.Turn
-import com.ampersand.model.InboxKind
 import com.ampersand.model.InboxItem
-import com.ampersand.model.Inbox
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -61,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
-import com.ampersand.model.Quiz
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
 import com.ampersand.model.Milestones
@@ -115,14 +111,7 @@ fun TodayScreen(
     onSubmit: (values: List<String>, guess: List<String>?) -> Unit,
     onOpenReveal: () -> Unit,
     modifier: Modifier = Modifier,
-    decks: List<Quiz> = emptyList(),
-    onOpenDeck: (String) -> Unit = {},
-    onWrite: () -> Unit = {},
     onTalkedAbout: (LocalDate) -> Unit = {},
-    themes: List<QuizTheme> = emptyList(),
-    onPickTomorrow: (String) -> Unit = {},
-    sittings: List<Instrument> = emptyList(),
-    onTakeInstrument: (String) -> Unit = {},
     onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
 ) {
     val you = Color(state.you.colorArgb)
@@ -242,27 +231,6 @@ fun TodayScreen(
                 SealedPanel(state, you, them, onOpenReveal)
             }
         }
-
-        if (day.isRevealed && themes.isNotEmpty()) {
-            Spacer(Modifier.height(24.dp))
-            TomorrowPick(state, themes, onPickTomorrow)
-        }
-
-        val waiting = remember(state.quizRuns, state.instrumentRuns, decks, sittings) {
-            Inbox.of(state, decks, sittings)
-        }
-        if (waiting.isNotEmpty()) {
-            Spacer(Modifier.height(32.dp))
-            Waiting(state, waiting) { item ->
-                when (item.kind) {
-                    InboxKind.DECK -> onOpenDeck(item.id)
-                    InboxKind.SITTING -> onTakeInstrument(item.id)
-                }
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-        WriteOne(state, onWrite)
 
 
         Spacer(Modifier.height(48.dp))
@@ -408,7 +376,7 @@ private fun QuestionHero(
  * write one on the same evening should be able to see that they did.
  */
 @Composable
-private fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
+internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
     val queued = state.wildcards
     val mine = queued.count { it.byUid == state.you.uid }
@@ -547,7 +515,7 @@ private fun pickedBy(state: CoupleState): String? {
  * until the question itself arrives.
  */
 @Composable
-private fun TomorrowPick(
+internal fun TomorrowPick(
     state: CoupleState,
     themes: List<QuizTheme>,
     onPick: (String) -> Unit,
@@ -893,7 +861,7 @@ private fun SealedPanel(
  * whoever has done it.
  */
 @Composable
-private fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxItem) -> Unit) {
+internal fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxItem) -> Unit) {
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
     val yours = items.count { it.turn == Turn.YOURS }
