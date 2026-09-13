@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     alias(libs.plugins.android.application)
     // No kotlin.android plugin: AGP 9 has built-in Kotlin support and rejects it.
@@ -123,4 +126,22 @@ dependencies {
     // one of them is invisible on screen -- a wrong letter still looks like a
     // letter. That is what there is a JVM test source set for.
     testImplementation(libs.junit)
+}
+
+// Each APK is also copied under a name stamped with the version and build
+// time, e.g. clickclack-0.1.0-20260913-1150-release.apk, so a file sent to a
+// phone does not land on top of the last one called app-release.apk.
+listOf("debug", "release").forEach { type ->
+    val cap = type.replaceFirstChar { it.uppercase() }
+    val stamp = tasks.register("stamp${cap}Apk") {
+        val dir = layout.buildDirectory.dir("outputs/apk/$type")
+        val version = android.defaultConfig.versionName
+        doLast {
+            val out = dir.get().asFile
+            val time = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmm"))
+            out.resolve("app-$type.apk").copyTo(out.resolve("clickclack-$version-$time-$type.apk"), overwrite = true)
+        }
+    }
+    tasks.matching { it.name == "assemble$cap" }.configureEach { finalizedBy(stamp) }
 }
