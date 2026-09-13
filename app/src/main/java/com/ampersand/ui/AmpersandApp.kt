@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.quiz.DecksScreen
 import com.ampersand.ui.us.SettingsScreen
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.activity.compose.BackHandler
@@ -165,6 +166,7 @@ class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
 
 private enum class Tab(val label: String) {
     TODAY("Today"),
+    DECKS("Decks"),
     BUILD("Build"),
     // "Shelf", not "History": it is where the finished sculptures live, and a
     // log is not what that screen is for. It is also the only label that fits a
@@ -625,6 +627,13 @@ private fun SignedInApp(
                             onTakeInstrument = { sitting = it },
                         )
 
+                        screen.tab == Tab.DECKS -> DecksScreen(
+                            state = state,
+                            decks = pool.decks,
+                            onOpenDeck = { openDeck = it },
+                            onTakeInstrument = { sitting = it },
+                        )
+
                         screen.tab == Tab.BUILD -> BuildScreen(
                             state = state,
                             plate = state.plate,
@@ -692,7 +701,8 @@ private fun BottomBar(
             .navigationBarsPadding()
             .padding(horizontal = 18.dp, vertical = 8.dp),
     ) {
-        val stud = maxWidth / 11f
+        // Two studs a tab and one between each: 14 for five tabs.
+        val stud = maxWidth / (Tab.entries.size * 3 - 1).toFloat()
         val barHeight = stud * (tabShape.h * BrickArt.ROW_RATIO + BrickArt.NUB_RATIO)
         // Body starts below the nub; centring in the whole tile would sit the
         // label half on the studs.

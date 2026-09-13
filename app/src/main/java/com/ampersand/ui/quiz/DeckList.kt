@@ -73,7 +73,7 @@ fun DeckList(
     modifier: Modifier = Modifier,
 ) {
     // Deliberately not saveable. A filter is a way of looking at the shelf for a
-    // minute, not a setting: coming back to Today to find two thirds of the pool
+    // minute, not a setting: coming back to Decks to find two thirds of the pool
     // hidden, with no memory of having hidden it, is worse than picking the
     // bricks again.
     var themes by remember { mutableStateOf(emptySet<QuizTheme>()) }

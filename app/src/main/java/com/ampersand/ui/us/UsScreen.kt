@@ -123,8 +123,6 @@ fun UsScreen(
         Spacer(Modifier.height(32.dp))
         Knowing(state)
 
-        Spacer(Modifier.height(32.dp))
-        ProfileBadges(state = state, onTake = { onTakeInstrument?.invoke(it) })
 
         Spacer(Modifier.height(48.dp))
     }

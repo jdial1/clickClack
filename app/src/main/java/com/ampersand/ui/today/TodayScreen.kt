@@ -93,7 +93,6 @@ import com.ampersand.ui.components.arrive
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
 import com.ampersand.ui.feel.play
-import com.ampersand.ui.quiz.DeckList
 import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
@@ -232,26 +231,6 @@ fun TodayScreen(
         Spacer(Modifier.height(32.dp))
         WriteOne(state, onWrite)
 
-        if (decks.isNotEmpty()) {
-            Spacer(Modifier.height(40.dp))
-            SectionLabel("Decks")
-            Spacer(Modifier.height(4.dp))
-
-            val waiting = state.decksAwaitingYou(decks.map { it.id })
-            Text(
-                text = if (waiting > 0) {
-                    // The only line here that is asking for something, so it is
-                    // the only one that gets to be specific.
-                    "${state.them.name} has finished $waiting, waiting on you."
-                } else {
-                    "One question a day is the habit. These are for an evening."
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            DeckList(decks = decks, state = state, onOpen = onOpenDeck)
-        }
 
         Spacer(Modifier.height(48.dp))
     }
