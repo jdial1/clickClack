@@ -1,0 +1,128 @@
+{
+  "id": "weather-cold",
+  "title": "Cold day",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "wcd1",
+      "text": "When it is freezing, I would rather:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Layer up and go out",
+        "Stay in until spring"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wcd2",
+      "text": "What warms me up fastest?",
+      "type": "PICK_ONE",
+      "options": [
+        "A hot drink",
+        "A hot shower",
+        "A blanket",
+        "You"
+      ],
+      "depth": 1,
+      "tags": [
+        "touch",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wcd3",
+      "text": "Which piece of winter clothing would I never give up?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wcd4",
+      "text": "How cold do I run, compared to you?",
+      "type": "SCALE",
+      "lowLabel": "Always too warm",
+      "highLabel": "Always freezing",
+      "depth": 1,
+      "tags": [
+        "touch",
+        "home"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wcd5",
+      "text": "Pick what makes a cold night cozy for me.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Thick socks",
+        "A heavy blanket",
+        "Something baking",
+        "Tea",
+        "Sitting close"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "home",
+        "touch"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wcd6",
+      "text": "What is a cold-weather tradition you would like us to have?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wcd7",
+      "text": "What would I cook on the coldest night of the year?",
+      "type": "DROPDOWN",
+      "options": [
+        "Chili",
+        "Soup",
+        "A roast",
+        "Mac and cheese",
+        "Something with a lot of garlic",
+        "Nothing, we order in"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "wcd8",
+      "text": "Put these in order of how much I dislike them in the cold.",
+      "type": "RANK",
+      "options": [
+        "Getting out of bed",
+        "A cold car",
+        "Wet boots",
+        "Short days"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

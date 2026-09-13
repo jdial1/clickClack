@@ -1,0 +1,130 @@
+{
+  "id": "region-mid_atlantic",
+  "title": "Mid-Atlantic",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rma1",
+      "text": "A big game day here, I would rather:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Watch with a crowd",
+        "Watch at home in peace"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "friends"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rma2",
+      "text": "Which team would I defend in an argument?",
+      "type": "PICK_ONE",
+      "options": [
+        "A New York team",
+        "A Philadelphia team",
+        "A Pittsburgh team",
+        "A Baltimore or Washington team",
+        "I stay out of it"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rma3",
+      "text": "Most important local food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "A proper slice of pizza",
+        "A cheesesteak",
+        "A bagel",
+        "Crab cakes",
+        "A pierogi",
+        "Scrapple, honestly"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rma4",
+      "text": "Where would I take someone visiting here for the first time?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "friends",
+        "planning"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rma5",
+      "text": "How much do I actually like the shore in summer?",
+      "type": "SCALE",
+      "lowLabel": "Too crowded",
+      "highLabel": "Every weekend",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rma6",
+      "text": "What do you love most about living around here, and what would you change?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "rma7",
+      "text": "Pick the local outings I would say yes to.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A ballgame",
+        "A day at the shore",
+        "A museum",
+        "A city food crawl",
+        "A hike in the hills"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rma8",
+      "text": "Rank these by how much I would miss them if we moved.",
+      "type": "RANK",
+      "options": [
+        "The food",
+        "The sports",
+        "Being near a big city",
+        "The four seasons"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "sports"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "id": "region-south",
+  "title": "The South",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rso1",
+      "text": "Saturday in the fall:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "College football, all day",
+        "Anything else, please"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rso2",
+      "text": "Which would I pick for a big Sunday?",
+      "type": "PICK_ONE",
+      "options": [
+        "NFL on TV",
+        "A long church-and-lunch Sunday",
+        "The lake",
+        "Porch and a cold drink"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rso3",
+      "text": "Best Southern food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "Barbecue",
+        "Biscuits and gravy",
+        "Fried chicken",
+        "Shrimp and grits",
+        "Sweet tea counts",
+        "Anything from a grandmother"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "family"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rso4",
+      "text": "Which college team would I cheer for, even if I pretend not to care?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "sports"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rso5",
+      "text": "How well do I handle the humidity?",
+      "type": "SCALE",
+      "lowLabel": "Barely",
+      "highLabel": "Born for it",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rso6",
+      "text": "What Southern habit or saying do you want us to hold on to?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "words",
+        "family"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "rso7",
+      "text": "Pick the outings I would say yes to this season.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A tailgate",
+        "A crawfish boil or fish fry",
+        "A day on the water",
+        "A small-town festival",
+        "A road trip to the coast"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports",
+        "friends"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rso8",
+      "text": "Put these in order of what I would miss most if we moved north.",
+      "type": "RANK",
+      "options": [
+        "The weather",
+        "The food",
+        "The football",
+        "The manners"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "sports"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

@@ -150,6 +150,18 @@ await check('a sealed day cannot be marked as talked about', async () => {
   )
 })
 
+// ---- the forecast, saved before anyone answers ---------------------------------
+
+await check('a member may save the forecast on a day nobody has answered', async () => {
+  await seed()
+  await assertSucceeds(setDoc(dayRef(as('alice')), { weather: { tempF: 84, summary: 'Sunny' } }, { merge: true }))
+})
+
+await check('saving the forecast cannot open the day', async () => {
+  await seed()
+  await assertFails(setDoc(dayRef(as('alice')), { weather: { tempF: 84 }, revealed: true }, { merge: true }))
+})
+
 // ---- the seal cannot be sidestepped -----------------------------------------
 
 await check('a day cannot be created already open', async () => {

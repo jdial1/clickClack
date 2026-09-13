@@ -143,6 +143,17 @@ fun TodayScreen(
             StreakStuds(days = state.streak, you = BrickColor.of(state.you.colorArgb))
         }
 
+        // The forecast both phones saved, in one plain line. Nothing when no
+        // home ZIP is set or the weather service had nothing to say.
+        state.weather?.let { weather ->
+            Spacer(Modifier.height(4.dp))
+            Text(
+                weather.line,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         // Yesterday, asked about this morning. Above the question rather than
         // below it, because it is about the day that has finished and the one
         // below has not started.

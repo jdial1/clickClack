@@ -33,7 +33,7 @@ DATA = json.load(open(os.path.join(HERE, "ipip_more.json"), encoding="utf-8"))
 NEO = json.load(open(os.path.join(ROOT, "tools", "ipip", "ipip_neo300.json"), encoding="utf-8"))
 
 TAGS = {"time", "words", "gifts", "acts", "touch", "planning", "money", "family",
-        "friends", "home", "work", "past", "romance", "fun"}
+        "friends", "home", "work", "past", "romance", "fun", "sports"}
 MAX_LIST_OPTION = 64  # longer statements still lead a scale, but crowd a list
 
 
@@ -402,7 +402,7 @@ ORAIS = {
     "Shopping": ("shop", "Everyday", ["money", "gifts"], 1,
         "What store could I spend an hour in without noticing?",
         "What purchase turned out to be worth every penny?", 1),
-    "Sports": ("sports", "Playful", ["fun", "friends"], 1,
+    "Sports": ("sports", "Playful", ["fun", "friends", "sports"], 1,
         "What team or sport would I watch no matter what?",
         "What sport would you like us to try together?", 1),
     "Summer Activities": ("summer", "Travel", ["time", "fun"], 1,
@@ -482,11 +482,11 @@ ATUS = [
      ["Going to a concert", "Seeing a play", "Visiting a museum", "Going to the movies", "Going to a party",
       "Catching up with friends", "Hosting people at our place", "Going to a class or talk"],
      "What night out would I pick for my birthday?", "What is happening around town that we should go to?", 1),
-    ("playing", "Playful", ["fun", "time"], 1, "fun",
+    ("playing", "Playful", ["fun", "time", "sports"], 1, "fun",
      ["Walking", "Running", "Biking", "Hiking", "Doing yoga", "Lifting weights", "Dancing", "Swimming", "Golfing",
       "Bowling", "Fishing", "Skiing or snowboarding", "Playing tennis", "Playing basketball"],
      "What sport was I best at growing up?", "What activity could we get better at together?", 1),
-    ("watching", "Playful", ["fun", "friends"], 1, "fun",
+    ("watching", "Playful", ["fun", "friends", "sports"], 1, "fun",
      ["Watching football", "Watching basketball", "Watching baseball", "Watching soccer", "Watching hockey",
       "Watching golf", "Watching tennis", "Watching gymnastics", "Watching figure skating", "Watching auto racing"],
      "What game or event would I pay the most to see live?", "What sports tradition do you want us to have?", 1),

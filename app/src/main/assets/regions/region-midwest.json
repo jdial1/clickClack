@@ -1,0 +1,132 @@
+{
+  "id": "region-midwest",
+  "title": "The Midwest",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rmw1",
+      "text": "A Sunday in the fall:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Football and a big pot of chili",
+        "A drive to see the leaves"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rmw2",
+      "text": "Which rivalry would I get loud about?",
+      "type": "PICK_ONE",
+      "options": [
+        "Bears and Packers",
+        "Michigan and Ohio State",
+        "Cubs and Cardinals",
+        "A high school rivalry",
+        "None, I am calm"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rmw3",
+      "text": "Most Midwestern food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "A hotdish or casserole",
+        "Deep dish pizza",
+        "Cheese curds",
+        "A pork tenderloin sandwich",
+        "Chili over spaghetti",
+        "Anything at a church supper"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "family"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rmw4",
+      "text": "Which lake or river would I pick for a summer weekend?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmw5",
+      "text": "How much do I enjoy a real Midwest winter?",
+      "type": "SCALE",
+      "lowLabel": "Never again",
+      "highLabel": "Bring it on",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rmw6",
+      "text": "What is a Midwest tradition you want us to keep, or start?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "family"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "rmw7",
+      "text": "Pick the outings I would say yes to.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A ballgame at an old stadium",
+        "A county fair",
+        "A lake cabin",
+        "A small-town festival",
+        "A drive through farm country"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmw8",
+      "text": "Rank these by how much I would miss them if we moved away.",
+      "type": "RANK",
+      "options": [
+        "The people",
+        "The seasons",
+        "The sports",
+        "The cost of living"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "money",
+        "sports"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

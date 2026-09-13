@@ -1,0 +1,128 @@
+{
+  "id": "weather-hot",
+  "title": "Hot day",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "wht1",
+      "text": "On a very hot day, I would rather:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Find water",
+        "Find air conditioning"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "wht2",
+      "text": "What is my go-to way to cool off?",
+      "type": "PICK_ONE",
+      "options": [
+        "Something frozen",
+        "A cold shower",
+        "Lying very still",
+        "Complaining loudly"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "wht3",
+      "text": "What is the hottest place I have ever been, and what was I doing there?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "wht4",
+      "text": "How grumpy do I get when it is this hot?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "Very",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wht5",
+      "text": "Pick the summer things I would be happy to do tonight.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Eat outside",
+        "Get ice cream",
+        "Sit on the porch",
+        "Swim",
+        "Watch the sun go down"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "wht6",
+      "text": "What is the best summer you have ever had, and what made it that?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wht7",
+      "text": "What would I pick for dinner on a night this hot?",
+      "type": "DROPDOWN",
+      "options": [
+        "Salad and nothing cooked",
+        "Something grilled",
+        "Cold noodles",
+        "Takeout, no stove",
+        "Watermelon counts",
+        "Ice cream counts too"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "wht8",
+      "text": "Rank these by how good they sound right now.",
+      "type": "RANK",
+      "options": [
+        "A lake",
+        "A pool",
+        "An air-conditioned movie",
+        "A shaded hammock"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

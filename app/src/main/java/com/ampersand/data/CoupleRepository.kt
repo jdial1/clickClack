@@ -66,6 +66,15 @@ interface CoupleRepository {
     /** Take a topic out of the daily question, or put it back. Yours; the draw uses both. */
     fun setTopicHidden(topic: Topic, hidden: Boolean)
 
+    /** Ask for more of a topic, or stop asking. Yours; the draw uses both. */
+    fun setTopicInterest(topic: Topic, interested: Boolean)
+
+    /**
+     * The couple's home ZIP, for weather and regional questions. False when the
+     * ZIP is not one the bundled table knows, and nothing is saved.
+     */
+    fun setHomeZip(zip: String): Boolean
+
     fun addSpecialDate(label: String, date: LocalDate)
 
     fun removeSpecialDate(id: String)
@@ -379,6 +388,18 @@ class FakeCoupleRepository(
     override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
         val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun setTopicInterest(topic: Topic, interested: Boolean) = mutate {
+        val mine = if (interested) it.yourInterests + topic else it.yourInterests - topic
+        it.copy(yourInterests = mine, interests = mine)
+    }
+
+    override fun setHomeZip(zip: String): Boolean {
+        val clean = zip.trim()
+        if (clean.length != 5 || !clean.all(Char::isDigit)) return false
+        mutate { it.copy(homeZip = clean) }
+        return true
     }
 
     override fun addSpecialDate(label: String, date: LocalDate) = mutate {

@@ -265,6 +265,15 @@ data class CoupleState(
     /** Hidden by either of you; this is what the draw uses. */
     val hiddenTopics: Set<Topic> = emptySet(),
     val specialDates: List<SpecialDate> = emptyList(),
+    /** Topics you asked for more of. */
+    val yourInterests: Set<Topic> = emptySet(),
+    /** Asked for by either of you; the draw leans toward these. */
+    val interests: Set<Topic> = emptySet(),
+    /** The couple's home ZIP, and where that is. */
+    val homeZip: String? = null,
+    val region: UsRegion? = null,
+    /** Today's forecast, as saved on the day. Null until somebody fetched it. */
+    val weather: DayWeather? = null,
     /**
      * Sittings with the whole-instrument tests, oldest first.
      *

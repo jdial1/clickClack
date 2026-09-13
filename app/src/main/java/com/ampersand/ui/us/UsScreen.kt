@@ -101,6 +101,8 @@ fun UsScreen(
     onSetProfile: (String?, java.time.LocalDate?) -> Unit = { _, _ -> },
     onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
     onSetTopicHidden: (Topic, Boolean) -> Unit = { _, _ -> },
+    onSetTopicInterest: (Topic, Boolean) -> Unit = { _, _ -> },
+    onSetHomeZip: (String) -> Boolean = { true },
     onAddSpecialDate: (String, java.time.LocalDate) -> Unit = { _, _ -> },
     onRemoveSpecialDate: (String) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -124,7 +126,9 @@ fun UsScreen(
         SideBySideTable(state)
 
         Spacer(Modifier.height(32.dp))
-        RelationshipProfile(state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden)
+        RelationshipProfile(
+            state, onSetProfile, onSetRelationship, onSetAnniversary, onSetTopicHidden, onSetTopicInterest, onSetHomeZip,
+        )
 
         Spacer(Modifier.height(32.dp))
         DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
@@ -918,6 +922,8 @@ private fun RelationshipProfile(
     onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit,
     onSetAnniversary: ((java.time.LocalDate) -> Unit)?,
     onSetTopicHidden: (Topic, Boolean) -> Unit,
+    onSetTopicInterest: (Topic, Boolean) -> Unit,
+    onSetHomeZip: (String) -> Boolean,
 ) {
     var open by rememberSaveable { mutableStateOf<String?>(null) }
     fun toggle(key: String) { open = if (open == key) null else key }
@@ -961,6 +967,7 @@ private fun RelationshipProfile(
         status = listOfNotNull(
             state.relationship?.label,
             state.anniversary?.let { "since ${it.format(LongDay)}" },
+            state.homeZip?.let { zip -> "home $zip" + (state.region?.let { " (${it.label})" } ?: "") },
         ).joinToString(", ").replaceFirstChar { it.uppercase() }.ifEmpty { "Not added" },
         done = state.relationship != null && state.anniversary != null,
         open = open == "us",
@@ -978,6 +985,20 @@ private fun RelationshipProfile(
                 onSelect = { label -> status = RelationshipStatus.entries.first { it.label == label } },
             )
             Spacer(Modifier.height(12.dp))
+            SectionLabel("Home ZIP")
+            Spacer(Modifier.height(6.dp))
+            var zip by rememberSaveable { mutableStateOf(state.homeZip.orEmpty()) }
+            var zipRefused by remember { mutableStateOf(false) }
+            AmpField(
+                value = zip,
+                onValueChange = { zip = it.filter(Char::isDigit).take(5); zipRefused = false },
+                color = you,
+                placeholder = "For the weather and questions about where you live",
+            )
+            if (zipRefused) {
+                Text("That is not a ZIP we know.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(Modifier.height(12.dp))
             SectionLabel("Together since")
             Spacer(Modifier.height(6.dp))
             DateFields(state.today.date, initial = since) { since = it }
@@ -988,9 +1009,13 @@ private fun RelationshipProfile(
                 DateFields(state.today.date, initial = married) { married = it }
             }
             Spacer(Modifier.height(12.dp))
-            AmpButton(label = "Save", slug = you.slug, enabled = status != null) {
+            AmpButton(label = "Save", slug = you.slug, enabled = status != null || zip.length == 5) {
                 status?.let { onSetRelationship(it, married) }
                 since?.takeIf { it != state.anniversary }?.let { onSetAnniversary?.invoke(it) }
+                if (zip != state.homeZip.orEmpty() && zip.isNotEmpty() && !onSetHomeZip(zip)) {
+                    zipRefused = true
+                    return@AmpButton
+                }
                 open = null
             }
         }
@@ -998,29 +1023,52 @@ private fun RelationshipProfile(
 
     ProfileRow(
         title = "Topics",
-        status = if (state.hiddenTopics.isEmpty()) "Everything is in" else
-            "Leaving out ${state.hiddenTopics.joinToString(", ") { it.label.lowercase() }}",
+        status = listOfNotNull(
+            state.interests.takeIf { it.isNotEmpty() }?.let { t -> "More ${t.joinToString(", ") { it.label.lowercase() }}" },
+            state.hiddenTopics.takeIf { it.isNotEmpty() }?.let { t -> "leaving out ${t.joinToString(", ") { it.label.lowercase() }}" },
+        ).joinToString("; ").replaceFirstChar { it.uppercase() }.ifEmpty { "Everything is in, nothing extra" },
         done = true,
         open = open == "topics",
     ) { toggle("topics") }
     AnimatedVisibility(visible = open == "topics") {
         Column(Modifier.padding(bottom = 16.dp)) {
             Text(
-                "Anything either of you leaves out stays out of the daily question for both. Decks are not affected.",
+                "More of something makes it come up more often. Anything either of you leaves out stays out of " +
+                    "the daily question for both. Decks are not affected.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
             Topic.entries.forEach { topic ->
-                val mine = topic in state.yourHiddenTopics
-                val theirs = topic in state.hiddenTopics && !mine
-                SwitchSlab(
-                    on = !mine && !theirs,
-                    title = { if (it) topic.label else "${topic.label}: left out" },
-                    subtitle = if (theirs) "${state.them.name} left this out." else topic.detail,
-                    you = you,
-                ) { onSetTopicHidden(topic, !mine) }
-                Spacer(Modifier.height(10.dp))
+                val hidden = topic in state.yourHiddenTopics
+                val more = topic in state.yourInterests
+                val theirs = when {
+                    topic in state.hiddenTopics && !hidden -> "${state.them.name} left this out."
+                    topic in state.interests && !more -> "${state.them.name} asked for more of this."
+                    else -> null
+                }
+                Text(topic.label, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                Text(
+                    theirs ?: topic.detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BrickChip(label = "More", on = more, color = you, onClick = {
+                        if (hidden) onSetTopicHidden(topic, false)
+                        onSetTopicInterest(topic, !more)
+                    })
+                    BrickChip(label = "As usual", on = !more && !hidden, color = you, onClick = {
+                        if (more) onSetTopicInterest(topic, false)
+                        if (hidden) onSetTopicHidden(topic, false)
+                    })
+                    BrickChip(label = "Leave out", on = hidden, color = you, onClick = {
+                        if (more) onSetTopicInterest(topic, false)
+                        onSetTopicHidden(topic, !hidden)
+                    })
+                }
+                Spacer(Modifier.height(16.dp))
             }
         }
     }

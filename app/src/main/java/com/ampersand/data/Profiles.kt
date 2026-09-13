@@ -68,6 +68,16 @@ object Profiles {
             }
         }
 
+        // Asked for out loud, so said back first after the week.
+        if (state.interests.isNotEmpty()) {
+            state.interests.forEach { topic ->
+                topic.theme?.let { favour(listOf(it), by = 2) }
+                topic.tag?.let { favourTags(listOf(it), by = 2) }
+            }
+            reasons += "You asked for more about " +
+                state.interests.joinToString(" and ") { it.label.lowercase() } + ", so there is more of that."
+        }
+
         shortfall(state)?.let { (language, who, label) ->
             // Each love language's id is also a question tag, so the lean
             // reaches every question about it, wherever the question sits.

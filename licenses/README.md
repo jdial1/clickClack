@@ -71,6 +71,11 @@ Scales. All public domain.
 
 # Government sources
 
+- `zips.csv`: ZIP centroids from the US Census Bureau 2023 ZCTA Gazetteer, with
+  states from the 2020 ZCTA-to-county relationship file. Public domain.
+- Weather comes live from the National Weather Service API (api.weather.gov).
+  Public domain; no key, but NWS asks every caller to send a User-Agent.
+
 - `daily-atus-*.json`: activities from the **American Time Use Survey Activity
   Lexicon** (US Bureau of Labor Statistics, 2024), reworded. Public domain.
 - `daily-cfpb-money.json`: after the **CFPB Financial Well-Being Scale**

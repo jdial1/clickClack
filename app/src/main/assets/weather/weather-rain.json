@@ -1,0 +1,127 @@
+{
+  "id": "weather-rain",
+  "title": "Rainy day",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "wrn1",
+      "text": "Rain on the window, I would rather:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Nap",
+        "Go for a walk in it"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "fun"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wrn2",
+      "text": "The perfect rainy afternoon, if neither of us had anywhere to be?",
+      "type": "PICK_ONE",
+      "options": [
+        "A movie marathon",
+        "Baking something",
+        "Reading side by side",
+        "Sleeping through it"
+      ],
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wrn3",
+      "text": "What song would I put on while it rains?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wrn4",
+      "text": "How much does a gray day change my mood?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "Completely",
+      "depth": 1,
+      "tags": [
+        "words"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wrn5",
+      "text": "Pick the rainy-day comforts I would reach for.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Soup",
+        "A hoodie",
+        "A candle",
+        "Tea or coffee",
+        "A long shower"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wrn6",
+      "text": "What is a rainy day of ours you remember, and why that one?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "wrn7",
+      "text": "Caught in a downpour with no umbrella, I would:",
+      "type": "DROPDOWN",
+      "options": [
+        "Run for it",
+        "Walk slowly and accept it",
+        "Dance in it",
+        "Hide under the nearest awning",
+        "Blame you",
+        "Laugh the whole way"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "wrn8",
+      "text": "Put these in order of how I would spend a stormy night.",
+      "type": "RANK",
+      "options": [
+        "Watching the lightning",
+        "Lights off, candles on",
+        "Headphones and a show",
+        "Checking the weather app"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "time"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

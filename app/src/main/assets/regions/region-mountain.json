@@ -1,0 +1,130 @@
+{
+  "id": "region-mountain",
+  "title": "The Mountain West",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rmo1",
+      "text": "A free weekend out here:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Up a mountain",
+        "Down by the water"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmo2",
+      "text": "Which would I rather watch live?",
+      "type": "PICK_ONE",
+      "options": [
+        "A college football game",
+        "An NBA or NHL game",
+        "A rodeo",
+        "A ski or snowboard event",
+        "None, I would rather be out there"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rmo3",
+      "text": "Best local food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "Green chile anything",
+        "A breakfast burrito",
+        "Fry sauce on everything",
+        "Elk or bison burger",
+        "Tacos from a truck",
+        "Trail mix counts"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rmo4",
+      "text": "Which national park would I go back to first?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "past"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmo5",
+      "text": "How much do I care about the altitude, honestly?",
+      "type": "SCALE",
+      "lowLabel": "What altitude",
+      "highLabel": "Every stair hurts",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rmo6",
+      "text": "What outdoor thing do you want us to finally try together out here?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "fun"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmo7",
+      "text": "Pick the outings I would say yes to this season.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A hike to a view",
+        "A hot spring",
+        "Skiing or snowboarding",
+        "A night under the stars",
+        "A ballgame"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rmo8",
+      "text": "Put these in order of what I would miss most if we moved.",
+      "type": "RANK",
+      "options": [
+        "The mountains",
+        "The sky",
+        "The space",
+        "The sunshine"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

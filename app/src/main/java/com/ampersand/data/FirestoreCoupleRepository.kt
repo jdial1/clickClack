@@ -1,5 +1,7 @@
 package com.ampersand.data
 
+import com.ampersand.model.Place
+import com.ampersand.model.DayWeather
 import com.ampersand.model.SpecialDate
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
@@ -128,6 +130,9 @@ class FirestoreCoupleRepository(
     private var platesLoaded = false
     private var anniversary: LocalDate? = null
     private var coupleDoc: DocumentSnapshot? = null
+
+    /** Whether the day listener has answered, so "no weather" means none saved. */
+    private var todayLoaded = false
     private var specialDates: List<SpecialDate> = emptyList()
 
     /** Every wildcard either of you has written, used or not. */
@@ -174,6 +179,7 @@ class FirestoreCoupleRepository(
 
         regs += dayRef.addSnapshotListener { d, _ ->
             todayDoc = d
+            todayLoaded = true
             // Only once the seal is off is the other answer readable at all,
             // so that is the first moment the listener for it can exist.
             if (d?.getBoolean("revealed") == true) watchPartnerAnswer()
@@ -365,16 +371,21 @@ class FirestoreCoupleRepository(
         val recent = recentlyAsked(basis)
         val picked = Turns.themeFor(today, history, myUid, partnerUid)
         val milestone = Milestones.on(today, history) != null
-        val hiddenByUid = coupleDoc.hiddenTopics()
+        val hiddenByUid = coupleDoc.topicsByUid("hiddenTopics")
         val hidden = hiddenByUid.values.flatten().toSet()
+        val interestsByUid = coupleDoc.topicsByUid("interests")
+        val homeZip = coupleDoc?.getString("homeZip")
+        val place = homeZip?.let { pool.places.lookup(it) }
+        val weather = todayDoc.toWeather()
+        maybeFetchWeather(place, weather)
 
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region)
             // A question one of you wrote outranks one a stranger wrote.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden)
+            else -> pool.daily(today, anniversary, taste, recent, picked, deeper = milestone, hidden = hidden, weatherKind = weather?.kind, region = place?.region)
         }
 
         val todayEntry = DayEntry(
@@ -415,6 +426,11 @@ class FirestoreCoupleRepository(
             marriedOn = coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
             yourHiddenTopics = hiddenByUid[myUid].orEmpty(),
             hiddenTopics = hidden,
+            yourInterests = interestsByUid[myUid].orEmpty(),
+            interests = interestsByUid.values.flatten().toSet(),
+            homeZip = homeZip,
+            region = place?.region,
+            weather = weather,
             specialDates = specialDates,
         )
 
@@ -965,6 +981,47 @@ class FirestoreCoupleRepository(
         couple.set(mapOf("hiddenTopics" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
     }
 
+    override fun setTopicInterest(topic: Topic, interested: Boolean) {
+        val mine = _state.value.yourInterests.let { if (interested) it + topic else it - topic }
+        couple.set(mapOf("interests" to mapOf(myUid to mine.map { it.name })), SetOptions.merge())
+    }
+
+    override fun setHomeZip(zip: String): Boolean {
+        pool.places.lookup(zip) ?: return false
+        couple.set(mapOf("homeZip" to zip.trim()), SetOptions.merge())
+        // A new home is a new forecast, if today's has not been saved yet.
+        weatherTried = false
+        return true
+    }
+
+    /** Once per repository: one fetch, however many listeners fire. */
+    private var weatherTried = false
+
+    /**
+     * Fetch today's forecast once and save it on the day, so the other phone
+     * reads the same weather instead of fetching its own a minute later and
+     * landing on a different question.
+     *
+     * Only when the day has no weather yet, and never blocking: a failed or
+     * slow fetch is an ordinary day. Saved in a transaction so two phones
+     * fetching at the same moment keep the first.
+     */
+    private fun maybeFetchWeather(place: Place?, saved: DayWeather?) {
+        if (weatherTried || place == null || saved != null || !todayLoaded) return
+        weatherTried = true
+        Thread {
+            val fetched = runCatching { NationalWeatherService.today(place) }
+                .onFailure { Log.d(TAG, "no forecast today", it) }
+                .getOrNull() ?: return@Thread
+            db.runTransaction { txn ->
+                if (txn.get(dayRef).get("weather") == null) {
+                    txn.set(dayRef, mapOf("weather" to fetched.toMap()), SetOptions.merge())
+                }
+                null
+            }.addOnFailureListener { Log.d(TAG, "forecast not saved", it) }
+        }.start()
+    }
+
     override fun addSpecialDate(label: String, date: LocalDate) {
         couple.collection(DATES).add(mapOf("label" to label, "date" to date.toString(), "byUid" to myUid))
     }
@@ -1164,8 +1221,22 @@ private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = 
     birthday = this?.getString("birthday")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
 )
 
-private fun DocumentSnapshot?.hiddenTopics(): Map<String, Set<Topic>> =
-    (this?.get("hiddenTopics") as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
+private fun DayWeather.toMap(): Map<String, Any?> =
+    mapOf("tempF" to tempF, "summary" to summary, "city" to city, "precipChance" to precipChance)
+
+private fun DocumentSnapshot?.toWeather(): DayWeather? {
+    val w = this?.get("weather") as? Map<*, *> ?: return null
+    val temp = (w["tempF"] as? Number)?.toInt() ?: return null
+    return DayWeather(
+        tempF = temp,
+        summary = w["summary"] as? String ?: "",
+        city = w["city"] as? String,
+        precipChance = (w["precipChance"] as? Number)?.toInt(),
+    )
+}
+
+private fun DocumentSnapshot?.topicsByUid(field: String): Map<String, Set<Topic>> =
+    (this?.get(field) as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
         val key = uid as? String ?: return@mapNotNull null
         key to (names as? List<*>).orEmpty().mapNotNull { n -> Topic.entries.firstOrNull { it.name == n } }.toSet()
     }.toMap()
@@ -1242,6 +1313,9 @@ private fun DocumentSnapshot.toAnswer(): Answer? {
 
 private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?) -> Question?): DayEntry? {
     val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
+    // A day document can exist with nobody having answered: the forecast is
+    // saved on it first thing. That is not a day anyone played.
+    if (getString("questionId") == null && getBoolean("revealed") != true && toSubmitted().isEmpty()) return null
     val question = resolve(getString("questionId")) ?: pool.daily(date)
     // History carries no answers: they live in a subcollection that would need
     // a read each. The Shelf shows questions, dates and reactions, so this is

@@ -1,0 +1,129 @@
+{
+  "id": "weather-snow",
+  "title": "Snow day",
+  "theme": "EVERYDAY",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "wsn1",
+      "text": "Snow day:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Out in it",
+        "Under a blanket"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wsn2",
+      "text": "First thing I would do on a real snow day?",
+      "type": "PICK_ONE",
+      "options": [
+        "Build something",
+        "Make hot chocolate",
+        "Go back to bed",
+        "Shovel before anyone else"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "fun"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wsn3",
+      "text": "What is my best snow memory from when I was a kid?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "wsn4",
+      "text": "How much do I actually like snow, after the first hour?",
+      "type": "SCALE",
+      "lowLabel": "Done with it",
+      "highLabel": "Love it all day",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wsn5",
+      "text": "Pick what makes a snowed-in evening good.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A fire or a candle",
+        "Soup",
+        "A long movie",
+        "A board game",
+        "No phones"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "home",
+        "time"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wsn6",
+      "text": "If we were snowed in for three days, what would you want us to finally do?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "time",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "wsn7",
+      "text": "Who would win a snowball fight between us?",
+      "type": "DROPDOWN",
+      "options": [
+        "Me, easily",
+        "You, sadly",
+        "Whoever throws first",
+        "Nobody, we would call a truce",
+        "The dog",
+        "We would both get hit by a stranger"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "wsn8",
+      "text": "Put these winter chores in order of how much I dread them.",
+      "type": "RANK",
+      "options": [
+        "Shoveling",
+        "Scraping the car",
+        "Salting the steps",
+        "Driving in it"
+      ],
+      "depth": 1,
+      "tags": [
+        "home",
+        "acts"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

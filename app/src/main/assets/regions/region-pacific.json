@@ -1,0 +1,129 @@
+{
+  "id": "region-pacific",
+  "title": "The West Coast",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rpa1",
+      "text": "A perfect Saturday out here:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "The beach",
+        "The mountains"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rpa2",
+      "text": "Which would I rather go to?",
+      "type": "PICK_ONE",
+      "options": [
+        "A baseball game by the water",
+        "An NBA game",
+        "A soccer match with a loud crowd",
+        "A surf competition",
+        "None, a hike instead"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rpa3",
+      "text": "Best West Coast food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "Fish tacos",
+        "A burrito from the right place",
+        "Fresh sushi",
+        "Anything with avocado",
+        "A food truck I cannot name",
+        "Coffee counts as food"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rpa4",
+      "text": "Which stretch of the coast would I drive again tomorrow?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "past"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rpa5",
+      "text": "How much does the traffic ruin my mood?",
+      "type": "SCALE",
+      "lowLabel": "Not at all",
+      "highLabel": "Completely",
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rpa6",
+      "text": "What do you want us to do out here before we ever move away?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rpa7",
+      "text": "Pick the outings I would say yes to this month.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "A sunset on the beach",
+        "A wine or cider tasting",
+        "A redwood walk",
+        "A ballgame",
+        "A farmers market"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "sports",
+        "time"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rpa8",
+      "text": "Rank these by what I would miss most if we moved.",
+      "type": "RANK",
+      "options": [
+        "The ocean",
+        "The weather",
+        "The food",
+        "The outdoors"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.ZipTable
+import com.ampersand.model.UsRegion
+import com.ampersand.model.WeatherKind
 import com.ampersand.model.Topic
 import android.content.Context
 import com.ampersand.model.Occasion
@@ -36,6 +39,12 @@ class QuestionPool(
      * as a deck, so nothing can spend them but the day.
      */
     val dailyOnly: List<Quiz> = emptyList(),
+    /** A few questions for each kind of weather. See [daily]. */
+    val weather: Map<WeatherKind, List<Question>> = emptyMap(),
+    /** Questions that join the daily pool only for couples living in that region. */
+    val regional: Map<UsRegion, List<Question>> = emptyMap(),
+    /** Every ZIP, for turning a home ZIP into a forecast and a region. */
+    val places: ZipTable = ZipTable.empty,
 ) {
 
     val all: List<Question> = decks.flatMap { it.questions } + dailyOnly.flatMap { it.questions }
@@ -68,7 +77,8 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions }).associateBy { it.id }
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten())
+            .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
 
@@ -115,9 +125,19 @@ class QuestionPool(
         deeper: Boolean = false,
         /** Topics either of you took out. A filter, because you asked for one. */
         hidden: Set<Topic> = emptySet(),
+        /**
+         * The kind of day the saved forecast says it is. On every other day of
+         * that weather -- by date, so both phones agree -- the question comes
+         * from its small set, so a wet week is not every day about rain.
+         */
+        weatherKind: WeatherKind? = null,
+        /** Where you live. Adds that region's questions to the pool. */
+        region: UsRegion? = null,
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
-        val open = all.filter { q -> hidden.none { it.matches(q) } }.ifEmpty { all }
+        fun shown(q: Question) = hidden.none { it.matches(q) }
+        val everything = all + region?.let { regional[it] }.orEmpty()
+        val open = everything.filter(::shown).ifEmpty { everything }
 
         // A day that is not like the others gets its own question. Rotated by
         // year, so the same holiday does not ask the same thing every time.
@@ -139,6 +159,10 @@ class QuestionPool(
         }
 
         if (deeper) walk(open.filter(::deep), date, weekend, taste, recent)?.let { return it }
+
+        if (weatherKind != null && date.toEpochDay().mod(2L) == 0L) {
+            weather[weatherKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
+        }
 
         val candidates = open.filter(::fits).ifEmpty { open }
         return walk(candidates, date, weekend, taste, recent)
@@ -228,6 +252,15 @@ class QuestionPool(
             decks = QuizJson.loadFolder(context, "quizzes"),
             occasions = QuizJson.loadFolder(context, "occasions").associateBy { it.id },
             dailyOnly = QuizJson.loadFolder(context, "daily"),
+            weather = QuizJson.loadFolder(context, "weather").mapNotNull { deck ->
+                WeatherKind.entries.firstOrNull { "weather-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
+            }.toMap(),
+            regional = QuizJson.loadFolder(context, "regions").mapNotNull { deck ->
+                UsRegion.entries.firstOrNull { "region-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
+            }.toMap(),
+            // ponytail: parsed on first launch of the screen, about 34k lines;
+            // index lazily or by prefix if it ever shows up in a startup trace.
+            places = context.assets.open("zips.csv").bufferedReader().useLines { ZipTable.parse(it) },
         )
 
         /** Primes to try as a stride, smallest first. One always fits: no list is that long. */

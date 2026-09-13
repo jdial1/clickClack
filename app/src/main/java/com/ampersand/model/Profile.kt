@@ -22,16 +22,18 @@ enum class RelationshipStatus(val label: String) {
  * about is not one to ask the other about either. Decks are not filtered --
  * choosing to play one is its own consent.
  */
-enum class Topic(val label: String, val detail: String, private val test: (Question) -> Boolean) {
-    SPICY("Spicy", "Warm, flirty questions about wanting each other.", { it.category == "Spicy" }),
-    ROMANTIC("Romantic", "Dates, love letters and how you fell for each other.", { it.category == "Romantic" }),
-    MONEY("Money", "Saving, spending and what you would do with more.", { "money" in it.tags }),
-    FAMILY("Family and upbringing", "How you were raised and the families you come from.", { "family" in it.tags }),
-    PAST("The past", "Old memories, old choices and how you got here.", { "past" in it.tags }),
-    WORK("Work", "Jobs, ambitions and what a working week does to you.", { "work" in it.tags }),
+enum class Topic(val label: String, val detail: String, val theme: String? = null, val tag: String? = null) {
+    SPICY("Spicy", "Warm, flirty questions about wanting each other.", theme = "Spicy"),
+    ROMANTIC("Romantic", "Dates, love letters and how you fell for each other.", theme = "Romantic"),
+    SPORTS("Sports", "Teams, games, and the ones you would travel to see.", tag = "sports"),
+    MONEY("Money", "Saving, spending and what you would do with more.", tag = "money"),
+    FAMILY("Family and upbringing", "How you were raised and the families you come from.", tag = "family"),
+    PAST("The past", "Old memories, old choices and how you got here.", tag = "past"),
+    WORK("Work", "Jobs, ambitions and what a working week does to you.", tag = "work"),
     ;
 
-    fun matches(question: Question): Boolean = test(question)
+    fun matches(question: Question): Boolean =
+        (theme != null && question.category == theme) || (tag != null && tag in question.tags)
 }
 
 /** A date worth a countdown: a birthday, a first date, the day you moved in. */

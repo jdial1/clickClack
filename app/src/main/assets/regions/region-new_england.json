@@ -1,0 +1,130 @@
+{
+  "id": "region-new_england",
+  "title": "New England",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "rne1",
+      "text": "Game night in New England:",
+      "type": "THIS_OR_THAT",
+      "options": [
+        "Red Sox or Patriots on TV",
+        "Anything but sports"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rne2",
+      "text": "Which New England sports memory would I bring up first?",
+      "type": "PICK_ONE",
+      "options": [
+        "A Red Sox World Series",
+        "A Patriots Super Bowl",
+        "The Celtics",
+        "The Bruins",
+        "I do not follow sports"
+      ],
+      "depth": 1,
+      "tags": [
+        "sports",
+        "past"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "rne3",
+      "text": "Best New England food, according to me?",
+      "type": "DROPDOWN",
+      "options": [
+        "Lobster roll",
+        "Clam chowder",
+        "A real maple anything",
+        "Fried clams",
+        "Apple cider donuts",
+        "Whoopie pie"
+      ],
+      "depth": 1,
+      "tags": [
+        "fun"
+      ],
+      "category": "Food"
+    },
+    {
+      "id": "rne4",
+      "text": "Which New England town would I pick for a weekend away?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "planning"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rne5",
+      "text": "How much do I love leaf-peeping season?",
+      "type": "SCALE",
+      "lowLabel": "It is just leaves",
+      "highLabel": "Best time of year",
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time"
+      ],
+      "category": "Know me"
+    },
+    {
+      "id": "rne6",
+      "text": "What is a New England tradition you want us to keep, or start?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "planning",
+        "home"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "rne7",
+      "text": "Pick the New England outings I would say yes to this fall.",
+      "type": "MULTI_SELECT",
+      "options": [
+        "Apple picking",
+        "A covered bridge drive",
+        "A Fenway game",
+        "The coast in the off-season",
+        "A corn maze"
+      ],
+      "maxChoices": 3,
+      "depth": 1,
+      "tags": [
+        "fun",
+        "time",
+        "sports"
+      ],
+      "category": "Travel"
+    },
+    {
+      "id": "rne8",
+      "text": "Put these in order of how much I would miss them if we moved away.",
+      "type": "RANK",
+      "options": [
+        "The seasons",
+        "The coast",
+        "The food",
+        "The accent"
+      ],
+      "depth": 1,
+      "tags": [
+        "home"
+      ],
+      "category": "Know me"
+    }
+  ]
+}

@@ -660,6 +660,8 @@ private fun SignedInApp(
                             onSetProfile = vm.repo::setProfile,
                             onSetRelationship = vm.repo::setRelationship,
                             onSetTopicHidden = vm.repo::setTopicHidden,
+                            onSetTopicInterest = vm.repo::setTopicInterest,
+                            onSetHomeZip = vm.repo::setHomeZip,
                             onAddSpecialDate = vm.repo::addSpecialDate,
                             onRemoveSpecialDate = vm.repo::removeSpecialDate,
                         )
