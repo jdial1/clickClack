@@ -621,6 +621,8 @@ private fun SignedInApp(
                             onTalkedAbout = vm.repo::markTalkedAbout,
                             themes = QuizTheme.entries.filter { it.label in pool.themes },
                             onPickTomorrow = vm.repo::pickTomorrow,
+                            sittings = Instruments.all,
+                            onTakeInstrument = { sitting = it },
                         )
 
                         screen.tab == Tab.BUILD -> BuildScreen(

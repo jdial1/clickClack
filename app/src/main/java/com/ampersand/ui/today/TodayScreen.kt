@@ -1,5 +1,15 @@
 package com.ampersand.ui.today
 
+import androidx.compose.foundation.layout.width
+import com.ampersand.ui.brick.glassOn
+import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.structureSlug
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.ampersand.model.Instrument
+import com.ampersand.model.Turn
+import com.ampersand.model.InboxKind
+import com.ampersand.model.InboxItem
+import com.ampersand.model.Inbox
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -108,6 +118,8 @@ fun TodayScreen(
     onTalkedAbout: (LocalDate) -> Unit = {},
     themes: List<QuizTheme> = emptyList(),
     onPickTomorrow: (String) -> Unit = {},
+    sittings: List<Instrument> = emptyList(),
+    onTakeInstrument: (String) -> Unit = {},
 ) {
     val you = Color(state.you.colorArgb)
     val them = Color(state.them.colorArgb)
@@ -202,6 +214,19 @@ fun TodayScreen(
         if (day.isRevealed && themes.isNotEmpty()) {
             Spacer(Modifier.height(24.dp))
             TomorrowPick(state, themes, onPickTomorrow)
+        }
+
+        val waiting = remember(state.quizRuns, state.instrumentRuns, decks, sittings) {
+            Inbox.of(state, decks, sittings)
+        }
+        if (waiting.isNotEmpty()) {
+            Spacer(Modifier.height(32.dp))
+            Waiting(state, waiting) { item ->
+                when (item.kind) {
+                    InboxKind.DECK -> onOpenDeck(item.id)
+                    InboxKind.SITTING -> onTakeInstrument(item.id)
+                }
+            }
         }
 
         Spacer(Modifier.height(32.dp))
@@ -845,6 +870,84 @@ private fun SealedPanel(
             sfx = Sfx.SEAL,
             onClick = onOpenReveal,
         )
+    }
+}
+
+/**
+ * Every deck and test one of you has finished and the other has not.
+ *
+ * Chips for whose turn, with counts, and rows that say it in a sentence. The
+ * two bricks on the right are the same two-a-day pips as the Shelf: lit for
+ * whoever has done it.
+ */
+@Composable
+private fun Waiting(state: CoupleState, items: List<InboxItem>, onOpen: (InboxItem) -> Unit) {
+    val you = BrickColor.of(state.you.colorArgb)
+    val them = BrickColor.of(state.them.colorArgb)
+    val yours = items.count { it.turn == Turn.YOURS }
+    val theirs = items.size - yours
+    var filter by rememberSaveable { mutableStateOf(if (yours > 0) Turn.YOURS else Turn.THEIRS) }
+    val shown = items.filter { it.turn == filter }
+
+    SectionLabel("Waiting")
+    Spacer(Modifier.height(10.dp))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        BrickChip(label = "Your turn  $yours", on = filter == Turn.YOURS, color = you, onClick = { filter = Turn.YOURS })
+        BrickChip(label = "${state.them.name}'s turn  $theirs", on = filter == Turn.THEIRS, color = them, onClick = { filter = Turn.THEIRS })
+    }
+    Spacer(Modifier.height(12.dp))
+
+    if (shown.isEmpty()) {
+        QuietNote(if (filter == Turn.YOURS) "Nothing waiting on you." else "Nothing waiting on ${state.them.name}.")
+        return
+    }
+
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    shown.forEach { item ->
+        BrickSlab(
+            slugs = listOf(structureSlug()),
+            studs = 12,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    sounds.play(Sfx.NAV)
+                    feel.play(Feel.NAV)
+                    onOpen(item)
+                },
+        ) {
+            val ink = inkOnBrick(structureSlug())
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 14.dp, end = 14.dp, top = 22.dp, bottom = 14.dp)
+                    .glassOn(structureSlug(), corner = 14.dp)
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(item.kind.label.uppercase(), style = MaterialTheme.typography.labelSmall, color = ink)
+                    Text(item.title, style = MaterialTheme.typography.titleMedium, color = ink)
+                    Text(
+                        when (item.turn) {
+                            Turn.YOURS -> "${state.them.name} finished. Your turn."
+                            Turn.THEIRS -> "You finished. ${state.them.name} has not yet."
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = ink,
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                    BrickDot(slug = if (item.youDone) you.slug else quietSlug(), studSize = Stud.pip, filled = item.youDone)
+                    BrickDot(slug = if (item.themDone) them.slug else quietSlug(), studSize = Stud.pip, filled = item.themDone)
+                }
+            }
+        }
     }
 }
 
