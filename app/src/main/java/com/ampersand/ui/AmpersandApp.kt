@@ -584,6 +584,7 @@ private fun SignedInApp(
                             onSetFollowing = vm.repo::setFollowing,
                             onSetHomeZip = vm.repo::setHomeZip,
                             onSetSource = vm.repo::setSource,
+                            onSetQuietHours = vm.repo::setQuietHours,
                             onRetake = { settings = false; sitting = it },
                         )
 

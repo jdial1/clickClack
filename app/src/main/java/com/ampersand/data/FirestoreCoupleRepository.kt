@@ -413,6 +413,8 @@ class FirestoreCoupleRepository(
                 .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
             why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests),
             sourcesOff = off,
+            quietFrom = coupleDoc?.getLong("quietFrom")?.toInt() ?: 20,
+            quietTo = coupleDoc?.getLong("quietTo")?.toInt() ?: 8,
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
@@ -749,6 +751,10 @@ class FirestoreCoupleRepository(
         // Merge keeps the partner's note.
         couple.collection(PLATES).document(plateId)
             .set(mapOf("notes" to mapOf(myUid to text)), SetOptions.merge())
+    }
+
+    override fun setQuietHours(from: Int, to: Int) {
+        couple.set(mapOf("quietFrom" to from, "quietTo" to to), SetOptions.merge())
     }
 
     override fun setSource(source: QuestionSource, on: Boolean) {

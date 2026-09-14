@@ -354,6 +354,7 @@ fun SettingsScreen(
     onSetFollowing: (Set<League>) -> Unit = {},
     onSetHomeZip: (String) -> Boolean = { true },
     onSetSource: (QuestionSource, Boolean) -> Unit = { _, _ -> },
+    onSetQuietHours: (Int, Int) -> Unit = { _, _ -> },
     onRetake: (String) -> Unit = {},
 ) {
     val sounds = LocalSounds.current
@@ -449,6 +450,34 @@ fun SettingsScreen(
                 else com.ampersand.notify.Reminder.schedule(context, parseHour(picked), 0)
             },
         )
+
+        Spacer(Modifier.height(20.dp))
+        SectionLabel("Quiet hours")
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "No notifications in these hours. Anything that comes in waits and arrives together.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            AmpDropdown(
+                options = HourLabels,
+                selected = HourLabels[state.quietFrom],
+                accent = Color(state.you.colorArgb),
+                placeholder = "From",
+                modifier = Modifier.weight(1f),
+                onSelect = { onSetQuietHours(HourLabels.indexOf(it), state.quietTo) },
+            )
+            AmpDropdown(
+                options = HourLabels,
+                selected = HourLabels[state.quietTo],
+                accent = Color(state.you.colorArgb),
+                placeholder = "Until",
+                modifier = Modifier.weight(1f),
+                onSelect = { onSetQuietHours(state.quietFrom, HourLabels.indexOf(it)) },
+            )
+        }
 
         Spacer(Modifier.height(32.dp))
         Credits()
@@ -722,6 +751,12 @@ private fun MoodFaceRow(you: BrickColor) {
             )
         }
     }
+}
+
+/** "12 am" through "11 pm", indexed by hour. */
+private val HourLabels = (0..23).map { h ->
+    val twelve = if (h % 12 == 0) 12 else h % 12
+    "$twelve ${if (h < 12) "am" else "pm"}"
 }
 
 /** One full-width brick that is either lit or not. */

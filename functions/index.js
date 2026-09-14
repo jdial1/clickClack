@@ -32,7 +32,7 @@ async function partnerOf(coupleId, uid) {
 
   const token = partner.get("fcmToken");
   if (!token) return null;
-  return { token, senderName: sender.get("displayName") || "They" };
+  return { token, uid: partnerUid, senderName: sender.get("displayName") || "They" };
 }
 
 /**
@@ -50,6 +50,16 @@ async function push(target, title, body) {
   });
 }
 
+/**
+ * Hold a push in the couple's outbox. [flushOutbox] sends it, batched with
+ * anything else for the same person, outside quiet hours.
+ */
+async function queue(coupleId, target, title, body) {
+  await db.collection(`couples/${coupleId}/outbox`).add({
+    to: target.uid, from: target.senderName || "", title, body: body || "", at: Date.now(),
+  });
+}
+
 /** Your partner answered the day. Nothing about *what* they said. */
 exports.onAnswer = onDocumentCreated(
   "couples/{coupleId}/days/{day}/answers/{uid}",
@@ -58,8 +68,7 @@ exports.onAnswer = onDocumentCreated(
     const target = await partnerOf(coupleId, uid);
     if (!target) return;
 
-    await push(
-      target,
+    await queue(coupleId, target,
       `${target.senderName} answered`,
       "Answer yours and the day opens.",
     );
@@ -74,8 +83,7 @@ exports.onQuizRun = onDocumentCreated(
     const target = await partnerOf(coupleId, uid);
     if (!target) return;
 
-    await push(
-      target,
+    await queue(coupleId, target,
       `${target.senderName} played a deck`,
       "Yours is the half that is missing.",
     );
@@ -99,8 +107,7 @@ exports.onWildcard = onDocumentCreated(
     const target = await partnerOf(coupleId, uid);
     if (!target) return;
 
-    await push(
-      target,
+    await queue(coupleId, target,
       `${target.senderName} wrote you a question`,
       "It will be the next one you are both asked.",
     );
@@ -129,15 +136,15 @@ exports.onDayUpdate = onDocumentUpdated(
 
     for (const uid of changedKeys(before, after, "reactions")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await push(target, `${target.senderName} reacted`, "See it on the day you both answered.");
+      if (target) await queue(coupleId, target, `${target.senderName} reacted`, "See it on the day you both answered.");
     }
     for (const uid of changedKeys(before, after, "notes")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await push(target, `${target.senderName} wrote a line back`, after.get("notes")[uid]);
+      if (target) await queue(coupleId, target, `${target.senderName} wrote a line back`, after.get("notes")[uid]);
     }
     for (const uid of changedKeys(before, after, "moodReplies")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await push(target, `${target.senderName} replied to your mood`, after.get("moodReplies")[uid]);
+      if (target) await queue(coupleId, target, `${target.senderName} replied to your mood`, after.get("moodReplies")[uid]);
     }
   },
 );
@@ -160,7 +167,7 @@ exports.onMoodUpdate = onDocumentUpdated("users/{uid}", async (event) => {
   const target = await partnerOf(coupleId, uid);
   if (!target) return;
   const label = MOOD_LABELS[after.id] || "a new mood";
-  await push(target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.");
+  await queue(coupleId, target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.");
 });
 
 /** Words picked toward a finished week's name, and the name once both are in. */
@@ -175,8 +182,8 @@ exports.onPlateUpdate = onDocumentUpdated(
     for (const uid of picked) {
       const target = await partnerOf(coupleId, uid);
       if (!target) continue;
-      if (both) await push(target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`);
-      else await push(target, `${target.senderName} picked words for the week`, "Pick yours to see its name.");
+      if (both) await queue(coupleId, target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`);
+      else await queue(coupleId, target, `${target.senderName} picked words for the week`, "Pick yours to see its name.");
     }
   },
 );
@@ -207,9 +214,69 @@ exports.specialDates = onSchedule({ schedule: "0 * * * *", timeZone: "UTC" }, as
     if (events.length === 0) continue;
 
     for (const u of users) {
-      const token = u.get("fcmToken");
-      if (!token) continue;
-      await push({ token }, events[0], events.length > 1 ? events.slice(1).join(". ") : "Today's question is about it.");
+      await queue(couple.id, { uid: u.id, senderName: "" }, events[0],
+        events.length > 1 ? events.slice(1).join(". ") : "Today's question is about it.");
     }
   }
 });
+
+/** Whether [hour] falls in quiet hours from [from] until [to] (wrapping past midnight). */
+function isQuiet(hour, from, to) {
+  if (from === to) return false;
+  return from > to ? hour >= from || hour < to : hour >= from && hour < to;
+}
+
+/** Wait this long after the newest item, so a burst goes out as one push. */
+const SETTLE_MS = 2 * 60 * 1000;
+/** Never hold a burst longer than this outside quiet hours. */
+const MAX_HOLD_MS = 15 * 60 * 1000;
+
+/**
+ * Every five minutes: for each couple, send what is waiting in the outbox as
+ * one push per person, unless it is quiet hours in their home time zone.
+ */
+exports.flushOutbox = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC" }, async () => {
+  const couples = await db.collection("couples").where("endedAt", "==", null).get();
+  const now = Date.now();
+  for (const couple of couples.docs) {
+    const pending = await couple.ref.collection("outbox").get();
+    if (pending.empty) continue;
+
+    const zone = couple.get("timeZone") || "America/Chicago";
+    const hour = new Date(new Date().toLocaleString("en-US", { timeZone: zone })).getHours();
+    const from = couple.get("quietFrom") ?? 20;
+    const to = couple.get("quietTo") ?? 8;
+    if (isQuiet(hour, from, to)) continue;
+
+    const byPerson = {};
+    pending.docs.forEach((d) => { (byPerson[d.get("to")] = byPerson[d.get("to")] || []).push(d); });
+
+    for (const [uid, items] of Object.entries(byPerson)) {
+      const times = items.map((d) => d.get("at") || 0);
+      const newest = Math.max(...times);
+      const oldest = Math.min(...times);
+      if (now - newest < SETTLE_MS && now - oldest < MAX_HOLD_MS) continue;
+
+      const user = await db.doc(`users/${uid}`).get();
+      const token = user.get("fcmToken");
+      if (token) {
+        items.sort((a, b) => (a.get("at") || 0) - (b.get("at") || 0));
+        if (items.length === 1) {
+          await push({ token }, items[0].get("title"), items[0].get("body"));
+        } else {
+          const name = items.map((d) => d.get("from")).find((n) => n) || "";
+          await push(
+            { token },
+            name ? `${items.length} updates from ${name}` : `${items.length} updates`,
+            items.map((d) => d.get("title")).join(" · "),
+          );
+        }
+      }
+      const batch = db.batch();
+      items.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+  }
+});
+
+exports._isQuiet = isQuiet;

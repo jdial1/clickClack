@@ -134,6 +134,9 @@ interface CoupleRepository {
     /** Turn a question source on or off for both of you. */
     fun setSource(source: QuestionSource, on: Boolean)
 
+    /** Hours (0-23) with no pushes, from [from] until [to]. Equal hours means never quiet. */
+    fun setQuietHours(from: Int, to: Int)
+
     fun addToBucket(text: String, group: BucketGroup)
 
     /** Marks an item done and awards each partner a brick. Cannot be undone. */
@@ -396,6 +399,8 @@ class FakeCoupleRepository(
             },
         )
     }
+
+    override fun setQuietHours(from: Int, to: Int) = mutate { it.copy(quietFrom = from, quietTo = to) }
 
     override fun setSource(source: QuestionSource, on: Boolean) = mutate {
         it.copy(sourcesOff = if (on) it.sourcesOff - source else it.sourcesOff + source)

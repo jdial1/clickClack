@@ -222,6 +222,9 @@ data class CoupleState(
     /** Sunrise and sunset at home today. */
     /** Question sources either of you can turn off in Advanced settings. Shared, so both phones agree. */
     val sourcesOff: Set<QuestionSource> = emptySet(),
+    /** No pushes from this hour until [quietTo], in your home ZIP's time zone. Shared by both of you. */
+    val quietFrom: Int = 20,
+    val quietTo: Int = 8,
     /** Why today's question was chosen, for the tag on its card: "Weather", "First date", "Family". */
     val why: String? = null,
     /** Days and decks either of you kept, keyed by [Kept.day] or [Kept.deck], with a label to show. */
