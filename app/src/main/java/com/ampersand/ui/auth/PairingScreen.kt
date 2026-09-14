@@ -1,5 +1,13 @@
 package com.ampersand.ui.auth
 
+import androidx.compose.foundation.layout.Row
+import com.ampersand.ui.components.UiIcon
+import android.content.ClipboardManager
+import android.content.ClipData
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import com.ampersand.auth.PendingJoin
+import com.ampersand.auth.InviteCode
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +57,10 @@ fun PairingScreen(
     onRedeem: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var entered by remember { mutableStateOf("") }
+    var entered by remember { mutableStateOf(PendingJoin.code?.let(InviteCode::display).orEmpty()) }
+    val context = LocalContext.current
+    // A join link opened while this screen is up fills the code in.
+    androidx.compose.runtime.LaunchedEffect(PendingJoin.code) { PendingJoin.code?.let { entered = InviteCode.display(it) } }
 
     Box(modifier.fillMaxSize()) {
       BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
@@ -91,6 +102,18 @@ fun PairingScreen(
             )
         } else {
             CodePlate(code)
+            Spacer(Modifier.height(12.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                AmpButton(label = "Share", slug = null, icon = UiIcon.NEXT, modifier = Modifier.weight(1f)) {
+                    val text = "Join me on Click Clack. Our code is ${InviteCode.display(code)}.\n${InviteCode.link(code)}"
+                    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+                    context.startActivity(Intent.createChooser(send, "Share your code"))
+                }
+                AmpButton(label = "Copy", slug = null, icon = UiIcon.DONE, modifier = Modifier.weight(1f)) {
+                    val clipboard = context.getSystemService(ClipboardManager::class.java)
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Click Clack code", InviteCode.display(code)))
+                }
+            }
             Spacer(Modifier.height(10.dp))
             Text(
                 text = "Single use. Expires in 1 hour.",
@@ -111,7 +134,7 @@ fun PairingScreen(
             onValueChange = { entered = it },
             // No user color exists yet; blue matches the button below.
             color = BrickColor.BLUE,
-            placeholder = "8-character code",
+            placeholder = "Like Wobbly Castle 427",
         )
         Spacer(Modifier.height(14.dp))
         AmpButton(
@@ -147,10 +170,8 @@ private fun CodePlate(code: String) {
     ) {
         SelectionContainer {
             Text(
-                text = code.toCharArray().joinToString(" "),
-                fontFamily = FontFamily.Monospace,
+                text = InviteCode.display(code),
                 fontSize = 26.sp,
-                letterSpacing = 1.sp,
                 color = inkOnBrick(BrickColor.YELLOW.slug),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -173,7 +194,7 @@ private fun PreviewPairing() = AmpersandTheme {
 @Composable
 private fun PreviewPairingCode() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
-        PairingScreen("Justin", "KX7PQ4MB", false, null, {}, {})
+        PairingScreen("Justin", "WOBBLYCASTLE427", false, null, {}, {})
     }
 }
 
@@ -181,7 +202,7 @@ private fun PreviewPairingCode() = AmpersandTheme {
 @Composable
 private fun PreviewPairingLight() = AmpersandTheme(darkTheme = false) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        PairingScreen("J D", "Y6CTDU6X", false, null, {}, {})
+        PairingScreen("J D", "SLEEPYWAFFLE318", false, null, {}, {})
     }
 }
 

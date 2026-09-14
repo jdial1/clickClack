@@ -1,5 +1,8 @@
 package com.ampersand.auth
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import com.ampersand.model.SculptureNames
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,16 +71,41 @@ fun createPairingRepository(
  * Invite codes: 8 chars from a 32-symbol alphabet without I, O, 0, 1 (2^40).
  * Rules let any signed-in user `get` an invite by id, so the code is the secret.
  */
+/**
+ * Join codes built from the sculpture-name words: a describing word, a thing
+ * and three digits, like WOBBLYCASTLE427, shown as "Wobbly Castle 427".
+ * About 1.6 million codes, each live for an hour.
+ */
 internal object InviteCode {
-    private const val ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    private const val LENGTH = 8
 
-    fun next(random: Random = Random.Default): String =
-        (1..LENGTH).map { ALPHABET[random.nextInt(ALPHABET.length)] }.joinToString("")
+    fun next(random: Random = Random.Default): String {
+        val describing = SculptureNames.Describing[random.nextInt(SculptureNames.Describing.size)]
+        val thing = SculptureNames.Things[random.nextInt(SculptureNames.Things.size)]
+        return "$describing$thing${random.nextInt(100, 1000)}".uppercase()
+    }
 
-    /** Uppercases and strips spaces, dashes and other non-alphabet characters. */
-    fun normalise(input: String): String =
-        input.uppercase().filter { it in ALPHABET }.take(LENGTH)
+    /** Uppercases and keeps only letters and digits, so "wobbly castle 427" and "Wobbly-Castle-427" both work. */
+    fun normalise(input: String): String = input.uppercase().filter { it in 'A'..'Z' || it in '0'..'9' }
+
+    /** "WOBBLYCASTLE427" as "Wobbly Castle 427"; anything else is returned as is. */
+    fun display(code: String): String {
+        val word = SculptureNames.Describing.firstOrNull { code.startsWith(it.uppercase()) } ?: return code
+        val rest = code.removePrefix(word.uppercase())
+        val thing = SculptureNames.Things.firstOrNull { rest.startsWith(it.uppercase()) } ?: return code
+        return "$word $thing ${rest.removePrefix(thing.uppercase())}"
+    }
+
+    /** A link that opens the app with the code filled in. */
+    fun link(code: String): String = "clickclack://join/$code"
+
+    /** The code from a [link], or null. */
+    fun fromLink(uri: String?): String? =
+        uri?.takeIf { it.startsWith("clickclack://join/") }?.removePrefix("clickclack://join/")?.let(::normalise)?.takeIf { it.isNotEmpty() }
+}
+
+/** A join code handed to the app by a link, waiting for the pairing screen. */
+object PendingJoin {
+    var code by androidx.compose.runtime.mutableStateOf<String?>(null)
 }
 
 /** In-memory pairing for builds without Firebase. Starts paired with the mock couple. */

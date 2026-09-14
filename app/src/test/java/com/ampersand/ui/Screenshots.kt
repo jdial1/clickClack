@@ -116,5 +116,9 @@ class Screenshots {
         UsScreen(special.copy(history = special.history.filter { it.date >= today.minusDays(2) }, quizRuns = emptyList()))
     }
 
+    @Test fun pairing() = shoot("08-pairing-code") {
+        com.ampersand.ui.auth.PairingScreen("Justin", "WOBBLYCASTLE427", false, null, {}, {})
+    }
+
     @Test fun settings() = shoot("07-settings") { SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {}) }
 }
