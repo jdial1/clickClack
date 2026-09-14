@@ -78,7 +78,6 @@ fun DecksScreen(
         Spacer(Modifier.height(24.dp))
         ShapeTomorrow(state, themes, onPickTomorrow, onWrite)
 
-        Spacer(Modifier.height(28.dp))
         LongerTests(state, onTakeInstrument)
 
         Spacer(Modifier.height(28.dp))
@@ -132,12 +131,15 @@ fun DecksScreen(
     }
 }
 
-/** The three profile tests: start or continue yours. Finished ones point to Us. */
+/** Profile tests not yet finished by both of you: start, continue, or wait. Hidden once all are done. */
 @Composable
 private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
+    // Finished tests live on Us; only ones still in progress show here.
     val groups = remember(state.instrumentRuns, state.you, state.them) {
-        BadgeWall.groups(state.instrumentRuns, state.you, state.them)
+        BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.isEarned }
     }
+    if (groups.isEmpty()) return
+    Spacer(Modifier.height(28.dp))
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     SectionLabel("Longer tests")
@@ -163,7 +165,6 @@ private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
                 Text(g.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                 Text(
                     when {
-                        g.isEarned -> "Done. Results are on Us."
                         !g.yourTurn -> "Waiting for ${state.them.name}"
                         else -> g.standing.ifBlank { "${g.minutes} min each" }
                     },
