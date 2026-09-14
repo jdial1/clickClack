@@ -11,6 +11,9 @@ data class Quiz(
 ) {
     val size: Int get() = questions.size
 
+    /** Playful decks are open: each of you can see the other's answers as you play. Others stay sealed. */
+    val sealed: Boolean get() = theme != QuizTheme.PLAYFUL
+
     /** Rough time estimate from [QuestionType.weight]. */
     val minutes: Int get() = (questions.sumOf { it.type.weight } / 60).coerceAtLeast(1)
 }

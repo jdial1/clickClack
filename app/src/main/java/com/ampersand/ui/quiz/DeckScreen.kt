@@ -1,5 +1,6 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.components.AnswerValues
 import com.ampersand.ui.components.IconAction
 import com.ampersand.model.Kept
 import com.ampersand.ui.components.IconBrick
@@ -185,9 +186,21 @@ private fun DeckPlayer(
             }
         }
 
-        Spacer(Modifier.height(28.dp))
         val ready = mine.value.isComplete(question) &&
             (!question.isScored || guess.value.isComplete(question))
+
+        // Open decks: once you've answered this one, see what they said.
+        val theirRun = state.theirRun(quiz.id)
+        if (!quiz.sealed && ready) {
+            theirRun?.answers?.get(question.id)?.let { theirs ->
+                Spacer(Modifier.height(20.dp))
+                SectionLabel("${state.them.name} said")
+                Spacer(Modifier.height(8.dp))
+                AnswerValues(theirs, question.type)
+            }
+        }
+
+        Spacer(Modifier.height(28.dp))
         val last = index == quiz.size - 1
 
         AmpButton(

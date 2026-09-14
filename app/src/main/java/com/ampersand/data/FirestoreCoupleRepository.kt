@@ -210,7 +210,8 @@ class FirestoreCoupleRepository(
                 snap?.documents.orEmpty().forEach { quiz ->
                     quizDocs = quizDocs + (quiz.id to quiz)
                     watchRuns(quiz.id)
-                    if (quiz.getBoolean("revealed") == true) watchPartnerRun(quiz.id)
+                    // Open decks (sealed = false) let you read theirs straight away.
+                    if (quiz.getBoolean("revealed") == true || quiz.getBoolean("sealed") == false) watchPartnerRun(quiz.id)
                     liftQuizSealIfBothIn(quiz.id)
                 }
             }
@@ -1107,11 +1108,14 @@ class FirestoreCoupleRepository(
     ) {
         if (_state.value.myRun(quizId) != null) return
         val quiz = couple.collection(QUIZZES).document(quizId)
+        val doc = quizDocs[quizId]
 
         quiz.set(
             mapOf(
-                "revealed" to false,
+                "revealed" to (doc?.getBoolean("revealed") ?: false),
                 "submitted" to FieldValue.arrayUnion(myUid),
+                // Fixed by whoever plays first; the rules refuse changing it later.
+                "sealed" to (doc?.getBoolean("sealed") ?: (pool.deck(quizId)?.sealed ?: true)),
             ),
             SetOptions.merge(),
         )
