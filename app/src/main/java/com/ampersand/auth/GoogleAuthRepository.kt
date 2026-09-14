@@ -86,7 +86,7 @@ class GoogleAuthRepository(
             if (message.isBlank() || message.contains("cancelled by the user", ignoreCase = true)) {
                 Result.success(Unit)
             } else {
-                Result.failure(IllegalStateException("Google sign-in didn't finish. $message"))
+                Result.failure(IllegalStateException("Google sign-in didn't finish. $message\nApp key SHA-1: ${signingSha1()}"))
             }
         } catch (e: NoCredentialException) {
             // No Google account on the device at all.
@@ -140,6 +140,18 @@ class GoogleAuthRepository(
         }
         signOut()
     }
+
+    /**
+     * The SHA-1 this install is signed with, the value Google matches against the OAuth clients.
+     * Shown on a rejected sign-in: Play, internal app sharing and sideloads each sign differently.
+     */
+    private fun signingSha1(): String = runCatching {
+        val info = appContext.packageManager.getPackageInfo(
+            appContext.packageName, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES,
+        )
+        val cert = info.signingInfo!!.apkContentsSigners.first().toByteArray()
+        java.security.MessageDigest.getInstance("SHA-1").digest(cert).joinToString(":") { "%02X".format(it) }
+    }.getOrDefault("unknown")
 
     /** Call when the owning scope dies, or the listener outlives this object. */
     fun close() = auth.removeAuthStateListener(listener)
