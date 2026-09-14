@@ -9,7 +9,6 @@ import com.ampersand.model.Moment
 import com.ampersand.ui.components.ThemeIcon
 import com.ampersand.ui.components.UiIcon
 import com.ampersand.model.DayEntry
-import com.ampersand.ui.theme.LocalAppearance
 import com.ampersand.ui.components.WeatherBrickArt
 import com.ampersand.ui.components.MoodArt
 import com.ampersand.model.MoodEntry
@@ -717,8 +716,8 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onRep
     var replying by rememberSaveable { mutableStateOf(false) }
     val theirReply = state.today.moodReplies[state.them.uid]
     val myReply = state.today.moodReplies[state.you.uid]
-    // The default face colour is set in Settings.
-    val faceColor = LocalAppearance.current?.moodFace
+    // Faces keep their own pack colours.
+    val faceColor: BrickColor? = null
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 

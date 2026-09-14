@@ -1,7 +1,9 @@
 package com.ampersand.ui.instrument
 
-import androidx.compose.foundation.layout.width
-import com.ampersand.ui.components.IconBrick
+import com.ampersand.ui.components.IconAction
+import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.components.UiIcon
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -21,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -326,15 +327,14 @@ private fun StickyHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(
-                onClick = onBack,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBrick(UiIcon.BACK, size = 20.dp)
-                    Spacer(Modifier.width(6.dp))
-                    Text(if (page.index > 0) "Back" else "Leave")
-                }
+            // Same Back pill as Settings.
+            BrickPill(slug = structureSlug(), studSize = Stud.chip, height = BrickHeight.MEDIUM) {
+                IconAction(
+                    UiIcon.BACK, "Back",
+                    Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                    color = inkOnBrick(structureSlug()),
+                    onClick = onBack,
+                )
             }
 
             if (instrument.needsProgress) {

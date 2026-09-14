@@ -462,8 +462,8 @@ private fun SignedInApp(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
                         enabled = openDate == null && openDeck == null && !writing && answering == null &&
-                            sitting == null && !settings,
-                        onSelect = { tab = it; openDate = null; openDeck = null },
+                            sitting == null,
+                        onSelect = { tab = it; openDate = null; openDeck = null; settings = false },
                     )
                 },
             ) { padding ->

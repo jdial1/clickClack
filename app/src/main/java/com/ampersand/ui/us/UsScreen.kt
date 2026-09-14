@@ -4,7 +4,6 @@ import com.ampersand.model.DayPips
 import com.ampersand.ui.components.IconAction
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
-import com.ampersand.ui.components.MoodArt
 import com.ampersand.ui.notify.parseHour
 import com.ampersand.ui.notify.Hours
 import com.ampersand.model.QuestionSource
@@ -478,10 +477,6 @@ fun SettingsScreen(
             }
         }
 
-        Spacer(Modifier.height(32.dp))
-        SectionLabel("Mood faces")
-        Spacer(Modifier.height(10.dp))
-        MoodFaceRow(BrickColor.of(state.you.colorArgb))
 
         Spacer(Modifier.height(32.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -780,28 +775,6 @@ private fun ThemeBricks(you: BrickColor) {
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }
-        }
-    }
-}
-
-/** The default colour for mood faces: each face's own colour, or one of the four brick colours. */
-@Composable
-private fun MoodFaceRow(you: BrickColor) {
-    val appearance = LocalAppearance.current
-    val sounds = LocalSounds.current
-    val current = appearance?.moodFace
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        (listOf<BrickColor?>(null) + BrickColor.entries).forEach { c ->
-            MoodArt(
-                com.ampersand.model.Mood.SNAPPED_IN,
-                you,
-                faceColor = c,
-                size = if (c == current) 48.dp else 36.dp,
-                modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                    sounds.play(Sfx.SELECT)
-                    appearance?.chooseMoodFace(c)
-                },
-            )
         }
     }
 }
