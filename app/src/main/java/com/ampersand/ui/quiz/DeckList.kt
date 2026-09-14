@@ -10,9 +10,7 @@ import com.ampersand.ui.components.UiIcon
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,14 +33,11 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DeckState
-import com.ampersand.model.QuestionType
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
-import com.ampersand.model.QuizTheme
 import com.ampersand.model.label
 import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.brick.inkOnBrick
-import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
@@ -55,7 +49,7 @@ import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.Stud
 
-/** All decks, filterable, grouped by [DeckState]. Finished decks stay listed so their results are one tap away. */
+/** All decks, grouped by [DeckState]. Finished decks stay listed so their results are one tap away. */
 @Composable
 fun DeckList(
     decks: List<Quiz>,
@@ -63,18 +57,7 @@ fun DeckList(
     onOpen: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Not saveable on purpose: filters reset when you leave so decks never stay hidden.
-    var themes by remember { mutableStateOf(emptySet<QuizTheme>()) }
-    var types by remember { mutableStateOf(emptySet<QuestionType>()) }
-    var sorting by remember { mutableStateOf(false) }
-
-    // A deck matches a type if any of its questions has that type.
-    val shown = remember(decks, themes, types) {
-        decks.filter { deck ->
-            (themes.isEmpty() || deck.theme in themes) &&
-                (types.isEmpty() || deck.questions.any { it.type in types })
-        }
-    }
+    val shown = decks
 
     val grouped = remember(shown, state.quizRuns) {
         shown.groupBy { state.deckState(it.id) }
@@ -82,24 +65,6 @@ fun DeckList(
     }
 
     Column(modifier.fillMaxWidth()) {
-        SortBricks(
-            themes = themes,
-            types = types,
-            open = sorting,
-            matching = shown.size,
-            total = decks.size,
-            onToggleOpen = { sorting = !sorting },
-            onTheme = { themes = themes.toggle(it) },
-            onType = { types = types.toggle(it) },
-            onClear = { themes = emptySet(); types = emptySet() },
-        )
-
-        if (shown.isEmpty()) {
-            Spacer(Modifier.height(20.dp))
-            QuietNote("No decks match. Try fewer filters.")
-            return@Column
-        }
-
         DeckState.entries.forEach { group ->
             val inGroup = grouped[group].orEmpty()
             if (inGroup.isEmpty()) return@forEach
@@ -118,92 +83,6 @@ fun DeckList(
                 DeckRow(deck, group, state, onOpen)
                 Spacer(Modifier.height(10.dp))
             }
-        }
-    }
-}
-
-private fun <T> Set<T>.toggle(value: T): Set<T> =
-    if (value in this) this - value else this + value
-
-/**
- * Collapsible filters: category chips (in each category's color) and question-type chips (plain).
- * The two rows combine with AND.
- */
-@Composable
-private fun SortBricks(
-    themes: Set<QuizTheme>,
-    types: Set<QuestionType>,
-    open: Boolean,
-    matching: Int,
-    total: Int,
-    onToggleOpen: () -> Unit,
-    onTheme: (QuizTheme) -> Unit,
-    onType: (QuestionType) -> Unit,
-    onClear: () -> Unit,
-) {
-    val active = themes.size + types.size
-
-    Spacer(Modifier.height(10.dp))
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        BrickChip(
-            label = if (active == 0) "Filter" else "Filter  ·  $active",
-            on = open || active > 0,
-            color = null,
-            icon = UiIcon.FILTER,
-            onClick = onToggleOpen,
-        )
-        if (active > 0) {
-            // Tapping the count clears all filters.
-            Text(
-                text = "$matching of $total  ·  Clear",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClear,
-                ),
-            )
-        }
-    }
-
-    if (!open) return
-
-    Spacer(Modifier.height(16.dp))
-    SectionLabel("Category")
-    Spacer(Modifier.height(8.dp))
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        QuizTheme.entries.forEach { theme ->
-            BrickChip(
-                label = theme.label,
-                on = theme in themes,
-                color = theme.brick,
-                onClick = { onTheme(theme) },
-            )
-        }
-    }
-
-    Spacer(Modifier.height(18.dp))
-    SectionLabel("Question type")
-    Spacer(Modifier.height(8.dp))
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        QuestionType.entries.forEach { type ->
-            BrickChip(
-                label = type.label,
-                on = type in types,
-                color = null,
-                onClick = { onType(type) },
-            )
         }
     }
 }

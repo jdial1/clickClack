@@ -1,5 +1,8 @@
 package com.ampersand.ui.quiz
 
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.border
 import com.ampersand.ui.components.ThemeIcon
@@ -83,48 +86,42 @@ fun DecksScreen(
         Spacer(Modifier.height(28.dp))
         SectionLabel("Themes")
         Spacer(Modifier.height(10.dp))
-        // Three across. Grey cards; only the icon brick carries the theme colour.
-        deckThemes.chunked(3).forEach { rowThemes ->
-            Row(Modifier.fillMaxWidth().padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                rowThemes.forEach { t ->
-                    val on = theme == t
-                    val inTheme = decks.filter { it.theme == t }
-                    val waiting = inTheme.count { state.deckState(it.id) == DeckState.WAITING_ON_YOU }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = if (on) 2.2f else 1.4f)
-                            .then(if (on) Modifier.border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(12.dp)) else Modifier)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                            ) {
-                                sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
-                                feel.play(if (on) Feel.DESELECT else Feel.SELECT)
-                                theme = if (on) null else t
-                            }
-                            .padding(horizontal = 6.dp, vertical = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        ThemeIcon(t, size = 40.dp)
-                        Spacer(Modifier.height(6.dp))
-                        Text(t.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
-                        Text(
-                            if (waiting > 0) "${inTheme.size} · $waiting for you" else "${inTheme.size} decks",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            maxLines = 1,
-                        )
-                    }
+        // One scrolling row. Grey cards; only the icon brick carries the theme colour.
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(deckThemes, key = { it.name }) { t ->
+                val on = theme == t
+                val inTheme = decks.filter { it.theme == t }
+                val waiting = inTheme.count { state.deckState(it.id) == DeckState.WAITING_ON_YOU }
+                Column(
+                    Modifier
+                        .width(108.dp)
+                        .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = if (on) 2.2f else 1.4f)
+                        .then(if (on) Modifier.border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(12.dp)) else Modifier)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) {
+                            sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
+                            feel.play(if (on) Feel.DESELECT else Feel.SELECT)
+                            theme = if (on) null else t
+                        }
+                        .padding(horizontal = 6.dp, vertical = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    ThemeIcon(t, size = 40.dp)
+                    Spacer(Modifier.height(6.dp))
+                    Text(t.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
+                    Text(
+                        if (waiting > 0) "${inTheme.size} · $waiting for you" else if (inTheme.size == 1) "1 deck" else "${inTheme.size} decks",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                    )
                 }
-                // Keep a short last row the same card width.
-                repeat(3 - rowThemes.size) { Spacer(Modifier.weight(1f)) }
             }
         }
 
-
-        Spacer(Modifier.height(28.dp))
-        SectionLabel(theme?.let { "${it.label} decks" } ?: "All decks")
+        Spacer(Modifier.height(12.dp))
         DeckList(decks = shown, state = state, onOpen = onOpenDeck)
 
         Spacer(Modifier.height(48.dp))
