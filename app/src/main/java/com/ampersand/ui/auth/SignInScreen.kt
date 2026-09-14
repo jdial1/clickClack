@@ -31,6 +31,7 @@ fun SignInScreen(
     error: String?,
     onSignIn: () -> Unit,
     modifier: Modifier = Modifier,
+    onPreview: () -> Unit = {},
 ) {
     Box(modifier.fillMaxSize()) {
       BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
@@ -73,6 +74,13 @@ fun SignInScreen(
 
         Spacer(Modifier.height(20.dp))
         SectionLabel("One question a day, for two people")
+
+        Spacer(Modifier.height(28.dp))
+        com.ampersand.ui.components.IconAction(
+            com.ampersand.ui.components.UiIcon.NEXT,
+            "Skip for now and look around",
+            onClick = onPreview,
+        )
       }
     }
 }

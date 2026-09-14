@@ -211,13 +211,20 @@ fun AmpersandApp() {
             return@CompositionLocalProvider
         }
 
+        // A look around on sample data, from sign-in or pairing. Nothing reaches Firebase.
+        var demo by rememberSaveable { mutableStateOf(false) }
+        if (demo) {
+            DemoApp(onExit = { demo = false })
+            return@CompositionLocalProvider
+        }
+
         when (auth) {
             // Blank, not a spinner: the cached session resolves in a frame or two.
             AuthState.Loading -> Surface(color = MaterialTheme.colorScheme.background) {
                 Box(Modifier.fillMaxSize())
             }
 
-            AuthState.SignedOut -> SignedOutScreen(authVm.auth)
+            AuthState.SignedOut -> SignedOutScreen(authVm.auth, onPreview = { demo = true })
 
             is AuthState.SignedIn -> {
                 val account = auth as AuthState.SignedIn
@@ -227,6 +234,7 @@ fun AmpersandApp() {
                         Reminder.cancel(context)
                         Push.unregister(context, account.uid) { authVm.auth.signOut() }
                     },
+                    onPreview = { demo = true },
                 )
             }
         }
@@ -234,9 +242,31 @@ fun AmpersandApp() {
     }
 }
 
+private const val DemoUid = "u_demo"
+
+/** The whole app on the in-memory sample couple. Sign out and unpair both just leave. */
+@Composable
+private fun DemoApp(onExit: () -> Unit) {
+    val context = LocalContext.current
+    val pool = remember(context) { QuestionPool.load(context) }
+    val account = remember { AuthState.SignedIn(DemoUid, "Alex", email = null, photoUrl = null) }
+    val vm: AmpersandViewModel = viewModel(
+        key = "demo",
+        factory = AmpersandViewModel.factory(hasFirebase = false, coupleId = "c_fake_demo", myUid = DemoUid, partnerUid = "u_demo_partner", pool = pool),
+    )
+    val state by vm.repo.state.collectAsStateWithLifecycle()
+    AmpersandTheme(
+        you = Color(state.you.colorArgb),
+        them = Color(state.them.colorArgb),
+        darkTheme = LocalAppearance.current?.isDark() ?: isSystemInDarkTheme(),
+    ) {
+        SignedInApp(vm = vm, state = state, account = account, pool = pool, onSignOut = onExit, onUnpair = onExit)
+    }
+}
+
 /** Sign-in, and the one place the app talks to Credential Manager. */
 @Composable
-private fun SignedOutScreen(auth: AuthRepository) {
+private fun SignedOutScreen(auth: AuthRepository, onPreview: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var busy by remember { mutableStateOf(false) }
@@ -263,6 +293,7 @@ private fun SignedOutScreen(auth: AuthRepository) {
                     }
                 }
             },
+            onPreview = onPreview,
         )
     }
 }
@@ -275,6 +306,7 @@ private fun SignedOutScreen(auth: AuthRepository) {
 private fun PairedGate(
     account: AuthState.SignedIn,
     onSignOut: () -> Unit,
+    onPreview: () -> Unit,
 ) {
     val context = LocalContext.current
     val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
@@ -361,6 +393,7 @@ private fun PairedGate(
                         error = r.exceptionOrNull()?.message
                     }
                 },
+                onPreview = onPreview,
             )
         }
     }
@@ -396,7 +429,7 @@ private fun SignedInApp(
         LaunchedEffect(account.uid, account.displayName) {
             vm.repo.bindLocalUser(account.uid, account.displayName)
             // Registered on every launch: tokens rotate and stale ones fail silently.
-            Push.register(appContext, account.uid)
+            if (account.uid != DemoUid) Push.register(appContext, account.uid)
         }
 
         // Interests setup, asked once. null means the profile is still loading.
@@ -414,7 +447,7 @@ private fun SignedInApp(
         val waiting = state.decksAwaitingYou(pool.playable.map { it.id })
         val unanswered = state.today.answerFor(account.uid) == null
         LaunchedEffect(waiting, unanswered, state.them.name) {
-            Reminder.cacheOutstanding(
+            if (account.uid != DemoUid) Reminder.cacheOutstanding(
                 context = context,
                 questionPending = unanswered,
                 decksWaiting = waiting,

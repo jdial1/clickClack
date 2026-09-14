@@ -58,6 +58,7 @@ fun PairingScreen(
     onCreateInvite: () -> Unit,
     onRedeem: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onPreview: () -> Unit = {},
 ) {
     var entered by remember { mutableStateOf(PendingJoin.code?.let(InviteCode::display).orEmpty()) }
     // A join link skips the choice.
@@ -177,6 +178,8 @@ fun PairingScreen(
             )
         }
 
+        Spacer(Modifier.height(28.dp))
+        IconAction(UiIcon.NEXT, "Skip for now and look around", onClick = onPreview)
         Spacer(Modifier.height(32.dp))
       }
     }

@@ -88,9 +88,10 @@ Tablet screenshots are optional and skipped.
 - **Privacy policy URL:** https://clickclack-002827.web.app/privacy
   (Firebase Hosting serves `store/privacy.html`; redeploy with
   `firebase deploy --only hosting`).
-- **App access:** sign-in is required. Give reviewers a Google test account and
-  a second paired account, or a partner code they can enter, under "All or some
-  functionality is restricted".
+- **Sign in details (App access):** Yes, restricted. Add a paired Google test
+  account, and in "Any other information" say: "Tap 'Skip for now and look
+  around' on the sign-in screen to open every screen with sample data and no
+  account. Signing in with the account above shows the live, paired version."
 - **Ads:** No, the app contains no ads.
 - **Target audience:** 18 and over. Not designed for children.
 - **Content rating (IARC questionnaire):** Category "Social or communication".

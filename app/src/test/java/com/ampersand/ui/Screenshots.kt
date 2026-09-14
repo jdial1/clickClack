@@ -120,5 +120,7 @@ class Screenshots {
         com.ampersand.ui.auth.PairingScreen("Justin", "WOBBLYCASTLE427", false, null, {}, {})
     }
 
+    @Test fun sign_in() = shoot("00-sign-in") { com.ampersand.ui.auth.SignInScreen(busy = false, error = null, onSignIn = {}) }
+
     @Test fun settings() = shoot("07-settings") { SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {}) }
 }
