@@ -24,6 +24,15 @@ object BadgeWall {
         group(runs, Instruments.LOVE_ATTITUDES, you, them) {
             listOf(styleRow(it, you, them))
         },
+        group(runs, Instruments.ATTACHMENT, you, them) { run ->
+            listOf(pairRow(run, you, them, Instruments.ATTACHMENT, "attachment") { attachmentStyle(it) })
+        },
+        group(runs, Instruments.ENNEAGRAM, you, them) { run ->
+            listOf(pairRow(run, you, them, Instruments.ENNEAGRAM, "enneagram") { r -> "The ${r.maxBy { it.value }.subscale.label}" })
+        },
+        group(runs, Instruments.DISC, you, them) { run ->
+            listOf(pairRow(run, you, them, Instruments.DISC, "disc") { discStyle(it) })
+        },
         group(runs, Instruments.LOVE_LANGUAGES, you, them) {
             listOf(
                 languageRow(it, you, them, Instruments.FELT,
@@ -183,6 +192,56 @@ object BadgeWall {
             minutes = kit.minutes,
             waitingOnThem = run != null && !open && run.has(of.uid),
         )
+    }
+
+    // ---- attachment, enneagram, DISC ----------------------------------------
+
+    /** One badge each for a single-pass test, titled by [title] from that person's readings. */
+    private fun pairRow(
+        run: InstrumentRun?,
+        you: Member,
+        them: Member,
+        kit: Instrument,
+        slot: String,
+        title: (List<Reading>) -> String,
+    ) = BadgeRow(
+        label = "",
+        badges = listOf(Owner.YOU to you, Owner.THEM to them).map { (owner, of) ->
+            val open = run?.isOpen == true
+            val readings = if (open) run.responsesFor(of.uid)?.let { kit.readings(it) } else null
+            Badge(
+                slotId = "$slot.${owner.name.lowercase()}",
+                owner = owner,
+                who = of.name,
+                result = readings?.let(title),
+                detail = readings.orEmpty().sortedByDescending { it.fraction }.map { r ->
+                    BadgeBar(r.subscale.label, r.fraction, "${r.value} of ${r.subscale.range.last}")
+                },
+                instrumentId = kit.id,
+                minutes = kit.minutes,
+                waitingOnThem = run != null && !open && run.has(of.uid),
+            )
+        },
+    )
+
+    /** Low or high on keeping distance and on worrying, split at each scale's midpoint. */
+    fun attachmentStyle(readings: List<Reading>): String {
+        val distant = readings.first { it.subscale.id == "avoidance" }.let { it.value > it.subscale.cut!! }
+        val worried = readings.first { it.subscale.id == "anxiety" }.let { it.value > it.subscale.cut!! }
+        return when {
+            !distant && !worried -> "Secure"
+            !distant -> "Anxious"
+            !worried -> "Avoidant"
+            else -> "Fearful"
+        }
+    }
+
+    /** The top trait, or a blend like "Steady-Conscientious" when the second is within a point. */
+    fun discStyle(readings: List<Reading>): String {
+        val ranked = readings.sortedByDescending { it.value }
+        val top = ranked[0]
+        val next = ranked[1]
+        return if (top.value - next.value <= 1) "${top.subscale.label}-${next.subscale.label}" else top.subscale.label
     }
 
     // ---- love language, one pass -----------------------------------------

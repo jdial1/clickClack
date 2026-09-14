@@ -55,6 +55,39 @@ object Sources {
         fidelity = Fidelity.ADAPTED,
     )
 
+    val ECRRS = Source(
+        id = "ecrrs",
+        authors = "Fraley, Heffernan, Vicary & Brumbaugh",
+        year = 2011,
+        title = "The Experiences in Close Relationships-Relationship Structures questionnaire",
+        venue = "Psychological Assessment, 23(3), 615-625",
+        url = "https://labs.psychology.illinois.edu/~rcfraley/measures/relstructures.htm",
+        licence = "Shared freely by the authors for use. Partner version, \"this person\" reworded as \"my partner\".",
+        fidelity = Fidelity.ADAPTED,
+    )
+
+    val OEPS = Source(
+        id = "oeps",
+        authors = "Open-Source Psychometrics Project",
+        year = 2019,
+        title = "Open Enneagram of Personality Scales v1.0",
+        venue = "openpsychometrics.org",
+        url = "https://openpsychometrics.org/tests/OEPS/development/",
+        licence = "CC BY-NC-SA 4.0",
+        fidelity = Fidelity.VERBATIM,
+    )
+
+    val ODAT = Source(
+        id = "odat",
+        authors = "Open-Source Psychometrics Project",
+        year = 0,
+        title = "OSPP DISC Assessment Test",
+        venue = "openpsychometrics.org",
+        url = "https://openpsychometrics.org/tests/ODAT/development/",
+        licence = "CC BY-NC-SA 4.0",
+        fidelity = Fidelity.VERBATIM,
+    )
+
     val ARON = Source(
         id = "aron1997",
         authors = "Aron, Melinat, Aron, Vallone & Bator",
@@ -163,7 +196,7 @@ object Sources {
     )
 
     /** Everything credited, in the order the credits screen lists them. */
-    val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ARON, RCIT, IPIP, ATUS, HAREL, CFPB, ALBUM, ONESOURCE, AZURA)
+    val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ECRRS, OEPS, ODAT, ARON, RCIT, IPIP, ATUS, HAREL, CFPB, ALBUM, ONESOURCE, AZURA)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }
@@ -371,11 +404,148 @@ object Instruments {
         ),
     )
 
+    /**
+     * Attachment style: the partner form of Fraley et al.'s ECR-RS, 9 items on the
+     * 5-point scale the authors now use. Avoidance averages items 1-6 with 1-4
+     * reversed; anxiety averages 7-9. Stored here as sums, cut at the midpoint.
+     */
+    val ATTACHMENT = Instrument(
+        id = "attachment",
+        sourceId = "ecrrs",
+        title = "Attachment style",
+        blurb = "Nine statements about leaning on your partner and worrying about them. " +
+            "Your answers place you as secure, anxious, avoidant or fearful.",
+        minutes = 2,
+        items = listOf(
+            agree("It helps to turn to my partner in times of need."),
+            agree("I usually discuss my problems and concerns with my partner."),
+            agree("I talk things over with my partner."),
+            agree("I find it easy to depend on my partner."),
+            agree("I don't feel comfortable opening up to my partner."),
+            agree("I prefer not to show my partner how I feel deep down."),
+            agree("I often worry that my partner doesn't really care for me."),
+            agree("I'm afraid that my partner may abandon me."),
+            agree("I worry that my partner won't care about me as much as I care about them."),
+        ),
+        subscales = listOf(
+            // Avoidance = (6 - Q1) + (6 - Q2) + (6 - Q3) + (6 - Q4) + Q5 + Q6, 6..30, midpoint 18.
+            Subscale(
+                id = "avoidance", label = "Keeping distance", constant = 24, cut = 18,
+                low = "close", high = "distant",
+                terms = mapOf(0 to -1, 1 to -1, 2 to -1, 3 to -1, 4 to 1, 5 to 1),
+            ),
+            // Anxiety = Q7 + Q8 + Q9, 3..15, midpoint 9.
+            Subscale(
+                id = "anxiety", label = "Worrying", cut = 9,
+                low = "settled", high = "worried",
+                terms = mapOf(6 to 1, 7 to 1, 8 to 1),
+            ),
+        ),
+    )
+
+    /** The nine Enneagram type names, in type order. */
+    val EnneagramTypes = listOf(
+        "Reformer", "Helper", "Achiever", "Individualist", "Investigator",
+        "Loyalist", "Enthusiast", "Challenger", "Peacemaker",
+    )
+
+    /**
+     * The OSPP Enneagram of Personality Scales v1.0, verbatim: 36 statements, four
+     * per type in rotation (Q1, Q10, Q19, Q28 are type 1, and so on). Highest sum wins.
+     * Cosmetic fixes: "bitter sweet" -> "bittersweet", "peoples work" -> "people's work".
+     */
+    val ENNEAGRAM = Instrument(
+        id = "enneagram",
+        sourceId = "oeps",
+        title = "Enneagram",
+        blurb = "Thirty-six statements about what drives you. Your answers point to one " +
+            "of nine types, like the Helper, the Investigator or the Peacemaker.",
+        minutes = 5,
+        items = listOf(
+            "I am a perfectionist.",
+            "My relationships with others are what my life is about.",
+            "I put work first.",
+            "I daydream about being in love.",
+            "I have a hard time showing emotions.",
+            "Fear of being taken advantage of keeps me from being more trusting.",
+            "I must always be having new experiences.",
+            "I naturally emerge as a leader.",
+            "When other people are arguing, I leave the room.",
+            "I strive for efficiency.",
+            "I have difficulty saying no.",
+            "I like to stand out.",
+            "I really enjoy feeling bittersweet.",
+            "I spend hours alone with my hobbies.",
+            "I get input from others before I make a decision.",
+            "I can keep a conversation going with anyone about anything.",
+            "I like a conversation where no one agrees.",
+            "I keep my thoughts to myself, to prevent trouble.",
+            "I often have to redo other people's work.",
+            "I get lots of satisfaction from helping others achieve their goals.",
+            "It is good to wake up to a full day of planned activities.",
+            "I cry.",
+            "I spend most of my time trying to understand things.",
+            "I conform.",
+            "I am uninhibited.",
+            "I want people to tell me the truth, not spare my feelings.",
+            "I am very accepting and flexible.",
+            "I keep my belongings in order.",
+            "I put family first.",
+            "Money is important to my happiness.",
+            "I side with the rebels over the establishment.",
+            "I like mental challenges.",
+            "I am loyal.",
+            "I always try to break the tension with a good joke.",
+            "I prefer it when leaders are decisive.",
+            "I avoid confrontation.",
+        ).map(::agree),
+        subscales = EnneagramTypes.mapIndexed { t, name ->
+            Subscale(id = "type${t + 1}", label = name, terms = (0..3).associate { round -> t + 9 * round to 1 })
+        },
+    )
+
+    /**
+     * The OSPP DISC Assessment Test, verbatim: 16 statements, four per trait,
+     * asked in rotation (D, I, S, C) rather than grouped. Highest sum wins.
+     */
+    val DISC = Instrument(
+        id = "disc",
+        sourceId = "odat",
+        title = "DISC style",
+        blurb = "Sixteen statements about how you deal with people and pressure. " +
+            "Your answers show whether you lead as dominant, influencer, steady or conscientious.",
+        minutes = 3,
+        items = listOf(
+            "I put people under pressure.",
+            "I enjoy being part of a loud crowd.",
+            "I hesitate to criticize other people's ideas.",
+            "I am emotionally reserved.",
+            "I have a strong need for power.",
+            "I want strangers to love me.",
+            "I value cooperation over competition.",
+            "I read the fine print.",
+            "I try to outdo others.",
+            "I joke around a lot.",
+            "I just want everyone to be equal.",
+            "I love order and regularity.",
+            "I am always on the lookout for ways to make money.",
+            "I make lots of noise.",
+            "I seldom toot my own horn.",
+            "My first reaction to an idea is to see its flaws.",
+        ).map(::agree),
+        subscales = listOf("Dominant", "Influencer", "Steady", "Conscientious").mapIndexed { t, name ->
+            Subscale(id = name.lowercase(), label = name, terms = (0..3).associate { round -> t + 4 * round to 1 })
+        },
+    )
+
+    /** A statement rated from disagree to agree. */
+    private fun agree(text: String) = InstrumentItem("Disagree", "Agree", text)
+
     /** A statement rated for how true it is, rising to the right. */
     private fun like(text: String) = InstrumentItem("Not like me", "Very like me", text)
 
     /** Shortest first. */
-    val all = listOf(JUNGIAN, LOVE_ATTITUDES, LOVE_LANGUAGES)
+    val all = listOf(ATTACHMENT, DISC, JUNGIAN, LOVE_ATTITUDES, ENNEAGRAM, LOVE_LANGUAGES)
 
     operator fun get(id: String?): Instrument? = all.firstOrNull { it.id == id }
 

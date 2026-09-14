@@ -229,7 +229,7 @@ class InstrumentScoringTest {
     @Test
     fun `each test owns its own courses`() {
         val groups = BadgeWall.groups(emptyList(), you, them)
-        assertEquals(3, groups.size)
+        assertEquals(Instruments.all.size, groups.size)
 
         val type = groups.first { it.instrumentId == Instruments.JUNGIAN.id }
         assertEquals(1, type.rows.size)

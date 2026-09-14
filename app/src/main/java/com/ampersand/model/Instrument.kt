@@ -25,8 +25,8 @@ data class Source(
     val licence: String,
     val fidelity: Fidelity,
 ) {
-    /** "Aron et al. (1997)", short enough to fit under a question. */
-    val credit: String get() = "$authors ($year)"
+    /** "Aron et al. (1997)", short enough to fit under a question. No year when the source gives none. */
+    val credit: String get() = if (year > 0) "$authors ($year)" else authors
 }
 
 /**
