@@ -131,7 +131,7 @@ shared documents, and ends the pairing. The partner's own answers stay; once bot
 accounts are gone the whole couple is deleted. Tested in
 `rules-test/delete.test.mjs`.
 
-Still needed: a Delete account button inside the app (Play requires both).
+In the app: Us, Settings, Delete account (two taps), which calls the same function.
 
 ## After the first upload
 
