@@ -269,7 +269,7 @@ private fun BucketRow(
     }
 }
 
-private val DoneDate: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+private val DoneDate: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 
 /** Both names, how long, and the way to the settings. */
 @Composable
@@ -467,7 +467,7 @@ fun SettingsScreen(
                     Column(Modifier.weight(1f)) {
                         Text(d.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                         Text(
-                            "${d.kind.label}  ·  ${d.date.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
+                            "${d.kind.label}  ·  ${d.date.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -1235,8 +1235,8 @@ private fun DateFields(
     }
 }
 
-private val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-private val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM")
+private val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
+private val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d")
 
 /** A date row: day on a low brick, title, detail, and countdown. */
 @Composable

@@ -60,5 +60,5 @@ object Moments {
     private const val MissedDays = 7L
     private const val RecallAfterDays = 28L
     private val Weekday: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE")
-    private val Short: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM")
+    private val Short: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d")
 }

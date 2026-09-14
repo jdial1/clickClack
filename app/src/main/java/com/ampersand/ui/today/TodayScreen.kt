@@ -99,7 +99,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private val DayFormat = DateTimeFormatter.ofPattern("EEEE d MMMM")
+private val DayFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 @Composable
 fun TodayScreen(

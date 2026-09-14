@@ -16,3 +16,8 @@ google-services.json
 node_modules/
 firestore-debug.log
 __pycache__/
+
+# Play upload key settings. Never commit.
+keystore.properties
+*.jks
+*.aab

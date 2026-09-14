@@ -24,7 +24,7 @@ object Chats {
 
     fun title(id: String, them: String): String {
         val date = runCatching { LocalDate.parse(id.substringAfter('_')) }.getOrNull()
-        val day = date?.let { "${it.dayOfMonth} ${it.month.name.lowercase().replaceFirstChar(Char::uppercase)}" }.orEmpty()
+        val day = date?.let { "${it.month.name.lowercase().replaceFirstChar(Char::uppercase)} ${it.dayOfMonth}" }.orEmpty()
         return when {
             id.startsWith("mood_") -> "Moods, $day"
             else -> "The question, $day"

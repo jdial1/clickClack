@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
-private val Month = DateTimeFormatter.ofPattern("d MMM")
+private val Month = DateTimeFormatter.ofPattern("MMM d")
 
 /** Stud width in the tray. */
 private val TrayStud = Stud.small

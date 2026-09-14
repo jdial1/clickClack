@@ -88,8 +88,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private val ShortDate = DateTimeFormatter.ofPattern("d MMM")
-private val LongDate = DateTimeFormatter.ofPattern("d MMMM yyyy")
+private val ShortDate = DateTimeFormatter.ofPattern("MMM d")
+private val LongDate = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 private const val WeeksShown = 10
 private const val DaysPerWeek = 7
 

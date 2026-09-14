@@ -1,4 +1,5 @@
 import java.time.LocalDateTime
+import java.util.Properties
 import java.time.format.DateTimeFormatter
 
 plugins {
@@ -51,6 +52,15 @@ fun webClientId(): String {
         ?: ""
 }
 
+/**
+ * The Google Play upload key, read from keystore.properties (gitignored). It is
+ * the same upload key as Chronicle Cryptogram; Play allows one upload key for
+ * many apps and re-signs each with its own app signing key.
+ */
+val uploadKey = Properties().apply {
+    rootProject.file("keystore.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
 val commitCount: Int = providers.exec { commandLine("git", "rev-list", "--count", "HEAD") }
     .standardOutput.asText.get().trim().toIntOrNull() ?: 1
 
@@ -70,6 +80,17 @@ android {
         buildConfigField("String", "WEB_CLIENT_ID", "\"${webClientId()}\"")
     }
 
+    signingConfigs {
+        if (uploadKey.getProperty("storeFile") != null) {
+            create("upload") {
+                storeFile = file(uploadKey.getProperty("storeFile"))
+                storePassword = uploadKey.getProperty("storePassword")
+                keyAlias = uploadKey.getProperty("keyAlias")
+                keyPassword = uploadKey.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             // R8 plus resource shrinking. Worth doing before shipping anything:
@@ -87,6 +108,14 @@ android {
             // A release key would need its own SHA-1 adding before Google
             // sign-in would work at all.
             signingConfig = signingConfigs.getByName("debug")
+        }
+        // The store build: release, signed with the upload key.
+        //   gradlew bundlePlay  ->  app/build/outputs/bundle/play/clickclack-<version>-play.aab
+        // Google sign-in on a Play install needs Play's app signing SHA-1 added to Firebase.
+        create("play") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.findByName("upload")
+            matchingFallbacks += "release"
         }
     }
 
@@ -167,3 +196,10 @@ listOf("debug", "release").forEach { type ->
     }
     tasks.matching { it.name == "assemble$cap" }.configureEach { finalizedBy(stamp) }
 }
+
+val stampBundle = tasks.register("stampPlayBundle") {
+    val dir = layout.buildDirectory.dir("outputs/bundle/play")
+    val version = android.defaultConfig.versionName
+    doLast { dir.get().asFile.let { it.resolve("app-play.aab").copyTo(it.resolve("clickclack-$version-play.aab"), overwrite = true) } }
+}
+tasks.matching { it.name == "bundlePlay" }.configureEach { finalizedBy(stampBundle) }
