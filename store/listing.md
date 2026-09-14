@@ -85,8 +85,9 @@ Tablet screenshots are optional and skipped.
 
 ## Store settings
 
-- **Privacy policy URL:** required. Host `store/privacy.html` (for example on
-  Firebase Hosting) and paste its URL.
+- **Privacy policy URL:** https://clickclack-002827.web.app/privacy
+  (Firebase Hosting serves `store/privacy.html`; redeploy with
+  `firebase deploy --only hosting`).
 - **App access:** sign-in is required. Give reviewers a Google test account and
   a second paired account, or a partner code they can enter, under "All or some
   functionality is restricted".
