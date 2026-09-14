@@ -102,7 +102,6 @@ fun UsScreen(
     onTickBucket: (String) -> Unit = {},
     onRemoveFromBucket: (String) -> Unit = {},
     onAddSpecialDate: (String, java.time.LocalDate, DateKind) -> Unit = { _, _, _ -> },
-    onRemoveSpecialDate: (String) -> Unit = {},
     onOpenDay: (com.ampersand.model.DayEntry) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -143,7 +142,7 @@ fun UsScreen(
         if (someday) {
             BucketSection(state, onAddToBucket, onTickBucket, onRemoveFromBucket)
         } else {
-            DatesSection(state, onAddSpecialDate, onRemoveSpecialDate)
+            DatesSection(state, onAddSpecialDate)
         }
 
         Spacer(Modifier.height(48.dp))
@@ -382,6 +381,7 @@ fun SettingsScreen(
     onSetHomeZip: (String) -> Boolean = { true },
     onSetSource: (QuestionSource, Boolean) -> Unit = { _, _ -> },
     onSetQuietHours: (Int, Int) -> Unit = { _, _ -> },
+    onRemoveSpecialDate: (String) -> Unit = {},
     onRetake: (String) -> Unit = {},
 ) {
     val sounds = LocalSounds.current
@@ -451,6 +451,32 @@ fun SettingsScreen(
         SectionLabel("Appearance")
         Spacer(Modifier.height(10.dp))
         ThemeBricks(you = BrickColor.of(state.you.colorArgb))
+
+        if (state.specialDates.isNotEmpty()) {
+            Spacer(Modifier.height(32.dp))
+            SectionLabel("Your dates")
+            Spacer(Modifier.height(10.dp))
+            state.specialDates.sortedBy { it.date.dayOfYear }.forEach { d ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(d.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                        Text(
+                            "${d.kind.label}  ·  ${d.date.format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                    }
+                    IconAction(UiIcon.CLOSE, "Remove", onClick = { onRemoveSpecialDate(d.id) })
+                }
+            }
+        }
 
         Spacer(Modifier.height(32.dp))
         SectionLabel("Mood faces")
@@ -1121,7 +1147,6 @@ private fun ProfileRow(title: String, status: String, done: Boolean, open: Boole
 private fun DatesSection(
     state: CoupleState,
     onAdd: (String, java.time.LocalDate, DateKind) -> Unit,
-    onRemove: (String) -> Unit,
 ) {
     val you = BrickColor.of(state.you.colorArgb)
     val upcoming = remember(state) { Dates.upcoming(state) }
@@ -1132,7 +1157,6 @@ private fun DatesSection(
     }
     upcoming.forEachIndexed { i, d ->
         if (i > 0) Spacer(Modifier.height(8.dp))
-        val added = state.specialDates.firstOrNull { it.label == d.label && it.date == d.since }
         DateCard(
             day = d.next,
             title = d.label,
@@ -1140,9 +1164,6 @@ private fun DatesSection(
             countdown = until(state.today.date, d.next),
             brick = if (d.label.startsWith(state.them.name)) BrickColor.of(state.them.colorArgb) else you,
         )
-        if (added != null) {
-            IconAction(UiIcon.CLOSE, "Remove", onClick = { onRemove(added.id) })
-        }
     }
     if (upcoming.isNotEmpty()) Spacer(Modifier.height(12.dp))
 

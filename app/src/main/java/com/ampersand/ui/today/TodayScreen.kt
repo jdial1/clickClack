@@ -161,7 +161,6 @@ fun TodayScreen(
             },
             author = author?.let { if (it.uid == state.you.uid) "You wrote this for ${state.them.name}" else "${it.name} wrote you this" },
             authorColor = author?.let { BrickColor.of(it.colorArgb) },
-            special = events.isNotEmpty(),
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -208,8 +207,6 @@ private fun QuestionHero(
     /** "Tasia wrote you this", when one of you wrote today's question. */
     author: String? = null,
     authorColor: BrickColor? = null,
-    /** A special day: the card gets a gold border. */
-    special: Boolean = false,
     /** Whose move it is, said on the card itself. */
     status: HeroStatus? = null,
 ) {
@@ -221,8 +218,7 @@ private fun QuestionHero(
         studs = 12,
         height = BrickHeight.MEDIUM,
         modifier = Modifier
-            .fillMaxWidth()
-            .then(if (special) Modifier.border(3.dp, SpecialGold, RoundedCornerShape(14.dp)) else Modifier),
+            .fillMaxWidth(),
     ) {
     Column(
         Modifier

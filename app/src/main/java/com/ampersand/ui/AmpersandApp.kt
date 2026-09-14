@@ -585,6 +585,7 @@ private fun SignedInApp(
                             onSetHomeZip = vm.repo::setHomeZip,
                             onSetSource = vm.repo::setSource,
                             onSetQuietHours = vm.repo::setQuietHours,
+                            onRemoveSpecialDate = vm.repo::removeSpecialDate,
                             onRetake = { settings = false; sitting = it },
                         )
 
@@ -652,7 +653,6 @@ private fun SignedInApp(
                             onTickBucket = vm.repo::tickBucket,
                             onRemoveFromBucket = vm.repo::removeFromBucket,
                             onAddSpecialDate = vm.repo::addSpecialDate,
-                            onRemoveSpecialDate = vm.repo::removeSpecialDate,
                             onOpenDay = { if (it.isRevealed) openDate = it.date },
                         )
                     }
