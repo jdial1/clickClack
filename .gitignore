@@ -21,3 +21,4 @@ __pycache__/
 keystore.properties
 *.jks
 *.aab
+.firebase/
