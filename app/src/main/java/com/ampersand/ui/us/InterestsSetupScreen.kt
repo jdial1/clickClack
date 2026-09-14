@@ -40,17 +40,19 @@ import com.ampersand.ui.components.BrickWall
 @Composable
 fun InterestsSetupScreen(
     color: BrickColor,
-    onDone: (following: Set<League>, leaveOut: Set<Topic>) -> Unit,
+    onDone: (following: Set<League>, leaveOut: Set<Topic>, horoscopes: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var step by rememberSaveable { mutableStateOf(0) }
     var leagues by rememberSaveable { mutableStateOf(emptySet<String>()) }
     var leaveOut by rememberSaveable { mutableStateOf(emptySet<String>()) }
+    var horoscopes by rememberSaveable { mutableStateOf(false) }
     val accent = Color(color.argb)
 
     fun finish() = onDone(
         League.entries.filter { it.label in leagues }.toSet(),
         Topic.entries.filter { it.label in leaveOut }.toSet(),
+        horoscopes,
     )
 
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -88,6 +90,14 @@ fun InterestsSetupScreen(
                         AmpButton(label = "Next", slug = color.slug, icon = UiIcon.NEXT) { step = 2 }
                     }
 
+                    2 -> {
+                        Heading("Into horoscopes?", "We'll use both your birthdays to find your signs and ask about them now and then.")
+                        Spacer(Modifier.height(24.dp))
+                        AmpButton(label = "Yes", slug = color.slug) { horoscopes = true; step = 3 }
+                        Spacer(Modifier.height(10.dp))
+                        AmpButton(label = "Not really", slug = "black") { horoscopes = false; step = 3 }
+                    }
+
                     else -> {
                         Heading(
                             "Any topics to skip?",
@@ -95,7 +105,7 @@ fun InterestsSetupScreen(
                         )
                         Spacer(Modifier.height(20.dp))
                         AmpCheckboxGroup(
-                            options = Topic.entries.filter { it != Topic.SPORTS }.map { it.label },
+                            options = Topic.entries.filter { it != Topic.SPORTS && it != Topic.HOROSCOPES }.map { it.label },
                             selected = leaveOut,
                             accent = accent,
                             modifier = Modifier.fillMaxWidth(),

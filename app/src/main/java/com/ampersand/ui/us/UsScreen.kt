@@ -1020,6 +1020,10 @@ private fun RelationshipProfile(
                 val theirs = when {
                     topic == Topic.SPORTS && state.following.isEmpty() && !more ->
                         "Off until one of you follows a sport below."
+                    topic == Topic.HOROSCOPES && Topic.HOROSCOPES !in state.interests ->
+                        "Off until one of you picks More. Uses both birthdays for your signs."
+                    topic == Topic.HOROSCOPES && (state.you.birthday == null || state.them.birthday == null) ->
+                        "Needs both birthdays, in About you."
                     topic in state.hiddenTopics && !hidden -> "${state.them.name} left this out."
                     topic in state.interests && !more -> "${state.them.name} asked for more of this."
                     else -> null

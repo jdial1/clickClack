@@ -1,0 +1,222 @@
+{
+  "id": "horoscope",
+  "title": "Horoscopes",
+  "theme": "PLAYFUL",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "hz1",
+      "text": "How much do I act like my sign, {mysign}?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Textbook"
+    },
+    {
+      "id": "hz2",
+      "text": "Which {mysign} trait do I think I have the most?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "hz3",
+      "text": "Horoscopes are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Fun to read",
+        "Secretly true"
+      ]
+    },
+    {
+      "id": "hz4",
+      "text": "How much do I check my horoscope?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Every day",
+        "When something big is coming",
+        "Only if someone sends it",
+        "Never"
+      ]
+    },
+    {
+      "id": "hz5",
+      "text": "What's the most {theirsign} thing about you?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "hz6",
+      "text": "{mysign} and {theirsign} together are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Written in the stars",
+        "Proof opposites attract"
+      ]
+    },
+    {
+      "id": "hz7",
+      "text": "Which part of being {mysign} would I happily give up?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "hz8",
+      "text": "When something goes wrong, how likely am I to blame Mercury in retrograde?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Never",
+      "highLabel": "Always"
+    },
+    {
+      "id": "hz9",
+      "text": "If our relationship had a horoscope this month, what would it say?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "astrology",
+        "romance"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "hz10",
+      "text": "Which sign would I most want to go on a road trip with?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Sagittarius, for the adventure",
+        "Leo, for the playlist",
+        "Virgo, for the planning",
+        "Pisces, for the daydreaming"
+      ]
+    },
+    {
+      "id": "hz11",
+      "text": "Which {theirsign} trait did you notice in me first?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "astrology",
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "hz12",
+      "text": "If the stars said we should move somewhere new this year, would I go?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Pack the car",
+        "The stars can wait"
+      ]
+    },
+    {
+      "id": "hz13",
+      "text": "What does {mysign} want for a perfect birthday, and is that me?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "hz14",
+      "text": "How much does a sign tell you about a person?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Nothing",
+      "highLabel": "A lot"
+    },
+    {
+      "id": "hz15",
+      "text": "Which element fits me best?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Fire",
+        "Earth",
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": "hz16",
+      "text": "What's something a horoscope got right about you?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

@@ -22,6 +22,7 @@ enum class Topic(val label: String, val detail: String, val theme: String? = nul
     SPICY("Spicy", "Warm, flirty questions about wanting each other.", theme = "Spicy"),
     ROMANTIC("Romantic", "Dates, love letters and how you fell for each other.", theme = "Romantic"),
     SPORTS("Sports", "Teams, games and trips to see them.", tag = "sports"),
+    HOROSCOPES("Horoscopes", "Your signs, from both birthdays, and whether any of it is true.", tag = "astrology"),
     MONEY("Money", "Saving, spending and big plans.", tag = "money"),
     FAMILY("Family and upbringing", "How you were raised and the families you come from.", tag = "family"),
     PAST("The past", "Old memories, old choices and how you got here.", tag = "past"),

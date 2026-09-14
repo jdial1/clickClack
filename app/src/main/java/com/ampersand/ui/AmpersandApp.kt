@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.model.Topic
 import com.ampersand.model.Kept
 import com.ampersand.ui.today.PastAnswerScreen
 import androidx.compose.foundation.layout.Arrangement
@@ -398,8 +399,9 @@ private fun SignedInApp(
 
         // Interests setup, asked once. null means the profile is still loading.
         if (state.interestsAsked == false) {
-            InterestsSetupScreen(color = BrickColor.of(state.you.colorArgb), onDone = { following, leaveOut ->
+            InterestsSetupScreen(color = BrickColor.of(state.you.colorArgb), onDone = { following, leaveOut, horoscopes ->
                 leaveOut.forEach { vm.repo.setTopicHidden(it, true) }
+                if (horoscopes) vm.repo.setTopicInterest(Topic.HOROSCOPES, true)
                 vm.repo.setFollowing(following)
             })
             return

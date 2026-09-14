@@ -29,6 +29,8 @@ class QuestionPool(
     val regional: Map<UsRegion, List<Question>> = emptyMap(),
     /** Questions naming the local teams, drawn only once a home ZIP is set. */
     val localTeams: List<Question> = emptyList(),
+    /** Sign questions, only in the draw when one of you asked for horoscopes and both birthdays are set. */
+    val horoscope: List<Question> = emptyList(),
     /** Old daylight questions, kept only so past days that asked one still resolve. */
     val sun: Map<SunKind, List<Question>> = emptyMap(),
     /** A few questions for each kind of special date, asked on the day. */
@@ -59,7 +61,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + sun.values.flatten() + dates.values.flatten())
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + horoscope + sun.values.flatten() + dates.values.flatten())
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -92,13 +94,15 @@ class QuestionPool(
         state: String? = null,
         /** Leagues with a local team in season. A team question needs all of its leagues here. */
         leagues: Set<League> = emptySet(),
+        /** Both birthdays are set and one of you picked horoscopes, so sign questions can be drawn. */
+        signs: Boolean = false,
         /** Kinds of special date that fall today; see [com.ampersand.model.Dates.kindsOn]. */
         dateKinds: List<DateKind> = emptyList(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
         val teams = localTeams.filter { q -> q.leagues.isNotEmpty() && leagues.containsAll(q.leagues) }
-        val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty()
+        val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty() + (if (signs) horoscope else emptyList())
         val open = everything.filter(::shown).ifEmpty { everything }
 
         // Your own dates, then holidays. Rotated by year.
@@ -147,6 +151,7 @@ class QuestionPool(
         Occasion.on(date, anniversary, state)?.takeIf { inSet(occasions[it.id]?.questions) }?.let { return it.label }
         if (weather.values.any(::inSet)) return "Weather"
         if (regional.values.any(::inSet) || inSet(localTeams)) return "Local"
+        if (inSet(horoscope)) return "Horoscope"
         interests.firstOrNull { it.matches(question) }?.let { return it.label.substringBefore(" and ") }
         return question.category
     }
@@ -217,6 +222,7 @@ class QuestionPool(
                 UsRegion.entries.firstOrNull { "region-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
             }.toMap(),
             localTeams = QuizJson.loadFolder(context, "local").flatMap { it.questions },
+            horoscope = QuizJson.loadFolder(context, "horoscope").flatMap { it.questions },
             dates = QuizJson.loadFolder(context, "dates").mapNotNull { deck ->
                 DateKind.entries.firstOrNull { "date-${it.id}" == deck.id }?.let { it to deck.questions }
             }.toMap(),
