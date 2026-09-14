@@ -76,7 +76,7 @@ class GoogleAuthRepository(
             val response = credentials.getCredential(activity, request)
             val token = GoogleIdTokenCredential.createFrom(response.credential.data).idToken
 
-            signInToFirebase(token)
+            signInToFirebase(token).recoverCatching { throw diagnose("Firebase sign-in", it) }
         } catch (e: GetCredentialCancellationException) {
             // Closing the sheet is not an error. But Google also reports a rejected sign-in after
             // an account is picked (a signing key it does not know: "[16] Account reauth failed")
@@ -86,14 +86,15 @@ class GoogleAuthRepository(
             if (message.isBlank() || message.contains("cancelled by the user", ignoreCase = true)) {
                 Result.success(Unit)
             } else {
-                Result.failure(IllegalStateException("Google sign-in didn't finish. $message\nApp key SHA-1: ${signingSha1()}"))
+                Result.failure(diagnose("Google account sheet", e))
             }
         } catch (e: NoCredentialException) {
             // No Google account on the device at all.
-            Result.failure(e)
+            Result.failure(diagnose("No Google account", e))
         } catch (e: GetCredentialException) {
-            Log.w(TAG, "Credential Manager failed", e)
-            Result.failure(e)
+            Result.failure(diagnose("Credential Manager", e))
+        } catch (e: Exception) {
+            Result.failure(diagnose("Unexpected", e))
         }
     }
 
@@ -139,6 +140,35 @@ class GoogleAuthRepository(
             }
         }
         signOut()
+    }
+
+    /**
+     * A failed sign-in, spelled out for a bug report: where it failed, the whole cause chain,
+     * and the facts Google matches on (package, signing key, web client id, installer).
+     * Logged under "GoogleAuth" and shown, selectable, on the sign-in screen.
+     */
+    private fun diagnose(stage: String, e: Throwable): Throwable {
+        val causes = generateSequence(e) { it.cause }.take(5).joinToString("\n") { t ->
+            val type = (t as? GetCredentialException)?.type?.let { " [$it]" }.orEmpty()
+            "- ${t.javaClass.simpleName}$type: ${(t as? GetCredentialException)?.errorMessage ?: t.message}"
+        }
+        val pm = appContext.packageManager
+        val installer = runCatching {
+            if (android.os.Build.VERSION.SDK_INT >= 30) pm.getInstallSourceInfo(appContext.packageName).installingPackageName
+            else @Suppress("DEPRECATION") pm.getInstallerPackageName(appContext.packageName)
+        }.getOrNull() ?: "sideloaded"
+        val playServices = runCatching { pm.getPackageInfo("com.google.android.gms", 0).versionName }.getOrNull() ?: "missing"
+        val text = buildString {
+            appendLine("Google sign-in didn't finish ($stage).")
+            appendLine(causes)
+            appendLine("App: ${appContext.packageName} ${com.ampersand.BuildConfig.VERSION_NAME} (${com.ampersand.BuildConfig.BUILD_TYPE})")
+            appendLine("Installed by: $installer")
+            appendLine("App key SHA-1: ${signingSha1()}")
+            appendLine("Web client: ${com.ampersand.BuildConfig.WEB_CLIENT_ID}")
+            append("Play services: $playServices, Android ${android.os.Build.VERSION.RELEASE}")
+        }
+        Log.e(TAG, text, e)
+        return IllegalStateException(text, e)
     }
 
     /**

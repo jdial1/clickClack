@@ -64,12 +64,15 @@ fun SignInScreen(
 
         if (error != null) {
             Spacer(Modifier.height(18.dp))
-            Text(
-                text = error,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-            )
+            // Selectable, so a failure report can be copied out whole.
+            androidx.compose.foundation.text.selection.SelectionContainer {
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
 
         Spacer(Modifier.height(20.dp))
