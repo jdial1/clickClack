@@ -95,6 +95,17 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            // Screenshots only when asked: gradlew testDebugUnitTest -Pshots
+            all {
+                it.systemProperty("roborazzi.test.record", "true")
+                if (project.hasProperty("shots")) it.systemProperty("shots", "true")
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -132,6 +143,11 @@ dependencies {
     // one of them is invisible on screen -- a wrong letter still looks like a
     // letter. That is what there is a JVM test source set for.
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 }
 
 // Each APK is also copied under a name stamped with the version and build

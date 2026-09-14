@@ -12,6 +12,8 @@ googleServices = "4.5.0"
 firebaseBom = "34.19.0"
 credentials = "1.6.0"
 googleid = "1.2.0"
+robolectric = "4.16"
+roborazzi = "1.52.0"
 
 [libraries]
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -37,6 +39,11 @@ firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+# Screenshots on the JVM, no device: renders Compose under Robolectric.
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
