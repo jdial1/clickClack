@@ -90,14 +90,34 @@ class GoogleAuthRepository(
             signInToFirebase(token).recoverCatching { throw diagnose("Firebase sign-in", it) }
         } catch (e: GetCredentialCancellationException) {
             // Closing the sheet is not an error. A rejection reported as a cancellation is.
-            if (e.isUserCancel()) Result.success(Unit) else Result.failure(diagnose("Google account sheet and picker", e))
+            if (e.isUserCancel()) Result.success(Unit) else signInInBrowser(activity, e)
         } catch (e: NoCredentialException) {
-            // No Google account on the device at all.
-            Result.failure(diagnose("No Google account", e))
+            // No account Google will hand this install, which is also what an unmatched signing key looks like.
+            signInInBrowser(activity, e)
         } catch (e: GetCredentialException) {
             Result.failure(diagnose("Credential Manager", e))
         } catch (e: Exception) {
             Result.failure(diagnose("Unexpected", e))
+        }
+    }
+
+    /**
+     * Last resort: Firebase's own Google sign-in in a browser tab. It goes through the web client
+     * and firebaseapp.com, so it works whatever key signed this install, where Credential Manager
+     * needs Google to match the signing key to an Android OAuth client.
+     */
+    private suspend fun signInInBrowser(activity: Activity, earlier: Throwable): Result<Unit> {
+        Log.w(TAG, "Credential Manager failed, signing in through the browser", earlier)
+        return suspendCancellableCoroutine { cont ->
+            val provider = com.google.firebase.auth.OAuthProvider.newBuilder("google.com").build()
+            val pending = auth.pendingAuthResult
+            val task = pending ?: auth.startActivityForSignInWithProvider(activity, provider)
+            task.addOnSuccessListener { cont.resume(Result.success(Unit)) }
+                .addOnFailureListener {
+                    val cancelled = it is com.google.firebase.auth.FirebaseAuthException &&
+                        it.errorCode == "ERROR_WEB_CONTEXT_CANCELED"
+                    cont.resume(if (cancelled) Result.success(Unit) else Result.failure(diagnose("Browser sign-in", it.also { f -> f.addSuppressed(earlier) })))
+                }
         }
     }
 
@@ -187,8 +207,13 @@ class GoogleAuthRepository(
         val info = appContext.packageManager.getPackageInfo(
             appContext.packageName, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES,
         )
-        val cert = info.signingInfo!!.apkContentsSigners.first().toByteArray()
-        java.security.MessageDigest.getInstance("SHA-1").digest(cert).joinToString(":") { "%02X".format(it) }
+        val signing = info.signingInfo!!
+        fun sha(sig: android.content.pm.Signature) =
+            java.security.MessageDigest.getInstance("SHA-1").digest(sig.toByteArray()).joinToString(":") { "%02X".format(it) }
+        val current = sha(signing.apkContentsSigners.first())
+        // With key rotation, Google may match on an older key in the lineage, not the current one.
+        val history = if (signing.hasPastSigningCertificates()) signing.signingCertificateHistory.map(::sha) else emptyList()
+        if (history.size > 1) "$current (history: ${history.joinToString(", ")})" else current
     }.getOrDefault("unknown")
 
     /** Call when the owning scope dies, or the listener outlives this object. */
