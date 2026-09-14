@@ -1,0 +1,88 @@
+{
+  "id": "milestone-big",
+  "title": "Anniversary milestones",
+  "theme": "ROMANTIC",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "msb1",
+      "text": "Which year together has been my favorite so far?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "msb2",
+      "text": "How we celebrate this one:",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Somewhere new",
+        "Where it all started",
+        "A quiet night in",
+        "A big party"
+      ]
+    },
+    {
+      "id": "msb3",
+      "text": "How much have we changed since we got together?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic",
+      "lowLabel": "Barely",
+      "highLabel": "Completely"
+    },
+    {
+      "id": "msb4",
+      "text": "What's something you're proud we got through together?",
+      "type": "REFLECT",
+      "depth": 3,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Deep"
+    },
+    {
+      "id": "msb5",
+      "text": "What do you hope the next milestone looks like for us?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "future"
+      ],
+      "category": "Future"
+    },
+    {
+      "id": "msb6",
+      "text": "Which traditional anniversary gift would I actually love?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Something handwritten",
+        "Something to keep forever",
+        "An experience",
+        "Something made by you"
+      ]
+    }
+  ]
+}

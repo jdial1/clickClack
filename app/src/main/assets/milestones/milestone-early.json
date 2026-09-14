@@ -1,0 +1,70 @@
+{
+  "id": "milestone-early",
+  "title": "Early milestones",
+  "theme": "ROMANTIC",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "mse1",
+      "text": "When did I first feel like we were really a couple?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "mse2",
+      "text": "So far, we are:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic",
+      "options": [
+        "Better than I expected",
+        "Exactly what I hoped"
+      ]
+    },
+    {
+      "id": "mse3",
+      "text": "How well do we know each other by now?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic",
+      "lowLabel": "Still learning",
+      "highLabel": "Inside out"
+    },
+    {
+      "id": "mse4",
+      "text": "What's a small moment from our time together you want to remember?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "romance",
+        "past"
+      ],
+      "category": "Romantic"
+    },
+    {
+      "id": "mse5",
+      "text": "What's the next thing I want us to do together?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "future",
+        "planning"
+      ],
+      "category": "Future"
+    }
+  ]
+}

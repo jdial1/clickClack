@@ -206,6 +206,8 @@ exports.specialDates = onSchedule({ schedule: "0 * * * *", timeZone: "UTC" }, as
     const events = [];
     if (onToday(couple.get("anniversary"))) events.push("It's your anniversary");
     if (onToday(couple.get("marriedOn"))) events.push("It's your wedding anniversary");
+    const milestone = togetherOn(local, couple.get("anniversary"), couple.get("marriedOn"));
+    if (milestone) events.unshift(milestone);
     // A half-birthday is six months on from the birthday.
     const halfOnToday = (iso) => {
       if (typeof iso !== "string") return false;
@@ -288,3 +290,31 @@ exports.flushOutbox = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC" 
 });
 
 exports._isQuiet = isQuiet;
+
+const NAMED = { 1: "paper", 5: "wood", 10: "tin", 15: "crystal", 20: "china", 25: "silver", 30: "pearl", 35: "coral", 40: "ruby", 45: "sapphire", 50: "gold", 60: "diamond" };
+
+/** The relationship milestone on [local] (a Date in the couple's zone), matching Together.on in the app. */
+function togetherOn(local, anniversary, marriedOn) {
+  const today = Date.UTC(local.getFullYear(), local.getMonth(), local.getDate());
+  const named = (iso, what) => {
+    if (typeof iso !== "string") return null;
+    const [y, m, d] = iso.split("-").map(Number);
+    if (m - 1 !== local.getMonth() || d !== local.getDate()) return null;
+    const years = local.getFullYear() - y;
+    return NAMED[years] ? `${years} ${years === 1 ? "year" : "years"} ${what}: the ${NAMED[years]} anniversary` : null;
+  };
+  const wedding = named(marriedOn, "married");
+  if (wedding) return wedding;
+  const together = named(anniversary, "together");
+  if (together) return together;
+  if (typeof anniversary !== "string") return null;
+  const [y, m, d] = anniversary.split("-").map(Number);
+  const start = Date.UTC(y, m - 1, d);
+  const six = new Date(start); six.setUTCMonth(six.getUTCMonth() + 6);
+  if (six.getTime() === today) return "Six months together";
+  const days = Math.round((today - start) / 86400000);
+  if ([100, 500, 1000, 2000, 5000, 10000].includes(days)) return `${days.toLocaleString("en-US")} days together`;
+  return null;
+}
+
+exports._togetherOn = togetherOn;

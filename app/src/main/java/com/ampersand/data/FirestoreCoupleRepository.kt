@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.Together
 import com.ampersand.model.decadeOf
 import com.ampersand.model.ChineseZodiac
 import com.ampersand.model.forSigns
@@ -356,15 +357,16 @@ class FirestoreCoupleRepository(
         val off = QuestionSource.entries.filter { coupleDoc?.getBoolean(it.field) == false }.toSet()
         val signs = Topic.HOROSCOPES in interests && you.birthday != null && partner.birthday != null
         val birthdays = listOfNotNull(you.birthday, partner.birthday)
+        val together = Together.on(today, anniversary, coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() })
         val decades = birthdays.map(::decadeOf).toSet()
         val animals = if (Topic.HOROSCOPES in interests) birthdays.map { ChineseZodiac.of(it) }.toSet() else emptySet()
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, dateKinds = dateKinds)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds)
             // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, dateKinds = dateKinds)
+            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds)
         }.forPlace(place, today).forSigns(you.birthday, partner.birthday)
 
         val todayEntry = DayEntry(
@@ -421,7 +423,7 @@ class FirestoreCoupleRepository(
             }.toMap(),
             recalled = recalledDocs.values.mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
                 .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
-            why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests),
+            why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests, together),
             sourcesOff = off,
             quietFrom = coupleDoc?.getLong("quietFrom")?.toInt() ?: 20,
             quietTo = coupleDoc?.getLong("quietTo")?.toInt() ?: 8,

@@ -863,7 +863,10 @@ private fun specialToday(state: CoupleState): List<Pair<String, String>> {
         today, state.anniversary, state.homeState.takeIf { com.ampersand.model.QuestionSource.HOLIDAYS !in state.sourcesOff },
     )?.takeIf { o -> dates.none { it.first.contains("anniversary", ignoreCase = true) } || !o.id.contains("anniversary") }
         ?.let { it.label to "Happy ${it.label}" }
-    return dates + listOfNotNull(holiday)
+    // A milestone replaces the plain anniversary line it falls on.
+    val together = com.ampersand.model.Together.on(today, state.anniversary, state.marriedOn)
+    val shown = if (together == null) dates else dates.filterNot { it.first.contains("anniversary", ignoreCase = true) }
+    return listOfNotNull(together?.let { it.title to it.detail }) + shown + listOfNotNull(holiday)
 }
 
 /** A gold-bordered card naming today's special days. */
