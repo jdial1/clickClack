@@ -184,7 +184,7 @@ object Instruments {
     val JUNGIAN = Instrument(
         id = "oejts",
         sourceId = "oejts",
-        title = "Type",
+        title = "Personality type",
         // Shown under the wall heading and atop the sitting. Tests require > 60 chars.
         blurb = "Thirty-two this-or-that pairs, like makes lists or relies on memory. " +
             "Your answers add up to a four-letter type.",
@@ -269,7 +269,7 @@ object Instruments {
     val LOVE_LANGUAGES = Instrument(
         id = "lovelang",
         sourceId = "lovelang",
-        title = "Love language",
+        title = "Love languages",
         blurb = "Twenty small things, rated twice: what makes you feel loved, and " +
             "what you do for them. Then see how well those match up.",
         minutes = 6,
@@ -323,7 +323,7 @@ object Instruments {
     val LOVE_ATTITUDES = Instrument(
         id = "loveattitudes",
         sourceId = "loveattitudes",
-        title = "Love style",
+        title = "Ways of loving",
         blurb = "Twenty-eight statements about how you love. Four styles: " +
             "love at first sight, friends first, thought through, and giving way.",
         minutes = 5,
