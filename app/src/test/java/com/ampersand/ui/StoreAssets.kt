@@ -235,16 +235,29 @@ class StoreAssets {
     @Config(qualifiers = "w1024dp-h500dp-mdpi")
     @Test fun featureGraphic() = captureRoboImage("$out/feature-graphic.png") {
         Wall {
-            Row(Modifier.fillMaxSize().padding(horizontal = 64.dp), verticalAlignment = Alignment.CenterVertically) {
-                Mark(200.dp)
-                Spacer(Modifier.width(48.dp))
+            // Words on the left, a finished week's sculpture on its base on the right.
+            Row(Modifier.fillMaxSize().padding(horizontal = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(
-                    Modifier.glass(inkOnBrick(structureSlug()), corner = 24.dp, strength = 1.4f).padding(horizontal = 36.dp, vertical = 28.dp),
+                    Modifier.weight(1f).glass(inkOnBrick(structureSlug()), corner = 24.dp, strength = 1.4f).padding(horizontal = 32.dp, vertical = 28.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Text("Click Clack", fontSize = 76.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-                    Text("A daily question for two.", fontSize = 34.sp, color = MaterialTheme.colorScheme.onBackground)
-                    Text("Sealed until you both answer.", fontSize = 26.sp, color = MaterialTheme.colorScheme.onBackground)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Mark(64.dp)
+                        Spacer(Modifier.width(16.dp))
+                        Text("Click Clack", fontSize = 58.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    }
+                    Text("A daily question for two.", fontSize = 30.sp, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Every answer earns bricks. Build together.", fontSize = 22.sp, color = MaterialTheme.colorScheme.onBackground)
+                }
+                Spacer(Modifier.width(40.dp))
+                Column(Modifier.width(400.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    com.ampersand.ui.brick.Sculpture(state.shelf.first(), Modifier.fillMaxWidth())
+                    com.ampersand.ui.brick.BrickSlab(
+                        slugs = listOf(null),
+                        modifier = Modifier.fillMaxWidth().height(20.dp),
+                        studs = 12,
+                        height = com.ampersand.model.BrickHeight.LOW,
+                    )
                 }
             }
         }
