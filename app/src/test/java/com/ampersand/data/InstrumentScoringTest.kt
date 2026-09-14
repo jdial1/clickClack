@@ -171,7 +171,7 @@ class InstrumentScoringTest {
             .rows.single()
             .badges.first { it.owner == Owner.YOU }
 
-        assertEquals("Giving way", badge.result)
+        assertEquals("The Giver", badge.result)
         assertEquals(4, badge.detail.size)
         val note = requireNotNull(badge.note)
         assertTrue("names the runner-up too: $note", note.contains(","))

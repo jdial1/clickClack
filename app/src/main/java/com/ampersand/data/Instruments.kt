@@ -368,8 +368,8 @@ object Instruments {
         id = "loveattitudes",
         sourceId = "loveattitudes",
         title = "Ways of loving",
-        blurb = "Twenty-eight statements about how you love. Four styles: " +
-            "love at first sight, friends first, thought through, and giving way.",
+        blurb = "Twenty-eight statements about how you love. You come out as the Romantic, " +
+            "the Best Friend, the Planner or the Giver, or a blend of two.",
         minutes = 5,
         items = listOf(
             // Eros -- passionate, immediate, physical. Original items 1-7.
@@ -408,10 +408,10 @@ object Instruments {
         // Plain sums, 7..35. The published coding has 1 = strongly agree; ours is reversed
         // (stored = 6 - published) so every scale in the app rises to the right.
         subscales = listOf(
-            Subscale("eros", "Straight away", terms = (0..6).associateWith { 1 }),
-            Subscale("storge", "Friends first", terms = (7..13).associateWith { 1 }),
-            Subscale("pragma", "Thought through", terms = (14..20).associateWith { 1 }),
-            Subscale("agape", "Giving way", terms = (21..27).associateWith { 1 }),
+            Subscale("eros", "The Romantic", low = "straight away", terms = (0..6).associateWith { 1 }),
+            Subscale("storge", "The Best Friend", low = "friends first", terms = (7..13).associateWith { 1 }),
+            Subscale("pragma", "The Planner", low = "thought through", terms = (14..20).associateWith { 1 }),
+            Subscale("agape", "The Giver", low = "giving way", terms = (21..27).associateWith { 1 }),
         ),
     )
 

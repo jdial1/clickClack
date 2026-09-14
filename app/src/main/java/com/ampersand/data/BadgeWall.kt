@@ -174,9 +174,10 @@ object BadgeWall {
             slotId = "style.${owner.name.lowercase()}",
             owner = owner,
             who = of.name,
-            result = ranked?.firstOrNull()?.subscale?.label,
+            result = ranked?.let(::loveStyle),
             detail = ranked.orEmpty().map { r ->
-                BadgeBar(r.subscale.label, r.fraction, "${r.value} of ${r.subscale.range.last}")
+                // "The Romantic (straight away)": the title, and what it means in plain words.
+                BadgeBar("${r.subscale.label} (${r.subscale.low})", r.fraction, "${r.value} of ${r.subscale.range.last}")
             },
             note = ranked?.let {
                 val top = it.getOrNull(0) ?: return@let null
@@ -276,6 +277,14 @@ object BadgeWall {
         val top = ranked[0]
         val next = ranked[1]
         return if (top.value - next.value <= 1) "${top.subscale.label}-${next.subscale.label}" else top.subscale.label
+    }
+
+    /** The top love style, or "The Best Friend & The Giver" when the second is within two points. */
+    fun loveStyle(readings: List<Reading>): String {
+        val ranked = readings.sortedByDescending { it.value }
+        val top = ranked[0]
+        val next = ranked.getOrNull(1) ?: return top.subscale.label
+        return if (top.value - next.value <= 2) "${top.subscale.label} & ${next.subscale.label}" else top.subscale.label
     }
 
     // ---- love language, one pass -----------------------------------------
