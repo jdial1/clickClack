@@ -391,6 +391,9 @@ class FirestoreCoupleRepository(
             // Only a capsule if today's question matches (a pin can override it).
             capsule = capsuleSource?.takeIf { it.question.id == question.id },
             wildcards = waiting,
+            todayAuthorUid = question.id.takeIf { Wildcard.isWildcard(it) }
+                ?.let { id -> allWildcards.firstOrNull { it.id == Wildcard.idOf(id) }?.byUid },
+            written = allWildcards.groupingBy { it.byUid }.eachCount(),
             bucket = bucket,
             relationship = coupleDoc?.getString("relationship")
                 ?.let { s -> RelationshipStatus.entries.firstOrNull { it.name == s } },

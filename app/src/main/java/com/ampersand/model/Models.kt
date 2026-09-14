@@ -193,6 +193,10 @@ data class CoupleState(
     val capsule: DayEntry? = null,
     /** Questions the two of you wrote, oldest first, none of them asked yet. */
     val wildcards: List<Wildcard> = emptyList(),
+    /** Who wrote today's question, when one of you did. */
+    val todayAuthorUid: String? = null,
+    /** Questions each of you has written, keyed by uid. */
+    val written: Map<String, Int> = emptyMap(),
     /** The shared bucket list, done and not. */
     val bucket: List<BucketItem> = emptyList(),
     val relationship: RelationshipStatus? = null,

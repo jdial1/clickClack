@@ -1,5 +1,8 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.brick.BrickPill
+import com.ampersand.ui.components.IconBrick
+import androidx.compose.foundation.border
 import com.ampersand.ui.components.IconAction
 import com.ampersand.model.Moments
 import com.ampersand.model.Moment
@@ -7,7 +10,6 @@ import com.ampersand.ui.components.ThemeIcon
 import com.ampersand.ui.components.UiIcon
 import com.ampersand.model.DayEntry
 import com.ampersand.ui.theme.LocalAppearance
-import com.ampersand.model.Wildcard
 import com.ampersand.ui.components.WeatherBrickArt
 import com.ampersand.ui.components.MoodArt
 import com.ampersand.model.MoodEntry
@@ -48,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,6 @@ import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.components.AmpRadioGroup
 import com.ampersand.ui.components.AmpScale
 import com.ampersand.ui.components.DepthDots
-import com.ampersand.ui.components.PersonDot
 import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
@@ -83,10 +83,8 @@ import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.brick.inkOnBricks
 import com.ampersand.ui.theme.toArgbLong
-import com.ampersand.ui.components.AnswerValues
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.components.SectionLabel
-import com.ampersand.ui.components.arrive
 import com.ampersand.ui.feel.Feel
 import com.ampersand.ui.feel.LocalFeel
 import com.ampersand.ui.feel.play
@@ -94,7 +92,6 @@ import com.ampersand.ui.sound.LocalSounds
 import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
-import com.ampersand.ui.theme.Radius
 import com.ampersand.ui.theme.Stud
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -143,13 +140,28 @@ fun TodayScreen(
         Spacer(Modifier.height(8.dp))
         Moods(state, onSetMood, onReplyToMood)
 
+        val events = remember(state) { specialToday(state) }
+        if (events.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            SpecialDayCard(events)
+        }
+
+        val author = when (state.todayAuthorUid) {
+            null -> null
+            state.you.uid -> state.you
+            else -> state.them
+        }
+
         Spacer(Modifier.height(18.dp))
         QuestionHero(
             why = when {
                 state.capsule?.question?.id == question.id -> "Again"
-                Wildcard.isWildcard(question.id) -> "Your own"
+                author != null -> if (author.uid == state.you.uid) "You wrote this" else "From ${author.name}"
                 else -> pickedBy(state)?.let { if (it == "You") "Your pick" else "$it's pick" } ?: state.why
             },
+            author = author?.let { if (it.uid == state.you.uid) "You wrote this for ${state.them.name}" else "${it.name} wrote you this" },
+            authorColor = author?.let { BrickColor.of(it.colorArgb) },
+            special = events.isNotEmpty(),
             question = question,
             you = BrickColor.of(state.you.colorArgb),
             them = BrickColor.of(state.them.colorArgb),
@@ -158,46 +170,26 @@ fun TodayScreen(
                     "Your turn",
                     "${state.them.name} sees your answer once they answer too.",
                 )
-                !day.isRevealed -> HeroStatus("Waiting for ${state.them.name}", "${state.them.name} has not answered yet.")
-                else -> HeroStatus("You both answered", "Tap to see answers.", onOpenReveal)
+                !day.isRevealed -> HeroStatus("Waiting for ${state.them.name}", answerLine(yourAnswer))
+                else -> HeroStatus("You both answered", "Tap to see answers. " + answerLine(yourAnswer), onOpenReveal)
             },
         )
-        Spacer(Modifier.height(28.dp))
-
-        // True only if this phone just submitted, so revisiting doesn't replay the animation.
-        var justSealed by remember(day.date) { mutableStateOf(false) }
-
+        // Your answer lives on the card once it's in, so the form is the only thing below it.
         if (yourAnswer == null) {
-            AnswerForm(state, you, them) { values, guess ->
-                justSealed = true
-                onSubmit(values, guess)
-            }
-        } else {
             val sounds = LocalSounds.current
             val feel = LocalFeel.current
-            // Column, not Box: a Box overlapped the waiting line with the answer.
-            Column(
-                Modifier.arrive(
-                    key = Unit,
-                    rise = 10.dp,
-                    enabled = justSealed,
-                    // Play the seal cue when the panel lands; the button is gone by then.
-                    onLanded = {
-                        if (justSealed) {
-                            sounds.play(Sfx.SEAL)
-                            feel.play(Feel.SEAL)
-                        }
-                    },
-                ),
-            ) {
-                SealedPanel(state, you, them, onOpenReveal)
+            Spacer(Modifier.height(24.dp))
+            AnswerForm(state, you, them) { values, guess ->
+                sounds.play(Sfx.SEAL)
+                feel.play(Feel.SEAL)
+                onSubmit(values, guess)
             }
         }
 
-        val moments = remember(state.history, state.today.date) { Moments.of(state) }
+        val moments = remember(state.history, state.kept, state.today.date) { Moments.of(state) }
         if (moments.isNotEmpty()) {
-            Spacer(Modifier.height(28.dp))
-            MomentsCard(state, moments, onOpenDay, onAnswerDay)
+            Spacer(Modifier.height(20.dp))
+            MomentsList(moments, onOpenDay, onAnswerDay)
         }
 
 
@@ -213,6 +205,11 @@ private fun QuestionHero(
     them: BrickColor,
     /** Why this question today, shown as a tag: "Weather", "First date", "Tasia's pick". */
     why: String? = null,
+    /** "Tasia wrote you this", when one of you wrote today's question. */
+    author: String? = null,
+    authorColor: BrickColor? = null,
+    /** A special day: the card gets a gold border. */
+    special: Boolean = false,
     /** Whose move it is, said on the card itself. */
     status: HeroStatus? = null,
 ) {
@@ -223,7 +220,9 @@ private fun QuestionHero(
         slugs = listOf(you.slug, them.slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (special) Modifier.border(3.dp, SpecialGold, RoundedCornerShape(14.dp)) else Modifier),
     ) {
     Column(
         Modifier
@@ -259,6 +258,18 @@ private fun QuestionHero(
                         Spacer(Modifier.width(6.dp))
                     }
                     Text(text = it, style = MaterialTheme.typography.labelMedium, color = ink)
+                }
+            }
+        }
+
+        // A written question arrives as a card from its author.
+        if (author != null && authorColor != null) {
+            Spacer(Modifier.height(12.dp))
+            BrickPill(slug = authorColor.slug, studSize = Stud.chip, height = BrickHeight.MEDIUM) {
+                Row(Modifier.padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconBrick(UiIcon.WRITE, size = 22.dp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(author, style = MaterialTheme.typography.titleSmall, color = inkOnBrick(authorColor.slug))
                 }
             }
         }
@@ -332,6 +343,11 @@ internal fun WriteOne(state: CoupleState, onWrite: () -> Unit) {
         slug = you.slug,
         onClick = onWrite,
     )
+
+    if (queued.isEmpty()) {
+        Spacer(Modifier.height(8.dp))
+        QuietNote("It arrives as a card with your name on it, and ${state.them.name} gets a notification.")
+    }
 
     if (queued.isNotEmpty()) {
         Spacer(Modifier.height(10.dp))
@@ -690,47 +706,6 @@ internal fun AnswerInput(
     }
 }
 
-/** After you submit: shows your answer and guess, then waiting or open. */
-@Composable
-private fun SealedPanel(
-    state: CoupleState,
-    youColor: Color,
-    themColor: Color,
-    onOpenReveal: () -> Unit,
-) {
-    val day = state.today
-    val yours = day.answerFor(state.you.uid)!!
-
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clip(Radius.card)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(22.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            PersonDot(state.you.name, youColor, size = 28)
-            Spacer(Modifier.size(10.dp))
-            SectionLabel("Your answer")
-        }
-        Spacer(Modifier.height(10.dp))
-        AnswerValues(yours.values, day.question.type)
-
-        yours.guessText?.let { guess ->
-            Spacer(Modifier.height(14.dp))
-            SectionLabel("Your guess for ${state.them.name}")
-            Spacer(Modifier.height(6.dp))
-            Text(
-                guess,
-                style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-
-}
-
 /**
  * Today's moods. Tapping yours opens a picker (face color row, faces, other bricks);
  * picking sets it and closes. Theirs is hidden when unset.
@@ -869,59 +844,95 @@ private fun MoodChip(
     }
 }
 
+/** Gold used to mark a special day. */
+private val SpecialGold = Color(0xFFFFC94D)
+
+/** Your answer and guess as one line for the question card. */
+private fun answerLine(answer: com.ampersand.model.Answer?): String = listOfNotNull(
+    answer?.values?.takeIf { it.isNotEmpty() }?.let { "You said: ${it.joinToString(", ")}." },
+    answer?.guessText?.let { "You guessed: $it." },
+).joinToString(" ")
+
+/** What makes today special: your dates and birthdays (with years), then a holiday. */
+private fun specialToday(state: CoupleState): List<Pair<String, String>> {
+    val today = state.today.date
+    val dates = com.ampersand.model.Dates.upcoming(state).filter { it.next == today }.map { d ->
+        val years = today.year - d.since.year
+        d.label to if (years > 0) "$years ${if (years == 1) "year" else "years"}" else "Today"
+    }
+    val holiday = com.ampersand.model.Occasion.on(
+        today, state.anniversary, state.homeState.takeIf { com.ampersand.model.QuestionSource.HOLIDAYS !in state.sourcesOff },
+    )?.takeIf { o -> dates.none { it.first.contains("anniversary", ignoreCase = true) } || !o.id.contains("anniversary") }
+        ?.let { it.label to "Happy ${it.label}" }
+    return dates + listOfNotNull(holiday)
+}
+
+/** A gold-bordered card naming today's special days. */
+@Composable
+private fun SpecialDayCard(events: List<Pair<String, String>>) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = 1.4f)
+            .border(2.dp, SpecialGold, RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconBrick(UiIcon.DATES, size = 34.dp)
+        Spacer(Modifier.width(12.dp))
+        Column {
+            events.forEach { (title, detail) ->
+                Text("Today: $title", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+            }
+        }
+    }
+}
+
 /** One-tap replies to your partner's mood. */
 private val MoodReplies = listOf("Thinking of you", "Here if you need me", "Proud of you", "Sending a hug", "Call you later")
 
-/** A missed day to answer late, and an old day to remember. */
+/** Moments as flat rows: a missed day to answer, and one thing from before. */
 @Composable
-private fun MomentsCard(
-    state: CoupleState,
+private fun MomentsList(
     moments: List<Moment>,
     onOpenDay: (LocalDate) -> Unit,
     onAnswerDay: (LocalDate) -> Unit,
 ) {
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
-    SectionLabel("Moments")
-    Spacer(Modifier.height(10.dp))
     moments.forEach { m ->
-        val day = m.day
-        Column(
+        Row(
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 10.dp)
+                .padding(bottom = 8.dp)
                 .glass(inkOnBrick(structureSlug()), corner = 12.dp)
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
                     sounds.play(Sfx.NAV)
                     feel.play(Feel.NAV)
-                    if (m is Moment.Missed) onAnswerDay(day.date) else onOpenDay(day.date)
+                    if (m.kind == Moment.Kind.MISSED) onAnswerDay(m.date) else onOpenDay(m.date)
                 }
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                when (m) {
-                    is Moment.Missed -> if (m.partnerAnswered) {
-                        "You missed ${day.date.format(MomentDay)}'s question. ${state.them.name} answered."
-                    } else {
-                        "You missed ${day.date.format(MomentDay)}'s question."
-                    }
-                    is Moment.Recall -> "Remember ${day.date.format(MomentDate)}?"
+            IconBrick(
+                when (m.kind) {
+                    Moment.Kind.MISSED -> UiIcon.WRITE
+                    Moment.Kind.KEPT -> UiIcon.KEEP
+                    Moment.Kind.ON_THIS_DAY -> UiIcon.DATES
+                    else -> UiIcon.DETAILS
                 },
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground,
+                size = 26.dp,
             )
-            Text(day.question.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-            Spacer(Modifier.height(6.dp))
-            IconAction(
-                if (m is Moment.Missed) UiIcon.WRITE else UiIcon.DETAILS,
-                if (m is Moment.Missed) "Answer it now" else "See what you both said",
-            )
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(m.title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                Text(m.text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
+            }
         }
     }
 }
 
-private val MomentDay = DateTimeFormatter.ofPattern("EEEE")
-private val MomentDate = DateTimeFormatter.ofPattern("d MMMM")
 
 /** Answer a past day you missed. */
 @Composable

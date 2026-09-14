@@ -328,7 +328,8 @@ private fun YouTwo(state: CoupleState) {
     Spacer(Modifier.height(8.dp))
     Text(
         "Last 10 weeks: you ${you.daysShowedUp} days, ${state.them.name} ${them.daysShowedUp}. " +
-            "Right guesses: you ${you.guessesLanded}, ${state.them.name} ${them.guessesLanded}.",
+            "Right guesses: you ${you.guessesLanded}, ${state.them.name} ${them.guessesLanded}. " +
+            "Questions written: you ${state.written[state.you.uid] ?: 0}, ${state.them.name} ${state.written[state.them.uid] ?: 0}.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(horizontal = 12.dp, vertical = 8.dp),
