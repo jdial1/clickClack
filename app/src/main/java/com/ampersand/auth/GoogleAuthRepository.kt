@@ -78,9 +78,16 @@ class GoogleAuthRepository(
 
             signInToFirebase(token)
         } catch (e: GetCredentialCancellationException) {
-            // User closed the sheet; not an error.
-            Log.d(TAG, "Sign-in dismissed")
-            Result.success(Unit)
+            // Closing the sheet is not an error. But Google also reports a rejected sign-in after
+            // an account is picked (a signing key it does not know: "[16] Account reauth failed")
+            // as a cancellation, and swallowing that made the button look dead.
+            val message = e.errorMessage?.toString().orEmpty()
+            Log.w(TAG, "Sign-in cancelled: $message")
+            if (message.isBlank() || message.contains("cancelled by the user", ignoreCase = true)) {
+                Result.success(Unit)
+            } else {
+                Result.failure(IllegalStateException("Google sign-in didn't finish. $message"))
+            }
         } catch (e: NoCredentialException) {
             // No Google account on the device at all.
             Result.failure(e)
