@@ -589,8 +589,17 @@ fun SettingsScreen(
                 SectionLabel("Retake a test")
                 Spacer(Modifier.height(10.dp))
                 done.forEach { g ->
-                    AmpButton(label = "Retake ${g.title}", slug = "black", icon = UiIcon.RETAKE) { onRetake(g.instrumentId) }
-                    Spacer(Modifier.height(8.dp))
+                    // Compact glass rows, not full bricks: six tall buttons were a screen of bricks.
+                    IconAction(
+                        UiIcon.RETAKE,
+                        g.title,
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 6.dp)
+                            .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        onClick = { onRetake(g.instrumentId) },
+                    )
                 }
             }
 
