@@ -425,7 +425,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
 }
 
 /**
- * Ten weeks, two 1-stud bricks per day (you left, them right), lit when that person did something. See [DayPips].
+ * Up to ten weeks (only as many as you've been going), two 1-stud bricks per day (you left, them right), lit when that person did something. See [DayPips].
  * One Canvas with manual hit-testing instead of 70 clickable boxes.
  */
 @Composable
@@ -437,7 +437,8 @@ internal fun StudPlate(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     val today = state.today.date
-    val start = today.minusDays((WeeksShown * DaysPerWeek - 1).toLong())
+    val weeks = remember(state.history, state.quizRuns, today) { DayPips.weeksActive(state, WeeksShown) }
+    val start = today.minusDays((weeks * DaysPerWeek - 1).toLong())
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
     val cellShape = BrickShape(1, BrickHeight.LOW)
@@ -451,14 +452,14 @@ internal fun StudPlate(
         Canvas(
             Modifier
                 .fillMaxWidth()
-                .height(cell * 0.72f * WeeksShown)
+                .height(cell * 0.72f * weeks)
                 .clip(RoundedCornerShape(20.dp))
                 .background(plate, RoundedCornerShape(20.dp))
                 .pointerInput(byDate, today) {
                     detectTapGestures { at ->
                         val col = (at.x / (size.width / DaysPerWeek)).toInt()
-                        val row = (at.y / (size.height / WeeksShown)).toInt()
-                        if (col !in 0 until DaysPerWeek || row !in 0 until WeeksShown) {
+                        val row = (at.y / (size.height / weeks)).toInt()
+                        if (col !in 0 until DaysPerWeek || row !in 0 until weeks) {
                             return@detectTapGestures
                         }
                         val date = start.plusDays((row * DaysPerWeek + col).toLong())
@@ -475,13 +476,13 @@ internal fun StudPlate(
                 },
         ) {
             val cw = size.width / DaysPerWeek
-            val ch = size.height / WeeksShown
+            val ch = size.height / weeks
             // Small gap within a day's pair, wider gap between days.
             val studPx = cw * 0.38f
             val gap = cw * 0.04f
             val inset = (cw - studPx * 2 - gap) / 2f
 
-            for (row in 0 until WeeksShown) {
+            for (row in 0 until weeks) {
                 for (col in 0 until DaysPerWeek) {
                     val date = start.plusDays((row * DaysPerWeek + col).toLong())
                     if (date.isAfter(today)) continue

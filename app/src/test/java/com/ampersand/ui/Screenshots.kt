@@ -112,5 +112,9 @@ class Screenshots {
 
     @Test fun us() = shoot("06-us") { UsScreen(special) }
 
+    @Test fun us_new_couple() = shoot("06b-us-two-days-in") {
+        UsScreen(special.copy(history = special.history.filter { it.date >= today.minusDays(2) }, quizRuns = emptyList()))
+    }
+
     @Test fun settings() = shoot("07-settings") { SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {}) }
 }

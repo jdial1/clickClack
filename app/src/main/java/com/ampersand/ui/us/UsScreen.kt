@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.model.DayPips
 import com.ampersand.ui.components.IconAction
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
@@ -319,21 +320,46 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
     }
 }
 
-/** One line for the last ten weeks: days each of you showed up, and right guesses. */
+/** You two: days each of you showed up, right guesses and questions written, side by side in your colours. */
 @Composable
 private fun YouTwo(state: CoupleState) {
     val you = SideBySide.of(state, state.you.uid)
     val them = SideBySide.of(state, state.them.uid)
-    SectionLabel("You two")
-    Spacer(Modifier.height(8.dp))
-    Text(
-        "Last 10 weeks: you ${you.daysShowedUp} days, ${state.them.name} ${them.daysShowedUp}. " +
-            "Right guesses: you ${you.guessesLanded}, ${state.them.name} ${them.guessesLanded}. " +
-            "Questions written: you ${state.written[state.you.uid] ?: 0}, ${state.them.name} ${state.written[state.them.uid] ?: 0}.",
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(horizontal = 12.dp, vertical = 8.dp),
-    )
+    val weeks = DayPips.weeksActive(state)
+    val youInk = Color(state.you.colorArgb)
+    val themInk = Color(state.them.colorArgb)
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .glass(inkOnBrick(structureSlug()), corner = 14.dp)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
+        Text("You two", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(Modifier.height(4.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(state.you.name, style = MaterialTheme.typography.labelMedium, color = youInk)
+            Text("  ·  ", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground)
+            Text(state.them.name, style = MaterialTheme.typography.labelMedium, color = themInk)
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(Modifier.fillMaxWidth()) {
+            listOf(
+                (if (weeks == 1) "Days this week" else "Days, $weeks weeks") to (you.daysShowedUp to them.daysShowedUp),
+                "Right guesses" to (you.guessesLanded to them.guessesLanded),
+                "Questions written" to ((state.written[state.you.uid] ?: 0) to (state.written[state.them.uid] ?: 0)),
+            ).forEach { (label, pair) ->
+                Column(Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text("${pair.first}", style = MaterialTheme.typography.headlineSmall, color = youInk)
+                        Text(" · ", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
+                        Text("${pair.second}", style = MaterialTheme.typography.headlineSmall, color = themInk)
+                    }
+                    Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
+                }
+            }
+        }
+    }
 }
 
 
