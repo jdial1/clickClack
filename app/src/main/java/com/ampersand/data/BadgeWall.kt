@@ -24,6 +24,7 @@ object BadgeWall {
         group(runs, Instruments.LOVE_ATTITUDES, you, them) {
             listOf(styleRow(it, you, them))
         },
+        group(runs, Instruments.LOVE_SPECTRUM, you, them) { run -> listOf(spectrumRow(run, you, them)) },
         group(runs, Instruments.ATTACHMENT, you, them) { run ->
             listOf(pairRow(run, you, them, Instruments.ATTACHMENT, "attachment") { attachmentStyle(it) })
         },
@@ -223,6 +224,39 @@ object BadgeWall {
             )
         },
     )
+
+    /** Love Spectrum: a count of autistic traits out of ten, worded plainly, never as a diagnosis. */
+    private fun spectrumRow(run: InstrumentRun?, you: Member, them: Member) = BadgeRow(
+        label = "",
+        badges = listOf(Owner.YOU to you, Owner.THEM to them).map { (owner, of) ->
+            val kit = Instruments.LOVE_SPECTRUM
+            val open = run?.isOpen == true
+            val score = if (open) run.responsesFor(of.uid)?.let(Instruments::autismTraits) else null
+            Badge(
+                slotId = "spectrum.${owner.name.lowercase()}",
+                owner = owner,
+                who = of.name,
+                result = score?.let(::spectrumTitle),
+                detail = score?.let {
+                    listOf(
+                        BadgeBar(
+                            "Autistic traits", it / 10f,
+                            "$it of 10" + if (it >= Instruments.AutismReferral) " · worth talking to a specialist" else "",
+                        ),
+                    )
+                }.orEmpty(),
+                instrumentId = kit.id,
+                minutes = kit.minutes,
+                waitingOnThem = run != null && !open && run.has(of.uid),
+            )
+        },
+    )
+
+    fun spectrumTitle(score: Int): String = when {
+        score >= Instruments.AutismReferral -> "Many autistic traits"
+        score >= 3 -> "Some autistic traits"
+        else -> "Few autistic traits"
+    }
 
     /** Low or high on keeping distance and on worrying, split at each scale's midpoint. */
     fun attachmentStyle(readings: List<Reading>): String {

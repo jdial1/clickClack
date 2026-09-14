@@ -88,6 +88,17 @@ object Sources {
         fidelity = Fidelity.VERBATIM,
     )
 
+    val AQ10 = Source(
+        id = "aq10",
+        authors = "Allison, Auyeung & Baron-Cohen",
+        year = 2012,
+        title = "Toward brief \"red flags\" for autism screening: the AQ-10",
+        venue = "Journal of the American Academy of Child and Adolescent Psychiatry, 51(2), 202-212",
+        url = "https://www.autismresearchcentre.com/tests/autism-spectrum-quotient-10-items-aq-10-adult/",
+        licence = "Autism Research Centre, University of Cambridge. Free for non-profit use. Asked on a five-point scale.",
+        fidelity = Fidelity.ADAPTED,
+    )
+
     val ARON = Source(
         id = "aron1997",
         authors = "Aron, Melinat, Aron, Vallone & Bator",
@@ -196,7 +207,7 @@ object Sources {
     )
 
     /** Everything credited, in the order the credits screen lists them. */
-    val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ECRRS, OEPS, ODAT, ARON, RCIT, IPIP, ATUS, HAREL, CFPB, ALBUM, ONESOURCE, AZURA)
+    val all = listOf(OEJTS, LOVE_LANGUAGES, LOVE_ATTITUDES, ECRRS, OEPS, ODAT, AQ10, ARON, RCIT, IPIP, ATUS, HAREL, CFPB, ALBUM, ONESOURCE, AZURA)
 
     operator fun get(id: String?): Source? = all.firstOrNull { it.id == id }
 }
@@ -538,6 +549,44 @@ object Instruments {
         },
     )
 
+    /**
+     * Love Spectrum: the AQ-10 (adult), a ten-question screen for autistic traits.
+     * Scored by [autismTraits], not by subscales: one point per item answered on the
+     * autistic side. Neutral scores nothing. A screen, never a diagnosis.
+     */
+    val LOVE_SPECTRUM = Instrument(
+        id = "aq10",
+        sourceId = "aq10",
+        title = "Love Spectrum",
+        blurb = "Ten statements about noticing details, reading people and switching tasks. " +
+            "A short screen for autistic traits, not a diagnosis.",
+        minutes = 2,
+        items = listOf(
+            agree("I often notice small sounds when others do not."),
+            agree("I usually concentrate more on the whole picture, rather than the small details."),
+            agree("I find it easy to do more than one thing at once."),
+            agree("If there is an interruption, I can switch back to what I was doing very quickly."),
+            agree("I find it easy to \"read between the lines\" when someone is talking to me."),
+            agree("I know how to tell if someone listening to me is getting bored."),
+            agree("When I'm reading a story I find it difficult to work out the characters' intentions."),
+            agree("I like to collect information about categories of things, like types of cars, birds, trains or plants."),
+            agree("I find it easy to work out what someone is thinking or feeling just by looking at their face."),
+            agree("I find it difficult to work out people's intentions."),
+        ),
+        subscales = emptyList(),
+    )
+
+    /** Items 1, 7, 8 and 10 score on agree; the rest on disagree. */
+    private val AutismAgreeItems = setOf(0, 6, 7, 9)
+
+    /** AQ-10 score, 0..10: a point for agreeing (4-5) on agree items, disagreeing (1-2) on the rest. */
+    fun autismTraits(responses: List<Int>): Int = responses.take(10).withIndex().count { (i, r) ->
+        if (i in AutismAgreeItems) r >= 4 else r in 1..2
+    }
+
+    /** At or above this, the AQ-10 suggests talking to a specialist. */
+    const val AutismReferral = 6
+
     /** A statement rated from disagree to agree. */
     private fun agree(text: String) = InstrumentItem("Disagree", "Agree", text)
 
@@ -545,7 +594,7 @@ object Instruments {
     private fun like(text: String) = InstrumentItem("Not like me", "Very like me", text)
 
     /** Shortest first. */
-    val all = listOf(ATTACHMENT, DISC, JUNGIAN, LOVE_ATTITUDES, ENNEAGRAM, LOVE_LANGUAGES)
+    val all = listOf(LOVE_SPECTRUM, ATTACHMENT, DISC, JUNGIAN, LOVE_ATTITUDES, ENNEAGRAM, LOVE_LANGUAGES)
 
     operator fun get(id: String?): Instrument? = all.firstOrNull { it.id == id }
 

@@ -36,4 +36,17 @@ class NewTestsScoringTest {
         val blend = List(16) { when (it % 4) { 2 -> 5; 3 -> if (it == 15) 4 else 5; else -> 1 } }
         assertEquals("Steady-Conscientious", BadgeWall.discStyle(kit.readings(blend)))
     }
+
+    @Test
+    fun `love spectrum scores the AQ-10 key, neutral counts for nothing`() {
+        val kit = Instruments.LOVE_SPECTRUM
+        assertEquals(10, kit.items.size)
+        // Every item answered on the autistic side: agree on 1, 7, 8, 10; disagree on the rest.
+        val all = listOf(5, 1, 1, 1, 2, 1, 4, 5, 1, 5)
+        assertEquals(10, Instruments.autismTraits(all))
+        assertEquals(0, Instruments.autismTraits(List(10) { 3 }))
+        assertEquals(0, Instruments.autismTraits(listOf(1, 5, 5, 5, 4, 5, 2, 1, 5, 1)))
+        assertEquals("Many autistic traits", BadgeWall.spectrumTitle(6))
+        assertEquals("Few autistic traits", BadgeWall.spectrumTitle(2))
+    }
 }
