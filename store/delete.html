@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete your Click Clack account</title>
+<style>
+  body { font: 16px/1.6 system-ui, sans-serif; color: #1a1d2e; background: #f6f5fb; margin: 0; padding: 32px 20px; }
+  main { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 12px; }
+  h2 { font-size: 18px; margin: 24px 0 6px; }
+  li { margin: 4px 0; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 12px 20px; cursor: pointer; }
+  button:focus-visible { outline: 3px solid #1a1d2e; outline-offset: 2px; }
+  .google { background: #1a1d2e; color: #fff; }
+  .danger { background: #c62828; color: #fff; }
+  .quiet { background: transparent; color: #1a1d2e; text-decoration: underline; padding: 12px 8px; }
+  .panel { background: #fff; border-radius: 14px; padding: 20px; margin-top: 20px; }
+  .status { margin-top: 14px; font-weight: 600; }
+  .error { color: #b71c1c; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+<h1>Delete your Click Clack account</h1>
+<p>Sign in with the Google account you use in Click Clack, then confirm. This can't be undone.</p>
+
+<h2>What is deleted</h2>
+<ul>
+  <li>Your account and profile: name, birthday, gender, ZIP code and settings</li>
+  <li>Your answers, deck runs and test results</li>
+  <li>Messages, photos, dates, bucket list items and questions you added</li>
+</ul>
+
+<h2>What happens to your partner</h2>
+<p>Your pairing ends. Your partner keeps their own answers, but can no longer see yours.
+When both of you have deleted your accounts, everything left from the pairing is deleted too.</p>
+
+<div class="panel">
+  <div id="signedOut">
+    <button class="google" id="signIn">Sign in with Google</button>
+  </div>
+  <div id="signedIn" hidden>
+    <p>Signed in as <strong id="who"></strong>.</p>
+    <button class="danger" id="confirm">Delete my account and data</button>
+    <button class="quiet" id="signOut">Use a different account</button>
+  </div>
+  <p class="status" id="status" role="status"></p>
+</div>
+
+<p style="margin-top:24px">Can't sign in? Email
+<a href="mailto:justinalandial@gmail.com?subject=Delete%20my%20Click%20Clack%20account">justinalandial@gmail.com</a>
+from the address you signed in with, and we'll delete your account within 30 days.</p>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-functions.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyA8WFud5MsRrXyp5T4uP_S-z-BPasw9750",
+  authDomain: "clickclack-002827.firebaseapp.com",
+  projectId: "clickclack-002827",
+  appId: "1:522013714152:web:4891bdedbfd4857653cb5d",
+});
+const auth = getAuth(app);
+const $ = (id) => document.getElementById(id);
+const status = (text, error = false) => { $("status").textContent = text; $("status").className = "status" + (error ? " error" : ""); };
+
+onAuthStateChanged(auth, (user) => {
+  $("signedOut").hidden = !!user;
+  $("signedIn").hidden = !user;
+  if (user) $("who").textContent = user.email || user.displayName || "your account";
+});
+
+$("signIn").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch((e) => {
+  if (e.code !== "auth/popup-closed-by-user") status("Sign-in didn't work. " + e.message, true);
+});
+$("signOut").onclick = () => { status(""); signOut(auth); };
+
+$("confirm").onclick = async () => {
+  if (!confirm("Delete your Click Clack account and data? This can't be undone.")) return;
+  $("confirm").disabled = true;
+  status("Deleting...");
+  try {
+    await httpsCallable(getFunctions(app), "deleteAccount")();
+    await signOut(auth).catch(() => {});
+    status("Your account and data have been deleted.");
+  } catch (e) {
+    $("confirm").disabled = false;
+    status("Couldn't delete your account. Try again, or email us. (" + e.message + ")", true);
+  }
+};
+</script>
+</body>
+</html>

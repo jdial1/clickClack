@@ -119,14 +119,19 @@ parties for advertising. Data is not collected for ads or analytics.
 | Other user-generated content: answers, moods, reactions | Yes | No | App functionality | Required for core use |
 | Device or other IDs: push token | Yes | No | App functionality (notifications) | Optional |
 
-Data deletion: see the blocker below.
+Data deletion: users can request deletion. **Delete account URL:**
+https://clickclack-002827.web.app/delete
 
-## Blocker: account deletion
+## Account deletion
 
-Play requires apps that create accounts to offer (1) account deletion inside the
-app and (2) a web link where people can ask for deletion. Click Clack has Sign out
-and Unpair ("Nothing is deleted"), but no deletion yet. Both are needed before
-the Data safety form can be completed truthfully and the app submitted.
+The web link is live: sign in with Google, confirm, and the `deleteAccount`
+Cloud Function removes the account, profile, answers, runs, drafts, messages,
+photos, dates, bucket items and written questions, strips per-person fields from
+shared documents, and ends the pairing. The partner's own answers stay; once both
+accounts are gone the whole couple is deleted. Tested in
+`rules-test/delete.test.mjs`.
+
+Still needed: a Delete account button inside the app (Play requires both).
 
 ## After the first upload
 

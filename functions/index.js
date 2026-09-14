@@ -357,3 +357,83 @@ exports.onMessage = onDocumentCreated(
     await queue(coupleId, target, `${target.senderName}`, text, "message");
   },
 );
+
+/**
+ * Delete the signed-in person's account and everything that is theirs.
+ *
+ * Called from the app and from the /delete page. What goes: their profile, their
+ * answers and runs, the messages, photos, dates, bucket items and questions they
+ * wrote, and every per-person field keyed by their uid on shared documents. The
+ * couple is ended so the partner is not left writing to someone who is gone; the
+ * partner's own answers stay theirs. Once neither person has an account, the
+ * couple itself is deleted outright.
+ */
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { getAuth } = require("firebase-admin/auth");
+const { FieldValue } = require("firebase-admin/firestore");
+
+async function deleteWhere(ref, field, uid) {
+  const snap = await ref.where(field, "==", uid).get();
+  await Promise.all(snap.docs.map((d) => d.ref.delete()));
+}
+
+/** Remove `field.uid` from every map field on the document that has that key. */
+async function stripUid(doc, uid) {
+  const data = doc.data() || {};
+  const update = {};
+  for (const [field, value] of Object.entries(data)) {
+    if (value && typeof value === "object" && !Array.isArray(value) && Object.prototype.hasOwnProperty.call(value, uid)) {
+      update[`${field}.${uid}`] = FieldValue.delete();
+    }
+  }
+  if (Object.keys(update).length) await doc.ref.update(update);
+}
+
+async function eraseFromCouple(cid, uid) {
+  const couple = db.doc(`couples/${cid}`);
+  const snap = await couple.get();
+  if (!snap.exists) return;
+  const partner = (snap.get("members") || []).find((m) => m !== uid);
+  const partnerStillHere = partner && (await db.doc(`users/${partner}`).get()).exists;
+  if (!partnerStillHere) {
+    await db.recursiveDelete(couple);
+    return;
+  }
+
+  for (const name of ["days", "quizzes", "instruments"]) {
+    const parents = await couple.collection(name).get();
+    for (const parent of parents.docs) {
+      const sub = name === "days" ? "answers" : "runs";
+      await parent.ref.collection(sub).doc(uid).delete();
+      if (name === "instruments") await parent.ref.collection("drafts").doc(uid).delete();
+      await stripUid(parent, uid);
+    }
+  }
+  for (const name of ["plates", "knowing"]) {
+    for (const d of (await couple.collection(name).get()).docs) await stripUid(d, uid);
+  }
+  for (const chat of (await couple.collection("chats").get()).docs) {
+    await deleteWhere(chat.ref.collection("messages"), "byUid", uid);
+    if (chat.get("lastBy") === uid) await chat.ref.update({ lastText: FieldValue.delete() });
+  }
+  for (const name of ["photos", "dates", "bucket", "wildcards"]) {
+    await deleteWhere(couple.collection(name), "byUid", uid);
+  }
+  await deleteWhere(couple.collection("outbox"), "to", uid);
+  await stripUid(snap, uid);
+  if (snap.get("endedAt") == null) await couple.update({ endedAt: FieldValue.serverTimestamp() });
+}
+
+exports.deleteAccount = onCall(async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "Sign in first.");
+
+  const couples = await db.collection("couples").where("members", "array-contains", uid).get();
+  for (const c of couples.docs) await eraseFromCouple(c.id, uid);
+  await deleteWhere(db.collection("invites"), "fromUid", uid);
+  await db.doc(`users/${uid}`).delete();
+  await getAuth().deleteUser(uid).catch((e) => {
+    if (e.code !== "auth/user-not-found") throw e;
+  });
+  return { deleted: true };
+});
