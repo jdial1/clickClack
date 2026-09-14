@@ -17,7 +17,7 @@ The bundle is `app/build/outputs/bundle/play/clickclack-<version>-play.aab`
 | Free or paid | Free |
 | Category | Lifestyle |
 | Tags | Relationships, Couples, Daily journal |
-| Contact email | justin.dial@mawdpathology.com (change if you want a public address) |
+| Contact email | justinalandial@gmail.com |
 | Countries | United States only |
 
 ## Short description (80 max)
