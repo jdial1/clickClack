@@ -68,26 +68,29 @@ class GoogleAuthRepository(
                 ),
             )
 
-        return try {
-            val request = GetCredentialRequest.Builder()
-                .addCredentialOption(GetSignInWithGoogleOption.Builder(clientId).build())
-                .build()
+        // The "Sign in with Google" sheet first. If Google rejects it after an account is picked
+        // ("[16] Account reauth failed"), try the older account picker, which takes another path.
+        val button = GetSignInWithGoogleOption.Builder(clientId).build()
+        val picker = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
+            .setServerClientId(clientId)
+            .setFilterByAuthorizedAccounts(false)
+            .setAutoSelectEnabled(false)
+            .build()
 
-            val response = credentials.getCredential(activity, request)
+        return try {
+            val response = try {
+                credentials.getCredential(activity, GetCredentialRequest.Builder().addCredentialOption(button).build())
+            } catch (e: GetCredentialCancellationException) {
+                if (e.isUserCancel()) return Result.success(Unit)
+                Log.w(TAG, "Sign in with Google rejected, trying the account picker: ${e.errorMessage}")
+                credentials.getCredential(activity, GetCredentialRequest.Builder().addCredentialOption(picker).build())
+            }
             val token = GoogleIdTokenCredential.createFrom(response.credential.data).idToken
 
             signInToFirebase(token).recoverCatching { throw diagnose("Firebase sign-in", it) }
         } catch (e: GetCredentialCancellationException) {
-            // Closing the sheet is not an error. But Google also reports a rejected sign-in after
-            // an account is picked (a signing key it does not know: "[16] Account reauth failed")
-            // as a cancellation, and swallowing that made the button look dead.
-            val message = e.errorMessage?.toString().orEmpty()
-            Log.w(TAG, "Sign-in cancelled: $message")
-            if (message.isBlank() || message.contains("cancelled by the user", ignoreCase = true)) {
-                Result.success(Unit)
-            } else {
-                Result.failure(diagnose("Google account sheet", e))
-            }
+            // Closing the sheet is not an error. A rejection reported as a cancellation is.
+            if (e.isUserCancel()) Result.success(Unit) else Result.failure(diagnose("Google account sheet and picker", e))
         } catch (e: NoCredentialException) {
             // No Google account on the device at all.
             Result.failure(diagnose("No Google account", e))
@@ -96,6 +99,11 @@ class GoogleAuthRepository(
         } catch (e: Exception) {
             Result.failure(diagnose("Unexpected", e))
         }
+    }
+
+    private fun GetCredentialCancellationException.isUserCancel(): Boolean {
+        val message = errorMessage?.toString().orEmpty()
+        return message.isBlank() || message.contains("cancelled by the user", ignoreCase = true)
     }
 
     /** Exchange the Google ID token for a Firebase session. */
