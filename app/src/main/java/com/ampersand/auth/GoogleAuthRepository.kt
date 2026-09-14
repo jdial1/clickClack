@@ -103,6 +103,37 @@ class GoogleAuthRepository(
         _state.value = AuthState.SignedOut
     }
 
+    /**
+     * Calls the deleteAccount callable over plain HTTPS with the Firebase ID token, which is all
+     * the callable protocol is; cheaper than adding the Functions SDK for one call.
+     */
+    override suspend fun deleteAccount(): Result<Unit> = runCatching {
+        val user = auth.currentUser ?: error("Not signed in.")
+        val token = suspendCancellableCoroutine { cont ->
+            user.getIdToken(true)
+                .addOnSuccessListener { cont.resume(Result.success(it.token.orEmpty())) }
+                .addOnFailureListener { cont.resume(Result.failure(it)) }
+        }.getOrThrow()
+        val project = com.google.firebase.FirebaseApp.getInstance().options.projectId
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            val connection = java.net.URL("https://us-central1-$project.cloudfunctions.net/deleteAccount")
+                .openConnection() as java.net.HttpURLConnection
+            try {
+                connection.requestMethod = "POST"
+                connection.doOutput = true
+                connection.connectTimeout = 15000
+                connection.readTimeout = 60000
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.setRequestProperty("Authorization", "Bearer $token")
+                connection.outputStream.use { it.write("{\"data\":null}".toByteArray()) }
+                check(connection.responseCode == 200) { "Couldn't delete your account (${connection.responseCode}). Try again." }
+            } finally {
+                connection.disconnect()
+            }
+        }
+        signOut()
+    }
+
     /** Call when the owning scope dies, or the listener outlives this object. */
     fun close() = auth.removeAuthStateListener(listener)
 

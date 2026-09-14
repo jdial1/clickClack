@@ -235,6 +235,10 @@ fun AmpersandApp() {
                         Push.unregister(context, account.uid) { authVm.auth.signOut() }
                     },
                     onPreview = { demo = true },
+                    onDeleteAccount = {
+                        Reminder.cancel(context)
+                        authVm.auth.deleteAccount()
+                    },
                 )
             }
         }
@@ -260,7 +264,10 @@ private fun DemoApp(onExit: () -> Unit) {
         them = Color(state.them.colorArgb),
         darkTheme = LocalAppearance.current?.isDark() ?: isSystemInDarkTheme(),
     ) {
-        SignedInApp(vm = vm, state = state, account = account, pool = pool, onSignOut = onExit, onUnpair = onExit)
+        SignedInApp(
+            vm = vm, state = state, account = account, pool = pool, onSignOut = onExit, onUnpair = onExit,
+            onDeleteAccount = { onExit(); Result.success(Unit) },
+        )
     }
 }
 
@@ -307,6 +314,7 @@ private fun PairedGate(
     account: AuthState.SignedIn,
     onSignOut: () -> Unit,
     onPreview: () -> Unit,
+    onDeleteAccount: suspend () -> Result<Unit>,
 ) {
     val context = LocalContext.current
     val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
@@ -363,6 +371,7 @@ private fun PairedGate(
                     account = account,
                     pool = pool,
                     onSignOut = onSignOut,
+                    onDeleteAccount = onDeleteAccount,
                     onUnpair = {
                         Reminder.cancel(context)
                         scope.launch { pairVm.pairing.unpair() }
@@ -423,6 +432,7 @@ private fun SignedInApp(
     pool: QuestionPool,
     onSignOut: () -> Unit,
     onUnpair: () -> Unit,
+    onDeleteAccount: suspend () -> Result<Unit>,
 ) {
         // Bind the local user once per account.
         val appContext = LocalContext.current
@@ -645,6 +655,7 @@ private fun SignedInApp(
                             account = account.email ?: account.displayName,
                             onSignOut = onSignOut,
                             onUnpair = onUnpair,
+                            onDeleteAccount = onDeleteAccount,
                             onSetAnniversary = vm.repo::setAnniversary,
                             onSetProfile = vm.repo::setProfile,
                             onSetRelationship = vm.repo::setRelationship,

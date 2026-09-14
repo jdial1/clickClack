@@ -55,6 +55,9 @@ interface AuthRepository {
     suspend fun signInWithGoogle(activity: Activity): Result<Unit>
 
     fun signOut()
+
+    /** Delete the account and everything that is yours (the deleteAccount Cloud Function), then sign out. */
+    suspend fun deleteAccount(): Result<Unit>
 }
 
 /** Always signed in as the mock user, for builds without Firebase. */
@@ -77,5 +80,10 @@ class FakeAuthRepository(
 
     override fun signOut() {
         _state.value = AuthState.SignedOut
+    }
+
+    override suspend fun deleteAccount(): Result<Unit> {
+        signOut()
+        return Result.success(Unit)
     }
 }

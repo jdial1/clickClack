@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import kotlinx.coroutines.launch
 import com.ampersand.model.DayPips
 import com.ampersand.ui.components.IconAction
 import com.ampersand.ui.components.IconBrick
@@ -371,6 +372,7 @@ fun SettingsScreen(
     account: String? = null,
     onSignOut: (() -> Unit)? = null,
     onUnpair: (() -> Unit)? = null,
+    onDeleteAccount: (suspend () -> Result<Unit>)? = null,
     onSetAnniversary: ((java.time.LocalDate) -> Unit)? = null,
     onSetProfile: (String?, java.time.LocalDate?) -> Unit = { _, _ -> },
     onSetRelationship: (RelationshipStatus, java.time.LocalDate?) -> Unit = { _, _ -> },
@@ -624,6 +626,44 @@ fun SettingsScreen(
                     slug = "black",
                     onClick = { if (confirming) onUnpair() else confirming = true },
                 )
+            }
+
+            if (onDeleteAccount != null) {
+                Spacer(Modifier.height(28.dp))
+                SectionLabel("Delete account")
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Deletes your account, answers, messages and photos for good. Your pairing ends, and ${state.them.name} keeps only their own answers.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+                val scope = androidx.compose.runtime.rememberCoroutineScope()
+                var confirming by remember { mutableStateOf(false) }
+                var deleting by remember { mutableStateOf(false) }
+                var failed by remember { mutableStateOf<String?>(null) }
+                AmpButton(
+                    label = when {
+                        deleting -> "Deleting"
+                        confirming -> "Tap again to delete for good"
+                        else -> "Delete my account"
+                    },
+                    slug = "black",
+                    enabled = !deleting,
+                    onClick = {
+                        if (!confirming) { confirming = true; return@AmpButton }
+                        deleting = true
+                        failed = null
+                        scope.launch {
+                            onDeleteAccount().onFailure { failed = it.message ?: "Couldn't delete your account. Try again." }
+                            deleting = false
+                        }
+                    },
+                )
+                failed?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                }
             }
             }
             }
