@@ -22,9 +22,9 @@ The bundle is `app/build/outputs/bundle/play/clickclack-<version>-play.aab`
 
 ## Short description (80 max)
 
-> A daily question for two. Answer, unlock it, then build a brick sculpture together.
+> One question a day for two. Answer it, then build a brick sculpture together.
 
-(80 characters)
+(77 characters)
 
 ## Full description (4000 max)
 
