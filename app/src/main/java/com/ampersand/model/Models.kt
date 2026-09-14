@@ -233,6 +233,12 @@ data class CoupleState(
     val why: String? = null,
     /** Days and decks either of you kept, keyed by [Kept.day] or [Kept.deck], with a label to show. */
     val kept: Map<String, String> = emptyMap(),
+    /** Messages of conversations that are open on screen, by conversation id. */
+    val chats: Map<String, List<ChatMessage>> = emptyMap(),
+    /** Last message and count for every conversation. */
+    val chatPreviews: Map<String, ChatPreview> = emptyMap(),
+    /** Photos kept from special days, newest first. */
+    val photos: List<DayPhoto> = emptyList(),
     /** Opened days older than the loaded history, fetched on demand to show a kept or recalled day. */
     val recalled: List<DayEntry> = emptyList(),
     /** Today's forecast, as saved on the day. Null until somebody fetched it. */

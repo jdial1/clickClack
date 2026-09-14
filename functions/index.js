@@ -54,9 +54,9 @@ async function push(target, title, body) {
  * Hold a push in the couple's outbox. [flushOutbox] sends it, batched with
  * anything else for the same person, outside quiet hours.
  */
-async function queue(coupleId, target, title, body) {
+async function queue(coupleId, target, title, body, kind = "update") {
   await db.collection(`couples/${coupleId}/outbox`).add({
-    to: target.uid, from: target.senderName || "", title, body: body || "", at: Date.now(),
+    to: target.uid, from: target.senderName || "", title, body: body || "", kind, at: Date.now(),
   });
 }
 
@@ -71,6 +71,7 @@ exports.onAnswer = onDocumentCreated(
     await queue(coupleId, target,
       `${target.senderName} answered`,
       "Answer yours and the day opens.",
+      "answered",
     );
   },
 );
@@ -86,6 +87,7 @@ exports.onQuizRun = onDocumentCreated(
     await queue(coupleId, target,
       `${target.senderName} played a deck`,
       "Yours is the half that is missing.",
+      "deck",
     );
   },
 );
@@ -110,6 +112,7 @@ exports.onWildcard = onDocumentCreated(
     await queue(coupleId, target,
       `${target.senderName} wrote you a question`,
       "It will be the next one you are both asked.",
+      "question",
     );
   },
 );
@@ -136,15 +139,15 @@ exports.onDayUpdate = onDocumentUpdated(
 
     for (const uid of changedKeys(before, after, "reactions")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await queue(coupleId, target, `${target.senderName} reacted`, "See it on the day you both answered.");
+      if (target) await queue(coupleId, target, `${target.senderName} reacted`, "See it on the day you both answered.", "reacted");
     }
     for (const uid of changedKeys(before, after, "notes")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await queue(coupleId, target, `${target.senderName} wrote a line back`, after.get("notes")[uid]);
+      if (target) await queue(coupleId, target, `${target.senderName} wrote a line back`, after.get("notes")[uid], "message");
     }
     for (const uid of changedKeys(before, after, "moodReplies")) {
       const target = await partnerOf(coupleId, uid);
-      if (target) await queue(coupleId, target, `${target.senderName} replied to your mood`, after.get("moodReplies")[uid]);
+      if (target) await queue(coupleId, target, `${target.senderName} replied to your mood`, after.get("moodReplies")[uid], "message");
     }
   },
 );
@@ -167,7 +170,7 @@ exports.onMoodUpdate = onDocumentUpdated("users/{uid}", async (event) => {
   const target = await partnerOf(coupleId, uid);
   if (!target) return;
   const label = MOOD_LABELS[after.id] || "a new mood";
-  await queue(coupleId, target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.");
+  await queue(coupleId, target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.", "mood");
 });
 
 /** Words picked toward a finished week's name, and the name once both are in. */
@@ -182,8 +185,8 @@ exports.onPlateUpdate = onDocumentUpdated(
     for (const uid of picked) {
       const target = await partnerOf(coupleId, uid);
       if (!target) continue;
-      if (both) await queue(coupleId, target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`);
-      else await queue(coupleId, target, `${target.senderName} picked words for the week`, "Pick yours to see its name.");
+      if (both) await queue(coupleId, target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`, "week");
+      else await queue(coupleId, target, `${target.senderName} picked words for the week`, "Pick yours to see its name.", "week");
     }
   },
 );
@@ -225,7 +228,7 @@ exports.specialDates = onSchedule({ schedule: "0 * * * *", timeZone: "UTC" }, as
 
     for (const u of users) {
       await queue(couple.id, { uid: u.id, senderName: "" }, events[0],
-        events.length > 1 ? events.slice(1).join(". ") : "Today's question is about it.");
+        events.length > 1 ? events.slice(1).join(". ") : "Today's question is about it.", "day");
     }
   }
 });
@@ -236,10 +239,32 @@ function isQuiet(hour, from, to) {
   return from > to ? hour >= from || hour < to : hour >= from && hour < to;
 }
 
-/** Wait this long after the newest item, so a burst goes out as one push. */
-const SETTLE_MS = 2 * 60 * 1000;
+/** Wait this long after the newest item, so a burst (a chat, say) goes out as one push. */
+const SETTLE_MS = 10 * 60 * 1000;
 /** Never hold a burst longer than this outside quiet hours. */
-const MAX_HOLD_MS = 15 * 60 * 1000;
+const MAX_HOLD_MS = 60 * 60 * 1000;
+/** At most one push per person in this window; a special day is the exception. */
+const MIN_GAP_MS = 30 * 60 * 1000;
+
+/** "Tasia: answered, sent 3 messages, reacted" from queued items. */
+function summarize(items) {
+  const name = items.map((d) => d.get("from")).find((n) => n) || "";
+  const counts = {};
+  items.forEach((d) => { const k = d.get("kind") || "update"; counts[k] = (counts[k] || 0) + 1; });
+  const words = {
+    answered: () => "answered today's question",
+    deck: (n) => n > 1 ? `played ${n} decks` : "played a deck",
+    question: (n) => n > 1 ? `wrote you ${n} questions` : "wrote you a question",
+    reacted: () => "reacted",
+    message: (n) => n > 1 ? `sent ${n} messages` : "sent a message",
+    mood: () => "set a mood",
+    week: () => "named the week",
+    day: () => "it's a special day",
+    update: (n) => `${n} updates`,
+  };
+  const parts = Object.entries(counts).map(([k, n]) => (words[k] || words.update)(n));
+  return { title: name || "Click Clack", body: parts.join(", ") };
+}
 
 /**
  * Every five minutes: for each couple, send what is waiting in the outbox as
@@ -265,7 +290,10 @@ exports.flushOutbox = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC" 
       const times = items.map((d) => d.get("at") || 0);
       const newest = Math.max(...times);
       const oldest = Math.min(...times);
-      if (now - newest < SETTLE_MS && now - oldest < MAX_HOLD_MS) continue;
+      const special = items.some((d) => d.get("kind") === "day");
+      if (!special && now - newest < SETTLE_MS && now - oldest < MAX_HOLD_MS) continue;
+      const last = (couple.get("pushedAt") || {})[uid] || 0;
+      if (!special && now - last < MIN_GAP_MS) continue;
 
       const user = await db.doc(`users/${uid}`).get();
       const token = user.get("fcmToken");
@@ -274,13 +302,10 @@ exports.flushOutbox = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC" 
         if (items.length === 1) {
           await push({ token }, items[0].get("title"), items[0].get("body"));
         } else {
-          const name = items.map((d) => d.get("from")).find((n) => n) || "";
-          await push(
-            { token },
-            name ? `${items.length} updates from ${name}` : `${items.length} updates`,
-            items.map((d) => d.get("title")).join(" · "),
-          );
+          const { title, body } = summarize(items);
+          await push({ token }, title, body);
         }
+        await couple.ref.set({ pushedAt: { [uid]: now } }, { merge: true });
       }
       const batch = db.batch();
       items.forEach((d) => batch.delete(d.ref));
@@ -318,3 +343,17 @@ function togetherOn(local, anniversary, marriedOn) {
 }
 
 exports._togetherOn = togetherOn;
+
+/** A message in a conversation. */
+exports.onMessage = onDocumentCreated(
+  "couples/{coupleId}/chats/{chatId}/messages/{mid}",
+  async (event) => {
+    const { coupleId } = event.params;
+    const uid = event.data.get("byUid");
+    if (!uid) return;
+    const target = await partnerOf(coupleId, uid);
+    if (!target) return;
+    const text = event.data.get("text") || "sent an emote";
+    await queue(coupleId, target, `${target.senderName}`, text, "message");
+  },
+);

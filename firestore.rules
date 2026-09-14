@@ -226,6 +226,34 @@ service cloud.firestore {
 
       // Dates worth a countdown. Either of you adds or removes one; nobody
       // edits one in place, which keeps "who changed the date" out of it.
+      // Conversations: either of you may start or update one; messages are yours to send,
+      // never edited or deleted.
+      match /chats/{chatId} {
+        allow read: if isMember(cid);
+        allow create, update: if isLive(cid);
+        allow delete: if false;
+
+        match /messages/{mid} {
+          allow read: if isMember(cid);
+          allow create: if isLive(cid)
+            && request.resource.data.byUid == me()
+            && (request.resource.data.get('text', null) == null
+                || (request.resource.data.text is string && request.resource.data.text.size() <= 500));
+          allow update, delete: if false;
+        }
+      }
+
+      // Photos from special days, stored inline as compressed JPEG. The author may remove theirs.
+      match /photos/{pid} {
+        allow read: if isMember(cid);
+        allow create: if isLive(cid)
+          && request.resource.data.byUid == me()
+          && request.resource.data.data is string
+          && request.resource.data.data.size() < 900000;
+        allow update: if false;
+        allow delete: if isMember(cid) && resource.data.byUid == me();
+      }
+
       match /dates/{id} {
         allow read: if isMember(cid);
         allow create: if isLive(cid)

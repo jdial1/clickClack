@@ -1,12 +1,10 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.model.Chats
 import com.ampersand.model.Kept
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import com.ampersand.ui.components.AmpButton
-import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.components.IconAction
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.components.IconBrick
@@ -79,6 +77,7 @@ fun RevealScreen(
     onOpened: () -> Unit = {},
     onTalkedAbout: (java.time.LocalDate) -> Unit = {},
     onNote: (String) -> Unit = {},
+    onOpenChat: (String) -> Unit = {},
     onKeep: (String, String?) -> Unit = { _, _ -> },
     themes: List<QuizTheme> = emptyList(),
     onPickTomorrow: (String) -> Unit = {},
@@ -229,26 +228,23 @@ fun RevealScreen(
         }
 
         if (day.isRevealed) {
+            // One conversation per day: as many lines and emotes as you like.
             Spacer(Modifier.height(24.dp))
-            SectionLabel("A line back")
+            SectionLabel("Talk about it")
             Spacer(Modifier.height(8.dp))
-            day.notes[state.them.uid]?.let {
-                Text("${state.them.name}: $it", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+            val chatId = Chats.day(day.date)
+            val preview = state.chatPreviews[chatId]
+            val line = preview?.let { (if (it.lastByUid == state.you.uid) "You" else state.them.name) + ": " + it.lastText }
+                ?: day.notes[state.them.uid]?.let { "${state.them.name}: $it" } ?: day.notes[state.you.uid]?.let { "You: $it" }
+            line?.let {
+                Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
                 Spacer(Modifier.height(8.dp))
             }
-            val mine = day.notes[state.you.uid]
-            var editing by remember(day.date) { mutableStateOf(mine == null) }
-            var draft by remember(day.date) { mutableStateOf(mine.orEmpty()) }
-            if (!editing && mine != null) {
-                IconAction(UiIcon.WRITE, "You: $mine", onClick = { editing = true })
-            } else {
-                AmpField(value = draft, onValueChange = { draft = it.take(140) }, color = BrickColor.of(state.you.colorArgb), placeholder = "Say one thing back")
-                Spacer(Modifier.height(8.dp))
-                AmpButton(label = "Send", slug = null, enabled = draft.isNotBlank(), icon = UiIcon.DONE) {
-                    onNote(draft.trim())
-                    editing = false
-                }
-            }
+            AmpButton(
+                label = if (line == null) "Start a conversation" else "Open conversation",
+                slug = null,
+                icon = UiIcon.WRITE,
+            ) { onOpenChat(chatId) }
         }
 
         Spacer(Modifier.height(24.dp))

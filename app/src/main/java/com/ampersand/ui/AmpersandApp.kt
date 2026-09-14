@@ -1,5 +1,6 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.chat.ChatScreen
 import com.ampersand.model.Topic
 import com.ampersand.model.Kept
 import com.ampersand.ui.today.PastAnswerScreen
@@ -374,6 +375,7 @@ private sealed interface Screen {
     data class Sitting(val instrumentId: String) : Screen
     data class Reveal(val date: LocalDate) : Screen
     data class Past(val date: LocalDate) : Screen
+    data class Chat(val id: String) : Screen
     data object Wildcard : Screen
     data object Settings : Screen
     data class Main(val tab: Tab) : Screen
@@ -431,6 +433,8 @@ private fun SignedInApp(
         var writing by rememberSaveable { mutableStateOf(false) }
         // A missed past day being answered late.
         var answering by rememberSaveable { mutableStateOf<LocalDate?>(null) }
+        // An open conversation, by id (see Chats).
+        var chatting by rememberSaveable { mutableStateOf<String?>(null) }
         // Past days load their answers when opened.
         LaunchedEffect(openDate) { openDate?.let { vm.repo.loadAnswers(it) } }
         var sitting by rememberSaveable { mutableStateOf<String?>(null) }
@@ -442,13 +446,14 @@ private fun SignedInApp(
         // No nav back stack, so handle back manually: close overlays, then return to Today.
         // Disabled on Today so back exits the app.
         BackHandler(
-            enabled = settings || writing || openDeck != null || openDate != null || answering != null || tab != Tab.TODAY,
+            enabled = settings || writing || openDeck != null || openDate != null || answering != null || chatting != null || tab != Tab.TODAY,
         ) {
             sounds.play(Sfx.NAV)
             feel.play(Feel.NAV)
             when {
                 settings -> settings = false
                 writing -> writing = false
+                chatting != null -> chatting = null
                 answering != null -> answering = null
                 openDeck != null -> openDeck = null
                 openDate != null -> openDate = null
@@ -463,7 +468,7 @@ private fun SignedInApp(
                     BottomBar(
                         current = tab,
                         color = BrickColor.of(state.you.colorArgb),
-                        enabled = openDate == null && openDeck == null && !writing && answering == null &&
+                        enabled = openDate == null && openDeck == null && !writing && answering == null && chatting == null &&
                             sitting == null,
                         onSelect = { tab = it; openDate = null; openDeck = null; settings = false },
                     )
@@ -485,6 +490,7 @@ private fun SignedInApp(
                         sitting != null -> Screen.Sitting(sitting!!)
                         settings -> Screen.Settings
                         writing -> Screen.Wildcard
+                        chatting != null -> Screen.Chat(chatting!!)
                         answering != null -> Screen.Past(answering!!)
                         openDeck != null -> Screen.Deck(openDeck!!)
                         openDate != null -> Screen.Reveal(openDate!!)
@@ -530,6 +536,33 @@ private fun SignedInApp(
                             onSaveDraft = { vm.repo.saveInstrumentDraft(kit.id, it) },
                         )
 
+                        screen is Screen.Chat -> {
+                            val id = screen.id
+                            androidx.compose.runtime.DisposableEffect(id) {
+                                vm.repo.openChat(id)
+                                onDispose { vm.repo.closeChat(id) }
+                            }
+                            val date = runCatching { LocalDate.parse(id.substringAfter('_')) }.getOrNull()
+                            val day = date?.let { d -> if (d == state.today.date) state.today else state.history.firstOrNull { it.date == d } }
+                            val seed = buildList {
+                                if (id.startsWith("mood_") && date == state.today.date) {
+                                    state.today.moodReplies.forEach { (uid, text) -> add(com.ampersand.model.ChatMessage("legacy_$uid", uid, text)) }
+                                }
+                                if (id.startsWith("day_")) {
+                                    day?.notes?.forEach { (uid, text) -> add(com.ampersand.model.ChatMessage("legacy_$uid", uid, text)) }
+                                }
+                            }
+                            ChatScreen(
+                                state = state,
+                                title = com.ampersand.model.Chats.title(id, state.them.name),
+                                subtitle = if (id.startsWith("day_")) day?.question?.text else null,
+                                messages = state.chats[id].orEmpty(),
+                                seed = seed,
+                                onBack = { chatting = null },
+                                onSend = { text, emote -> vm.repo.sendMessage(id, text, emote) },
+                            )
+                        }
+
                         past != null -> PastAnswerScreen(
                             state = state,
                             day = past,
@@ -559,6 +592,7 @@ private fun SignedInApp(
                             onOpened = { openedReveal = day.date.toString() },
                             onTalkedAbout = vm.repo::markTalkedAbout,
                             onNote = { vm.repo.noteDay(day.date, it) },
+                            onOpenChat = { chatting = it },
                             onKeep = vm.repo::keep,
                             themes = QuizTheme.entries.filter { it.label in pool.themes },
                             onPickTomorrow = vm.repo::pickTomorrow,
@@ -598,7 +632,9 @@ private fun SignedInApp(
                             onSubmit = vm.repo::submitToday,
                             onOpenReveal = { openDate = state.today.date },
                             onSetMood = vm.repo::setMood,
-                            onReplyToMood = vm.repo::replyToMood,
+                            onReplyToMood = { vm.repo.sendMessage(com.ampersand.model.Chats.mood(state.today.date), it) },
+                            onOpenChat = { chatting = it },
+                            onAddPhoto = { label, data -> vm.repo.addPhoto(state.today.date, label, data) },
                             onOpenDay = { openDate = it },
                             onAnswerDay = { answering = it },
                         )

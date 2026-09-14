@@ -1,5 +1,7 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.brick.glass
 import com.ampersand.ui.components.IconAction
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.animation.core.animateFloatAsState
@@ -143,6 +145,20 @@ private fun WallGroup(
             }
         } else {
             TakeIt(group = group, onTake = onTake)
+        }
+
+        group.together?.let { reading ->
+            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+            ) {
+                Text("You two", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.height(4.dp))
+                Text(reading, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+            }
         }
 
     }

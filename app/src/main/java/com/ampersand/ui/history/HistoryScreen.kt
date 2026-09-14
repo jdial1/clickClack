@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.components.rememberPhoto
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.IconBrick
@@ -109,6 +110,30 @@ fun HistoryScreen(
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 40.dp),
     ) {
+        if (state.photos.isNotEmpty()) {
+            item {
+                SectionLabel("Our days")
+                Spacer(Modifier.height(10.dp))
+                androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(state.photos, key = { it.id }) { p ->
+                        Column(Modifier.width(150.dp).glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(6.dp)) {
+                            rememberPhoto(p.data)?.let {
+                                androidx.compose.foundation.Image(
+                                    it, contentDescription = p.label,
+                                    modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(8.dp)),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                )
+                            }
+                            Spacer(Modifier.height(4.dp))
+                            Text(p.label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
+                            Text(p.date.format(LongDate), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
+                        }
+                    }
+                }
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+
         if (state.kept.isNotEmpty()) {
             item {
                 SectionLabel("Kept")

@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.DayPhoto
+import com.ampersand.model.ChatPreview
+import com.ampersand.model.ChatMessage
 import com.ampersand.model.Together
 import com.ampersand.model.decadeOf
 import com.ampersand.model.ChineseZodiac
@@ -74,6 +77,9 @@ private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
 private const val BUCKET = "bucket"
 private const val DATES = "dates"
+private const val CHATS = "chats"
+private const val MESSAGES = "messages"
+private const val PHOTOS = "photos"
 private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
 private const val DRAFTS = "drafts"
@@ -137,6 +143,11 @@ class FirestoreCoupleRepository(
     /** The past day today's question repeats, on a capsule day. */
     private var capsuleSource: DayEntry? = null
 
+    private var chatPreviews: Map<String, ChatPreview> = emptyMap()
+    private var chatMessages: Map<String, List<ChatMessage>> = emptyMap()
+    private val chatRegs = mutableMapOf<String, ListenerRegistration>()
+    private var photos: List<DayPhoto> = emptyList()
+
     /** Day documents older than the loaded history, read on demand (see [loadAnswers]). */
     private var recalledDocs: Map<LocalDate, DocumentSnapshot> = emptyMap()
 
@@ -159,6 +170,33 @@ class FirestoreCoupleRepository(
             coupleDoc = d
             anniversary = d?.getString("anniversary")
                 ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+            recompose()
+        }
+
+        regs += couple.collection(CHATS).addSnapshotListener { snap, error ->
+            if (error != null) {
+                Log.w(TAG, "chats listener failed", error)
+                return@addSnapshotListener
+            }
+            chatPreviews = snap?.documents.orEmpty().associate { doc ->
+                doc.id to ChatPreview(
+                    doc.getString("lastText").orEmpty(),
+                    doc.getString("lastBy").orEmpty(),
+                    (doc.getLong("count") ?: 0L).toInt(),
+                )
+            }
+            recompose()
+        }
+
+        regs += couple.collection(PHOTOS).addSnapshotListener { snap, error ->
+            if (error != null) {
+                Log.w(TAG, "photos listener failed", error)
+                return@addSnapshotListener
+            }
+            photos = snap?.documents.orEmpty().mapNotNull { doc ->
+                val date = doc.getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@mapNotNull null
+                DayPhoto(doc.id, date, doc.getString("label").orEmpty(), doc.getString("byUid").orEmpty(), doc.getString("data") ?: return@mapNotNull null)
+            }.sortedByDescending { it.date }
             recompose()
         }
 
@@ -421,6 +459,9 @@ class FirestoreCoupleRepository(
                 val label = (v as? Map<*, *>)?.get("label") as? String ?: return@mapNotNull null
                 (k as? String)?.let { it to label }
             }.toMap(),
+            chats = chatMessages,
+            chatPreviews = chatPreviews,
+            photos = photos,
             recalled = recalledDocs.values.mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
                 .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
             why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests, together),
@@ -1024,6 +1065,56 @@ class FirestoreCoupleRepository(
         )
     }
 
+    override fun openChat(id: String) {
+        if (id in chatRegs) return
+        chatRegs[id] = couple.collection(CHATS).document(id).collection(MESSAGES)
+            .orderBy("at")
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.w(TAG, "chat $id listener failed", error)
+                    return@addSnapshotListener
+                }
+                chatMessages = chatMessages + (id to snap?.documents.orEmpty().map { doc ->
+                    ChatMessage(
+                        id = doc.id,
+                        byUid = doc.getString("byUid").orEmpty(),
+                        text = doc.getString("text"),
+                        emote = Reaction.entries.firstOrNull { it.name == doc.getString("emote") },
+                        atMillis = doc.getTimestamp("at")?.toDate()?.time ?: System.currentTimeMillis(),
+                    )
+                })
+                recompose()
+            }
+    }
+
+    override fun closeChat(id: String) {
+        chatRegs.remove(id)?.remove()
+    }
+
+    override fun sendMessage(id: String, text: String?, emote: Reaction?) {
+        val clean = text?.trim()?.take(500)?.takeIf { it.isNotEmpty() }
+        if (clean == null && emote == null) return
+        val chat = couple.collection(CHATS).document(id)
+        chat.collection(MESSAGES).add(
+            mapOf("byUid" to myUid, "text" to clean, "emote" to emote?.name, "at" to FieldValue.serverTimestamp()),
+        )
+        chat.set(
+            mapOf(
+                "lastText" to (clean ?: emote!!.label),
+                "lastBy" to myUid,
+                "lastAt" to FieldValue.serverTimestamp(),
+                "count" to FieldValue.increment(1),
+            ),
+            SetOptions.merge(),
+        )
+    }
+
+    override fun addPhoto(date: LocalDate, label: String, jpegBase64: String) {
+        couple.collection(PHOTOS).add(
+            mapOf("date" to date.toString(), "label" to label.take(80), "byUid" to myUid, "data" to jpegBase64),
+        )
+    }
+
     override fun noteDay(date: LocalDate, text: String) {
         couple.collection(DAYS).document(date.toString())
             .set(mapOf("notes" to mapOf(myUid to text.take(140))), SetOptions.merge())
@@ -1199,6 +1290,8 @@ class FirestoreCoupleRepository(
         instrumentRegs.clear()
         partnerRunRegs.values.forEach { it.remove() }
         partnerRunRegs.clear()
+        chatRegs.values.forEach { it.remove() }
+        chatRegs.clear()
     }
 
     private fun plateRef(plate: BuildPlate) = couple.collection(PLATES).document(plate.id)

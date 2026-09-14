@@ -1,5 +1,8 @@
 package com.ampersand.data
 
+import com.ampersand.model.DayPhoto
+import com.ampersand.model.ChatPreview
+import com.ampersand.model.ChatMessage
 import com.ampersand.model.QuestionSource
 import com.ampersand.model.NameWords
 import com.ampersand.model.DateKind
@@ -80,6 +83,16 @@ interface CoupleRepository {
 
     /** Sets or clears your reaction to a revealed day. Unlike answers, reactions can change. */
     fun react(date: LocalDate, reaction: Reaction?)
+
+    /** Start listening to a conversation's messages; [closeChat] stops. */
+    fun openChat(id: String)
+    fun closeChat(id: String)
+
+    /** Send a line or an emote into a conversation. */
+    fun sendMessage(id: String, text: String?, emote: Reaction? = null)
+
+    /** Keep a photo from a special day. [jpegBase64] is already compressed. */
+    fun addPhoto(date: LocalDate, label: String, jpegBase64: String)
 
     /** Your one line back on a revealed day. */
     fun noteDay(date: LocalDate, text: String)
@@ -329,6 +342,22 @@ class FakeCoupleRepository(
     override fun setTopicHidden(topic: Topic, hidden: Boolean) = mutate {
         val mine = if (hidden) it.yourHiddenTopics + topic else it.yourHiddenTopics - topic
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
+    }
+
+    override fun openChat(id: String) = Unit
+    override fun closeChat(id: String) = Unit
+
+    override fun sendMessage(id: String, text: String?, emote: Reaction?) = mutate { current ->
+        val list = current.chats[id].orEmpty()
+        val message = ChatMessage("m${list.size + 1}", current.you.uid, text, emote, System.currentTimeMillis())
+        current.copy(
+            chats = current.chats + (id to list + message),
+            chatPreviews = current.chatPreviews + (id to ChatPreview(text ?: emote?.label.orEmpty(), current.you.uid, list.size + 1)),
+        )
+    }
+
+    override fun addPhoto(date: LocalDate, label: String, jpegBase64: String) = mutate {
+        it.copy(photos = listOf(DayPhoto("p${it.photos.size + 1}", date, label, it.you.uid, jpegBase64)) + it.photos)
     }
 
     override fun noteDay(date: LocalDate, text: String) = mutate { current ->

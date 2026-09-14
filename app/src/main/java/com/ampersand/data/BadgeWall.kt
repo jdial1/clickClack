@@ -64,6 +64,7 @@ object BadgeWall {
             action = action,
             yourTurn = !yours.finished,
             rows = rows(runs.of(instrument)),
+            together = CoupleReadings.of(instrument.id, runs.of(instrument), you, them),
         )
     }
 

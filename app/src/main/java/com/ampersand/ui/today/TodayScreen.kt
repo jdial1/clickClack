@@ -1,5 +1,8 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.components.rememberPhoto
+import com.ampersand.ui.components.compressPhoto
+import com.ampersand.model.Chats
 import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.components.IconBrick
 import androidx.compose.foundation.border
@@ -106,6 +109,8 @@ fun TodayScreen(
     modifier: Modifier = Modifier,
     onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
     onReplyToMood: (String) -> Unit = {},
+    onOpenChat: (String) -> Unit = {},
+    onAddPhoto: (label: String, jpegBase64: String) -> Unit = { _, _ -> },
     onOpenDay: (LocalDate) -> Unit = {},
     onAnswerDay: (LocalDate) -> Unit = {},
 ) {
@@ -137,12 +142,12 @@ fun TodayScreen(
         }
 
         Spacer(Modifier.height(8.dp))
-        Moods(state, onSetMood, onReplyToMood)
+        Moods(state, onSetMood, onReplyToMood, onOpenChat)
 
         val events = remember(state) { specialToday(state) }
         if (events.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
-            SpecialDayCard(events)
+            SpecialDayCard(state, events, onAddPhoto)
         }
 
         val author = when (state.todayAuthorUid) {
@@ -706,7 +711,7 @@ internal fun AnswerInput(
  * picking sets it and closes. Theirs is hidden when unset.
  */
 @Composable
-private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onReply: (String) -> Unit) {
+private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onReply: (String) -> Unit, onOpenChat: (String) -> Unit) {
     val today = state.today.date
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
@@ -751,11 +756,18 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onRep
             MoodChip(who = state.them.name, entry = it, color = them, empty = "") { replying = !replying; picking = false }
         }
     }
-    theirReply?.takeIf { mine != null }?.let {
-        Text("${state.them.name}: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
-    }
-    myReply?.takeIf { theirs != null }?.let {
-        Text("You sent: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+    // The moods conversation: its latest line, or an old one-line reply, opens the chat.
+    val chatId = Chats.mood(today)
+    val preview = state.chatPreviews[chatId]
+    val line = preview?.let { (if (it.lastByUid == state.you.uid) "You" else state.them.name) + ": " + it.lastText }
+        ?: theirReply?.let { "${state.them.name}: $it" } ?: myReply?.let { "You: $it" }
+    line?.let {
+        IconAction(
+            UiIcon.WRITE,
+            if (preview != null && preview.count > 1) "$it  ·  ${preview.count} messages" else it,
+            color = MaterialTheme.colorScheme.onBackground,
+            onClick = { onOpenChat(chatId) },
+        )
     }
     }
     AnimatedVisibility(visible = replying && theirs != null) {
@@ -767,6 +779,7 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onRep
                 onReply(text)
                 note = ""
                 replying = false
+                onOpenChat(Chats.mood(today))
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 MoodReplies.forEach { r -> BrickChip(label = r, on = r == myReply, color = null, onClick = { send(r) }) }
@@ -871,21 +884,51 @@ private fun specialToday(state: CoupleState): List<Pair<String, String>> {
 
 /** A gold-bordered card naming today's special days. */
 @Composable
-private fun SpecialDayCard(events: List<Pair<String, String>>) {
-    Row(
+private fun SpecialDayCard(state: CoupleState, events: List<Pair<String, String>>, onAddPhoto: (String, String) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val today = state.today.date
+    val photo = state.photos.firstOrNull { it.date == today }
+    val label = events.first().first
+    // Asked once a day; "Not now" hides the offer until tomorrow.
+    var declined by rememberSaveable(today) { mutableStateOf(false) }
+    val pick = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia(),
+    ) { uri -> uri?.let { compressPhoto(context, it) }?.let { onAddPhoto(label, it) } }
+
+    Column(
         Modifier
             .fillMaxWidth()
             .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = 1.4f)
             .border(2.dp, SpecialGold, RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconBrick(UiIcon.DATES, size = 34.dp)
-        Spacer(Modifier.width(12.dp))
-        Column {
-            events.forEach { (title, detail) ->
-                Text("Today: $title", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
-                Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBrick(UiIcon.DATES, size = 34.dp)
+            Spacer(Modifier.width(12.dp))
+            Column {
+                events.forEach { (title, detail) ->
+                    Text("Today: $title", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                    Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+                }
+            }
+        }
+        if (photo != null) {
+            rememberPhoto(photo.data)?.let {
+                Spacer(Modifier.height(10.dp))
+                androidx.compose.foundation.Image(
+                    it, contentDescription = photo.label,
+                    modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(10.dp)),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                )
+            }
+        } else if (!declined) {
+            Spacer(Modifier.height(8.dp))
+            Text("Add a photo to remember today?", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                IconAction(UiIcon.ADD, "Add a photo", onClick = {
+                    pick.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
+                })
+                IconAction(UiIcon.CLOSE, "Not now", onClick = { declined = true })
             }
         }
     }
