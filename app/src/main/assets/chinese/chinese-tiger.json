@@ -1,0 +1,47 @@
+{
+  "id": "chinese-tiger",
+  "title": "Year of the Tiger",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "cztiger1",
+      "text": "People born in the Year of the Tiger are said to be brave and competitive. Which of us is more like that?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "cztiger2",
+      "text": "How much does being brave and competitive describe me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "cztiger3",
+      "text": "If the Tiger were our couple's mascot, what would it say about us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

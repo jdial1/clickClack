@@ -1,0 +1,76 @@
+{
+  "id": "era-1960",
+  "title": "Born in the 1960s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n60a",
+      "text": "As a kid I was more:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Star Wars in the theater",
+        "Disco on the radio"
+      ]
+    },
+    {
+      "id": "n60b",
+      "text": "Which toy would I have fought a sibling for?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "A Big Wheel",
+        "An Etch A Sketch",
+        "A Lite-Brite",
+        "A pet rock"
+      ]
+    },
+    {
+      "id": "n60c",
+      "text": "How often did we ride in the back of a station wagon with no seatbelts?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Never",
+      "highLabel": "Every trip"
+    },
+    {
+      "id": "n60d",
+      "text": "What did I do when the TV had nothing on but static?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n60e",
+      "text": "What did your family do together on a typical weekend growing up?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

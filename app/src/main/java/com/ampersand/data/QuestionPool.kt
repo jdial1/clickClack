@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.ChineseZodiac
 import com.ampersand.model.DateKind
 import com.ampersand.model.leagues
 import com.ampersand.model.League
@@ -31,6 +32,10 @@ class QuestionPool(
     val localTeams: List<Question> = emptyList(),
     /** Sign questions, only in the draw when one of you asked for horoscopes and both birthdays are set. */
     val horoscope: List<Question> = emptyList(),
+    /** Growing-up questions for each birth decade (1950, 1960...). */
+    val eras: Map<Int, List<Question>> = emptyMap(),
+    /** A few questions for each Chinese zodiac animal, drawn with horoscopes. */
+    val chinese: Map<ChineseZodiac, List<Question>> = emptyMap(),
     /** Old daylight questions, kept only so past days that asked one still resolve. */
     val sun: Map<SunKind, List<Question>> = emptyMap(),
     /** A few questions for each kind of special date, asked on the day. */
@@ -61,7 +66,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + horoscope + sun.values.flatten() + dates.values.flatten())
+        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + horoscope + eras.values.flatten() + chinese.values.flatten() + sun.values.flatten() + dates.values.flatten())
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -96,13 +101,18 @@ class QuestionPool(
         leagues: Set<League> = emptySet(),
         /** Both birthdays are set and one of you picked horoscopes, so sign questions can be drawn. */
         signs: Boolean = false,
+        /** Birth decades of either of you, for growing-up questions. */
+        decades: Set<Int> = emptySet(),
+        /** Chinese zodiac animals of either of you, when horoscopes are on. */
+        animals: Set<ChineseZodiac> = emptySet(),
         /** Kinds of special date that fall today; see [com.ampersand.model.Dates.kindsOn]. */
         dateKinds: List<DateKind> = emptyList(),
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
         val teams = localTeams.filter { q -> q.leagues.isNotEmpty() && leagues.containsAll(q.leagues) }
-        val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty() + (if (signs) horoscope else emptyList())
+        val everything = all + region?.let { regional[it].orEmpty() + teams }.orEmpty() + (if (signs) horoscope else emptyList()) +
+            decades.flatMap { eras[it].orEmpty() } + animals.flatMap { chinese[it].orEmpty() }
         val open = everything.filter(::shown).ifEmpty { everything }
 
         // Your own dates, then holidays. Rotated by year.
@@ -152,6 +162,8 @@ class QuestionPool(
         if (weather.values.any(::inSet)) return "Weather"
         if (regional.values.any(::inSet) || inSet(localTeams)) return "Local"
         if (inSet(horoscope)) return "Horoscope"
+        if (eras.values.any(::inSet)) return "Growing up"
+        if (chinese.values.any(::inSet)) return "Chinese zodiac"
         interests.firstOrNull { it.matches(question) }?.let { return it.label.substringBefore(" and ") }
         return question.category
     }
@@ -223,6 +235,12 @@ class QuestionPool(
             }.toMap(),
             localTeams = QuizJson.loadFolder(context, "local").flatMap { it.questions },
             horoscope = QuizJson.loadFolder(context, "horoscope").flatMap { it.questions },
+            eras = QuizJson.loadFolder(context, "eras").mapNotNull { deck ->
+                deck.id.removePrefix("era-").toIntOrNull()?.let { it to deck.questions }
+            }.toMap(),
+            chinese = QuizJson.loadFolder(context, "chinese").mapNotNull { deck ->
+                ChineseZodiac.entries.firstOrNull { "chinese-${it.name.lowercase()}" == deck.id }?.let { it to deck.questions }
+            }.toMap(),
             dates = QuizJson.loadFolder(context, "dates").mapNotNull { deck ->
                 DateKind.entries.firstOrNull { "date-${it.id}" == deck.id }?.let { it to deck.questions }
             }.toMap(),

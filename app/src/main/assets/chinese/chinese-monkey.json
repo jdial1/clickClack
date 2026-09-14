@@ -1,0 +1,47 @@
+{
+  "id": "chinese-monkey",
+  "title": "Year of the Monkey",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "czmonkey1",
+      "text": "People born in the Year of the Monkey are said to be clever and playful. Which of us is more like that?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "czmonkey2",
+      "text": "How much does being clever and playful describe me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "czmonkey3",
+      "text": "If the Monkey were our couple's mascot, what would it say about us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

@@ -40,6 +40,8 @@ enum class DateKind(val id: String, val label: String) {
     WEDDING("wedding", "Wedding"),
     MOVED_IN("moved-in", "Moved in"),
     BIRTHDAY("birthday", "Birthday"),
+    /** Six months after a birthday. Comes from profiles; not offered when adding a date. */
+    HALF_BIRTHDAY("half-birthday", "Half-birthday"),
     PET("pet", "Pet"),
     TRIP("trip", "Trip"),
     REMEMBERING("remembering", "Remembering someone"),
@@ -79,7 +81,8 @@ object Dates {
         fun on(d: LocalDate?) = d != null && MonthDay.from(d) == MonthDay.from(today)
         return added.filter { on(it.date) }.map { it.kind } +
             listOfNotNull(DateKind.WEDDING.takeIf { on(marriedOn) }) +
-            birthdays.filter(::on).map { DateKind.BIRTHDAY }
+            birthdays.filter(::on).map { DateKind.BIRTHDAY } +
+            birthdays.filter { on(it?.plusMonths(6)) }.map { DateKind.HALF_BIRTHDAY }
     }
 
     /** Every yearly date (anniversary, wedding, birthdays, added dates), soonest first. */
@@ -90,6 +93,8 @@ object Dates {
             state.marriedOn?.let { add("Your wedding anniversary" to it) }
             state.you.birthday?.let { add("Your birthday" to it) }
             state.them.birthday?.let { add("${state.them.name}'s birthday" to it) }
+            state.you.birthday?.let { add("Your half-birthday" to it.plusMonths(6)) }
+            state.them.birthday?.let { add("${state.them.name}'s half-birthday" to it.plusMonths(6)) }
             state.specialDates.forEach { add(it.label to it.date) }
         }
         return entries

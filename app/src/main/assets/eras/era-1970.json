@@ -1,0 +1,75 @@
+{
+  "id": "era-1970",
+  "title": "Born in the 1970s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n70a",
+      "text": "Rewinding a movie before returning it:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Be kind, rewind",
+        "Pay the fine"
+      ]
+    },
+    {
+      "id": "n70b",
+      "text": "Which would I have played for hours?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Pac-Man at the arcade",
+        "A Rubik's Cube",
+        "The Oregon Trail",
+        "Super Mario Bros."
+      ]
+    },
+    {
+      "id": "n70c",
+      "text": "How much of a latchkey kid was I?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Never alone",
+      "highLabel": "Key on a string"
+    },
+    {
+      "id": "n70d",
+      "text": "Which movie did I watch so often the tape wore out?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n70e",
+      "text": "What song takes you straight back to being a teenager?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

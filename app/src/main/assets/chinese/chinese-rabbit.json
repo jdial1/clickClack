@@ -1,0 +1,47 @@
+{
+  "id": "chinese-rabbit",
+  "title": "Year of the Rabbit",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "czrabbit1",
+      "text": "People born in the Year of the Rabbit are said to be gentle and careful. Which of us is more like that?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "czrabbit2",
+      "text": "How much does being gentle and careful describe me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "czrabbit3",
+      "text": "If the Rabbit were our couple's mascot, what would it say about us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

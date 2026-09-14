@@ -1,0 +1,47 @@
+{
+  "id": "chinese-horse",
+  "title": "Year of the Horse",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "czhorse1",
+      "text": "People born in the Year of the Horse are said to be free and energetic. Which of us is more like that?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "czhorse2",
+      "text": "How much does being free and energetic describe me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "czhorse3",
+      "text": "If the Horse were our couple's mascot, what would it say about us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

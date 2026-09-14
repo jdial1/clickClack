@@ -1,0 +1,75 @@
+{
+  "id": "era-1990",
+  "title": "Born in the 1990s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n90a",
+      "text": "My first phone was:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "A flip phone",
+        "Whatever my parents handed down"
+      ]
+    },
+    {
+      "id": "n90b",
+      "text": "Which would I have been most excited to get?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "An iPod",
+        "A Nintendo DS",
+        "A MySpace top 8 spot",
+        "Tickets to a Harry Potter premiere"
+      ]
+    },
+    {
+      "id": "n90c",
+      "text": "How much of my childhood happened on AIM or MSN Messenger?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "None",
+      "highLabel": "All of it"
+    },
+    {
+      "id": "n90d",
+      "text": "Which Disney Channel show did I watch the most?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n90e",
+      "text": "What was a big deal at school when you were growing up that seems small now?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

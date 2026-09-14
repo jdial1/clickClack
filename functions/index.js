@@ -206,8 +206,16 @@ exports.specialDates = onSchedule({ schedule: "0 * * * *", timeZone: "UTC" }, as
     const events = [];
     if (onToday(couple.get("anniversary"))) events.push("It's your anniversary");
     if (onToday(couple.get("marriedOn"))) events.push("It's your wedding anniversary");
+    // A half-birthday is six months on from the birthday.
+    const halfOnToday = (iso) => {
+      if (typeof iso !== "string") return false;
+      const d = new Date(`${iso}T12:00:00Z`);
+      d.setUTCMonth(d.getUTCMonth() + 6);
+      return `${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}` === md;
+    };
     users.forEach((u) => {
       if (onToday(u.get("birthday"))) events.push(`It's ${u.get("displayName") || "a"}'s birthday`);
+      if (halfOnToday(u.get("birthday"))) events.push(`It's ${u.get("displayName") || "a"}'s half-birthday`);
     });
     const dates = await couple.ref.collection("dates").get();
     dates.docs.forEach((d) => { if (onToday(d.get("date"))) events.push(`Today: ${d.get("label")}`); });

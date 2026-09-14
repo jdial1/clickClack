@@ -1,0 +1,47 @@
+{
+  "id": "chinese-goat",
+  "title": "Year of the Goat",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "czgoat1",
+      "text": "People born in the Year of the Goat are said to be calm and creative. Which of us is more like that?",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Me",
+        "You"
+      ]
+    },
+    {
+      "id": "czgoat2",
+      "text": "How much does being calm and creative describe me?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "astrology"
+      ],
+      "category": "Playful",
+      "lowLabel": "Not at all",
+      "highLabel": "Exactly"
+    },
+    {
+      "id": "czgoat3",
+      "text": "If the Goat were our couple's mascot, what would it say about us?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "astrology",
+        "fun"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

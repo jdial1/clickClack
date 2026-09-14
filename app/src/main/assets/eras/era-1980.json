@@ -1,0 +1,76 @@
+{
+  "id": "era-1980",
+  "title": "Born in the 1980s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n80a",
+      "text": "Getting online growing up meant:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Waiting for dial-up",
+        "Someone yelling to get off the phone line"
+      ]
+    },
+    {
+      "id": "n80b",
+      "text": "After school, I'd most likely be watching:",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "TGIF shows",
+        "Nickelodeon",
+        "Saved by the Bell",
+        "MTV"
+      ]
+    },
+    {
+      "id": "n80c",
+      "text": "How serious was I about my Tamagotchi or Pokemon cards?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Didn't care",
+      "highLabel": "Life or death"
+    },
+    {
+      "id": "n80d",
+      "text": "What was on the mixtape or burned CD I made for a crush?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "romance"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n80e",
+      "text": "What did you and your friends do on a summer day with no plans?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "friends"
+      ],
+      "category": "Playful"
+    }
+  ]
+}

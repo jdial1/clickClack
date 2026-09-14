@@ -30,7 +30,7 @@ class ProfileTest {
             specialDates = listOf(SpecialDate("s", "First date", LocalDate.of(2012, 4, 20))),
         )
         assertEquals(
-            listOf("Tasia's birthday", "Your birthday", "First date", "Your anniversary"),
+            listOf("Tasia's birthday", "Your birthday", "Tasia's half-birthday", "First date", "Your anniversary", "Your half-birthday"),
             Dates.upcoming(state).map { it.label },
         )
     }

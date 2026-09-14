@@ -1,0 +1,76 @@
+{
+  "id": "era-1950",
+  "title": "Born in the 1950s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n50a",
+      "text": "Saturday morning as a kid meant:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Cartoons on the TV",
+        "Outside until the streetlights came on"
+      ]
+    },
+    {
+      "id": "n50b",
+      "text": "Which would I have begged to stay up for?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "The moon landing",
+        "The Ed Sullivan Show",
+        "A drive-in movie",
+        "The Beatles on TV"
+      ]
+    },
+    {
+      "id": "n50c",
+      "text": "How many channels did we really need growing up?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Three was plenty",
+      "highLabel": "Never enough"
+    },
+    {
+      "id": "n50d",
+      "text": "What chore did I always get stuck with as a kid?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n50e",
+      "text": "What's something from your childhood that kids today would never believe?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "family"
+      ],
+      "category": "Everyday"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "era-2000",
+  "title": "Born in the 2000s",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "n00a",
+      "text": "Growing up, a rainy day meant:",
+      "type": "THIS_OR_THAT",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "A tablet on the couch",
+        "Minecraft with friends"
+      ]
+    },
+    {
+      "id": "n00b",
+      "text": "Which would I have watched on repeat?",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Frozen",
+        "iCarly",
+        "YouTube gamers",
+        "Vine compilations"
+      ]
+    },
+    {
+      "id": "n00c",
+      "text": "How old was I when I got my own phone?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "lowLabel": "Very young",
+      "highLabel": "Late"
+    },
+    {
+      "id": "n00d",
+      "text": "Which app or game did I lose the most hours to as a kid?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful"
+    },
+    {
+      "id": "n00e",
+      "text": "What's something about growing up online you'd do differently?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past"
+      ],
+      "category": "Deep"
+    }
+  ]
+}

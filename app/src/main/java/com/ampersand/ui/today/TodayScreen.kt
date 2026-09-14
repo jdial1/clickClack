@@ -853,7 +853,11 @@ private fun specialToday(state: CoupleState): List<Pair<String, String>> {
     val today = state.today.date
     val dates = com.ampersand.model.Dates.upcoming(state).filter { it.next == today }.map { d ->
         val years = today.year - d.since.year
-        d.label to if (years > 0) "$years ${if (years == 1) "year" else "years"}" else "Today"
+        d.label to when {
+            d.label.endsWith("half-birthday") -> "$years and a half"
+            years > 0 -> "$years ${if (years == 1) "year" else "years"}"
+            else -> "Today"
+        }
     }
     val holiday = com.ampersand.model.Occasion.on(
         today, state.anniversary, state.homeState.takeIf { com.ampersand.model.QuestionSource.HOLIDAYS !in state.sourcesOff },

@@ -27,6 +27,27 @@ enum class Zodiac(val label: String, val starts: MonthDay) {
     }
 }
 
+/**
+ * Chinese zodiac animals, by year.
+ * ponytail: the year turns on 5 February here, not the real Lunar New Year (21 January to
+ * 20 February); a birthday in that window can land a year off. Add a date table if it matters.
+ */
+enum class ChineseZodiac(val label: String) {
+    RAT("Rat"), OX("Ox"), TIGER("Tiger"), RABBIT("Rabbit"), DRAGON("Dragon"), SNAKE("Snake"),
+    HORSE("Horse"), GOAT("Goat"), MONKEY("Monkey"), ROOSTER("Rooster"), DOG("Dog"), PIG("Pig");
+
+    companion object {
+        fun of(birthday: LocalDate): ChineseZodiac {
+            val year = if (MonthDay.from(birthday) < MonthDay.of(2, 5)) birthday.year - 1 else birthday.year
+            // 2020 was a Rat year.
+            return entries[(year - 2020).mod(12)]
+        }
+    }
+}
+
+/** The decade a birthday falls in, e.g. 1989 -> 1980. */
+fun decadeOf(birthday: LocalDate): Int = birthday.year / 10 * 10
+
 private const val MySign = "{mysign}"
 private const val TheirSign = "{theirsign}"
 

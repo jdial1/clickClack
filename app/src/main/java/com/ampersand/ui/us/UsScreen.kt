@@ -1021,7 +1021,7 @@ private fun RelationshipProfile(
                     topic == Topic.SPORTS && state.following.isEmpty() && !more ->
                         "Off until one of you follows a sport below."
                     topic == Topic.HOROSCOPES && Topic.HOROSCOPES !in state.interests ->
-                        "Off until one of you picks More. Uses both birthdays for your signs."
+                        "Off until one of you picks More. Uses both birthdays for your signs and Chinese zodiac animals."
                     topic == Topic.HOROSCOPES && (state.you.birthday == null || state.them.birthday == null) ->
                         "Needs both birthdays, in About you."
                     topic in state.hiddenTopics && !hidden -> "${state.them.name} left this out."
@@ -1161,7 +1161,7 @@ private fun DatesSection(
     var kind by rememberSaveable { mutableStateOf<DateKind?>(null) }
     var date by remember { mutableStateOf<java.time.LocalDate?>(null) }
     AmpDropdown(
-        options = DateKind.entries.map { it.label },
+        options = DateKind.entries.filter { it != DateKind.HALF_BIRTHDAY }.map { it.label },
         selected = kind?.label,
         accent = Color(you.argb),
         placeholder = "Type of date",

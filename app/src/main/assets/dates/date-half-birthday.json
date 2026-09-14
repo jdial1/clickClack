@@ -1,0 +1,58 @@
+{
+  "id": "date-half-birthday",
+  "title": "Half-birthday",
+  "theme": "KNOW_ME",
+  "blurb": "",
+  "source": "Written for Click Clack",
+  "questions": [
+    {
+      "id": "dhb1",
+      "text": "What's the best thing about the first half of my year so far?",
+      "type": "GUESS_ME",
+      "depth": 1,
+      "tags": [
+        "future"
+      ],
+      "category": "Everyday"
+    },
+    {
+      "id": "dhb2",
+      "text": "A half-birthday deserves:",
+      "type": "PICK_ONE",
+      "depth": 1,
+      "tags": [
+        "past",
+        "fun"
+      ],
+      "category": "Playful",
+      "options": [
+        "Half a cake",
+        "A small treat",
+        "A proper fuss",
+        "Nothing, it's not a thing"
+      ]
+    },
+    {
+      "id": "dhb3",
+      "text": "How am I doing on what I hoped for this year?",
+      "type": "SCALE",
+      "depth": 1,
+      "tags": [
+        "future"
+      ],
+      "category": "Everyday",
+      "lowLabel": "Way off",
+      "highLabel": "Right on track"
+    },
+    {
+      "id": "dhb4",
+      "text": "What do you hope the next six months bring for me?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "future"
+      ],
+      "category": "Future"
+    }
+  ]
+}
