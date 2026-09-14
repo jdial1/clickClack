@@ -1,5 +1,7 @@
 package com.ampersand.ui.auth
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.ampersand.ui.components.IconAction
 import androidx.compose.foundation.layout.Row
 import com.ampersand.ui.components.UiIcon
 import android.content.ClipboardManager
@@ -20,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,7 +46,9 @@ import com.ampersand.ui.components.AmpField
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.theme.AmpersandTheme
 
-/** Signed in but unpaired: create an invite code or redeem your partner's, on one screen. */
+private enum class PairMode { CHOOSE, CREATE, JOIN }
+
+/** Signed in but unpaired: choose to create a partner code or enter one, then do that. */
 @Composable
 fun PairingScreen(
     name: String,
@@ -57,9 +60,13 @@ fun PairingScreen(
     modifier: Modifier = Modifier,
 ) {
     var entered by remember { mutableStateOf(PendingJoin.code?.let(InviteCode::display).orEmpty()) }
+    // A join link skips the choice.
+    var mode by rememberSaveable { mutableStateOf(if (PendingJoin.code != null) PairMode.JOIN else PairMode.CHOOSE) }
     val context = LocalContext.current
     // A join link opened while this screen is up fills the code in.
-    androidx.compose.runtime.LaunchedEffect(PendingJoin.code) { PendingJoin.code?.let { entered = InviteCode.display(it) } }
+    androidx.compose.runtime.LaunchedEffect(PendingJoin.code) {
+        PendingJoin.code?.let { entered = InviteCode.display(it); mode = PairMode.JOIN }
+    }
 
     Box(modifier.fillMaxSize()) {
       BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
@@ -88,60 +95,77 @@ fun PairingScreen(
             textAlign = TextAlign.Center,
         )
 
+        // Choose first: nothing is created until you pick "Create a code".
         Spacer(Modifier.height(30.dp))
-        SectionLabel("Invite your partner")
-        Spacer(Modifier.height(12.dp))
-
-        if (code == null) {
-            AmpButton(
-                label = if (busy) "Creating code" else "Create invite code",
-                slug = BrickColor.RED.slug,
-                enabled = !busy,
-                onClick = onCreateInvite,
-            )
-        } else {
-            CodePlate(code)
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                AmpButton(label = "Share", slug = null, icon = UiIcon.NEXT, modifier = Modifier.weight(1f)) {
-                    val text = "Join me on Click Clack. Our code is ${InviteCode.display(code)}.\n${InviteCode.link(code)}"
-                    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
-                    context.startActivity(Intent.createChooser(send, "Share your code"))
+        when (mode) {
+            PairMode.CHOOSE -> {
+                AmpButton(label = "Create a partner code", slug = BrickColor.RED.slug, icon = UiIcon.ADD) {
+                    mode = PairMode.CREATE
+                    if (code == null) onCreateInvite()
                 }
-                AmpButton(label = "Copy", slug = null, icon = UiIcon.DONE, modifier = Modifier.weight(1f)) {
-                    val clipboard = context.getSystemService(ClipboardManager::class.java)
-                    clipboard.setPrimaryClip(ClipData.newPlainText("Click Clack code", InviteCode.display(code)))
+                Spacer(Modifier.height(12.dp))
+                AmpButton(label = "Enter a partner code", slug = BrickColor.BLUE.slug, icon = UiIcon.WRITE) {
+                    mode = PairMode.JOIN
                 }
             }
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = "Single use. Expires in 1 hour.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
+
+            PairMode.CREATE -> {
+                SectionLabel("Your partner code")
+                Spacer(Modifier.height(12.dp))
+                if (code == null) {
+                    AmpButton(
+                        label = if (busy) "Creating code" else "Create code",
+                        slug = BrickColor.RED.slug,
+                        enabled = !busy,
+                        onClick = onCreateInvite,
+                    )
+                } else {
+                    CodePlate(code)
+                    Spacer(Modifier.height(12.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        AmpButton(label = "Share", slug = null, icon = UiIcon.NEXT, modifier = Modifier.weight(1f)) {
+                            val text = "Join me on Click Clack. Our code is ${InviteCode.display(code)}.\n${InviteCode.link(code)}"
+                            val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+                            context.startActivity(Intent.createChooser(send, "Share your code"))
+                        }
+                        AmpButton(label = "Copy", slug = null, icon = UiIcon.DONE, modifier = Modifier.weight(1f)) {
+                            val clipboard = context.getSystemService(ClipboardManager::class.java)
+                            clipboard.setPrimaryClip(ClipData.newPlainText("Click Clack code", InviteCode.display(code)))
+                        }
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = "Send it to your partner. Single use, expires in 1 hour.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Spacer(Modifier.height(20.dp))
+                IconAction(UiIcon.BACK, "I have a code instead", onClick = { mode = PairMode.JOIN })
+            }
+
+            PairMode.JOIN -> {
+                SectionLabel("Enter your partner's code")
+                Spacer(Modifier.height(12.dp))
+                AmpField(
+                    value = entered,
+                    onValueChange = { entered = it },
+                    // No user color exists yet; blue matches the button below.
+                    color = BrickColor.BLUE,
+                    placeholder = "Like Wobbly Castle 427",
+                )
+                Spacer(Modifier.height(14.dp))
+                AmpButton(
+                    label = if (busy) "Joining" else "Join",
+                    slug = BrickColor.BLUE.slug,
+                    enabled = !busy && entered.isNotBlank(),
+                    onClick = { onRedeem(entered) },
+                )
+                Spacer(Modifier.height(20.dp))
+                IconAction(UiIcon.BACK, "Create a code instead", onClick = { mode = PairMode.CREATE })
+            }
         }
-
-        Spacer(Modifier.height(30.dp))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Spacer(Modifier.height(24.dp))
-
-        SectionLabel("Or enter their code")
-        Spacer(Modifier.height(12.dp))
-        AmpField(
-            value = entered,
-            onValueChange = { entered = it },
-            // No user color exists yet; blue matches the button below.
-            color = BrickColor.BLUE,
-            placeholder = "Like Wobbly Castle 427",
-        )
-        Spacer(Modifier.height(14.dp))
-        AmpButton(
-            label = if (busy) "Joining" else "Join",
-            slug = BrickColor.BLUE.slug,
-            enabled = !busy && entered.isNotBlank(),
-            onClick = { onRedeem(entered) },
-        )
 
         if (error != null) {
             Spacer(Modifier.height(18.dp))
