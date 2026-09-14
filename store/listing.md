@@ -22,9 +22,9 @@ The bundle is `app/build/outputs/bundle/play/clickclack-<version>-play.aab`
 
 ## Short description (80 max)
 
-> One question a day for the two of you. No peeking until you both answer.
+> A daily question for two. Answer, unlock it, then build a brick sculpture together.
 
-(72 characters)
+(80 characters)
 
 ## Full description (4000 max)
 
@@ -33,16 +33,19 @@ You've been together long enough to finish each other's sentences. Great. Now an
 
 Click Clack gives you and your person one question a day. You each answer on your own phone, and it stays sealed until you're both in. No reading theirs first, no tweaking yours to match. Then it opens, and the fun part starts.
 
+BUILD A LITTLE SCULPTURE, TOGETHER
+Every answer earns bricks in your color. Your partner earns bricks in theirs. All week you both stack them on one shared plate, balancing, building up, and occasionally wrecking each other's tower. At the end of the week it's sealed for good, and you name it together, like "The Cosmic Castle of Wobbly Pretzel."
+
+A SHELF THAT GROWS WITH YOU
+Every finished week goes on your shelf with its name, its date and a line from each of you about the week. Scroll back months from now and there it is: a row of tiny, slightly lopsided proof that you kept showing up for each other.
+
 WHAT A DAY LOOKS LIKE
 Morning: a question shows up. Sometimes it's easy ("What is my favorite dish of all time?"), sometimes it goes deeper ("What is the biggest thing you are carrying right now?"), and sometimes you have to guess what they'll say.
 Whenever: you answer. They answer. Click. Clack.
-Later: it opens. React, laugh, keep the good ones, and talk about it right there.
+Later: it opens. React, laugh, keep the good ones, talk about it, and go spend your bricks.
 
 KEEP THE CONVERSATION GOING
 Every answer and every mood can turn into a real back-and-forth. Write as much as you want, or just send a little heart and get back to your day.
-
-BUILD SOMETHING, BRICK BY BRICK
-Every answer earns bricks. You both stack them on one shared plate, and at the end of the week your little sculpture gets a date and a spot on your shelf. A year from now, you've got a whole shelf of proof you showed up for each other.
 
 DECKS FOR EVERY MOOD
 Want more than one question tonight? Pick a deck: getting to know you, travel, food, silly stuff, or the late-night kind of talk.
@@ -62,7 +65,7 @@ No ads. No feed. No strangers. Notifications get bundled so your phone doesn't b
 It takes two: one of you makes a code, the other types it in, and you're paired. Go ahead, send your person the code.
 ```
 
-(2243 characters)
+(2594 characters)
 
 ## Graphics
 
@@ -70,7 +73,7 @@ It takes two: one of you makes a code, the other types it in, and you're paired.
 |---|---|---|
 | App icon | `graphics/icon-512.png` | 512x512 PNG |
 | Feature graphic | `graphics/feature-graphic.png` | 1024x500 PNG |
-| Phone screenshots (8) | `graphics/phone/1-today.png` to `8-pairing.png` | 1236x2196, 9:16, 2 to 8 required |
+| Phone screenshots (8) | `graphics/phone/1-today.png` to `8-decks.png`, upload in number order | 1236x2196, 9:16, 2 to 8 required |
 | Launch splash (reference) | `graphics/splash.png` | Not uploaded; matches the in-app Android 12+ splash |
 
 Tablet screenshots are optional and skipped.

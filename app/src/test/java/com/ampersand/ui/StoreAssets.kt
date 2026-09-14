@@ -52,7 +52,6 @@ import com.ampersand.model.Quiz
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Reaction
 import com.ampersand.model.SpecialDate
-import com.ampersand.ui.auth.PairingScreen
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
@@ -169,11 +168,33 @@ class StoreAssets {
         TodayScreen(state.copy(today = state.today.copy(answers = mapOf(you.uid to answer))), { _, _ -> }, {})
     }
 
-    @Test fun phone3_reveal() = phone("3-reveal", "Then open them together") {
+    @Test fun phone3_build() = phone("3-build", "Every answer earns bricks. Build together") {
+        com.ampersand.ui.build.BuildScreen(state, state.plate, onPlace = { _, _, _ -> })
+    }
+
+    @Test fun phone4_reveal() = phone("4-reveal", "Then open them together") {
         RevealScreen(state, state.history.first { it.isRevealed }, onBack = {}, animateIn = false)
     }
 
-    @Test fun phone4_chat() = phone("4-chat", "Keep talking about it") {
+    @Test fun phone5_shelf() = phone("5-shelf", "A sculpture for every week, kept forever") {
+        // Just the shelf at the top: no photos, kept days or anniversaries above it.
+        // Every week named, with a line from each of you, as a shelf looks a few weeks in.
+        val words = listOf(
+            com.ampersand.model.NameWords("Wobbly", "Castle") to com.ampersand.model.NameWords("Cosmic", "Pretzel"),
+            com.ampersand.model.NameWords("Brave", "Couch") to com.ampersand.model.NameWords("Spicy", "Dragon"),
+            com.ampersand.model.NameWords("Lucky", "Garden") to com.ampersand.model.NameWords("Chaotic", "Trombone"),
+        )
+        val shelf = state.shelf.mapIndexed { i, p ->
+            val (a, b) = words[i % words.size]
+            p.copy(
+                words = mapOf(you.uid to a, them.uid to b),
+                notes = mapOf(you.uid to "The week we finally fixed the porch light", them.uid to "Pancakes on a Tuesday. Worth it."),
+            )
+        }
+        HistoryScreen(state.copy(shelf = shelf, kept = emptyMap(), photos = emptyList(), history = state.history.filter { it.date > today.minusDays(20) }), onOpenDay = {})
+    }
+
+    @Test fun phone6_chat() = phone("6-chat", "Keep talking about it") {
         val day = state.history.first { it.isRevealed }
         val id = Chats.day(day.date)
         ChatScreen(
@@ -192,22 +213,14 @@ class StoreAssets {
         )
     }
 
-    @Test fun phone5_decks() = phone("5-decks", "Decks for every kind of night") {
-        DecksScreen(state, decks, onOpenDeck = {})
-    }
-
-    @Test fun phone6_profiles() = phone("6-profiles", "See how you two fit together") {
+    @Test fun phone7_profiles() = phone("7-profiles", "See how you two fit together") {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp)) {
             ProfileBadges(state, onTake = {})
         }
     }
 
-    @Test fun phone7_shelf() = phone("7-shelf", "Every week you build, kept") {
-        HistoryScreen(state, onOpenDay = {})
-    }
-
-    @Test fun phone8_pairing() = phone("8-pairing", "Pair up with one code") {
-        PairingScreen(you.name, "WOBBLYCASTLE427", false, null, {}, {})
+    @Test fun phone8_decks() = phone("8-decks", "Decks for every kind of night") {
+        DecksScreen(state, decks, onOpenDeck = {})
     }
 
     /** The two-brick mark on its own ground, rounded as a launcher would show it. */
