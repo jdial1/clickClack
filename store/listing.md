@@ -11,7 +11,7 @@ The bundle is `app/build/outputs/bundle/play/clickclack-<version>-play.aab`
 | Field | Value |
 |---|---|
 | Package name | `com.ampersand` (free on Play as of September 14, 2026) |
-| App name (30 max) | Click Clack |
+| App name (30 max) | Click Clack: Couples Questions |
 | Default language | English (United States), en-US |
 | App or game | App |
 | Free or paid | Free |
@@ -22,55 +22,47 @@ The bundle is `app/build/outputs/bundle/play/clickclack-<version>-play.aab`
 
 ## Short description (80 max)
 
-> A daily question for two. Sealed until you both answer, then open it together.
+> One question a day for the two of you. No peeking until you both answer.
 
-(78 characters)
+(72 characters)
 
 ## Full description (4000 max)
 
 ```
-Click Clack is a daily question for two people.
+You've been together long enough to finish each other's sentences. Great. Now answer this without looking at theirs.
 
-You each answer privately. Neither answer can be read until both are in. Then it
-opens, and you talk about it. That's the whole idea: you answer honestly instead
-of answering them.
+Click Clack gives you and your person one question a day. You each answer on your own phone, and it stays sealed until you're both in. No reading theirs first, no tweaking yours to match. Then it opens, and the fun part starts.
 
-ONE QUESTION A DAY
-Both of your phones get the same question each morning. Some are light, some go
-deep, and some ask you to guess what your partner will say. Special days like
-anniversaries, birthdays and half-birthdays get questions of their own.
+WHAT A DAY LOOKS LIKE
+Morning: a question shows up. Sometimes it's easy ("What is my favorite dish of all time?"), sometimes it goes deeper ("What is the biggest thing you are carrying right now?"), and sometimes you have to guess what they'll say.
+Whenever: you answer. They answer. Click. Clack.
+Later: it opens. React, laugh, keep the good ones, and talk about it right there.
 
-SEALED UNTIL YOU BOTH ANSWER
-Your answer stays closed until theirs arrives. When it opens, react, keep the
-ones worth keeping, and start a conversation right there.
+KEEP THE CONVERSATION GOING
+Every answer and every mood can turn into a real back-and-forth. Write as much as you want, or just send a little heart and get back to your day.
 
-KEEP TALKING
-Every question and every mood can turn into a conversation. Write back as much
-as you like, or just send an emote.
+BUILD SOMETHING, BRICK BY BRICK
+Every answer earns bricks. You both stack them on one shared plate, and at the end of the week your little sculpture gets a date and a spot on your shelf. A year from now, you've got a whole shelf of proof you showed up for each other.
 
-BUILD SOMETHING TOGETHER
-Every answer earns bricks. You both place them on one shared plate, and at the
-end of the week it's sealed with a date and kept on your shelf.
+DECKS FOR EVERY MOOD
+Want more than one question tonight? Pick a deck: getting to know you, travel, food, silly stuff, or the late-night kind of talk.
 
-DECKS FOR EVERY KIND OF NIGHT
-Pick a deck when you want more: getting to know you, everyday plans, travel,
-food, late-night talks and silly stuff.
+FIND OUT HOW YOU FIT
+Take the longer tests side by side: personality type, love languages, attachment style, ways of loving, and more. When you've both finished, Click Clack tells you what your results mean together, not just apart.
 
-SEE HOW YOU FIT TOGETHER
-Take longer profiles side by side: personality type, ways of loving, love
-languages, attachment style, DISC, Enneagram and more. When you both finish, you
-get a reading of what your results mean together.
+THE DAYS THAT MATTER
+Add your anniversary, birthdays and first date. Click Clack remembers them (half-birthdays too) and gives those days questions of their own. Snap a photo on the big days to keep on your timeline.
 
-REMEMBER THE DAYS THAT MATTER
-Add your first date, anniversary and birthdays. On a special day, add a photo
-and keep it on your timeline.
+QUESTIONS THAT KNOW YOU
+Grew up in the 90s? Expect a question about it. Into horoscopes? Turn them on. Not a fan of a topic? Turn it off. It's your daily question, after all.
 
-QUIET BY DESIGN
-No ads and no feed. Notifications are bundled so your phone doesn't buzz every
-time your partner taps something, and quiet hours keep nights quiet.
+NOT ANOTHER NOISY APP
+No ads. No feed. No strangers. Notifications get bundled so your phone doesn't buzz every time they tap something, and quiet hours keep bedtime quiet.
 
-Click Clack works in pairs: one of you creates a code and the other enters it.
+It takes two: one of you makes a code, the other types it in, and you're paired. Go ahead, send your person the code.
 ```
+
+(2243 characters)
 
 ## Graphics
 
