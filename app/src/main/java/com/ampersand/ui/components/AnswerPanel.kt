@@ -173,7 +173,8 @@ fun HitBadge(hit: Boolean) {
             .padding(horizontal = 7.dp, vertical = 2.dp),
     ) {
         Text(
-            text = if (hit) "GOT IT" else "MISSED",
+            // A wrong guess is the best reveal of the day, not a failure.
+            text = if (hit) "GOT IT" else "SURPRISE",
             style = MaterialTheme.typography.labelSmall,
             color = if (hit) Duo.inkOn(bg) else MaterialTheme.colorScheme.onSurfaceVariant,
         )

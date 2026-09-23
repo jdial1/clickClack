@@ -112,7 +112,7 @@ fun DecksScreen(
                     Spacer(Modifier.height(6.dp))
                     Text(t.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
                     Text(
-                        if (waiting > 0) "${inTheme.size} · $waiting for you" else if (inTheme.size == 1) "1 deck" else "${inTheme.size} decks",
+                        if (waiting > 0) "${inTheme.size} · $waiting your turn" else if (inTheme.size == 1) "1 deck" else "${inTheme.size} decks",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 1,

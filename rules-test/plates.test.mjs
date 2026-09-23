@@ -1,9 +1,10 @@
-// Sealed plates take one line each about the week, and nothing else.
+// Sealed plates take one line each about the week, and nothing else. Words
+// toward the week's name are sealed per person, like answers.
 //
 //   npx firebase emulators:exec --only firestore --project clickclack-rules "node plates.test.mjs"
 import { readFileSync } from 'node:fs'
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 
 const RULES = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8')
 const env = await initializeTestEnvironment({
@@ -52,19 +53,48 @@ await check('a line cannot smuggle a brick in with it', async () => {
   await assertFails(setDoc(plate(as('alice')), { notes: { alice: 'Hi' }, blocks: [{ id: 'x' }] }, { merge: true }))
 })
 
+const words = (db, uid) => doc(db, 'couples', CID, 'plates', 'plate_2026-09-06', 'words', uid)
+
 await check('you may pick your two words for a sealed week', async () => {
   await seed(sealed)
-  await assertSucceeds(setDoc(plate(as('alice')), { words: { alice: { describing: 'Wobbly', thing: 'Castle' } } }, { merge: true }))
+  await assertSucceeds(setDoc(words(as('alice'), 'alice'), { describing: 'Wobbly', thing: 'Castle' }))
+})
+
+await check('your words are sealed: they cannot be read by the other one', async () => {
+  await seed(sealed)
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(words(ctx.firestore(), 'alice'), { describing: 'Wobbly', thing: 'Castle' })
+  })
+  await assertSucceeds(getDoc(words(as('alice'), 'alice')))
+  await assertFails(getDoc(words(as('bob'), 'alice')))
 })
 
 await check('you may not pick their words', async () => {
   await seed(sealed)
-  await assertFails(setDoc(plate(as('alice')), { words: { bob: { describing: 'Wobbly', thing: 'Castle' } } }, { merge: true }))
+  await assertFails(setDoc(words(as('alice'), 'bob'), { describing: 'Wobbly', thing: 'Castle' }))
 })
 
 await check('words cannot carry anything else', async () => {
   await seed(sealed)
-  await assertFails(setDoc(plate(as('alice')), { words: { alice: { describing: 'Wobbly', thing: 'Castle', extra: 1 } } }, { merge: true }))
+  await assertFails(setDoc(words(as('alice'), 'alice'), { describing: 'Wobbly', thing: 'Castle', extra: 1 }))
+})
+
+await check('picked words are never changed', async () => {
+  await seed(sealed)
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(words(ctx.firestore(), 'alice'), { describing: 'Wobbly', thing: 'Castle' })
+  })
+  await assertFails(setDoc(words(as('alice'), 'alice'), { describing: 'Cosmic', thing: 'Pretzel' }))
+})
+
+await check('no words for a week still being built', async () => {
+  await seed({ ...sealed, completedOn: null })
+  await assertFails(setDoc(words(as('alice'), 'alice'), { describing: 'Wobbly', thing: 'Castle' }))
+})
+
+await check('nobody writes the name onto the plate directly', async () => {
+  await seed(sealed)
+  await assertFails(setDoc(plate(as('alice')), { words: { alice: { describing: 'Wobbly', thing: 'Castle' } } }, { merge: true }))
 })
 
 await check('an open week still takes bricks', async () => {

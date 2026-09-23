@@ -414,19 +414,19 @@ object MockCouple {
      */
     fun shelf(today: LocalDate = LocalDate.now()): List<BuildPlate> =
         listOf(
-            // An even week, a lopsided week, and a low-hit week of stubs.
-            sculpture("plate_w1", today.minusDays(11), seed = 4021, yourShare = 0.5f, hitRate = 0.7f),
-            sculpture("plate_w2", today.minusDays(18), seed = 1177, yourShare = 0.78f, hitRate = 0.6f),
-            sculpture("plate_w3", today.minusDays(25), seed = 8830, yourShare = 0.45f, hitRate = 0.15f),
+            // An even week, a lopsided week, and a week of quick picks.
+            sculpture("plate_w1", today.minusDays(11), seed = 4021, yourShare = 0.5f, writtenRate = 0.7f),
+            sculpture("plate_w2", today.minusDays(18), seed = 1177, yourShare = 0.78f, writtenRate = 0.6f),
+            sculpture("plate_w3", today.minusDays(25), seed = 8830, yourShare = 0.45f, writtenRate = 0.15f),
         )
 
-    /** [yourShare] is the fraction of bricks that are yours; [hitRate] how often guesses landed (see [Rewards]). */
+    /** [yourShare] is the fraction of bricks that are yours; [writtenRate] how many days were not quick picks (see [Rewards.widthFor]). */
     private fun sculpture(
         id: String,
         startedOn: LocalDate,
         seed: Int,
         yourShare: Float,
-        hitRate: Float,
+        writtenRate: Float,
     ): BuildPlate {
         val random = Random(seed)
         val blocks = mutableListOf<Block>()
@@ -436,8 +436,8 @@ object MockCouple {
 
         repeat(PeriodDays * 2) { i ->
             val owner = if (random.nextFloat() < yourShare) you else them
-            // Wide when the guess landed, a stub when it did not.
-            val shape = if (random.nextFloat() < hitRate) {
+            // A list or a written answer, or a 2-stud pick.
+            val shape = if (random.nextFloat() < writtenRate) {
                 if (random.nextFloat() < 0.55f) {
                     BrickShape(6, BrickHeight.LOW)
                 } else {

@@ -179,27 +179,23 @@ object Rewards {
     /**
      * One brick for [member] for a revealed day they answered.
      *
-     * Width is whether the guess landed (6 hit, 2 miss, 4 unscored). Height is
-     * question depth plus [effortOf]. Every 7-day streak earns a character instead,
-     * and wildcards or called deep questions earn a roof.
+     * Flat: the same for both of you whether or not a guess landed, so the plate
+     * records turning up together and never who knew whom better. Width is the
+     * question type ([widthFor]); height is depth plus [effortOf]. Every 7-day
+     * streak earns a character instead, and a wildcard earns a roof.
      */
     fun forDay(day: DayEntry, member: Member, partner: Member, streakAfter: Int): List<Block> {
         if (!day.isRevealed) return emptyList()
         // No answer from you means no brick, even if the day is revealed.
         val mine = day.answerFor(member.uid) ?: return emptyList()
-        val theirs = day.answerFor(partner.uid) ?: return emptyList()
+        day.answerFor(partner.uid) ?: return emptyList()
 
-        val effort = effortOf(mine, day.question)
         val milestone = streakAfter > 0 && streakAfter % 7 == 0
-        val called = day.question.isScored && day.question.guessHit(mine.guess, theirs.values)
         val shape = when {
             milestone -> CharacterShape
             // Talked-about days earn their piece later, in [forTalk].
             Wildcard.isWildcard(day.question.id) -> roof(member, partner)
-            called && day.question.depth.level >= 3 -> roof(member, partner)
-            !day.question.isScored -> unscored(day.question.depth, effort)
-            called -> landed(day.question.depth, effort)
-            else -> missed(day.question.depth, effort)
+            else -> BrickShape(widthFor(day.question.type), heightFor(day.question.depth, effortOf(mine, day.question)))
         }
 
         return listOf(
@@ -237,36 +233,15 @@ object Rewards {
         )
     }
 
-    /** A brick for finishing a deck: width from the share of guesses that landed, a roof for all of them. */
+    /** A brick for finishing a deck. Flat, like a day: how many guesses landed never changes it. */
     fun forQuiz(
         result: QuizResult,
         member: Member,
-        partner: Member,
-        hits: Int,
         earnedOn: LocalDate,
         /** From [deckEffort]: 1 if you wrote properly, 0 otherwise. */
         effort: Int = 0,
-    ): List<Block> {
-        if (result.possible == 0) {
-            return listOf(
-                block(result, member, BrickShape(4, deckHeight(4, effort)), earnedOn),
-            )
-        }
-        // Every scorable question called earns a roof.
-        if (hits == result.possible) {
-            return listOf(block(result, member, roof(member, partner), earnedOn))
-        }
-
-        val share = hits.toFloat() / result.possible
-        val width = when {
-            share >= 0.7f -> 6
-            share >= 0.35f -> 4
-            else -> 2
-        }
-        return listOf(
-            block(result, member, BrickShape(width, deckHeight(width, effort)), earnedOn),
-        )
-    }
+    ): List<Block> =
+        listOf(block(result, member, BrickShape(4, deckHeight(4, effort)), earnedOn))
 
     /**
      * 1 if at least half of the deck's text questions got a real answer (per [effortOf]),
@@ -343,14 +318,17 @@ object Rewards {
             else -> BrickHeight.HIGH
         }
 
-    /** Guess landed. */
-    private fun landed(depth: Depth, effort: Int) = BrickShape(6, heightFor(depth, effort))
-
-    /** Guess missed. */
-    private fun missed(depth: Depth, effort: Int) = BrickShape(2, heightFor(depth, effort))
-
-    /** Unscored (REFLECT) days. */
-    private fun unscored(depth: Depth, effort: Int) = BrickShape(4, heightFor(depth, effort))
+    /**
+     * Width comes from how the question is answered, so a week's plate varies
+     * without anyone being graded: a pick is 2 studs, a written answer 4, a list 6.
+     * Only written answers can earn height from effort, which keeps 4 x HIGH the
+     * tallest ordinary brick and inside [RoofArea].
+     */
+    fun widthFor(type: QuestionType): Int = when (type) {
+        QuestionType.REFLECT, QuestionType.GUESS_ME -> 4
+        QuestionType.MULTI_SELECT, QuestionType.RANK -> 6
+        QuestionType.THIS_OR_THAT, QuestionType.PICK_ONE, QuestionType.SCALE, QuestionType.DROPDOWN -> 2
+    }
 
     private fun faceFor(streak: Int): BlockFace =
         BlockFace.entries[(streak / 7 - 1).coerceAtLeast(0) % BlockFace.entries.size]

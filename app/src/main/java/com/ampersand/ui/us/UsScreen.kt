@@ -319,11 +319,10 @@ private fun CoupleHeader(state: CoupleState, onOpenSettings: () -> Unit) {
     }
 }
 
-/** You two: days each of you showed up, right guesses and questions written, side by side in your colours. */
+/** You two: days you both answered, questions you wrote and guesses that landed, each one number for the pair. */
 @Composable
 private fun YouTwo(state: CoupleState) {
-    val you = SideBySide.of(state, state.you.uid)
-    val them = SideBySide.of(state, state.them.uid)
+    val together = SideBySide.of(state)
     val weeks = DayPips.weeksActive(state)
     val youInk = Color(state.you.colorArgb)
     val themInk = Color(state.them.colorArgb)
@@ -343,17 +342,14 @@ private fun YouTwo(state: CoupleState) {
         }
         Spacer(Modifier.height(10.dp))
         Row(Modifier.fillMaxWidth()) {
+            // One number each, for the pair: none of this is a contest.
             listOf(
-                (if (weeks == 1) "Days this week" else "Days, $weeks weeks") to (you.daysShowedUp to them.daysShowedUp),
-                "Right guesses" to (you.guessesLanded to them.guessesLanded),
-                "Questions written" to ((state.written[state.you.uid] ?: 0) to (state.written[state.them.uid] ?: 0)),
-            ).forEach { (label, pair) ->
+                together.daysTogether to (if (weeks == 1) "Days together this week" else "Days together, $weeks weeks"),
+                together.questionsWritten to "Questions written",
+                state.knowing.landed to "Guesses landed",
+            ).forEach { (n, label) ->
                 Column(Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text("${pair.first}", style = MaterialTheme.typography.headlineSmall, color = youInk)
-                        Text(" · ", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-                        Text("${pair.second}", style = MaterialTheme.typography.headlineSmall, color = themInk)
-                    }
+                    Text("$n", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
                     Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
                 }
             }

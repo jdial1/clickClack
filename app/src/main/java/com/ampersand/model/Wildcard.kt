@@ -45,7 +45,8 @@ data class Wildcard(
 }
 
 /**
- * All-time guess hits for each of you.
+ * All-time guess hits, stored per person but shown only as the pair's [landed].
+ * A per-person tally invites "I know you better than you know me".
  *
  * Stored as one doc per month with a map keyed by day, not a counter, so both
  * phones writing the same day is idempotent. Totals are summed here.
@@ -56,6 +57,9 @@ data class Knowing(
     val youHits: Int get() = months.sumOf { it.youHits }
     val theyHits: Int get() = months.sumOf { it.theyHits }
     val scored: Int get() = months.sumOf { it.scored }
+
+    /** Guesses that landed between the two of you. The only figure the UI shows. */
+    val landed: Int get() = youHits + theyHits
 
     val isEmpty: Boolean get() = scored == 0
 

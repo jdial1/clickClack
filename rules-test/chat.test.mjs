@@ -35,41 +35,22 @@ async function check(name, fn) {
 const hi = { byUid: 'alice', text: 'That was sweet', emote: null, at: new Date() }
 const pic = { byUid: 'alice', date: '2026-09-14', label: 'Anniversary', data: 'abc' }
 
-await check('a member sends a line as themselves', async () => {
+await check('conversations are retired: nobody sends a new line', async () => {
   await seed()
-  await assertSucceeds(setDoc(msg(as('alice')), hi))
+  await assertFails(setDoc(msg(as('alice')), hi))
+  await assertFails(setDoc(msg(as('bob')), { byUid: 'bob', text: null, emote: 'HEART', at: new Date() }))
 })
 
-await check('an emote needs no text', async () => {
-  await seed()
-  await assertSucceeds(setDoc(msg(as('bob')), { byUid: 'bob', text: null, emote: 'HEART', at: new Date() }))
-})
-
-await check('nobody writes under the other name', async () => {
-  await seed()
-  await assertFails(setDoc(msg(as('bob')), hi))
-})
-
-await check('an outsider can neither send nor read', async () => {
+await check('old lines stay readable to the two of you, and only to you', async () => {
   await seed({ existing: hi })
-  await assertFails(setDoc(msg(as('mallory'), 'm2'), { ...hi, byUid: 'mallory' }))
+  await assertSucceeds(getDoc(msg(as('bob'))))
   await assertFails(getDoc(msg(as('mallory'))))
 })
 
-await check('a line is capped at 500 characters', async () => {
-  await seed()
-  await assertFails(setDoc(msg(as('alice')), { ...hi, text: 'x'.repeat(501) }))
-})
-
-await check('a sent line is never edited or deleted', async () => {
+await check('an old line is never edited or deleted', async () => {
   await seed({ existing: hi })
   await assertFails(updateDoc(msg(as('alice')), { text: 'edited' }))
   await assertFails(deleteDoc(msg(as('alice'))))
-})
-
-await check('nothing new once the couple has ended', async () => {
-  await seed({ ended: true })
-  await assertFails(setDoc(msg(as('alice')), hi))
 })
 
 await check('a member keeps a photo as themselves', async () => {

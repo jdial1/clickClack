@@ -1,8 +1,6 @@
 package com.ampersand.data
 
 import com.ampersand.model.DayPhoto
-import com.ampersand.model.ChatPreview
-import com.ampersand.model.ChatMessage
 import com.ampersand.model.Together
 import com.ampersand.model.decadeOf
 import com.ampersand.model.ChineseZodiac
@@ -43,6 +41,7 @@ import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Knowing
+import com.ampersand.model.Memories
 import com.ampersand.model.KnowingMonth
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
@@ -77,8 +76,6 @@ private const val RUNS = "runs"
 private const val WILDCARDS = "wildcards"
 private const val BUCKET = "bucket"
 private const val DATES = "dates"
-private const val CHATS = "chats"
-private const val MESSAGES = "messages"
 private const val PHOTOS = "photos"
 private const val KNOWING = "knowing"
 private const val INSTRUMENTS = "instruments"
@@ -86,6 +83,9 @@ private const val DRAFTS = "drafts"
 
 /** Days of history to load (ten weeks, what the Shelf shows). */
 private const val HistoryDays = 70L
+
+/** Each person's words toward a sealed week's name, under the plate. */
+private const val WORDS = "words"
 
 /** Plate length in days. */
 private const val PeriodDays = 7
@@ -143,9 +143,13 @@ class FirestoreCoupleRepository(
     /** The past day today's question repeats, on a capsule day. */
     private var capsuleSource: DayEntry? = null
 
-    private var chatPreviews: Map<String, ChatPreview> = emptyMap()
-    private var chatMessages: Map<String, List<ChatMessage>> = emptyMap()
-    private val chatRegs = mutableMapOf<String, ListenerRegistration>()
+    /** Today's date in earlier years and seasons, with both answers (see [loadMemories]). */
+    private var memoryDays: Map<LocalDate, DayEntry> = emptyMap()
+
+    /** Your own words toward sealed weeks' names, read by name (see [loadMyWords]). */
+    private var myWords: Map<String, NameWords> = emptyMap()
+    private var myWordsAsked: Set<String> = emptySet()
+
     private var photos: List<DayPhoto> = emptyList()
 
     /** Day documents older than the loaded history, read on demand (see [loadAnswers]). */
@@ -170,21 +174,6 @@ class FirestoreCoupleRepository(
             coupleDoc = d
             anniversary = d?.getString("anniversary")
                 ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-            recompose()
-        }
-
-        regs += couple.collection(CHATS).addSnapshotListener { snap, error ->
-            if (error != null) {
-                Log.w(TAG, "chats listener failed", error)
-                return@addSnapshotListener
-            }
-            chatPreviews = snap?.documents.orEmpty().associate { doc ->
-                doc.id to ChatPreview(
-                    doc.getString("lastText").orEmpty(),
-                    doc.getString("lastBy").orEmpty(),
-                    (doc.getLong("count") ?: 0L).toInt(),
-                )
-            }
             recompose()
         }
 
@@ -314,6 +303,7 @@ class FirestoreCoupleRepository(
             }
 
         loadCapsule()
+        loadMemories()
 
         regs += couple.collection(PLATES)
             .addSnapshotListener { snap, error ->
@@ -323,6 +313,7 @@ class FirestoreCoupleRepository(
                 }
                 plates = snap?.documents.orEmpty().mapNotNull { it.toPlate() }
                 platesLoaded = true
+                loadMyWords()
                 recompose()
             }
     }
@@ -415,6 +406,7 @@ class FirestoreCoupleRepository(
             notes = todayDoc.stringMap("notes"),
             moodReplies = todayDoc.stringMap("moodReplies"),
             talkedAbout = todayDoc.toTalkedAbout(),
+            askAgain = todayDoc.toUidSet("askAgain"),
             opened = todayDoc?.getBoolean("revealed") == true,
             submitted = todayDoc.toSubmitted(),
             nextTheme = todayDoc?.getString("nextTheme"),
@@ -432,7 +424,9 @@ class FirestoreCoupleRepository(
         val next = basis.copy(
             today = todayEntry,
             plate = live,
-            shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn },
+            shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn }
+                .map { p -> myWords[p.id]?.takeIf { myUid !in p.words }?.let { p.copy(words = p.words + (myUid to it)) } ?: p },
+            memories = memoryDays.values.sortedByDescending { it.date },
             anniversary = anniversary,
             streak = Streaks.run(history, todayEntry),
             // Only a capsule if today's question matches (a pin can override it).
@@ -459,8 +453,6 @@ class FirestoreCoupleRepository(
                 val label = (v as? Map<*, *>)?.get("label") as? String ?: return@mapNotNull null
                 (k as? String)?.let { it to label }
             }.toMap(),
-            chats = chatMessages,
-            chatPreviews = chatPreviews,
             photos = photos,
             recalled = recalledDocs.values.mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
                 .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
@@ -773,7 +765,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    /** Awards bricks to both for finished decks, sized by each person's accuracy. */
+    /** Awards bricks to both for finished decks. Flat: accuracy never changes the brick. */
     private fun awardForQuizzes(s: CoupleState) {
         val plate = s.plate
         if (plate.isSealed) return
@@ -785,10 +777,10 @@ class FirestoreCoupleRepository(
             val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
             val result = QuizResult.of(quiz, mine, theirs)
             Rewards.forQuiz(
-                result, s.you, s.them, result.youKnewThem, today,
+                result, s.you, today,
                 effort = Rewards.deckEffort(result.rows, yours = true),
             ) + Rewards.forQuiz(
-                result, s.them, s.you, result.theyKnewYou, today,
+                result, s.them, today,
                 effort = Rewards.deckEffort(result.rows, yours = false),
             )
         }.filter { it.id !in laid }
@@ -814,11 +806,16 @@ class FirestoreCoupleRepository(
         couple.set(mapOf(source.field to on), SetOptions.merge())
     }
 
+    /**
+     * Your two words, sealed like an answer: one document each, readable only by
+     * its author. The `onWords` function copies both onto the plate once both exist.
+     */
     override fun nameWeek(plateId: String, words: NameWords) {
-        couple.collection(PLATES).document(plateId).set(
-            mapOf("words" to mapOf(myUid to mapOf("describing" to words.describing, "thing" to words.thing))),
-            SetOptions.merge(),
-        )
+        if (myWords.containsKey(plateId)) return
+        couple.collection(PLATES).document(plateId).collection(WORDS).document(myUid)
+            .set(mapOf("describing" to words.describing, "thing" to words.thing))
+        myWords = myWords + (plateId to words)
+        recompose()
     }
 
     override fun addToBucket(text: String, group: BucketGroup) {
@@ -877,7 +874,46 @@ class FirestoreCoupleRepository(
      * On capsule days, looks for a revealed day 12, 6, 3, then 1 months ago and loads its answers.
      * See [capsuleDays] for how often.
      */
+    /**
+     * Today's capsule, in order: a day either of you asked for again a year ago,
+     * then the very first question you answered on its anniversary, then the
+     * weekday rota. The first two come on their date whatever the weekday, and
+     * nothing announces them in advance.
+     */
     private fun loadCapsule() {
+        val yearAgo = today.minusYears(1)
+        couple.collection(DAYS).document(yearAgo.toString()).get()
+            .addOnSuccessListener { doc ->
+                val question = resolveQuestion(doc.getString("questionId"), yearAgo)
+                if (doc.toUidSet("askAgain").isNotEmpty() && doc.getBoolean("revealed") == true && question != null) {
+                    readCapsuleAnswers(yearAgo, question, doc)
+                } else {
+                    firstQuestionAgain()
+                }
+            }
+            .addOnFailureListener { firstQuestionAgain() }
+    }
+
+    /** The first day you both answered, if today is its anniversary (whole years only). */
+    private fun firstQuestionAgain() {
+        couple.collection(DAYS).whereEqualTo("revealed", true)
+            .orderBy(FieldPath.documentId()).limit(1).get()
+            .addOnSuccessListener { snap ->
+                val first = snap.documents.firstOrNull()
+                val date = first?.id?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                val question = date?.let { resolveQuestion(first.getString("questionId"), it) }
+                if (first != null && date != null && question != null &&
+                    date.year < today.year && date.monthValue == today.monthValue && date.dayOfMonth == today.dayOfMonth
+                ) {
+                    readCapsuleAnswers(date, question, first)
+                } else {
+                    weekdayCapsule()
+                }
+            }
+            .addOnFailureListener { weekdayCapsule() }
+    }
+
+    private fun weekdayCapsule() {
         if (today.dayOfWeek !in capsuleDays()) return
         tryCapsule(listOf(12L, 6L, 3L, 1L))
     }
@@ -897,6 +933,55 @@ class FirestoreCoupleRepository(
             weeks >= 26 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
             weeks >= 12 -> setOf(DayOfWeek.SUNDAY, DayOfWeek.WEDNESDAY)
             else -> setOf(DayOfWeek.SUNDAY)
+        }
+    }
+
+    /**
+     * Today's date [Memories.MonthsBack] months ago, read by name with both answers,
+     * so On this day can reach past the ten weeks of loaded history.
+     */
+    private fun loadMemories() {
+        Memories.MonthsBack.map { today.minusMonths(it) }
+            .filter { it.dayOfMonth == today.dayOfMonth }
+            .forEach { date ->
+                couple.collection(DAYS).document(date.toString()).get().addOnSuccessListener { doc ->
+                    val question = resolveQuestion(doc.getString("questionId"), date)
+                    if (!doc.exists() || doc.getBoolean("revealed") != true || question == null) return@addOnSuccessListener
+                    val answers = couple.collection(DAYS).document(date.toString()).collection(ANSWERS)
+                    answers.document(myUid).get().addOnSuccessListener { mine ->
+                        answers.document(partnerUid).get().addOnSuccessListener { theirs ->
+                            val both = listOfNotNull(mine.toAnswer(), theirs.toAnswer())
+                            if (both.size < 2) return@addOnSuccessListener
+                            memoryDays = memoryDays + (
+                                date to DayEntry(
+                                    date = date,
+                                    question = question,
+                                    answers = both.associateBy { it.uid },
+                                    reactions = doc.toReactions(),
+                                    opened = true,
+                                )
+                                )
+                            recompose()
+                        }
+                    }
+                }
+            }
+    }
+
+    /**
+     * Your own words for sealed weeks that have no name yet. Read by name: the
+     * partner's are unreadable until the function copies both onto the plate.
+     */
+    private fun loadMyWords() {
+        plates.filter { it.isSealed && myUid !in it.words && it.id !in myWordsAsked }.forEach { plate ->
+            myWordsAsked = myWordsAsked + plate.id
+            couple.collection(PLATES).document(plate.id).collection(WORDS).document(myUid).get()
+                .addOnSuccessListener { doc ->
+                    val describing = doc.getString("describing") ?: return@addOnSuccessListener
+                    val thing = doc.getString("thing") ?: return@addOnSuccessListener
+                    myWords = myWords + (plate.id to NameWords(describing, thing))
+                    recompose()
+                }
         }
     }
 
@@ -1065,50 +1150,6 @@ class FirestoreCoupleRepository(
         )
     }
 
-    override fun openChat(id: String) {
-        if (id in chatRegs) return
-        chatRegs[id] = couple.collection(CHATS).document(id).collection(MESSAGES)
-            .orderBy("at")
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "chat $id listener failed", error)
-                    return@addSnapshotListener
-                }
-                chatMessages = chatMessages + (id to snap?.documents.orEmpty().map { doc ->
-                    ChatMessage(
-                        id = doc.id,
-                        byUid = doc.getString("byUid").orEmpty(),
-                        text = doc.getString("text"),
-                        emote = Reaction.entries.firstOrNull { it.name == doc.getString("emote") },
-                        atMillis = doc.getTimestamp("at")?.toDate()?.time ?: System.currentTimeMillis(),
-                    )
-                })
-                recompose()
-            }
-    }
-
-    override fun closeChat(id: String) {
-        chatRegs.remove(id)?.remove()
-    }
-
-    override fun sendMessage(id: String, text: String?, emote: Reaction?) {
-        val clean = text?.trim()?.take(500)?.takeIf { it.isNotEmpty() }
-        if (clean == null && emote == null) return
-        val chat = couple.collection(CHATS).document(id)
-        chat.collection(MESSAGES).add(
-            mapOf("byUid" to myUid, "text" to clean, "emote" to emote?.name, "at" to FieldValue.serverTimestamp()),
-        )
-        chat.set(
-            mapOf(
-                "lastText" to (clean ?: emote!!.label),
-                "lastBy" to myUid,
-                "lastAt" to FieldValue.serverTimestamp(),
-                "count" to FieldValue.increment(1),
-            ),
-            SetOptions.merge(),
-        )
-    }
-
     override fun addPhoto(date: LocalDate, label: String, jpegBase64: String) {
         couple.collection(PHOTOS).add(
             mapOf("date" to date.toString(), "label" to label.take(80), "byUid" to myUid, "data" to jpegBase64),
@@ -1174,6 +1215,14 @@ class FirestoreCoupleRepository(
     }
 
     /** Uses arrayUnion so concurrent marks do not clobber each other. */
+    override fun askAgain(date: LocalDate, ask: Boolean) {
+        val ref = if (date == today) dayRef else couple.collection(DAYS).document(date.toString())
+        ref.set(
+            mapOf("askAgain" to if (ask) FieldValue.arrayUnion(myUid) else FieldValue.arrayRemove(myUid)),
+            SetOptions.merge(),
+        )
+    }
+
     override fun markTalkedAbout(date: LocalDate) {
         val ref = if (date == today) dayRef else couple.collection(DAYS).document(date.toString())
         ref.set(
@@ -1290,8 +1339,6 @@ class FirestoreCoupleRepository(
         instrumentRegs.clear()
         partnerRunRegs.values.forEach { it.remove() }
         partnerRunRegs.clear()
-        chatRegs.values.forEach { it.remove() }
-        chatRegs.clear()
     }
 
     private fun plateRef(plate: BuildPlate) = couple.collection(PLATES).document(plate.id)
@@ -1371,6 +1418,9 @@ private fun DocumentSnapshot?.stringMap(field: String): Map<String, String> =
         .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
         .toMap()
 
+private fun DocumentSnapshot?.toUidSet(field: String): Set<String> =
+    (this?.get(field) as? List<*>).orEmpty().filterIsInstance<String>().toSet()
+
 private fun DocumentSnapshot?.toTalkedAbout(): Set<String> {
     @Suppress("UNCHECKED_CAST")
     val raw = this?.get("talkedAbout") as? List<String> ?: return emptySet()
@@ -1442,6 +1492,7 @@ private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?, L
         notes = stringMap("notes"),
         moodReplies = stringMap("moodReplies"),
         talkedAbout = toTalkedAbout(),
+        askAgain = toUidSet("askAgain"),
         opened = getBoolean("revealed") == true,
         submitted = toSubmitted(),
         nextTheme = getString("nextTheme"),

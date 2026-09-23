@@ -129,6 +129,11 @@ data class DayEntry(
     /** Uids who marked that this day came up again in conversation. Not sealed, not scored. */
     val talkedAbout: Set<String> = emptySet(),
     /**
+     * Uids who asked for this question again in a year. A gesture, so either of
+     * you can take your own ask back. It returns sealed on the date, beside this pair.
+     */
+    val askAgain: Set<String> = emptySet(),
+    /**
      * The day doc's `revealed` flag: both answers are in, even when not loaded.
      *
      * Past days are read without their answer subcollection, so counting [answers]
@@ -137,7 +142,7 @@ data class DayEntry(
     val opened: Boolean = false,
     /** Who has answered, from the day document. Read on past days, which carry no answers. */
     val submitted: Set<String> = emptySet(),
-    /** Tomorrow's theme, picked tonight. Hidden from the partner by the UI, not rules. See [Turns]. */
+    /** Tomorrow's theme, picked tonight and shown to both at once: a gesture, not a sealed answer. See [Turns]. */
     val nextTheme: String? = null,
     val nextThemeBy: String? = null,
     /**
@@ -233,10 +238,6 @@ data class CoupleState(
     val why: String? = null,
     /** Days and decks either of you kept, keyed by [Kept.day] or [Kept.deck], with a label to show. */
     val kept: Map<String, String> = emptyMap(),
-    /** Messages of conversations that are open on screen, by conversation id. */
-    val chats: Map<String, List<ChatMessage>> = emptyMap(),
-    /** Last message and count for every conversation. */
-    val chatPreviews: Map<String, ChatPreview> = emptyMap(),
     /** Photos kept from special days, newest first. */
     val photos: List<DayPhoto> = emptyList(),
     /** Opened days older than the loaded history, fetched on demand to show a kept or recalled day. */
@@ -247,11 +248,24 @@ data class CoupleState(
     val instrumentRuns: List<InstrumentRun> = emptyList(),
     /** How often each of you has called the other, all time. */
     val knowing: Knowing = Knowing(),
+    /**
+     * Revealed days on today's date [Memories.MonthsBack] months ago, with both
+     * answers. Fetched on their own because loaded history stops at ten weeks.
+     */
+    val memories: List<DayEntry> = emptyList(),
 ) {
-    /** Answered days on today's day-of-month in earlier months, excluding the last 27 days. */
+    /**
+     * Revealed days on today's day-of-month, at least [Memories.MinDays] old: a
+     * memory needs distance. Whole years first, then the oldest. [memories] win
+     * over [history] for the same date, because they carry both answers.
+     */
     fun onThisDay(on: LocalDate = today.date): List<DayEntry> =
-        history.filter { it.date.dayOfMonth == on.dayOfMonth && it.date < on.minusDays(27) }
-            .sortedByDescending { it.date }
+        (memories + history).distinctBy { it.date }
+            .filter { it.isRevealed && it.date.dayOfMonth == on.dayOfMonth && it.date <= on.minusDays(Memories.MinDays) }
+            .sortedWith(
+                compareByDescending<DayEntry> { java.time.temporal.ChronoUnit.MONTHS.between(it.date, on) % 12 == 0L }
+                    .thenBy { it.date },
+            )
 
     /** Your run through [quizId], if you have played it. */
     fun myRun(quizId: String): QuizRun? = quizRuns.firstOrNull {

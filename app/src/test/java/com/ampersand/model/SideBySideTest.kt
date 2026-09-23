@@ -12,7 +12,7 @@ class SideBySideTest {
     private val them = Member("b", "Tasia", BrickColor.BLUE.argb)
 
     @Test
-    fun `counts days, guesses and decks per person`() {
+    fun `counts only what the two of you did together`() {
         val state = CoupleState(
             you = you,
             them = them,
@@ -25,8 +25,9 @@ class SideBySideTest {
             quizRuns = listOf(QuizRun("d", "b", emptyMap(), completedAtMillis = 1L), QuizRun("e", "a", emptyMap())),
             knowing = Knowing(months = listOf(KnowingMonth(java.time.YearMonth.from(today), youHits = 3, theyHits = 5, scored = 8))),
         )
-        assertEquals(Tally(daysShowedUp = 2, guessesLanded = 3, decksFinished = 0), SideBySide.of(state, "a"))
-        assertEquals(Tally(daysShowedUp = 2, guessesLanded = 5, decksFinished = 1), SideBySide.of(state, "b"))
+        // Only yesterday was answered by both; one deck finished by one person is not together.
+        assertEquals(Tally(daysTogether = 1, decksTogether = 0, questionsWritten = 0), SideBySide.of(state))
+        assertEquals(8, state.knowing.landed)
     }
 
     @Test

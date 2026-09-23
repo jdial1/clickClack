@@ -1,8 +1,6 @@
 package com.ampersand.data
 
 import com.ampersand.model.DayPhoto
-import com.ampersand.model.ChatPreview
-import com.ampersand.model.ChatMessage
 import com.ampersand.model.QuestionSource
 import com.ampersand.model.NameWords
 import com.ampersand.model.DateKind
@@ -84,13 +82,6 @@ interface CoupleRepository {
     /** Sets or clears your reaction to a revealed day. Unlike answers, reactions can change. */
     fun react(date: LocalDate, reaction: Reaction?)
 
-    /** Start listening to a conversation's messages; [closeChat] stops. */
-    fun openChat(id: String)
-    fun closeChat(id: String)
-
-    /** Send a line or an emote into a conversation. */
-    fun sendMessage(id: String, text: String?, emote: Reaction? = null)
-
     /** Keep a photo from a special day. [jpegBase64] is already compressed. */
     fun addPhoto(date: LocalDate, label: String, jpegBase64: String)
 
@@ -137,6 +128,9 @@ interface CoupleRepository {
 
     /** Marks that a revealed day was talked about. Cannot be undone. */
     fun markTalkedAbout(date: LocalDate)
+
+    /** Ask for (or stop asking for) [date]'s question again a year later. */
+    fun askAgain(date: LocalDate, ask: Boolean)
 
     /** Sets your note on a sealed week. Can be rewritten. */
     fun noteWeek(plateId: String, text: String)
@@ -344,18 +338,6 @@ class FakeCoupleRepository(
         it.copy(yourHiddenTopics = mine, hiddenTopics = mine)
     }
 
-    override fun openChat(id: String) = Unit
-    override fun closeChat(id: String) = Unit
-
-    override fun sendMessage(id: String, text: String?, emote: Reaction?) = mutate { current ->
-        val list = current.chats[id].orEmpty()
-        val message = ChatMessage("m${list.size + 1}", current.you.uid, text, emote, System.currentTimeMillis())
-        current.copy(
-            chats = current.chats + (id to list + message),
-            chatPreviews = current.chatPreviews + (id to ChatPreview(text ?: emote?.label.orEmpty(), current.you.uid, list.size + 1)),
-        )
-    }
-
     override fun addPhoto(date: LocalDate, label: String, jpegBase64: String) = mutate {
         it.copy(photos = listOf(DayPhoto("p${it.photos.size + 1}", date, label, it.you.uid, jpegBase64)) + it.photos)
     }
@@ -469,6 +451,13 @@ class FakeCoupleRepository(
 
     override fun removeFromBucket(id: String) = mutate { current ->
         current.copy(bucket = current.bucket.filterNot { it.id == id && it.byUid == current.you.uid && !it.isDone })
+    }
+
+    override fun askAgain(date: LocalDate, ask: Boolean) = mutate { current ->
+        fun DayEntry.mark() =
+            if (this.date != date || !isRevealed) this
+            else copy(askAgain = if (ask) askAgain + current.you.uid else askAgain - current.you.uid)
+        current.copy(today = current.today.mark(), history = current.history.map { it.mark() })
     }
 
     override fun markTalkedAbout(date: LocalDate) = mutate { current ->

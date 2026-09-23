@@ -5,8 +5,11 @@ import com.ampersand.model.Member
 import com.ampersand.model.Reading
 
 /**
- * A few sentences on what two finished results mean together. Null until both of
- * you have finished. Plain and warm; never a verdict on the relationship.
+ * Two finished results side by side, then one question about them. Null until
+ * both of you have finished.
+ *
+ * Never what the results mean together, and never advice: the app does not
+ * interpret, it asks. The reading is the couple's to do (DESIGN.md, "Never coach").
  */
 object CoupleReadings {
 
@@ -45,10 +48,10 @@ object CoupleReadings {
         return buildString {
             if (shared.isNotEmpty()) append("You both ${shared.joinToString(", ")}. ")
             if (differ.isEmpty()) {
-                append("With the same type you'll rarely need to explain yourselves, so watch for the blind spots you share.")
+                append("When has being alike made things easy, and when has it caught you both out?")
             } else {
-                differ.forEach { (x, y) -> append("$a tends to ${TypeMeaning[x.letter]}, while $b tends to ${TypeMeaning[y.letter]}. ") }
-                append("Those differences are where you cover for each other.")
+                differ.forEach { (x, y) -> append("$a tends to ${TypeMeaning[x.letter]}, and $b tends to ${TypeMeaning[y.letter]}. ") }
+                append("Where does that show up on an ordinary Sunday?")
             }
         }
     }
@@ -65,10 +68,10 @@ object CoupleReadings {
         val tb = theirs.maxBy { it.value }.subscale
         return if (ta.id == tb.id) {
             "You're both ${ta.label}: you both ${LovingMeaning[ta.id]?.replaceFirst("feels", "feel")?.replaceFirst("loves", "love")}. " +
-                "You probably recognize love when it arrives the same way, so try it the other way now and then."
+                "When did you first notice that in each other?"
         } else {
             "$a is ${ta.label} and $b is ${tb.label}. $a ${LovingMeaning[ta.id]}, and $b ${LovingMeaning[tb.id]}. " +
-                "Neither is more loving; say out loud what makes love feel real, because you may be showing it differently."
+                "What does each of you do that the other might not read as love?"
         }
     }
 
@@ -79,31 +82,13 @@ object CoupleReadings {
         val aGives = top(mine, Instruments.GIVEN)
         val bWants = top(theirs, Instruments.FELT)
         val bGives = top(theirs, Instruments.GIVEN)
-        val match = aWants == bGives && bWants == aGives
         return "$a feels most loved through $aWants, and $b tends to give $bGives. " +
             "$b feels most loved through $bWants, and $a tends to give $aGives. " +
-            if (match) "You're already speaking each other's language." else "A little more $aWants for $a and $bWants for $b would land well."
+            "When did one of you last get it exactly right?"
     }
 
     private fun attachment(x: String, y: String, a: String, b: String): String {
-        val pair = setOf(x, y)
-        val body = when {
-            x == "Secure" && y == "Secure" -> "You're both secure: you can lean on each other, and give each other space, without either feeling like a threat."
-            pair == setOf("Anxious", "Avoidant") -> {
-                val anx = if (x == "Anxious") a else b
-                val avo = if (x == "Avoidant") a else b
-                "When things get tense, $anx may reach for closeness while $avo needs room. It's a common pattern; naming it out loud takes the sting out of it."
-            }
-            "Secure" in pair -> {
-                val steady = if (x == "Secure") a else b
-                val other = if (x == "Secure") b else a
-                "$steady is steady ground, which helps $other feel safe to be close. Keep checking in, even when things feel fine."
-            }
-            x == y && x == "Anxious" -> "You both notice distance quickly. Small, regular reassurance goes a long way for both of you."
-            x == y && x == "Avoidant" -> "You both value independence. Make time for closeness on purpose, so it doesn't only happen by accident."
-            else -> "At least one of you can want closeness and worry about it at the same time. Patience and consistency help most."
-        }
-        return "$a is $x and $b is $y. $body Styles can shift over time."
+        return "$a is $x and $b is $y. When things get tense, what does each of you reach for first? Styles can shift over time."
     }
 
     private val DiscMeaning = mapOf(
@@ -117,9 +102,9 @@ object CoupleReadings {
         val ta = mine.maxBy { it.value }.subscale
         val tb = theirs.maxBy { it.value }.subscale
         return if (ta.id == tb.id) {
-            "You're both ${ta.label}: you each ${DiscMeaning[ta.id]?.replace("decides", "decide")?.replace("brings", "bring")?.replace("keeps", "keep")?.replace("gets", "get")?.replace("pushes", "push")?.replace("talks", "talk")}, so you'll understand each other's pace. Watch for the moments neither of you wants to take on."
+            "You're both ${ta.label}: you each ${DiscMeaning[ta.id]?.replace("decides", "decide")?.replace("brings", "bring")?.replace("keeps", "keep")?.replace("gets", "get")?.replace("pushes", "push")?.replace("talks", "talk")}. Who ends up taking on the thing neither of you wants?"
         } else {
-            "$a ${DiscMeaning[ta.id]}, and $b ${DiscMeaning[tb.id]}. Let each of you lead where you're strongest."
+            "$a ${DiscMeaning[ta.id]}, and $b ${DiscMeaning[tb.id]}. Where does each of you end up leading without deciding to?"
         }
     }
 
@@ -132,9 +117,9 @@ object CoupleReadings {
         val ia = mine.indexOf(mine.maxBy { it.value })
         val ib = theirs.indexOf(theirs.maxBy { it.value })
         return if (ia == ib) {
-            "You're both the ${Instruments.EnneagramTypes[ia]}, sharing the same ${Gifts[ia]}. You'll get each other easily; make room for what neither of you naturally brings."
+            "You're both the ${Instruments.EnneagramTypes[ia]}, sharing the same ${Gifts[ia]}. What does the other one see in you that you don't?"
         } else {
-            "$a brings ${Gifts[ia]} as the ${Instruments.EnneagramTypes[ia]}, and $b brings ${Gifts[ib]} as the ${Instruments.EnneagramTypes[ib]}. Together that's a wider range than either of you alone."
+            "$a brings ${Gifts[ia]} as the ${Instruments.EnneagramTypes[ia]}, and $b brings ${Gifts[ib]} as the ${Instruments.EnneagramTypes[ib]}. When did you last lean on what the other brings?"
         }
     }
 
@@ -142,11 +127,11 @@ object CoupleReadings {
         val many = Instruments.AutismReferral
         return when {
             x < 3 && y < 3 -> "Neither of you shows many autistic traits here."
-            x >= many && y >= many -> "You both show many autistic traits. You may already share a way of seeing the world that others miss."
+            x >= many && y >= many -> "You both show many autistic traits."
             else -> {
                 val more = if (x > y) a else b
-                "$more shows more autistic traits than the other. Talk about how you each notice details and read people; different is not wrong."
+                "$more shows more autistic traits than the other."
             }
-        } + " This is a screen, not a diagnosis."
+        } + " How does each of you notice details and read a room? This is a screen, not a diagnosis."
     }
 }

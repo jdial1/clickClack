@@ -167,7 +167,8 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> "Today's question is waiting"
         }
         val body = when {
-            decksWaiting > 0 -> "Waiting for you."
+            // What is waiting, never who is waiting on whom.
+            decksWaiting > 0 -> "It opens when you've played it too."
             else -> "Opens when you both answer."
         }
 

@@ -65,7 +65,7 @@ val QuestionType.weight: Int
 /** Where a deck has got to for the couple. Declaration order is the list sort order. */
 enum class DeckState(val heading: String) {
     /** They played it and you have not. */
-    WAITING_ON_YOU("Waiting for you"),
+    WAITING_ON_YOU("Your turn"),
 
     /** You played it; results open when they do. */
     WAITING_ON_THEM("Waiting for them"),
@@ -131,27 +131,14 @@ data class QuizResult(
     val syncPercent: Int
         get() = if (possible == 0) 0 else ((youKnewThem + theyKnewYou) * 100) / (possible * 2)
 
-    /** One-line summary under the chart, by score band. */
-    val verdict: String
-        get() = when {
-            possible == 0 -> "Nothing to score in this one."
-            syncPercent >= 90 -> "You know each other really well."
-            syncPercent >= 70 -> "You know each other well."
-            syncPercent >= 45 -> "Mostly in sync, with a few surprises."
-            syncPercent >= 20 -> "Lots left to learn."
-            else -> "Time for a good talk."
-        }
+    /**
+     * Guesses that landed between the two of you. The only score a deck shows:
+     * never who knew whom better, and never a verdict on the number.
+     */
+    val landed: Int get() = youKnewThem + theyKnewYou
 
-    /** A line when one of you guessed far better, or null when it is close. */
-    fun lopsided(yourName: String, theirName: String): String? {
-        val gap = youKnewThem - theyKnewYou
-        if (possible < 4 || kotlin.math.abs(gap) < possible / 3 + 1) return null
-        return if (gap > 0) {
-            "$yourName guessed right more often."
-        } else {
-            "$theirName guessed right more often."
-        }
-    }
+    /** Every guess either of you made on a scoreable question. */
+    val guesses: Int get() = possible * 2
 
     companion object {
         /** Pair up two runs through the same deck. */

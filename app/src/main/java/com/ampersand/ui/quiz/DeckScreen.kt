@@ -329,7 +329,7 @@ private fun DeckResult(
 
         Spacer(Modifier.height(20.dp))
         Text(
-            text = "Talk about it together.",
+            text = "Now go and ask them about it.",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

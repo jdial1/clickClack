@@ -10,9 +10,10 @@ import java.time.LocalDate
  * What a day earns, and why the sculpture is worth looking at.
  *
  * The shelf only means anything if a week where something happened is
- * distinguishable from a week of clearing the notification. Width already said
- * how well you did and height said how deep the question was; the two rarest
- * and best days earned the same box as everything else.
+ * distinguishable from a week of clearing the notification, without the plate
+ * ever becoming a scoreboard. Width says how the question was answered, height
+ * says how deep it was and how much you put in, and whether a guess landed
+ * changes nothing.
  */
 class DayRewardTest {
 
@@ -121,19 +122,38 @@ class DayRewardTest {
     }
 
     @Test
-    fun `an ordinary missed day is still a plain stub`() {
+    fun `an ordinary pick is a plain stub`() {
         val shape = shapeOf(day())
         assertEquals(Slope.NONE, shape.slope)
         assertEquals(2, shape.w)
     }
 
-    // ---- what was already there, which should not have moved ---------------
+    // ---- flat: being right about them earns nothing extra -------------------
+
+    /** A wrong guess is the best reveal of the day. It must not cost a brick. */
+    @Test
+    fun `calling it changes nothing`() {
+        assertEquals(shapeOf(day(myGuess = "b")), shapeOf(day(myGuess = "wrong")))
+        assertEquals(shapeOf(day(myGuess = "b")), shapeOf(day()))
+    }
 
     @Test
-    fun `calling it still widens the brick`() {
-        assertEquals(6, shapeOf(day(myGuess = "b")).w)
-        assertEquals(2, shapeOf(day(myGuess = "wrong")).w)
+    fun `calling a deep one is not a roof`() {
+        val deep = question(type = QuestionType.GUESS_ME, depth = 3)
+        val called = shapeOf(day(q = deep, theirs = "b", myGuess = "b"))
+        val missed = shapeOf(day(q = deep, theirs = "b", myGuess = "x"))
+        assertEquals(Slope.NONE, called.slope)
+        assertEquals(missed, called)
     }
+
+    @Test
+    fun `width comes from how the question is answered`() {
+        assertEquals(2, shapeOf(day(q = question(type = QuestionType.PICK_ONE))).w)
+        assertEquals(4, shapeOf(day(q = question(type = QuestionType.GUESS_ME))).w)
+        assertEquals(6, shapeOf(day(q = question(type = QuestionType.RANK))).w)
+    }
+
+    // ---- what was already there, which should not have moved ---------------
 
     /** `BrickShape.h` is a row count, not a `BrickHeight`. */
     @Test
@@ -233,7 +253,7 @@ class DayRewardTest {
      *
      * The whole point of the cap, checked across every combination rather than
      * a hand-picked few: depth, type, whether you called it, how much you
-     * wrote. Letting length climb freely would make a six-stud "called it" a
+     * wrote. Letting length climb freely would make a six-stud list a
      * twenty-four cell slab.
      */
     @Test
@@ -242,6 +262,7 @@ class DayRewardTest {
         val types = listOf(
             QuestionType.REFLECT, QuestionType.GUESS_ME,
             QuestionType.THIS_OR_THAT, QuestionType.PICK_ONE,
+            QuestionType.MULTI_SELECT, QuestionType.RANK,
         )
         for (depth in 1..3) for (type in types) for (n in listOf(0, 14, 15, 1500)) {
             for (called in listOf(true, false)) {

@@ -40,8 +40,6 @@ import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.BrickColor
-import com.ampersand.model.ChatMessage
-import com.ampersand.model.Chats
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DateKind
 import com.ampersand.model.DayWeather
@@ -55,7 +53,7 @@ import com.ampersand.model.SpecialDate
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
-import com.ampersand.ui.chat.ChatScreen
+import com.ampersand.ui.wildcard.WildcardScreen
 import com.ampersand.ui.components.BrickWall
 import com.ampersand.ui.history.HistoryScreen
 import com.ampersand.ui.quiz.DecksScreen
@@ -194,23 +192,8 @@ class StoreAssets {
         HistoryScreen(state.copy(shelf = shelf, kept = emptyMap(), photos = emptyList(), history = state.history.filter { it.date > today.minusDays(20) }), onOpenDay = {})
     }
 
-    @Test fun phone6_chat() = phone("6-chat", "Keep talking about it") {
-        val day = state.history.first { it.isRevealed }
-        val id = Chats.day(day.date)
-        ChatScreen(
-            state = state,
-            title = Chats.title(id, them.name),
-            subtitle = day.question.text,
-            messages = listOf(
-                ChatMessage("1", them.uid, "I had no idea you remembered that"),
-                ChatMessage("2", you.uid, "Of course I did. Best night of that whole summer"),
-                ChatMessage("3", them.uid, emote = Reaction.MELT),
-                ChatMessage("4", them.uid, "Same place Friday?"),
-                ChatMessage("5", you.uid, "It's a date"),
-            ),
-            onBack = {},
-            onSend = { _, _ -> },
-        )
+    @Test fun phone6_write() = phone("6-write", "Write one for them") {
+        WildcardScreen(state, onBack = {}, onSubmit = { _, _, _ -> })
     }
 
     @Test fun phone7_profiles() = phone("7-profiles", "See how you two fit together") {

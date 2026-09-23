@@ -3,18 +3,22 @@ package com.ampersand.model
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-/** One person's row in the Us screen's side-by-side table. */
-data class Tally(val daysShowedUp: Int, val guessesLanded: Int, val decksFinished: Int)
+/**
+ * The Us screen's "You two" numbers, counted for the pair and never per person:
+ * a per-person tally invites "I show up more than you". See [Knowing.landed].
+ */
+data class Tally(val daysTogether: Int, val decksTogether: Int, val questionsWritten: Int)
 
 object SideBySide {
 
-    fun of(state: CoupleState, uid: String): Tally {
+    fun of(state: CoupleState): Tally {
         val days = (state.history + state.today).count { day ->
-            DayPips.didSomething(uid, day.date, day, emptyList())
+            DayPips.didSomething(state.you.uid, day.date, day, emptyList()) &&
+                DayPips.didSomething(state.them.uid, day.date, day, emptyList())
         }
-        val decks = state.quizRuns.count { it.uid == uid && it.completedAtMillis != null }
-        val guesses = if (uid == state.you.uid) state.knowing.youHits else state.knowing.theyHits
-        return Tally(daysShowedUp = days, guessesLanded = guesses, decksFinished = decks)
+        val finished = state.quizRuns.filter { it.completedAtMillis != null }
+        val decks = finished.groupBy { it.quizId }.count { (_, runs) -> runs.map { it.uid }.toSet().size >= 2 }
+        return Tally(daysTogether = days, decksTogether = decks, questionsWritten = state.written.values.sum())
     }
 }
 

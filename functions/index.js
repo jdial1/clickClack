@@ -76,7 +76,7 @@ exports.onAnswer = onDocumentCreated(
   },
 );
 
-/** Your partner finished a deck and is waiting on you. */
+/** Your partner finished a deck. Says what is waiting, never who is waiting on whom. */
 exports.onQuizRun = onDocumentCreated(
   "couples/{coupleId}/quizzes/{quizId}/runs/{uid}",
   async (event) => {
@@ -86,7 +86,7 @@ exports.onQuizRun = onDocumentCreated(
 
     await queue(coupleId, target,
       `${target.senderName} played a deck`,
-      "Yours is the half that is missing.",
+      "It opens when you've played it too.",
       "deck",
     );
   },
@@ -173,20 +173,32 @@ exports.onMoodUpdate = onDocumentUpdated("users/{uid}", async (event) => {
   await queue(coupleId, target, `${target.senderName} is feeling ${label.toLowerCase()}`, "Tap their mood on Today to reply.", "mood");
 });
 
-/** Words picked toward a finished week's name, and the name once both are in. */
-exports.onPlateUpdate = onDocumentUpdated(
-  "couples/{coupleId}/plates/{plateId}",
+/**
+ * Somebody picked their two words toward a sealed week's name.
+ *
+ * The words are sealed like answers: each is its own document, readable only by
+ * its author. Once both exist this lifts the seal by copying them onto the plate,
+ * which both can read. Nothing else writes the plate's `words`.
+ */
+exports.onWords = onDocumentCreated(
+  "couples/{coupleId}/plates/{plateId}/words/{uid}",
   async (event) => {
-    const { coupleId } = event.params;
-    const picked = changedKeys(event.data.before, event.data.after, "words");
-    if (picked.length === 0) return;
-    const words = event.data.after.get("words") || {};
-    const both = Object.keys(words).length >= 2;
-    for (const uid of picked) {
-      const target = await partnerOf(coupleId, uid);
-      if (!target) continue;
-      if (both) await queue(coupleId, target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`, "week");
-      else await queue(coupleId, target, `${target.senderName} picked words for the week`, "Pick yours to see its name.", "week");
+    const { coupleId, plateId, uid } = event.params;
+    const target = await partnerOf(coupleId, uid);
+    const couple = await db.doc(`couples/${coupleId}`).get();
+    const partnerUid = (couple.get("members") || []).find((m) => m !== uid);
+    const plate = db.doc(`couples/${coupleId}/plates/${plateId}`);
+    const theirDoc = partnerUid ? await plate.collection("words").doc(partnerUid).get() : null;
+    const pick = (d) => ({ describing: d.get("describing"), thing: d.get("thing") });
+    // Words picked before the seal moved here live on the plate itself; they still count.
+    const legacy = partnerUid ? ((await plate.get()).get("words") || {})[partnerUid] : null;
+    const theirs = theirDoc && theirDoc.exists ? pick(theirDoc) : legacy;
+
+    if (theirs) {
+      await plate.set({ words: { [uid]: pick(event.data), [partnerUid]: theirs } }, { merge: true });
+      if (target) await queue(coupleId, target, "Your week has a name", `${target.senderName} picked the last words. See it on the Shelf.`, "week");
+    } else if (target) {
+      await queue(coupleId, target, `${target.senderName} picked words for the week`, "Pick yours to see its name.", "week");
     }
   },
 );
@@ -344,20 +356,6 @@ function togetherOn(local, anniversary, marriedOn) {
 
 exports._togetherOn = togetherOn;
 
-/** A message in a conversation. */
-exports.onMessage = onDocumentCreated(
-  "couples/{coupleId}/chats/{chatId}/messages/{mid}",
-  async (event) => {
-    const { coupleId } = event.params;
-    const uid = event.data.get("byUid");
-    if (!uid) return;
-    const target = await partnerOf(coupleId, uid);
-    if (!target) return;
-    const text = event.data.get("text") || "sent an emote";
-    await queue(coupleId, target, `${target.senderName}`, text, "message");
-  },
-);
-
 /**
  * Delete the signed-in person's account and everything that is theirs.
  *
@@ -411,6 +409,9 @@ async function eraseFromCouple(cid, uid) {
   }
   for (const name of ["plates", "knowing"]) {
     for (const d of (await couple.collection(name).get()).docs) await stripUid(d, uid);
+  }
+  for (const p of (await couple.collection("plates").get()).docs) {
+    await p.ref.collection("words").doc(uid).delete();
   }
   for (const chat of (await couple.collection("chats").get()).docs) {
     await deleteWhere(chat.ref.collection("messages"), "byUid", uid);

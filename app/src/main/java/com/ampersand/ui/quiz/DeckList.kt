@@ -72,7 +72,8 @@ fun DeckList(
             Spacer(Modifier.height(18.dp))
             SectionLabel(
                 when (group) {
-                    DeckState.WAITING_ON_YOU -> "${state.them.name} is waiting for you"
+                    // Your turn, never "Maya is waiting for you": that is a lever.
+                    DeckState.WAITING_ON_YOU -> "Your turn"
                     DeckState.WAITING_ON_THEM -> "Waiting for ${state.them.name}"
                     else -> group.heading
                 },
@@ -192,15 +193,14 @@ private fun DeckRow(
     }
 }
 
-/** Both scores for a finished deck, kept separate rather than combined. */
+/** A finished deck's guesses, counted for the pair only. */
 @Composable
 private fun finishedDetail(deck: Quiz, state: CoupleState): String {
     val mine = state.myRun(deck.id) ?: return "Finished"
     val theirs = state.theirRun(deck.id) ?: return "Finished"
     val result = QuizResult.of(deck, mine, theirs)
     if (result.possible == 0) return "Finished  ·  No score"
-    return "You ${result.youKnewThem}  ·  ${state.them.name} ${result.theyKnewYou}" +
-        "  ·  of ${result.possible}"
+    return "${result.landed} of ${result.guesses} guesses landed"
 }
 
 // --- Previews ----------------------------------------------------------------

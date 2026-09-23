@@ -2,7 +2,6 @@ package com.ampersand.ui.today
 
 import com.ampersand.ui.components.rememberPhoto
 import com.ampersand.ui.components.compressPhoto
-import com.ampersand.model.Chats
 import com.ampersand.ui.brick.BrickPill
 import com.ampersand.ui.components.IconBrick
 import androidx.compose.foundation.border
@@ -60,7 +59,6 @@ import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
-import com.ampersand.model.Milestones
 import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
@@ -109,7 +107,6 @@ fun TodayScreen(
     modifier: Modifier = Modifier,
     onSetMood: (Mood?, BrickColor?) -> Unit = { _, _ -> },
     onReplyToMood: (String) -> Unit = {},
-    onOpenChat: (String) -> Unit = {},
     onAddPhoto: (label: String, jpegBase64: String) -> Unit = { _, _ -> },
     onOpenDay: (LocalDate) -> Unit = {},
     onAnswerDay: (LocalDate) -> Unit = {},
@@ -134,20 +131,13 @@ fun TodayScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SectionLabel(day.date.format(DayFormat))
+            // Days you both answered this week, not a run: a gap never breaks anything.
             StreakStuds(
-                days = state.streak,
+                days = remember(state.history, state.today, state.plate.startedOn) {
+                    (state.history + state.today).count { it.date >= state.plate.startedOn && it.isRevealed }
+                },
                 you = BrickColor.of(state.you.colorArgb),
-                milestone = remember(state.history, day.date) { Milestones.on(day.date, state.history) != null },
             )
-        }
-
-        Spacer(Modifier.height(8.dp))
-        Moods(state, onSetMood, onReplyToMood, onOpenChat)
-
-        val events = remember(state) { specialToday(state) }
-        if (events.isNotEmpty()) {
-            Spacer(Modifier.height(12.dp))
-            SpecialDayCard(state, events, onAddPhoto)
         }
 
         val author = when (state.todayAuthorUid) {
@@ -156,7 +146,8 @@ fun TodayScreen(
             else -> state.them
         }
 
-        Spacer(Modifier.height(18.dp))
+        // The question leads. Nothing else on Today asks for attention above it.
+        Spacer(Modifier.height(12.dp))
         QuestionHero(
             why = when {
                 state.capsule?.question?.id == question.id -> "Again"
@@ -189,10 +180,19 @@ fun TodayScreen(
             }
         }
 
+        Spacer(Modifier.height(20.dp))
+        Moods(state, onSetMood, onReplyToMood)
+
+        val events = remember(state) { specialToday(state) }
+        if (events.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            SpecialDayCard(state, events, onAddPhoto)
+        }
+
         val moments = remember(state.history, state.kept, state.today.date) { Moments.of(state) }
         if (moments.isNotEmpty()) {
             Spacer(Modifier.height(20.dp))
-            MomentsList(moments, onOpenDay, onAnswerDay)
+            MomentsList(state, moments, onOpenDay, onAnswerDay)
         }
 
 
@@ -457,9 +457,10 @@ internal fun TomorrowPick(
         Text(
             text = when {
                 yours && picked == null -> "Your turn to pick tomorrow's theme."
-                yours -> "Tomorrow is ${picked!!.lowercase()}. ${state.them.name} sees it in the morning."
+                // Not sealed, so not hidden: the pick is a gesture, shared as soon as it is made.
+                yours -> "Tomorrow is ${picked!!.lowercase()}."
                 picked == null -> "${state.them.name} picks tomorrow's theme."
-                else -> "${state.them.name} picked tomorrow's theme. You'll see it in the morning."
+                else -> "${state.them.name} picked ${picked.orEmpty().lowercase()} for tomorrow."
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
@@ -484,12 +485,12 @@ internal fun TomorrowPick(
 }
 
 /**
- * Streak count plus seven one-stud bricks lit for the current week of the streak.
- * Wraps every seven days so the row never grows.
+ * Seven one-stud bricks, one lit for each day this week you both answered.
+ * No number and no milestone: a count that gets praised becomes one people perform for.
  */
 @Composable
-private fun StreakStuds(days: Int, you: BrickColor, milestone: Boolean = false) {
-    val lit = if (days <= 0) 0 else ((days - 1) % StreakWeek) + 1
+private fun StreakStuds(days: Int, you: BrickColor) {
+    val lit = days.coerceIn(0, StreakWeek)
     val shape = BrickShape(1, BrickHeight.LOW)
     val quiet = quietSlug()
     val atlas = rememberBricks(
@@ -499,15 +500,6 @@ private fun StreakStuds(days: Int, you: BrickColor, milestone: Boolean = false) 
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        if (days > 0) {
-            // A milestone day (see Milestones.Runs) shows the count large, in your colour.
-            Text(
-                text = if (milestone) "$days days" else "$days",
-                style = if (milestone) MaterialTheme.typography.titleSmall else MaterialTheme.typography.labelSmall,
-                color = if (milestone) Color(you.argb) else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(end = 8.dp),
-            )
-        }
         // Pip size keeps the row small next to the date.
         Canvas(
             Modifier.size(
@@ -711,7 +703,7 @@ internal fun AnswerInput(
  * picking sets it and closes. Theirs is hidden when unset.
  */
 @Composable
-private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onReply: (String) -> Unit, onOpenChat: (String) -> Unit) {
+private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onReply: (String) -> Unit) {
     val today = state.today.date
     val you = BrickColor.of(state.you.colorArgb)
     val them = BrickColor.of(state.them.colorArgb)
@@ -756,18 +748,12 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onRep
             MoodChip(who = state.them.name, entry = it, color = them, empty = "") { replying = !replying; picking = false }
         }
     }
-    // The moods conversation: its latest line, or an old one-line reply, opens the chat.
-    val chatId = Chats.mood(today)
-    val preview = state.chatPreviews[chatId]
-    val line = preview?.let { (if (it.lastByUid == state.you.uid) "You" else state.them.name) + ": " + it.lastText }
-        ?: theirReply?.let { "${state.them.name}: $it" } ?: myReply?.let { "You: $it" }
-    line?.let {
-        IconAction(
-            UiIcon.WRITE,
-            if (preview != null && preview.count > 1) "$it  ·  ${preview.count} messages" else it,
-            color = MaterialTheme.colorScheme.onBackground,
-            onClick = { onOpenChat(chatId) },
-        )
+    // One reply each, shown once both of you have set a mood.
+    theirReply?.takeIf { mine != null }?.let {
+        Text("${state.them.name}: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+    }
+    myReply?.takeIf { theirs != null }?.let {
+        Text("You sent: $it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
     }
     }
     AnimatedVisibility(visible = replying && theirs != null) {
@@ -779,7 +765,6 @@ private fun Moods(state: CoupleState, onSet: (Mood?, BrickColor?) -> Unit, onRep
                 onReply(text)
                 note = ""
                 replying = false
-                onOpenChat(Chats.mood(today))
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 MoodReplies.forEach { r -> BrickChip(label = r, on = r == myReply, color = null, onClick = { send(r) }) }
@@ -940,6 +925,7 @@ private val MoodReplies = listOf("Thinking of you", "Here if you need me", "Prou
 /** Moments as flat rows: a missed day to answer, and one thing from before. */
 @Composable
 private fun MomentsList(
+    state: CoupleState,
     moments: List<Moment>,
     onOpenDay: (LocalDate) -> Unit,
     onAnswerDay: (LocalDate) -> Unit,
@@ -973,6 +959,15 @@ private fun MomentsList(
             Column(Modifier.weight(1f)) {
                 Text(m.title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
                 Text(m.text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
+                // In full, not a link: reading it by accident is the whole value.
+                m.day?.let { day ->
+                    listOf(state.you.uid to "You", state.them.uid to state.them.name).forEach { (uid, who) ->
+                        day.answerFor(uid)?.let {
+                            Spacer(Modifier.height(4.dp))
+                            Text("$who: ${it.response}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onBackground)
+                        }
+                    }
+                }
             }
         }
     }

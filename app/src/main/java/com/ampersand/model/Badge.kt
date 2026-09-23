@@ -63,7 +63,7 @@ data class BadgeGroup(
     /** False once you have sealed your half. */
     val yourTurn: Boolean,
     val rows: List<BadgeRow>,
-    /** What both results mean together, once you've both finished. */
+    /** Both results side by side and one question about them, once you've both finished. */
     val together: String? = null,
 ) {
     val isEarned: Boolean get() = rows.all { it.isEarned }

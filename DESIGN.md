@@ -156,9 +156,10 @@ and the plate into an index. What you actually want to be able to say is *"that
 is the one we made the week of the ninth"*, so the **sculpture** carries the
 date and the bricks stay anonymous.
 
-**Payout is flat.** One brick each per completed day, sized by the question's
-depth, never by the score. Paying more for a better score would make the plate a
-scoreboard, and the point is that it records turning up together.
+**Payout is flat.** One brick each per completed day, shaped by how the
+question is answered and how deep it was, never by the score. Paying more for a
+better score would make the plate a scoreboard, and the point is that it records
+turning up together.
 
 **Unplaced bricks carry over when a plate seals.** They were earned by
 answering; confiscating them would punish you for not tidying the tray before a

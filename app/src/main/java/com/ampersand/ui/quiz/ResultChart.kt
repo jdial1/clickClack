@@ -51,7 +51,12 @@ import com.ampersand.ui.theme.Motion
 import com.ampersand.ui.theme.AmpersandTheme
 import kotlinx.coroutines.delay
 
-/** Quiz result as two brick towers (one per person's guessing score) plus the verdict lines. */
+/**
+ * Quiz result as one tower for the pair: a course per scoreable question, two
+ * slots per course, filled bottom-up by how many guesses landed between you.
+ * Slot colours alternate by position, not by whose guess it was, so the tower
+ * never says who knew whom better.
+ */
 @Composable
 fun CrossAnswerChart(
     result: QuizResult,
@@ -65,62 +70,47 @@ fun CrossAnswerChart(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
 
-    // Both towers share one counter so they build together; one sound per course, not per brick.
+    // One sound per brick laid.
     val built = remember(result.quiz.id) { mutableIntStateOf(0) }
     LaunchedEffect(result.quiz.id) {
-        val tallest = maxOf(result.youKnewThem, result.theyKnewYou)
-        // Faster beat for tall towers.
-        val beat = if (tallest > 6) Motion.BrickMs / 2 else Motion.BrickMs
-        repeat(tallest) {
+        val beat = if (result.landed > 12) Motion.BrickMs / 2 else Motion.BrickMs
+        repeat(result.landed) {
             delay(beat.toLong())
             built.intValue = it + 1
-            sounds.play(Sfx.CLICK)
+            sounds.play(if (it % 2 == 0) Sfx.CLICK else Sfx.CLACK)
             feel.play(Feel.TICK)
         }
     }
 
-    Column(modifier.fillMaxWidth()) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
-        ) {
-            ScoreTower(
-                score = result.youKnewThem,
-                built = built,
-                possible = possible,
-                color = you,
-                caption = "$yourName knew $theirName",
-                modifier = Modifier.weight(1f),
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        if (possible == 0) {
+            Text(
+                text = "Nothing to score in this one.",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
             )
-            ScoreTower(
-                score = result.theyKnewYou,
-                built = built,
-                possible = possible,
-                color = them,
-                caption = "$theirName knew $yourName",
-                modifier = Modifier.weight(1f),
-            )
+            return@Column
         }
 
-        Spacer(Modifier.height(22.dp))
+        PairTower(
+            landed = result.landed,
+            built = built,
+            courses = possible,
+            you = you,
+            them = them,
+            modifier = Modifier.fillMaxWidth(0.6f),
+        )
+
+        Spacer(Modifier.height(10.dp))
         Text(
-            text = result.verdict,
+            text = "${result.landed} of ${result.guesses} guesses landed",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
-
-        result.lopsided(yourName, theirName)?.let { line ->
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = line,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
 
         if (result.agreements > 0) {
             Spacer(Modifier.height(6.dp))
@@ -136,59 +126,51 @@ fun CrossAnswerChart(
     }
 }
 
-/** One person's score as a stack: every possible point drawn, unscored ones faint. */
+/** A stack of [courses] courses, each two 2-stud bricks wide; the first [landed] slots are solid. */
 @Composable
-private fun ScoreTower(
-    score: Int,
-    /** Courses laid so far, shared with the other tower. Read inside the Canvas. */
+private fun PairTower(
+    landed: Int,
+    /** Bricks laid so far. Read inside the Canvas. */
     built: MutableIntState,
-    possible: Int,
-    color: BrickColor,
-    caption: String,
+    courses: Int,
+    you: BrickColor,
+    them: BrickColor,
     modifier: Modifier = Modifier,
 ) {
-    val shape = BrickShape(4, BrickHeight.MEDIUM)
-    val asset = color.asset(shape)
-    val atlas = rememberBricks(listOf(asset))
+    val half = BrickShape(2, BrickHeight.MEDIUM)
+    val assets = listOf(you.asset(half), them.asset(half))
+    val atlas = rememberBricks(assets)
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val stud = maxWidth / shape.w
-            val course = stud * shape.h * BrickArt.ROW_RATIO
-            val nub = stud * BrickArt.NUB_RATIO
+    BoxWithConstraints(modifier) {
+        val stud = maxWidth / (half.w * 2)
+        val course = stud * half.h * BrickArt.ROW_RATIO
+        val nub = stud * BrickArt.NUB_RATIO
 
-            Canvas(
-                Modifier
-                    .fillMaxWidth()
-                    .height(course * possible.coerceAtLeast(1) + nub),
-            ) {
-                val studPx = size.width / shape.w
-                val coursePx = studPx * shape.h * BrickArt.ROW_RATIO
-                // Read `built` only in the draw lambda so ticks redraw without recomposing the BoxWithConstraints.
-                val laid = minOf(built.intValue, score)
-                for (i in 0 until possible.coerceAtLeast(1)) {
-                    drawBrickArt(
-                        atlas = atlas,
-                        asset = asset,
-                        studs = shape.w,
-                        rows = shape.h,
-                        left = 0f,
-                        bottom = size.height - i * coursePx,
-                        studPx = studPx,
-                        alpha = if (i < laid) 1f else 0.16f,
-                    )
-                }
+        Canvas(
+            Modifier
+                .fillMaxWidth()
+                .height(course * courses + nub),
+        ) {
+            val studPx = size.width / (half.w * 2)
+            val coursePx = studPx * half.h * BrickArt.ROW_RATIO
+            val laid = minOf(built.intValue, landed)
+            for (i in 0 until courses * 2) {
+                val row = i / 2
+                val side = i % 2
+                // Running bond: alternate courses swap which colour sits left.
+                val asset = assets[(side + row) % 2]
+                drawBrickArt(
+                    atlas = atlas,
+                    asset = asset,
+                    studs = half.w,
+                    rows = half.h,
+                    left = side * half.w * studPx,
+                    bottom = size.height - row * coursePx,
+                    studPx = studPx,
+                    alpha = if (i < laid) 1f else 0.16f,
+                )
             }
         }
-
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = "$score / $possible",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Spacer(Modifier.height(2.dp))
-        SectionLabel(caption, modifier = Modifier.fillMaxWidth())
     }
 }
 
@@ -246,7 +228,7 @@ fun CrossAnswerRow(
 
 // --- Previews ----------------------------------------------------------------
 
-/** Sample lopsided result (four hits vs two) for previews and the quiz kit. */
+/** Sample result, some guesses landed and some not, for previews and the quiz kit. */
 internal fun sampleCrossResult(): QuizResult {
     fun q(id: String, text: String, vararg options: String) = Question(
         id = id,

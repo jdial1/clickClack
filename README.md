@@ -374,11 +374,14 @@ which cannot reach the pack's saturated reds without clipping and left the
 bricks slightly off from the rest of the UI. Character bricks carry their own
 art and ignore the owner's colour entirely.
 
-**Earning** is deliberately modest — one brick each per completed day, sized by
-the question's depth (2-stud low / 4-stud low / 4-stud medium), with a character
-brick at every seventh day of streak. Paying out more for a better score would
-turn the plate into a scoreboard; the point is that it records turning up
-together, not winning.
+**Earning** is deliberately modest — one brick each per completed day, flat
+whether or not a guess landed. Width comes from how the question is answered
+(a pick is 2 studs, a written answer 4, a list 6) and height from depth plus
+whether you wrote properly, capped so nothing outgrows the roof. A wildcard
+earns a roof, a talked-about day a small slope the morning after, and every
+seventh day of streak a character brick. Decks earn one flat 4-stud brick each.
+Paying out more for a better score would turn the plate into a scoreboard; the
+point is that it records turning up together, not winning.
 
 **Placing** is drag-from-tray with three rules in `BuildPlate.canPlace`: inside
 the grid, not overlapping, and resting on the baseplate or on at least one stud
@@ -411,8 +414,10 @@ The memory screen, ordered by feeling rather than chronology:
 1. **On this day** — an entry from six months or a year back, with both answers
    shown in full. `CoupleState.onThisDay` matches on day-of-month rather than on
    exact anniversaries, so there is something to find more than once a year, and
-   excludes anything inside the last month: "three weeks ago today" is not a
-   memory, it is just recent.
+   excludes anything inside the last season (`Memories.MinDays`, 90 days): "three
+   weeks ago today" is not a memory, it is just recent. Whole years win. Loaded
+   history stops at ten weeks, so `loadMemories` fetches today's date 3, 6, 12,
+   24, 36 and 48 months back by name, with both answers.
 2. **The shelf** — sealed sculptures, the selected one large, the rest as a
    strip. `Sculpture` crops to `BuildPlate.builtHeight()` rather than to the
    grid; drawn to the full 14 rows every week's work would be two thirds empty

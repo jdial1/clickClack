@@ -14,7 +14,6 @@ import java.time.LocalDate
 class DeckRewardTest {
 
     private val you = Member("u1", "You", 0xFFF54E4F)
-    private val them = Member("u2", "Maya", 0xFF108BE2)
     private val on = LocalDate.of(2026, 9, 12)
 
     private fun words(n: Int) = List(n) { "word" }.joinToString(" ")
@@ -81,33 +80,33 @@ class DeckRewardTest {
     }
 
     @Test
-    fun `effort raises a middling deck to the top`() {
+    fun `effort raises a deck brick to the top`() {
         val r = result(scoredRows(hits = 2, of = 5))
-        val plain = Rewards.forQuiz(r, you, them, 2, on).single().shape
-        val written = Rewards.forQuiz(r, you, them, 2, on, effort = 1).single().shape
+        val plain = Rewards.forQuiz(r, you, on).single().shape
+        val written = Rewards.forQuiz(r, you, on, effort = 1).single().shape
         assertEquals(BrickHeight.MEDIUM.rows, plain.h)
         assertEquals(BrickHeight.HIGH.rows, written.h)
         assertEquals(plain.w, written.w)
     }
 
-    /** Growing it would make a twenty-four cell slab. */
+    /** Flat, like a day: a deck where every guess landed earns what one with none did. */
     @Test
-    fun `the widest deck brick does not grow`() {
-        val r = result(scoredRows(hits = 4, of = 5))
-        val shape = Rewards.forQuiz(r, you, them, 4, on, effort = 1).single().shape
-        assertEquals(6, shape.w)
-        assertEquals(BrickHeight.MEDIUM.rows, shape.h)
+    fun `how many guesses landed never changes the brick`() {
+        val none = Rewards.forQuiz(result(scoredRows(hits = 0, of = 5)), you, on).single().shape
+        val all = Rewards.forQuiz(result(scoredRows(hits = 5, of = 5)), you, on).single().shape
+        assertEquals(none, all)
+        assertEquals(Slope.NONE, all.slope)
     }
 
     @Test
     fun `nothing a deck earns outgrows the roof`() {
         for (of in 1..6) for (hits in 0..of) for (effort in 0..1) {
             val r = result(scoredRows(hits, of))
-            val shape = Rewards.forQuiz(r, you, them, hits, on, effort = effort).single().shape
+            val shape = Rewards.forQuiz(r, you, on, effort = effort).single().shape
             assertTrue("$hits/$of effort $effort gave ${shape.w}x${shape.h}", shape.w * shape.h <= Rewards.RoofArea)
         }
         val unscored = result(listOf(row(QuestionType.REFLECT, yours = words(30))))
-        val shape = Rewards.forQuiz(unscored, you, them, 0, on, effort = 1).single().shape
+        val shape = Rewards.forQuiz(unscored, you, on, effort = 1).single().shape
         assertTrue(shape.w * shape.h <= Rewards.RoofArea)
     }
 }

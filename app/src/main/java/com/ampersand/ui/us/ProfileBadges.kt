@@ -59,8 +59,9 @@ import com.ampersand.ui.theme.Motion
 
 
 /**
- * Saved results of every whole-instrument test, as badge bricks. Unclaimed slots
- * are ghost bricks; tapping an earned badge shows its full score breakdown.
+ * Results of whole-instrument tests you have both finished, as badge bricks.
+ * Unfinished tests are not drawn at all: an empty slot is a to-do list.
+ * Tapping a badge shows its full score breakdown.
  */
 @Composable
 fun ProfileBadges(

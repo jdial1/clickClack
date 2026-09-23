@@ -44,14 +44,14 @@ Morning: a question shows up. Sometimes it's easy ("What is my favorite dish of 
 Whenever: you answer. They answer. Click. Clack.
 Later: it opens. React, laugh, keep the good ones, talk about it, and go spend your bricks.
 
-KEEP THE CONVERSATION GOING
-Every answer and every mood can turn into a real back-and-forth. Write as much as you want, or just send a little heart and get back to your day.
+THEN PUT THE PHONE DOWN
+When it opens, you each get one reaction and one line back. That's on purpose. Click Clack isn't another place to text each other. It's the reason to go and talk in the same room.
 
 DECKS FOR EVERY MOOD
 Want more than one question tonight? Pick a deck: getting to know you, travel, food, silly stuff, or the late-night kind of talk.
 
-FIND OUT HOW YOU FIT
-Take the longer tests side by side: personality type, love languages, attachment style, ways of loving, and more. When you've both finished, Click Clack tells you what your results mean together, not just apart.
+SEE HOW YOU FIT
+Take the longer tests side by side: personality type, love languages, attachment style, ways of loving, and more. When you've both finished, Click Clack puts your results next to each other and asks you one question about them. What it means is yours to work out.
 
 THE DAYS THAT MATTER
 Add your anniversary, birthdays and first date. Click Clack remembers them (half-birthdays too) and gives those days questions of their own. Snap a photo on the big days to keep on your timeline.
@@ -65,7 +65,7 @@ No ads. No feed. No strangers. Notifications get bundled so your phone doesn't b
 It takes two: one of you makes a code, the other types it in, and you're paired. Go ahead, send your person the code.
 ```
 
-(2594 characters)
+(2671 characters)
 
 ## Graphics
 
@@ -73,7 +73,7 @@ It takes two: one of you makes a code, the other types it in, and you're paired.
 |---|---|---|
 | App icon | `graphics/icon-512.png` | 512x512 PNG |
 | Feature graphic | `graphics/feature-graphic.png` | 1024x500 PNG |
-| Phone screenshots (8) | `graphics/phone/1-today.png` to `8-decks.png`, upload in number order | 1236x2196, 9:16, 2 to 8 required |
+| Phone screenshots (8) | `graphics/phone/1-today.png` to `8-decks.png`, upload in number order (6 is now `6-write.png`; regenerate before uploading) | 1236x2196, 9:16, 2 to 8 required |
 | Launch splash (reference) | `graphics/splash.png` | Not uploaded; matches the in-app Android 12+ splash |
 
 Tablet screenshots are optional and skipped.
