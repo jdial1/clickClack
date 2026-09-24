@@ -100,7 +100,9 @@ class FirestoreCoupleRepository(
     private val myUid: String,
     private val partnerUid: String,
     private val pool: QuestionPool,
-    private val today: LocalDate = LocalDate.now(),
+    /** The couple's home zone. [today] is the date there, never the phone's own. */
+    private val zone: java.time.ZoneId = java.time.ZoneId.systemDefault(),
+    private val today: LocalDate = LocalDate.now(zone),
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) : CoupleRepository {
 
@@ -323,7 +325,7 @@ class FirestoreCoupleRepository(
         val current = _state.value
         val waiting = allWildcards.filter { it.usedOn == null }.sortedBy { it.createdAtMillis }
         // Only wildcards created before today are eligible. A pending server timestamp reads as 0 and waits.
-        val startOfToday = today.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val startOfToday = today.atStartOfDay(zone).toInstant().toEpochMilli()
         val ready = waiting.filter { it.createdAtMillis in 1 until startOfToday }
 
         // History is mapped here (not in its listener) so past wildcard days resolve once wildcards load.
@@ -332,6 +334,11 @@ class FirestoreCoupleRepository(
         // Backfill the time zone for ZIPs saved before it was stored.
         place?.timeZone?.takeIf { coupleDoc?.getString("timeZone") != it }?.let {
             couple.set(mapOf("timeZone" to it), SetOptions.merge())
+        }
+        // No ZIP yet: the first phone to look lends its own zone, so both phones
+        // still share one calendar. Setting a ZIP replaces it.
+        if (coupleDoc != null && place == null && coupleDoc?.getString("timeZone") == null) {
+            couple.set(mapOf("timeZone" to java.time.ZoneId.systemDefault().id), SetOptions.merge())
         }
         history = historyDocs
             .mapNotNull { it.toDayEntry(pool) { id, date -> resolveQuestion(id, date) } }
@@ -391,11 +398,11 @@ class FirestoreCoupleRepository(
         val animals = if (Topic.HOROSCOPES in interests) birthdays.map { ChineseZodiac.of(it) }.toSet() else emptySet()
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds)
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history))
             // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds)
+            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history))
         }.forPlace(place, today).forSigns(you.birthday, partner.birthday)
 
         val todayEntry = DayEntry(
@@ -422,6 +429,7 @@ class FirestoreCoupleRepository(
         }
 
         val next = basis.copy(
+            homeZone = coupleDoc?.getString("timeZone"),
             today = todayEntry,
             plate = live,
             shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn }

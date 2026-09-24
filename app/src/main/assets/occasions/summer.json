@@ -33,6 +33,15 @@
       "text": "Which summer do I bring up most?",
       "type": "GUESS_ME",
       "depth": 2
+    },
+    {
+      "id": "summer-lm1",
+      "text": "What am I looking forward to most this summer?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

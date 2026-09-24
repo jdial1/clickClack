@@ -163,9 +163,11 @@ fun createCoupleRepository(
     myUid: String,
     partnerUid: String,
     pool: QuestionPool,
+    /** The couple's home zone, as last seen. See [HomeZone]. */
+    zone: java.time.ZoneId = java.time.ZoneId.systemDefault(),
 ): CoupleRepository =
     if (hasFirebase && !coupleId.startsWith("c_fake")) {
-        FirestoreCoupleRepository(coupleId, myUid, partnerUid, pool)
+        FirestoreCoupleRepository(coupleId, myUid, partnerUid, pool, zone)
     } else {
         FakeCoupleRepository()
     }

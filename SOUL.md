@@ -207,9 +207,9 @@ listed.
 
 | Pitfall or rule | Evidence | Weight |
 |---|---|---|
-| **The Seal: one calendar per couple** (DESIGN.md: "never device time") | `FirestoreCoupleRepository` takes `today = LocalDate.now()`, the phone's own date. Two phones in different time zones can answer different days, so the second answer never lifts the first's seal. | **Blocker** for 1.0 |
-| **Social Safety: No Levers** | The rules check membership, not whose key is written (README, "Still to do"), so one partner's app could set or clear the other's reaction or line back. | **Blocker** for 1.0 |
-| **Dead Servers** | The whole archive, which *is* Time Answers Back, lives only in Firestore, with no backup or export. | **Blocker** for 1.0 |
+| **The Seal: one calendar per couple** (DESIGN.md: "never device time") | `FirestoreCoupleRepository` took `today = LocalDate.now()`, the phone's own date. Two phones in different time zones could answer different days, so the second answer never lifted the first's seal. | **Fixed:** `HomeZone` |
+| **Social Safety: No Levers** | The rules checked membership, not whose key was written, so one partner's app could set or clear the other's reaction or line back. | **Fixed** in the rules (deploy pending) |
+| **Dead Servers** | The whole archive, which *is* Time Answers Back, lives only in Firestore, with no backup or export. | **Blocker:** the commands are in README, not yet run |
 | **Detail Nobody Feels** | Horoscopes, Chinese zodiac, eras, local teams, weather, moods, a bucket list, photos and nine personality tests sit around a two-minute daily loop. None breaks the soul, but each is copy and tests to maintain. | Scope freeze, not a cut |
 | Character brick on every seventh *consecutive* day | The last streak-shaped reward. | After 1.0 |
 
@@ -225,6 +225,12 @@ rough size (S is a day or two, M is a week, L is more than that).
 **Status (23 September 2026):**
 - **Built:** *Ask us again* and *The first question again*. Both ride on the capsule path and come back sealed on their date, whatever the weekday, with nothing announcing them beforehand.
 - **Already present:** *Question debt* (every reveal offers "Write a question for Maya") and *The reveal goes quiet* (nothing sits below the last line).
+- **Built (24 September):**
+  - *Gentle return*: after three days neither of you answered, only depth-1 questions are drawn, and nothing mentions the gap.
+  - *How you see them*: a new daily set of six kind questions about the other person.
+  - *Love-map season*: one "your world now" guess in each season's deck.
+  - *Hand me that brick*: bricks left a week on the tray can be placed by either of you, and keep their owner and colour.
+- **Left out on purpose:** *Blind reactions* and *Slow mail* would only hide things on screen, which is the Seal by Convention. They wait until they can be sealed in storage.
 - **Everything else** waits until after 1.0.
 
 #### The Seal
@@ -258,6 +264,43 @@ rough size (S is a day or two, M is a week, L is more than that).
 | **The first question again** | On the anniversary, the very first question the couple ever answered comes back, sealed as before. → | They meet their day-one selves → | Built for Year Two. | A Memory Needs Distance: only on whole years. | S |
 | **Pause together** | Either person can pause the ritual with no reason given. Both phones show only the Shelf, and nothing is counted. → | A hard month costs nothing and needs no explanation → | Kind when barely speaking. | Either Can Veto: either person can resume, and neither is asked why. | M |
 
+#### Round two (24 September 2026)
+
+New ideas, none of them in the set above. They are grounded in what the app
+now has (home time zones, the SURPRISE stamp, capsules, the depth on every
+question), so most are small.
+
+| Idea | Pillar | Mechanic → | Dynamic → | Tone | Watch | Size |
+|---|---|---|---|---|---|---|
+| **Blind reactions** | The Seal | Your reaction stays hidden until they react too, or until the day ends at home. → | Neither of you mirrors the other's heart or laugh → | Even the gesture is honest. | The Bad Month: it must open at the day's end whatever happens, so waiting for a reaction never becomes a lever. | S |
+| **Gentle return** | Time Answers Back (the Bad-Month Test) | After three or more days that neither of you answered, the next question is drawn from the lightest depth, and nothing mentions the gap. → | Coming back costs nothing and asks nothing heavy → | Kind when barely speaking. | Interface Voice: no "welcome back," no count of days away. | S |
+| **The year's surprises** | Time Answers Back + Failure as Content | On the anniversary, the Shelf brings back the three days from the year that were stamped SURPRISE or got an "I didn't know that," in full. → | They remember what they *learned* about each other, not what they got right → | The miss is the conversation, a year later. | The Payout: never a count of misses, and never who missed. | S |
+| **Moving day** | Time Answers Back | When the home ZIP changes, the next day's question is about the old place and the new one, from a small deck of its own. → | A move is marked the way a birthday is → | The calendar notices their life. | The Witness: the question never names either place to anyone but the two of them. | S |
+| **Today on the fridge** | The Game Ends in the Other Room | A home-screen widget that shows today's question and nothing else: no answers, no status, no names. → | The question gets read over breakfast, aloud → | Talked about before it's even answered. | The Seal and No Levers: the widget never says who has answered. | M |
+| **Hand me that brick** | The Pair Is the Player | Bricks left on the tray for a week can be placed by either of you, and keep their owner's colour. → | One can finish the other's corner without taking it → | Colours apart, object together. | Nothing Is Made by One: placing isn't earning, and a brick is never re-coloured. | S |
+
+#### Round three: borrowed from outside (24 September 2026)
+
+Twelve ideas, each taking one mechanic from a game, a party game, a design
+principle or a piece of research, and bending it to fit the soul. The
+"Borrowed from" column names what is taken. The adaptation is what makes it
+Ampersand rather than a copy.
+
+| Idea | Borrowed from | Pillar | Mechanic → | Dynamic → | Tone | Watch | Size |
+|---|---|---|---|---|---|---|---|
+| **Slow mail** | *Animal Crossing* letters, which arrive the next day, not the moment they're sent | The Other Room | A line back written after the reveal is delivered at the other person's next morning. → | Nobody waits by the phone for a reply, and the conversation that night happens in person → | A letter, not a chat. | Design the Session to End: it should also stop the line back turning into a thread. | S |
+| **Pick the picture** | *Dixit*, where a card is chosen to fit a prompt and the fun is in "why that one?" | The Seal | A question type offering six pieces of pack art ("Which of these was this week?"). Both pick blind, and both picks show at the reveal. → | Couples explain an image, which is easier than answering a hard question outright → | Expression without words. | No Borrowed Art: only pack art, never emoji or stock images. | M |
+| **How you see them** | *Hanabi*, where you see everyone's hand but your own | The Pair Is the Player | Some questions ask you to describe the other person, never yourself ("What do they do better than anyone you know?"). Both answer blind. → | Each learns how they're seen, side by side with how they see the other → | Understanding runs both ways. | The Bad Month: generous prompts only; nothing that invites a list of faults. | S |
+| **Two halves, one story** | The surrealists' *exquisite corpse*, where each person writes part of a sentence without seeing the rest | The Seal + Colours Apart | One writes the first half of a prompt ("Where we'd go"), the other the second ("What we'd do there"), both blind. The reveal joins them into one sentence, in two colours. → | The result is usually absurd, and the laugh is shared → | Object together. | Nothing Is Made by One: half a story is never shown. | S |
+| **Callback questions** | *Hades*, whose characters remember and refer back to what already happened | Time Answers Back | Some questions quote your own answer from at least a season ago: "Last spring you both said Lisbon. Still?" → | The past arrives as a question, not an archive to browse → | The app remembers, and never interprets. | The Verdict: quote the words, never summarize them. | S |
+| **Sealed envelopes** | Legacy board games (*Pandemic Legacy*, *Risk Legacy*), with sealed packets opened at set moments | Time Answers Back | Designer-written decks that stay closed until a milestone: 100 days answered together, a first anniversary, a first home. Neither of you knows what's inside. → | Milestones bring something new, not a badge → | Built for Year Two. | Never Congratulate a Number: the envelope opens quietly, with no "You unlocked." | M |
+| **Reveal hour** | Calm technology (Weiser and Brown), where information waits in the periphery until you're ready | The Other Room | The notification that a day has opened is held until the couple's chosen evening hour. The reveal itself opens the moment both have answered. → | Most reveals are read at home, near each other → | The conversation has a place to happen. | The Seal: only the notification waits, never the reveal. | S |
+| **Arrival, spent once** | *Neko Atsume*, where coming back and finding what happened while you were away is the reward | The Pair Is the Player | The first time you open the plate after your partner has built, their new bricks settle into place with the pack's click. After that, they simply stand there. → | The partner's presence is felt, not reported → | News is spent once, and only goes up. | The Cheerful Toast: no caption, no count. | S |
+| **The slow deepening** | Aron and colleagues' *36 Questions* (1997): disclosure that deepens gradually and in turns | Time Answers Back | A long deck whose next set opens only once both have finished the last and a few days have passed. The depth rises over weeks. → | Heavier questions arrive after lighter ones have been survived together → | Trust, earned slowly. | The Payout: the deck has no finish line, no progress bar and no score. | M |
+| **Love-map season** | Gottman's "love maps": knowing the small details of a partner's current world | Time Answers Back | Each season, five quick questions about the partner's world *now* (a worry, a friend, a song), answered as guesses, shown beside last season's. → | Small changes get noticed before they become big ones → | Understanding, never finished. | Ranked Group: never a total of right guesses. | S |
+| **Where on the line** | *Wavelength*, where a position on a spectrum is argued over | The Seal | A spectrum question ("Plans ↔ Spontaneity"). Each places a marker for themselves and one for the other, blind. The reveal shows all four markers on one line. → | The distance between markers is something to talk about, not a score → | The gap is the conversation. | The Payout: distance is shown, never graded. | S |
+| **Two thumbs** | *Sky: Children of the Light*, where holding hands needs both players to take part | The Other Room | Once a week, a keystone brick can only be placed while both of you hold it down on your own phones at the same moment. → | It almost always happens in the same room, with a laugh at the timing → | Nothing Is Made by One, literally. | No Levers: never required, the week seals fine without it, and nothing ever marks a missed keystone. | S |
+
 #### Refused on sight
 
 Ideas that will come up, and why the soul says no. Keep these here so the
@@ -273,6 +316,15 @@ argument only happens once.
 | Couples comparing against other couples | The Witness, and the Ranked Group. |
 | An AI summary of "your relationship this month" | The Verdict: the game interpreting the pair. |
 | A nudge button | No Levers, word for word. |
+| "Maya is online now" | No Levers: presence becomes pressure. |
+| A weekly recap email or "your week in review" | The Chat Room's cousin: the conversation moves into an inbox. |
+| Suggested replies for the line back | Interface Voice and The Seal: the line stops being theirs. |
+| "Words you both used today" | The Verdict: the app starts reading the answers for them. |
+| Marking a quiet week with a gold seam, like *kintsugi* | The Bad Month: even a beautiful mark on the gap is still a mark on the gap. |
+| A random "answer now" window, like *BeReal* | No Levers: a timed prompt is pressure with a timer on it. |
+| A shared pet that needs daily care, like a *Tamagotchi* | The Guilt Engine: a pet that suffers when you miss a day is a streak with a face. |
+| *Quiplash*-style voting on the funnier answer | The Witness and The Scoreboard: someone wins the reveal. |
+| A cheerful mascot that reminds you to come back, like *Duolingo*'s owl | Interface Voice and No Levers: the app never asks to be opened. |
 
 ### Cost Warning
 

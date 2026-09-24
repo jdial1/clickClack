@@ -57,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
 import com.ampersand.data.FirestoreCoupleRepository
 import com.ampersand.data.createCoupleRepository
+import com.ampersand.data.HomeZone
 import com.ampersand.data.Instruments
 import com.ampersand.data.QuestionPool
 import android.content.Context
@@ -129,10 +130,12 @@ class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
             myUid: String,
             partnerUid: String,
             pool: QuestionPool,
+            /** The couple's home zone; the demo has none, so it uses the phone's. */
+            zone: java.time.ZoneId = java.time.ZoneId.systemDefault(),
         ) = viewModelFactory {
             initializer {
                 AmpersandViewModel(
-                    createCoupleRepository(hasFirebase, coupleId, myUid, partnerUid, pool),
+                    createCoupleRepository(hasFirebase, coupleId, myUid, partnerUid, pool, zone),
                 )
             }
         }
@@ -166,17 +169,18 @@ private enum class Tab(val label: String) {
 }
 
 /**
- * Today's date, checked again every time the app comes back to the front.
+ * Today's date at home ([zone], never the phone's own), checked again every
+ * time the app comes back to the front.
  *
  * ponytail: yesterday's ViewModel stays in the store until the Activity
  * finishes, listeners and all; one extra per day the app is left open. Clear
  * the store on a date change if that ever shows up in battery or read counts.
  */
 @Composable
-private fun rememberToday(): LocalDate {
-    var today by remember { mutableStateOf(LocalDate.now()) }
-    LifecycleResumeEffect(Unit) {
-        today = LocalDate.now()
+private fun rememberToday(zone: java.time.ZoneId): LocalDate {
+    var today by remember(zone) { mutableStateOf(LocalDate.now(zone)) }
+    LifecycleResumeEffect(zone) {
+        today = LocalDate.now(zone)
         onPauseOrDispose { }
     }
     return today
@@ -344,9 +348,14 @@ private fun PairedGate(
                 return@PairedGate
             }
 
+            // The day is the couple's, not the phone's: home zone as last seen,
+            // corrected below once the couple document says otherwise.
+            val homeZoneContext = LocalContext.current
+            var homeZoneId by remember(p.coupleId) { mutableStateOf(HomeZone.read(homeZoneContext, p.coupleId)) }
+            val zone = remember(homeZoneId) { HomeZone.of(homeZoneId) }
             // Keyed on couple and day: the repository fixes its date at build time,
             // so without the day key an overnight process wrote to yesterday.
-            val today = rememberToday()
+            val today = rememberToday(zone)
             val vm: AmpersandViewModel = viewModel(
                 key = "couple_${p.coupleId}_$today",
                 factory = AmpersandViewModel.factory(
@@ -355,9 +364,17 @@ private fun PairedGate(
                     myUid = account.uid,
                     partnerUid = p.partnerUid,
                     pool = pool,
+                    zone = zone,
                 ),
             )
             val state by vm.repo.state.collectAsStateWithLifecycle()
+            // A new or changed home zone can move the date, which rebuilds the repository on the right day.
+            LaunchedEffect(state.homeZone) {
+                state.homeZone?.takeIf { it != homeZoneId }?.let {
+                    HomeZone.write(homeZoneContext, p.coupleId, it)
+                    homeZoneId = it
+                }
+            }
             AmpersandTheme(
                 you = Color(state.you.colorArgb),
                 them = Color(state.them.colorArgb),

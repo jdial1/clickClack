@@ -66,12 +66,18 @@ for plates, chat, day and delete pass.
 Each of these breaks a promise the app already makes. See "Re-review after the
 deploy" in SOUL.md.
 
+**Status (23 September 2026):**
+- 1.1, 1.2 and 1.4 are done, with 240 unit tests and all rules and function emulator tests green.
+- **Still to do by hand:**
+  - Deploy the 1.2 rules (`npx firebase-tools deploy --only firestore:rules --project clickclack-002827`).
+  - Run the two backup commands in README ("Days, halves and backups"), then try one restore.
+
 | # | Mechanic → | Dynamic → | Tone | Size |
 |---|---|---|---|---|
-| 1.1 | **Home-time-zone days.** The repository derives `today` from the couple's saved `timeZone`, not `LocalDate.now()`, and the Today screen rolls over at the couple's midnight. → | Two phones always answer the same day, so the second answer always lifts the seal → | The Seal holds across a trip or a move. | S–M |
-| 1.2 | **Per-person writes in the rules.** Reactions, lines back, mood replies and deck progress may be written only under your own uid (`affectedKeys().hasOnly([me()])`, as the plate notes already do), with rules tests for each. → | Neither partner's app can speak for the other → | No levers, even by accident. | S |
-| 1.3 | **Backups.** Turn on Firestore point-in-time recovery and a scheduled daily backup, and write the restore step into README. → | Years of answers survive a bad deploy or a bad script → | The archive is the long game, so it must outlive mistakes. | S (console) |
-| 1.4 | **Test `onWords`.** An emulator test covers both new-style picks, and a new pick meeting an old-style pick on the plate. → | The week-naming path that only runs on the server is proven, not assumed → | The name appears for both, every week. | S |
+| 1.1 ✅ | **Home-time-zone days.** The repository derives `today` from the couple's saved `timeZone`, not `LocalDate.now()`, and the Today screen rolls over at the couple's midnight. → | Two phones always answer the same day, so the second answer always lifts the seal → | The Seal holds across a trip or a move. | S–M |
+| 1.2 ✅ | **Per-person writes in the rules.** Reactions, lines back, mood replies and deck progress may be written only under your own uid (`affectedKeys().hasOnly([me()])`, as the plate notes already do), with rules tests for each. → | Neither partner's app can speak for the other → | No levers, even by accident. | S |
+| 1.3 ◐ | **Backups.** Turn on Firestore point-in-time recovery and a scheduled daily backup, and write the restore step into README. → | Years of answers survive a bad deploy or a bad script → | The archive is the long game, so it must outlive mistakes. | S (console) |
+| 1.4 ✅ | **Test `onWords`.** An emulator test covers both new-style picks, and a new pick meeting an old-style pick on the plate. → | The week-naming path that only runs on the server is proven, not assumed → | The name appears for both, every week. | S |
 
 ### 2. Hard deadline: the functions runtime (before 30 October)
 

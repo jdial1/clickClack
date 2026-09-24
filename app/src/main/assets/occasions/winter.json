@@ -33,6 +33,15 @@
       "text": "What would I say I need most right now?",
       "type": "GUESS_ME",
       "depth": 3
+    },
+    {
+      "id": "winter-lm1",
+      "text": "What's keeping me going this winter?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

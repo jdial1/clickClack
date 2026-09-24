@@ -83,6 +83,7 @@ class QuestionPool(
      * the theme picked last night, notable weather (every other such day).
      * Otherwise a draw leaning toward the topics you asked for more of.
      * Weekdays stay at depth 1-2; Friday to Sunday use the whole pool.
+     * After a quiet spell ([gentle]) only depth 1 is drawn, and nothing says why.
      */
     fun daily(
         date: LocalDate,
@@ -112,6 +113,8 @@ class QuestionPool(
         animals: Set<ChineseZodiac> = emptySet(),
         /** Kinds of special date that fall today; see [com.ampersand.model.Dates.kindsOn]. */
         dateKinds: List<DateKind> = emptyList(),
+        /** Neither of you answered for a few days. Coming back should cost nothing. See [gentleReturn]. */
+        gentle: Boolean = false,
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
@@ -136,7 +139,7 @@ class QuestionPool(
         }
 
         val weekend = date.dayOfWeek in setOf(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-        fun fits(q: Question) = weekend || q.depth.level <= 2
+        fun fits(q: Question) = if (gentle) q.depth.level == 1 else weekend || q.depth.level <= 2
 
         theme?.let { t ->
             val themed = open.filter { it.category == t }
@@ -277,3 +280,17 @@ class QuestionPool(
         const val RecentDays = 42L
     }
 }
+
+/**
+ * The Bad-Month Test as a rule: after [QuietDays] days that neither of you
+ * answered, the next question is a light one. Only for couples who have
+ * answered before, and computed from shared history so both phones agree.
+ */
+fun gentleReturn(today: java.time.LocalDate, history: List<com.ampersand.model.DayEntry>): Boolean {
+    if (history.none { it.submitted.isNotEmpty() || it.isRevealed }) return false
+    return (1L..QuietDays).all { back ->
+        history.none { it.date == today.minusDays(back) && (it.submitted.isNotEmpty() || it.isRevealed) }
+    }
+}
+
+const val QuietDays = 3L

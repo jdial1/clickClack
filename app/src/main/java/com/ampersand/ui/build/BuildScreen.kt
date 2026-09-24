@@ -86,7 +86,8 @@ fun BuildScreen(
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     val atlas = rememberBricks(plate.blocks.map { it.asset })
-    val tray = plate.tray(state.you.uid)
+    // Your bricks, plus any of theirs left a week: either of you can finish the other's corner.
+    val tray = plate.placeable(state.you.uid, state.today.date)
 
     // All positions are relative to this screen's root so tray drags resolve against the plate.
     var rootOrigin by remember { mutableStateOf(Offset.Zero) }

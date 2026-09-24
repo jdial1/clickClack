@@ -106,8 +106,9 @@ await check('a phone that lies in submitted still cannot open the day', async ()
   await seed()
   await assertSucceeds(submit('alice', ['mine']))
   const db = as('alice')
-  await assertSucceeds(setDoc(dayRef(db), { submitted: arrayUnion('bob') }, { merge: true }))
-  // Bob has not answered, so the rule's own check on the two documents holds.
+  // The lie itself is now refused: nobody writes the other person's name.
+  await assertFails(setDoc(dayRef(db), { submitted: arrayUnion('bob') }, { merge: true }))
+  // And even if a list said so, Bob has not answered, so the day stays shut.
   await assertFails(setDoc(dayRef(db), { revealed: true }, { merge: true }))
 })
 
@@ -188,6 +189,43 @@ await check('an ended couple cannot be brought back', async () => {
 await check('a live couple can still be ended by either of you', async () => {
   await seed()
   await assertSucceeds(setDoc(doc(as('bob'), 'couples', CID), { endedAt: new Date() }, { merge: true }))
+})
+
+// ---- your half only ---------------------------------------------------------
+
+const opened = { questionId: 'q', revealed: true, submitted: ['alice', 'bob'] }
+const bothAnswered = { alice: { values: ['a'] }, bob: { values: ['b'] } }
+
+await check('you may react, write a line back and say "we did" as yourself', async () => {
+  await seed({ dayDoc: opened, given: bothAnswered })
+  await assertSucceeds(setDoc(dayRef(as('alice')), {
+    reactions: { alice: 'LOVE' }, notes: { alice: 'Hi' }, talkedAbout: arrayUnion('alice'), askAgain: arrayUnion('alice'),
+  }, { merge: true }))
+})
+
+await check('you may not react or write a line back for them', async () => {
+  await seed({ dayDoc: opened, given: bothAnswered })
+  await assertFails(setDoc(dayRef(as('alice')), { reactions: { bob: 'LOVE' } }, { merge: true }))
+  await assertFails(setDoc(dayRef(as('alice')), { notes: { bob: 'Not yours' } }, { merge: true }))
+  await assertFails(setDoc(dayRef(as('alice')), { moodReplies: { bob: 'Not yours' } }, { merge: true }))
+})
+
+await check('you may not add or remove their name from a list', async () => {
+  await seed({ dayDoc: { ...opened, talkedAbout: ['bob'], askAgain: ['bob'] }, given: bothAnswered })
+  await assertFails(setDoc(dayRef(as('alice')), { talkedAbout: arrayUnion('bob', 'alice'), askAgain: [] }, { merge: true }))
+  await assertFails(setDoc(dayRef(as('alice')), { askAgain: [] }, { merge: true }))
+  await assertSucceeds(setDoc(dayRef(as('alice')), { askAgain: arrayUnion('alice') }, { merge: true }))
+})
+
+await check('nobody submits for the other person', async () => {
+  await seed()
+  await assertFails(setDoc(dayRef(as('alice')), { questionId: 'q', revealed: false, submitted: arrayUnion('bob') }, { merge: true }))
+})
+
+await check("tomorrow's theme is signed by whoever picks it", async () => {
+  await seed({ dayDoc: opened, given: bothAnswered })
+  await assertFails(setDoc(dayRef(as('alice')), { nextTheme: 'Food', nextThemeBy: 'bob' }, { merge: true }))
+  await assertSucceeds(setDoc(dayRef(as('alice')), { nextTheme: 'Food', nextThemeBy: 'alice' }, { merge: true }))
 })
 
 await env.cleanup()

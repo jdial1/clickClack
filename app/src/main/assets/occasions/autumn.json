@@ -31,6 +31,15 @@
       "text": "What do you want to slow down about?",
       "type": "REFLECT",
       "depth": 2
+    },
+    {
+      "id": "autumn-lm1",
+      "text": "What's the one thing I'd most like to get done before winter?",
+      "type": "GUESS_ME",
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
     }
   ]
 }

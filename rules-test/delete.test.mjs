@@ -30,6 +30,9 @@ async function seed() {
   await c.collection('chats').doc('day_x').collection('messages').doc('m1').set({ byUid: 'alice', text: 'secret' })
   await c.collection('chats').doc('day_x').collection('messages').doc('m2').set({ byUid: 'bob', text: 'mine' })
   await c.collection('photos').doc('p1').set({ byUid: 'alice', data: 'x' })
+  await c.collection('plates').doc('w1').set({ completedOn: '2026-09-13' })
+  await c.collection('plates/w1/words').doc('alice').set({ describing: 'Wobbly', thing: 'Castle' })
+  await c.collection('plates/w1/words').doc('bob').set({ describing: 'Cosmic', thing: 'Pretzel' })
   await db.doc('invites/ABC').set({ fromUid: 'alice' })
 }
 
@@ -48,6 +51,8 @@ check('her message gone, his kept', !(await c.collection('chats/day_x/messages')
   && (await c.collection('chats/day_x/messages').doc('m2').get()).exists)
 check('chat preview of her text gone', (await c.collection('chats').doc('day_x').get()).get('lastText') === undefined)
 check('her photo gone', !(await c.collection('photos').doc('p1').get()).exists)
+check('her words gone, his kept', !(await c.collection('plates/w1/words').doc('alice').get()).exists
+  && (await c.collection('plates/w1/words').doc('bob').get()).exists)
 check('her invite gone', !(await db.doc('invites/ABC').get()).exists)
 const couple = (await c.get()).data()
 check('couple ended, her key stripped', couple.endedAt != null && !('alice' in couple.hiddenTopics))

@@ -124,6 +124,17 @@ data class BuildPlate(
         return blocks.filter { it.ownerUid == uid && it.id !in used }
     }
 
+    /**
+     * What [uid] can place today: their own tray, plus the other person's bricks
+     * that have sat unplaced for a week. Placing someone's brick doesn't make it
+     * yours; it keeps its owner and colour, and nothing ever says it was left.
+     */
+    fun placeable(uid: String, today: LocalDate): List<Block> {
+        val used = placed.mapTo(mutableSetOf()) { it.blockId }
+        val waiting = blocks.filter { it.ownerUid != uid && it.id !in used && !it.earnedOn.isAfter(today.minusDays(HandOverDays)) }
+        return tray(uid) + waiting
+    }
+
     fun endsOn(): LocalDate = startedOn.plusDays(periodDays.toLong() - 1)
 
     fun daysLeft(today: LocalDate): Int =
@@ -333,3 +344,6 @@ object Rewards {
     private fun faceFor(streak: Int): BlockFace =
         BlockFace.entries[(streak / 7 - 1).coerceAtLeast(0) % BlockFace.entries.size]
 }
+
+/** Days a brick sits on its owner's tray before either of you may place it. */
+const val HandOverDays = 7L

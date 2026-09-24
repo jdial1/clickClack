@@ -253,6 +253,8 @@ data class CoupleState(
      * answers. Fetched on their own because loaded history stops at ten weeks.
      */
     val memories: List<DayEntry> = emptyList(),
+    /** The couple's IANA time zone. Days turn over at its midnight on both phones. See [com.ampersand.data.HomeZone]. */
+    val homeZone: String? = null,
 ) {
     /**
      * Revealed days on today's day-of-month, at least [Memories.MinDays] old: a

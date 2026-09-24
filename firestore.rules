@@ -39,6 +39,37 @@ service cloud.firestore {
         || bothIn(cid, coll, id, sub);
     }
 
+    // Your half of a shared document, and only yours. Membership says you may
+    // write here; these say you may not write *for* the other person -- their
+    // reaction, their line back, their "we did", their place in a list.
+    // No levers, even by accident.
+    function myKeyOnly(f) {
+      return request.resource.data.get(f, {})
+        .diff(resource == null ? {} : resource.data.get(f, {}))
+        .affectedKeys().hasOnly([me()]);
+    }
+    function myNameOnly(f) {
+      let before = resource == null ? [].toSet() : resource.data.get(f, []).toSet();
+      let after = request.resource.data.get(f, []).toSet();
+      return after.difference(before).hasOnly([me()])
+        && before.difference(after).hasOnly([me()]);
+    }
+    function ownHalves(maps, lists) {
+      return (!('reactions' in maps) || myKeyOnly('reactions'))
+        && (!('notes' in maps) || myKeyOnly('notes'))
+        && (!('moodReplies' in maps) || myKeyOnly('moodReplies'))
+        && (!('progress' in maps) || myKeyOnly('progress'))
+        && (!('submitted' in lists) || myNameOnly('submitted'))
+        && (!('talkedAbout' in lists) || myNameOnly('talkedAbout'))
+        && (!('askAgain' in lists) || myNameOnly('askAgain'));
+    }
+    // Tomorrow's theme is picked by one person at a time, and signed by them.
+    function signedTheme() {
+      return request.resource.data.get('nextThemeBy', null)
+          == (resource == null ? null : resource.data.get('nextThemeBy', null))
+        || request.resource.data.nextThemeBy == me();
+    }
+
     // Redeeming an invite has to land in *both* user documents at once --
     // otherwise the person who made the code is never told it was taken -- and
     // a user document is writable only by its owner, which is precisely the
@@ -133,8 +164,12 @@ service cloud.firestore {
         // `revealed` is the seal, so a client must not be able to flip it
         // early and read the other answer. Not on create either: creating
         // tomorrow's day already open used to leave it open.
-        allow create: if isLive(cid) && bornShut();
-        allow update: if isLive(cid) && sealHolds(cid, 'days', day, 'answers');
+        allow create: if isLive(cid) && bornShut()
+          && ownHalves(['reactions', 'notes', 'moodReplies'], ['submitted', 'talkedAbout', 'askAgain'])
+          && signedTheme();
+        allow update: if isLive(cid) && sealHolds(cid, 'days', day, 'answers')
+          && ownHalves(['reactions', 'notes', 'moodReplies'], ['submitted', 'talkedAbout', 'askAgain'])
+          && signedTheme();
         allow delete: if false;
 
         // The sealed part, and the reason answers are one document per person:
@@ -157,9 +192,10 @@ service cloud.firestore {
       // decks). Whether a deck is sealed is fixed when it is created.
       match /quizzes/{quizId} {
         allow read: if isMember(cid);
-        allow create: if isLive(cid) && bornShut();
+        allow create: if isLive(cid) && bornShut() && ownHalves([], ['submitted']);
         allow update: if isLive(cid) && sealHolds(cid, 'quizzes', quizId, 'runs')
-          && request.resource.data.get('sealed', true) == resource.data.get('sealed', true);
+          && request.resource.data.get('sealed', true) == resource.data.get('sealed', true)
+          && ownHalves([], ['submitted']);
         allow delete: if false;
 
         match /runs/{uid} {
@@ -180,8 +216,9 @@ service cloud.firestore {
       // measuring if neither could see the answer while giving theirs.
       match /instruments/{instrumentId} {
         allow read: if isMember(cid);
-        allow create: if isLive(cid) && bornShut();
-        allow update: if isLive(cid) && sealHolds(cid, 'instruments', instrumentId, 'runs');
+        allow create: if isLive(cid) && bornShut() && ownHalves(['progress'], ['submitted']);
+        allow update: if isLive(cid) && sealHolds(cid, 'instruments', instrumentId, 'runs')
+          && ownHalves(['progress'], ['submitted']);
         allow delete: if false;
 
         match /runs/{uid} {

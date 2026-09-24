@@ -1,0 +1,63 @@
+{
+  "id": "daily-seen",
+  "title": "How you see them",
+  "theme": "KNOW_ME",
+  "blurb": "Daily only. Questions about the other person, never yourself, and only the kind ones.",
+  "questions": [
+    {
+      "id": "dsn1",
+      "text": "What do they do better than anyone else you know?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dsn2",
+      "text": "When did they last make an ordinary day better without meaning to?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dsn3",
+      "text": "What is something they're quietly proud of that they never mention?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dsn4",
+      "text": "What would their friends be surprised to learn about them?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dsn5",
+      "text": "What do they make look easy that isn't?",
+      "type": "REFLECT",
+      "depth": 1,
+      "tags": [
+        "words"
+      ]
+    },
+    {
+      "id": "dsn6",
+      "text": "Where have you seen them change the most since you met?",
+      "type": "REFLECT",
+      "depth": 2,
+      "tags": [
+        "past",
+        "words"
+      ]
+    }
+  ]
+}

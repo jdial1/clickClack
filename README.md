@@ -326,15 +326,45 @@ Details worth keeping:
 - **Awards wait for the plates listener.** Until it answers, an empty list means
   "not arrived", and awarding against it laid bricks on a phantom plate.
 
+### Days, halves and backups
+
+**Days follow the couple's home time zone**, never the phone's (`HomeZone`).
+The zone is the couple document's `timeZone`, set from the home ZIP. Until
+there is a ZIP, it is set from the first phone to look, so both phones still
+share one calendar. The last zone seen is cached per couple, so the first
+frame is already on the right day. A changed zone rebuilds the repository on
+the right date.
+
+**Each person writes only their own half.** On days, decks and sittings, the
+rules allow a map field keyed by uid (reactions, lines back, mood replies,
+progress) or a uid list (submitted, "We did", ask-again) to change only at
+your own uid. Tomorrow's theme must be signed by whoever picks it. Plates
+stay shared: the sculpture belongs to both of you.
+
+**Backups** are what keep Time Answers Back safe, because the archive is the
+product. Run once, on the Blaze plan the functions already need:
+
+```bash
+gcloud firestore databases update --database="(default)" --enable-pitr --project=clickclack-002827
+gcloud firestore backups schedules create --database="(default)" --recurrence=daily --retention=14w --project=clickclack-002827
+```
+
+Point-in-time recovery covers the last seven days, and the daily backups keep
+fourteen weeks. A restore always goes to a **new** database, never over the
+live one:
+
+```bash
+gcloud firestore backups list --project=clickclack-002827
+gcloud firestore databases restore --source-backup=<backup name> --destination-database=restore-check --project=clickclack-002827
+```
+
+Compare, copy back what was lost, then delete `restore-check`.
+
 ### Still to do
 
 - History rows carry no answers; they live in a subcollection that would need a
   read each. The Shelf shows questions, dates and reactions; the Reveal screen
   loads a single day in full.
-- Day boundaries follow each phone's clock. Two phones in different timezones
-  can disagree about which day it is.
-- Members can still write each other's per-person fields (reactions, progress,
-  plates). The rules check membership, not whose key is being written.
 
 ## The build
 
