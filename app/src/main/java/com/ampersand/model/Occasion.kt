@@ -35,6 +35,7 @@ enum class Occasion(
     THANKSGIVING("thanksgiving", "Thanksgiving"),
     CHRISTMAS("christmas", "Christmas Day"),
     NEW_YEARS_EVE("new-years-eve", "New Year's Eve"),
+    LEAP_DAY("leap-day", "Leap day"),
 
     // State-specific days, only for couples whose home ZIP is there. After national ones.
     MARDI_GRAS("mardi-gras", "Mardi Gras", setOf("LA", "AL", "MS")),
@@ -122,6 +123,7 @@ enum class Occasion(
         WINTER -> date.month == Month.DECEMBER && date.dayOfMonth == 21
         CHRISTMAS -> date.month == Month.DECEMBER && date.dayOfMonth == 25
         NEW_YEARS_EVE -> date.month == Month.DECEMBER && date.dayOfMonth == 31
+        LEAP_DAY -> date.month == Month.FEBRUARY && date.dayOfMonth == 29
         // Fat Tuesday: 47 days before Easter.
         MARDI_GRAS -> date == easter(date.year).minusDays(47)
         TEXAS_INDEPENDENCE -> date.month == Month.MARCH && date.dayOfMonth == 2

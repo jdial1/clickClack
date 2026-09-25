@@ -1,6 +1,12 @@
 package com.ampersand.ui.brick
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.pointer.pointerInput
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.play
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -34,7 +40,15 @@ fun BrickMark(
     upperCourses: Float = 0f,
     lowerCourses: Float = 0f,
     textAlpha: Float = 1f,
+    /** Unannounced: tap a brick for its sound, hold the mark to see the old name for a moment. */
+    playful: Boolean = false,
 ) {
+    val sounds = com.ampersand.ui.sound.LocalSounds.current
+    val feel = com.ampersand.ui.feel.LocalFeel.current
+    var oldName by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(oldName) {
+        if (oldName) { kotlinx.coroutines.delay(1200); oldName = false }
+    }
     val course = stud * Tile.h * BrickArt.ROW_RATIO
     val nub = stud * BrickArt.NUB_RATIO
 
@@ -42,7 +56,26 @@ fun BrickMark(
     val lower = them.asset(Tile)
     val atlas = rememberBricks(listOf(upper, lower))
 
-    Box(modifier.size(stud * Tile.w * 2, course * 2 + nub)) {
+    Box(
+        modifier
+            .size(stud * Tile.w * 2, course * 2 + nub)
+            .then(
+                if (!playful) Modifier else Modifier.pointerInput(Unit) {
+                    detectTapGestures(
+                        // The upper brick (Click) sits in the top course; the lower (Clack) below it.
+                        onTap = { at ->
+                            val upper = at.y < size.height / 2f
+                            sounds.play(if (upper) com.ampersand.ui.sound.Sfx.CLICK else com.ampersand.ui.sound.Sfx.CLACK)
+                            feel.play(com.ampersand.ui.feel.Feel.TAP)
+                        },
+                        onLongPress = {
+                            feel.play(com.ampersand.ui.feel.Feel.PLACE)
+                            oldName = true
+                        },
+                    )
+                },
+            ),
+    ) {
         Canvas(Modifier.size(stud * Tile.w * 2, course * 2 + nub)) {
             val studPx = size.width / (Tile.w * 2f)
             val coursePx = studPx * Tile.h * BrickArt.ROW_RATIO
@@ -67,6 +100,14 @@ fun BrickMark(
                 bottom = size.height - coursePx + upperCourses * coursePx,
                 studPx = studPx,
             )
+        }
+
+        // The name before the rename: a character whose only job is to join two things.
+        if (oldName) {
+            Box(Modifier.matchParentSize(), contentAlignment = Alignment.Center) {
+                Word(text = "&", slug = null, stud = stud * 2, alpha = 1f)
+            }
+            return@Box
         }
 
         // Center each word on the brick body, below the nub.

@@ -165,7 +165,11 @@ fun BuildScreen(
                 animationSpec = if (landing != null) {
                     Motion.settle
                 } else {
-                    tween(Motion.SwapMs, easing = FastOutSlowInEasing)
+                    // A refused brick wobbles home: the material says no, and no text does.
+                    androidx.compose.animation.core.spring(
+                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                        stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+                    )
                 },
             ) { p, _ -> dragPos = lerp(from, destination, p) }
 
@@ -181,6 +185,11 @@ fun BuildScreen(
     }
 
     val target = frozen ?: resolveTarget()
+
+    // Stud snap: feel each new cell the brick would land in. Haptic only, never sound.
+    androidx.compose.runtime.LaunchedEffect(target) {
+        if (dragging != null && !flying && target != null) feel.play(Feel.TICK)
+    }
 
     Box(
         modifier

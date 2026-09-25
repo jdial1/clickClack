@@ -174,7 +174,8 @@ fun TodayScreen(
             val feel = LocalFeel.current
             Spacer(Modifier.height(24.dp))
             AnswerForm(state, you, them) { values, guess ->
-                sounds.play(Sfx.SEAL)
+                // The name doing its job: first in is the click, the answer that opens the day is the clack.
+                sounds.play(if (state.them.uid in day.submitted) Sfx.CLACK else Sfx.CLICK)
                 feel.play(Feel.SEAL)
                 onSubmit(values, guess)
             }

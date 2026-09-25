@@ -110,6 +110,7 @@ fun SplashScreen(
                     lowerCourses = lowerY.value,
                     // Text fades in after both bricks land.
                     textAlpha = fade.value,
+                    playful = true,
                 )
             }
         }

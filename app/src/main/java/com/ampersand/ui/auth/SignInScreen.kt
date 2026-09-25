@@ -91,7 +91,7 @@ fun SignInScreen(
 /** The app wordmark, same as the splash. */
 @Composable
 private fun Wordmark() {
-    BrickMark(you = BrickColor.RED, them = BrickColor.BLUE, stud = 38.dp)
+    BrickMark(you = BrickColor.RED, them = BrickColor.BLUE, stud = 38.dp, playful = true)
 }
 
 @Preview(name = "Sign in", showBackground = true, heightDp = 760)
