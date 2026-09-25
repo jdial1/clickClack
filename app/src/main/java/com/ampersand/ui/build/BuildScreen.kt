@@ -74,6 +74,9 @@ private val Month = DateTimeFormatter.ofPattern("MMM d")
 /** Stud width in the tray. */
 private val TrayStud = Stud.small
 
+/** The tray's height, full or empty. */
+private val TrayHeight = 78.dp
+
 /** The shared baseplate: drag earned bricks from your tray onto it. Bricks keep their owner's color. */
 @Composable
 fun BuildScreen(
@@ -116,7 +119,8 @@ fun BuildScreen(
 
         val ghostLeft = dragPos.x - block.shape.w * studPx / 2f
         val ghostTop = dragPos.y - block.shape.h * rowPx / 2f
-        val x = ((ghostLeft - plateOrigin.x) / studPx).roundToInt()
+        // Clamped: a brick hanging a little off the edge lands at the edge instead of being refused.
+        val x = ((ghostLeft - plateOrigin.x) / studPx).roundToInt().coerceIn(0, (p.gridW - block.shape.w).coerceAtLeast(0))
         val fromTop = ((ghostTop - plateOrigin.y) / rowPx).roundToInt()
         val y = p.gridH - block.shape.h - fromTop
 
@@ -140,14 +144,14 @@ fun BuildScreen(
 
         scope.launch {
             val rowPx = studPx * BrickArt.ROW_RATIO
-            val nubPx = studPx * BrickArt.NUB_RATIO
             val destination = if (landing != null) {
                 val (x, y) = landing
+                // The body's centre, where the plate will draw it: no nub offset, or it lands low and hops up.
                 Offset(
                     plateOrigin.x + x * studPx + block.shape.w * studPx / 2f,
                     plateOrigin.y +
                         (currentPlate.gridH - y - block.shape.h) * rowPx +
-                        block.shape.h * rowPx / 2f + nubPx,
+                        block.shape.h * rowPx / 2f,
                 )
             } else {
                 feel.play(Feel.REJECT)
@@ -228,11 +232,12 @@ fun BuildScreen(
             }
             Spacer(Modifier.height(10.dp))
 
+            // Same height as the brick row, so placing your last brick never moves the page.
             if (tray.isEmpty()) {
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .height(72.dp)
+                        .height(TrayHeight)
                         .clip(Radius.control)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center,
@@ -247,8 +252,9 @@ fun BuildScreen(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .height(78.dp)
-                        .horizontalScroll(rememberScrollState()),
+                        .height(TrayHeight)
+                        // Frozen while a brick is in the air, so the tray never slides under your finger.
+                        .horizontalScroll(rememberScrollState(), enabled = dragging == null),
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                     verticalAlignment = Alignment.Bottom,
                 ) {

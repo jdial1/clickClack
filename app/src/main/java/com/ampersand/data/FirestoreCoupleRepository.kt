@@ -506,6 +506,10 @@ class FirestoreCoupleRepository(
     }
 
     /** Awards bricks for talked-about days. Checks all plates, since the day is often in a sealed week. */
+    // Every award appends with arrayUnion. Five awards run in one recompose, each
+    // from the same snapshot; writing `plate.blocks + fresh` made the last one
+    // erase the others, the tray flickered while they fought it out, and a brick
+    // dropped mid-fight was refused because it had briefly vanished from the plate.
     private fun awardForTalks(s: CoupleState) {
         val plate = s.plate
         if (plate.isSealed) return
@@ -516,7 +520,7 @@ class FirestoreCoupleRepository(
         if (fresh.isEmpty()) return
 
         plateRef(plate).set(
-            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -530,7 +534,7 @@ class FirestoreCoupleRepository(
             .filter { it.id !in laid }
         if (fresh.isEmpty()) return
         plateRef(plate).set(
-            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -545,7 +549,7 @@ class FirestoreCoupleRepository(
         }.filter { it.id !in laid }
         if (fresh.isEmpty()) return
         plateRef(plate).set(
-            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -768,7 +772,7 @@ class FirestoreCoupleRepository(
         if (fresh.isEmpty()) return
 
         plateRef(plate).set(
-            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -795,7 +799,7 @@ class FirestoreCoupleRepository(
 
         if (fresh.isEmpty()) return
         plateRef(plate).set(
-            plate.toMap() + ("blocks" to (plate.blocks + fresh).map { it.toMap() }),
+            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -1151,9 +1155,10 @@ class FirestoreCoupleRepository(
         if (plate.placed.any { it.blockId == blockId }) return
         if (!plate.canPlace(block.shape, x, y)) return
 
-        val placed = plate.placed + Placement(blockId, x, y)
+        // Appended, never rewritten: a whole-list write from a slightly stale plate
+        // would erase a brick the other phone placed a moment ago.
         plateRef(plate).set(
-            plate.toMap() + ("placed" to placed.map { it.toMap() }),
+            plate.toMap() + ("placed" to FieldValue.arrayUnion(Placement(blockId, x, y).toMap())),
             SetOptions.merge(),
         )
     }
@@ -1528,7 +1533,8 @@ private fun DocumentSnapshot.toPlate(): BuildPlate? {
     @Suppress("UNCHECKED_CAST")
     val blocks = (get("blocks") as? List<Map<String, Any?>>).orEmpty().mapNotNull { it.toBlock() }
     @Suppress("UNCHECKED_CAST")
-    val placed = (get("placed") as? List<Map<String, Any?>>).orEmpty().mapNotNull { it.toPlacement() }
+    // Placements are appended, so two phones placing the same brick at once leave two; the first stands.
+    val placed = (get("placed") as? List<Map<String, Any?>>).orEmpty().mapNotNull { it.toPlacement() }.distinctBy { it.blockId }
     return BuildPlate(
         id = id,
         startedOn = started,
