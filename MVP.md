@@ -67,9 +67,8 @@ Each of these breaks a promise the app already makes. See "Re-review after the
 deploy" in SOUL.md.
 
 **Status (23 September 2026):**
-- 1.1, 1.2 and 1.4 are done, with 240 unit tests and all rules and function emulator tests green.
+- 1.1, 1.2 and 1.4 are done, with 240 unit tests and all rules and function emulator tests green. The 1.2 rules are live.
 - **Still to do by hand:**
-  - Deploy the 1.2 rules (`npx firebase-tools deploy --only firestore:rules --project clickclack-002827`).
   - Run the two backup commands in README ("Days, halves and backups"), then try one restore.
 
 | # | Mechanic → | Dynamic → | Tone | Size |

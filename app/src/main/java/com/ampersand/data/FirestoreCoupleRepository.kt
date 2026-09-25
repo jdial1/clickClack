@@ -423,16 +423,19 @@ class FirestoreCoupleRepository(
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
             ?: emptyPlate(today)
 
-        // Auto-seal a plate whose period has ended.
-        if (platesLoaded && live.isSealed.not() && live.placed.isNotEmpty() && live.endsOn() < today) {
-            sealPlate()
+        // A week that has ended rolls over, placed-on or not: an unsealed past week used to
+        // keep collecting bricks, and the first brick placed on it sealed it from a stale copy
+        // of the plate, so that very brick was carried back to the tray. Seal from `live`.
+        if (platesLoaded && live.isSealed.not() && live.endsOn() < today) {
+            sealPlate(live)
         }
 
         val next = basis.copy(
             homeZone = coupleDoc?.getString("timeZone"),
             today = todayEntry,
             plate = live,
-            shelf = plates.filter { it.isSealed }.sortedByDescending { it.completedOn }
+            // A week nobody built on rolls over without leaving an empty sculpture on the shelf.
+            shelf = plates.filter { it.isSealed && it.placed.isNotEmpty() }.sortedByDescending { it.completedOn }
                 .map { p -> myWords[p.id]?.takeIf { myUid !in p.words }?.let { p.copy(words = p.words + (myUid to it)) } ?: p },
             memories = memoryDays.values.sortedByDescending { it.date },
             anniversary = anniversary,
@@ -1150,7 +1153,8 @@ class FirestoreCoupleRepository(
 
     override fun placeBlock(blockId: String, x: Int, y: Int) {
         val plate = _state.value.plate
-        if (plate.isSealed) return
+        // Never onto a week that has ended; it is rolling over.
+        if (plate.isSealed || plate.endsOn() < today) return
         val block = plate.block(blockId) ?: return
         if (plate.placed.any { it.blockId == blockId }) return
         if (!plate.canPlace(block.shape, x, y)) return
@@ -1254,9 +1258,17 @@ class FirestoreCoupleRepository(
         )
     }
 
-    override fun sealPlate() {
-        val plate = _state.value.plate
-        if (plate.isSealed || plate.placed.isEmpty()) return
+    override fun sealPlate() = sealPlate(_state.value.plate)
+
+    /** Plates already sealed by this phone, so a recompose before the snapshot doesn't seal twice. */
+    private val sealing = mutableSetOf<String>()
+
+    /**
+     * Seals [plate] as it is now, not as the last published state saw it, and
+     * starts the next week with whatever wasn't placed.
+     */
+    private fun sealPlate(plate: BuildPlate) {
+        if (plate.isSealed || !sealing.add(plate.id)) return
 
         plateRef(plate).set(
             plate.toMap() + ("completedOn" to today.toString()),
@@ -1265,9 +1277,11 @@ class FirestoreCoupleRepository(
         // Unplaced bricks carry over.
         val carried = plate.tray(myUid) + plate.tray(partnerUid)
         val next = emptyPlate(today).copy(blocks = carried)
-        // Date-based id, so two phones sealing at once write the same next plate.
+        // Date-based id, so two phones sealing at once write the same next plate,
+        // and appended, so neither phone's carried bricks erase the other's.
         plateRef(next).set(
-            next.toMap() + ("blocks" to next.blocks.map { it.toMap() }),
+            if (carried.isEmpty()) next.toMap()
+            else next.toMap() + ("blocks" to FieldValue.arrayUnion(*carried.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
