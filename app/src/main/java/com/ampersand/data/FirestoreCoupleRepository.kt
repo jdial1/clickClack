@@ -130,6 +130,7 @@ class FirestoreCoupleRepository(
 
     /** Whether plates have loaded. Awarding or sealing before this writes to a wrong, empty plate. */
     private var platesLoaded = false
+    private var historyLoaded = false
     private var anniversary: LocalDate? = null
     private var coupleDoc: DocumentSnapshot? = null
 
@@ -230,6 +231,7 @@ class FirestoreCoupleRepository(
                     return@addSnapshotListener
                 }
                 historyDocs = snap?.documents.orEmpty()
+                historyLoaded = true
                 recompose()
             }
 
@@ -396,13 +398,19 @@ class FirestoreCoupleRepository(
         val together = Together.on(today, anniversary, coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() })
         val decades = birthdays.map(::decadeOf).toSet()
         val animals = if (Topic.HOROSCOPES in interests) birthdays.map { ChineseZodiac.of(it) }.toSet() else emptySet()
+        // Only once both are in: an older couple's empty first read must not look like day one.
+        val firstWeek = if (historyLoaded && platesLoaded) {
+            firstWeekDay(history, sealedSculpture = plates.any { it.isSealed && it.placed.isNotEmpty() })
+        } else {
+            null
+        }
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history))
+            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history), firstWeekDay = firstWeek)
             // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history))
+            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history), firstWeekDay = firstWeek)
         }.forPlace(place, today).forSigns(you.birthday, partner.birthday)
 
         val todayEntry = DayEntry(

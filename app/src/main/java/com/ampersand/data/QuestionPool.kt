@@ -45,6 +45,8 @@ class QuestionPool(
     val dates: Map<DateKind, List<Question>> = emptyMap(),
     /** Every ZIP, for turning a home ZIP into a forecast and a region. */
     val places: ZipTable = ZipTable.empty,
+    /** Chosen questions for the first seven days you both answer, in order. See [firstWeekDay]. */
+    val firstWeek: List<Question> = emptyList(),
 ) {
 
     val all: List<Question> = decks.flatMap { it.questions } + dailyOnly.flatMap { it.questions }
@@ -69,7 +71,7 @@ class QuestionPool(
     val playable: List<Quiz> = decks + packs
 
     private val byId: Map<String, Question> =
-        (all + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + horoscope + milestones.values.flatten() + eras.values.flatten() + chinese.values.flatten() + sun.values.flatten() + dates.values.flatten())
+        (all + firstWeek + occasions.values.flatMap { it.questions } + weather.values.flatten() + regional.values.flatten() + localTeams + horoscope + milestones.values.flatten() + eras.values.flatten() + chinese.values.flatten() + sun.values.flatten() + dates.values.flatten())
             .associateBy { it.id }
 
     fun question(id: String?): Question? = id?.let { byId[it] }
@@ -115,6 +117,8 @@ class QuestionPool(
         dateKinds: List<DateKind> = emptyList(),
         /** Neither of you answered for a few days. Coming back should cost nothing. See [gentleReturn]. */
         gentle: Boolean = false,
+        /** How far through the first week you are, or null once it is over. See [firstWeekDay]. */
+        firstWeekDay: Int? = null,
     ): Question {
         require(all.isNotEmpty()) { "no questions loaded" }
         fun shown(q: Question) = hidden.none { it.matches(q) }
@@ -147,6 +151,10 @@ class QuestionPool(
             if (picked.isNotEmpty()) walk(picked, date, weekend, taste, recent)?.let { return it }
         }
 
+        firstWeekDay?.let { n ->
+            firstWeek.drop(n).firstOrNull { it.id !in recent && shown(it) }?.let { return it }
+        }
+
         if (weatherKind != null && date.toEpochDay().mod(2L) == 0L) {
             weather[weatherKind]?.filter(::shown)?.let { walk(it, date, weekend, taste, recent) }?.let { return it }
         }
@@ -173,6 +181,7 @@ class QuestionPool(
         together?.takeIf { inSet(milestones[it.tier]) }?.let { return it.title }
         dateKinds.firstOrNull { inSet(dates[it]) }?.let { return it.label }
         Occasion.on(date, anniversary, state)?.takeIf { inSet(occasions[it.id]?.questions) }?.let { return it.label }
+        if (inSet(firstWeek)) return "First week"
         if (weather.values.any(::inSet)) return "Weather"
         if (regional.values.any(::inSet) || inSet(localTeams)) return "Local"
         if (inSet(horoscope)) return "Horoscope"
@@ -267,6 +276,7 @@ class QuestionPool(
             }.toMap(),
             // ponytail: parsed on first launch of the screen, about 34k lines;
             // index lazily or by prefix if it ever shows up in a startup trace.
+            firstWeek = QuizJson.loadFolder(context, "firstweek").flatMap { it.questions },
             places = context.assets.open("zips.csv").bufferedReader().useLines { ZipTable.parse(it) },
         )
 
@@ -286,6 +296,16 @@ class QuestionPool(
  * answered, the next question is a light one. Only for couples who have
  * answered before, and computed from shared history so both phones agree.
  */
+/**
+ * Which of the first week's questions is next: the count of days you have both opened,
+ * or null after seven, or once a sculpture has sealed (history is a window, so a couple
+ * back from a long gap must not start over). Shared state only, so both phones agree.
+ */
+fun firstWeekDay(history: List<com.ampersand.model.DayEntry>, sealedSculpture: Boolean): Int? {
+    if (sealedSculpture) return null
+    return history.count { it.isRevealed }.takeIf { it < 7 }
+}
+
 fun gentleReturn(today: java.time.LocalDate, history: List<com.ampersand.model.DayEntry>): Boolean {
     if (history.none { it.submitted.isNotEmpty() || it.isRevealed }) return false
     return (1L..QuietDays).all { back ->

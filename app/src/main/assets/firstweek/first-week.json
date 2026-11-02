@@ -1,0 +1,16 @@
+{
+  "id": "first-week",
+  "title": "The first week",
+  "theme": "PLAYFUL",
+  "blurb": "Daily only. The first seven days you both answer, in this order.",
+  "source": "Written for Click Clack",
+  "questions": [
+    { "id": "fw1", "text": "What will I say is the best meal we have had together?", "type": "GUESS_ME", "depth": 1, "tags": ["food", "past"] },
+    { "id": "fw2", "text": "Saturday morning, I would rather:", "type": "THIS_OR_THAT", "depth": 1, "options": ["Stay in bed with you", "Be out of the house by nine"], "tags": ["fun"] },
+    { "id": "fw3", "text": "What do I do when I think nobody is watching?", "type": "GUESS_ME", "depth": 1, "tags": ["fun"] },
+    { "id": "fw4", "text": "Where would I go tomorrow if we could both take the day off?", "type": "PICK_ONE", "depth": 1, "options": ["Somewhere with water", "Somewhere with trees", "A city we have never seen", "Nowhere. Home, phones off"], "tags": ["fun", "travel"] },
+    { "id": "fw5", "text": "What is something small I do that you would miss by Wednesday?", "type": "REFLECT", "depth": 1, "tags": ["romance"] },
+    { "id": "fw6", "text": "What has been on my mind this week that I have not brought up?", "type": "GUESS_ME", "depth": 2, "tags": ["feelings"] },
+    { "id": "fw7", "text": "What from this week do you want to remember?", "type": "REFLECT", "depth": 2, "tags": ["past"] }
+  ]
+}

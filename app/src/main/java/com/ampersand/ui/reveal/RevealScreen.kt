@@ -50,6 +50,9 @@ import com.ampersand.ui.components.DepthDots
 import com.ampersand.ui.components.PartnerReaction
 import com.ampersand.ui.components.QuietNote
 import com.ampersand.ui.brick.BrickDot
+import com.ampersand.model.BrickHeight
+import com.ampersand.ui.brick.BrickPill
+import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.components.SectionLabel
 import com.ampersand.ui.feel.Feel
@@ -134,6 +137,12 @@ fun RevealScreen(
                 SectionLabel(day.date.format(DayFormat))
                 DepthDots(day.question.depth)
             }
+        }
+
+        // The first day you both answered gets the name, in your two colours, and nothing louder.
+        if (day.isRevealed && (state.history + state.today).count { it.isRevealed } == 1) {
+            Spacer(Modifier.height(20.dp))
+            FirstOpen(state, Modifier.arrive(day.date, index = 0, enabled = animateIn))
         }
 
         Spacer(Modifier.height(20.dp))
@@ -265,7 +274,7 @@ fun RevealScreen(
             IconAction(
                 UiIcon.DATES,
                 when {
-                    mine -> "Coming back a year from now. Tap to take it back."
+                    mine -> "Coming back a year from now. Take it back."
                     theirs -> "${state.them.name} asked for this one again in a year."
                     else -> "Ask us this again in a year"
                 },
@@ -360,5 +369,31 @@ private fun PreviewRevealDark() = AmpersandTheme(darkTheme = true) {
     val s = MockCouple.state()
     Surface(color = MaterialTheme.colorScheme.background) {
         RevealScreen(s, s.history.first { it.question.id == "t3" }, {})
+    }
+}
+
+/** Two bricks going down: the first day either of you has opened. */
+@Composable
+private fun FirstOpen(state: CoupleState, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("Click." to state.you, "Clack." to state.them).forEach { (word, member) ->
+                val slug = BrickColor.of(member.colorArgb).slug
+                BrickPill(slug = slug, studSize = Stud.chip, height = BrickHeight.MEDIUM) {
+                    Text(
+                        word,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = inkOnBrick(slug),
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            "This is your first one.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
