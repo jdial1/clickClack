@@ -124,6 +124,15 @@ class Screenshots {
 
     @Test fun settings() = shoot("07-settings") { SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {}) }
 
+    /** Bricks scale with the screen and text does not, so buttons get tested narrow too. */
+    @Config(qualifiers = "w320dp-h1900dp-xxhdpi")
+    @Test fun settings_narrow() = shoot("13-settings-narrow-phone") {
+        SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {})
+    }
+
+    @Config(qualifiers = "w320dp-h1900dp-xxhdpi")
+    @Test fun today_narrow() = shoot("14-today-narrow-phone") { TodayScreen(special, { _, _ -> }, {}) }
+
     /** Today once you have both answered: the first thing a new couple ever opens. */
     private val bothIn: CoupleState = base.copy(
         today = base.today.copy(

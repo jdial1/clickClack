@@ -1,5 +1,12 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.components.panel
+import com.ampersand.ui.theme.IconSize
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Corner
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.components.rememberPhoto
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.inkOnBrick
@@ -108,36 +115,36 @@ fun HistoryScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 40.dp),
+        contentPadding = PaddingValues(start = Inset.screen, end = Inset.screen, top = Space.l, bottom = Space.page),
     ) {
         if (state.photos.isNotEmpty()) {
             item {
                 SectionLabel("Our days")
-                Spacer(Modifier.height(10.dp))
-                androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Spacer(Modifier.height(Space.m))
+                androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(Space.m)) {
                     items(state.photos, key = { it.id }) { p ->
-                        Column(Modifier.width(150.dp).glass(inkOnBrick(structureSlug()), corner = 12.dp).padding(6.dp)) {
+                        Column(Modifier.width(150.dp).panel().padding(Space.s)) {
                             rememberPhoto(p.data)?.let {
                                 androidx.compose.foundation.Image(
                                     it, contentDescription = p.label,
-                                    modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(8.dp)),
+                                    modifier = Modifier.fillMaxWidth().height(150.dp).clip(Radius.small),
                                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                 )
                             }
-                            Spacer(Modifier.height(4.dp))
-                            Text(p.label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
+                            Spacer(Modifier.height(Space.xs))
+                            Text(p.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
                             Text(p.date.format(LongDate), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
                         }
                     }
                 }
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(Space.xl))
             }
         }
 
         if (state.kept.isNotEmpty()) {
             item {
                 SectionLabel("Kept")
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(Space.m))
             }
             val kept = state.kept.entries.sortedByDescending { Kept.dateOf(it.key) ?: java.time.LocalDate.MIN }
             items(kept.map { it.key }, key = { "kept_$it" }) { key ->
@@ -145,47 +152,47 @@ fun HistoryScreen(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                        .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                        .padding(bottom = Space.s)
+                        .panel()
                         .clickable { onOpenKept(key) }
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .padding(horizontal = Space.m, vertical = Space.m),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    IconBrick(UiIcon.KEEP, size = 26.dp)
-                    Spacer(Modifier.width(10.dp))
+                    IconBrick(UiIcon.KEEP, size = IconSize.medium)
+                    Spacer(Modifier.width(Space.m))
                     Column(Modifier.weight(1f)) {
                         Text(
                             date?.format(LongDate) ?: "Deck",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
                         Text(state.kept.getValue(key), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground, maxLines = 2)
                     }
                 }
             }
-            item { Spacer(Modifier.height(20.dp)) }
+            item { Spacer(Modifier.height(Space.xl)) }
         }
 
         if (anniversaries.isNotEmpty()) {
             item {
                 SectionLabel("On this day")
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.m))
             }
             items(anniversaries, key = { "ago_${it.date}" }) { entry ->
                 OnThisDay(state, entry) { onOpenDay(entry) }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.m))
             }
-            item { Spacer(Modifier.height(20.dp)) }
+            item { Spacer(Modifier.height(Space.xl)) }
         }
 
         item {
             SectionLabel("The shelf")
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
             Shelf(state.shelf, state, onNoteWeek, onNameWeek)
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Space.xxl))
 
             SectionLabel("Every day")
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
         }
 
         items(state.history, key = { it.date.toString() }) { entry ->
@@ -221,30 +228,30 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
+                .padding(start = Space.l, end = Space.l, top = Space.xl, bottom = Space.l)
                 .glass(ink)
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = Space.l, vertical = Space.m),
         ) {
             Text(
                 text = ago(entry.date, state.today.date),
                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
-                color = ink.copy(alpha = 0.75f),
+                color = ink.copy(alpha = Alpha.secondary),
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = entry.question.text,
                 style = MaterialTheme.typography.titleMedium,
                 color = ink,
             )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(Space.m))
             Said(state.you.name, entry.answerFor(state.you.uid)?.response, ink)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             Said(state.them.name, entry.answerFor(state.them.uid)?.response, ink)
 
             val marks = entry.reactions.values.toList()
             if (marks.isNotEmpty()) {
-                Spacer(Modifier.height(12.dp))
-                ReactionMarks(marks, size = 20.dp)
+                Spacer(Modifier.height(Space.m))
+                ReactionMarks(marks, size = IconSize.small)
             }
         }
     }
@@ -253,7 +260,7 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
 /** Reaction images left on a day. */
 @Composable
 private fun ReactionMarks(marks: List<Reaction>, size: Dp) {
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
         marks.forEach {
             Image(
                 painter = painterResource(it.drawable()),
@@ -270,7 +277,7 @@ private fun Said(name: String, what: String?, ink: Color) {
     Text(
         text = "$name: $what",
         style = MaterialTheme.typography.bodyMedium,
-        color = ink.copy(alpha = 0.9f),
+        color = ink.copy(alpha = Alpha.strong),
     )
 }
 
@@ -300,7 +307,7 @@ private fun Shelf(
         val seals = live.endsOn().format(LongDate)
         if (live.placed.isNotEmpty()) {
             Sculpture(live, Modifier.fillMaxWidth())
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
         }
         Text(
             text = if (live.placed.isEmpty()) {
@@ -331,9 +338,9 @@ private fun Shelf(
             height = BrickHeight.LOW,
         )
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(Space.m))
         selected.name(state.you.uid, state.them.uid)?.let {
-            Text(it, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(it, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
         }
         Text(
             text = "Finished ${selected.completedOn?.format(LongDate).orEmpty()}",
@@ -341,20 +348,20 @@ private fun Shelf(
             color = MaterialTheme.colorScheme.onBackground,
         )
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(Space.m))
         NameWeek(selected, state, onNameWeek)
 
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(Space.m))
         WeekNotes(selected, state, onNoteWeek)
 
-        Spacer(Modifier.height(16.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Spacer(Modifier.height(Space.l))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(Space.m)) {
             items(shelf, key = { it.id }) { plate ->
                 val on = plate.id == selected.id
                 Column(
                     Modifier
                         .width(86.dp)
-                        .clip(RoundedCornerShape(14.dp))
+                        .clip(Radius.medium)
                         .clickable {
                             if (!on) {
                                 sounds.play(Sfx.TAP)
@@ -362,11 +369,11 @@ private fun Shelf(
                                 selectedId = plate.id
                             }
                         }
-                        .padding(6.dp),
+                        .padding(Space.s),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Sculpture(plate, Modifier.fillMaxWidth(), alpha = if (on) 1f else 0.4f)
-                    Spacer(Modifier.height(6.dp))
+                    Sculpture(plate, Modifier.fillMaxWidth(), alpha = if (on) 1f else Alpha.dim)
+                    Spacer(Modifier.height(Space.s))
                     SectionLabel(plate.completedOn?.format(ShortDate).orEmpty())
                 }
             }
@@ -382,7 +389,7 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
     val mine = plate.words[state.you.uid]
 
     SectionLabel("Name it")
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Space.s))
     if (mine != null) {
         Text(
             "You picked ${mine.describing} and ${mine.thing}. ${state.them.name} has not picked yet.",
@@ -399,19 +406,19 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onBackground,
     )
-    Spacer(Modifier.height(10.dp))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Spacer(Modifier.height(Space.m))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.s), verticalArrangement = Arrangement.spacedBy(Space.s)) {
         SculptureNames.offered(plate.id, state.you.uid, SculptureNames.Describing).forEach { w ->
             BrickChip(label = w, on = describing == w, color = you, onClick = { describing = w })
         }
     }
-    Spacer(Modifier.height(10.dp))
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Spacer(Modifier.height(Space.m))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(Space.s), verticalArrangement = Arrangement.spacedBy(Space.s)) {
         SculptureNames.offered(plate.id, state.you.uid, SculptureNames.Things).forEach { w ->
             BrickChip(label = w, on = thing == w, color = you, onClick = { thing = w })
         }
     }
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(Space.m))
     AmpButton(label = "Done", slug = you.slug, enabled = describing != null && thing != null, icon = UiIcon.DONE) {
         onName(plate.id, NameWords(describing!!, thing!!))
     }
@@ -428,7 +435,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
 
     theirs?.let {
         Text("${state.them.name}: $it", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(Space.s))
     }
     if (!editing && mine != null) {
         Text(
@@ -444,14 +451,14 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
             color = you,
             placeholder = "The week we...",
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.s))
         AmpButton(label = "Save", slug = you.slug, enabled = draft.isNotBlank(), icon = UiIcon.DONE) {
             onNote(plate.id, draft.trim())
             editing = false
         }
     }
     if (theirs == null) {
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(Space.s))
         Text(
             "${state.them.name} has not written one yet.",
             style = MaterialTheme.typography.bodySmall,
@@ -489,8 +496,8 @@ internal fun StudPlate(
             Modifier
                 .fillMaxWidth()
                 .height(cell * 0.72f * weeks)
-                .clip(RoundedCornerShape(20.dp))
-                .background(plate, RoundedCornerShape(20.dp))
+                .clip(Radius.control)
+                .background(plate, Radius.control)
                 .pointerInput(byDate, today) {
                     detectTapGestures { at ->
                         val col = (at.x / (size.width / DaysPerWeek)).toInt()
@@ -534,7 +541,7 @@ internal fun StudPlate(
                             left = col * cw + inset + side * (studPx + gap),
                             bottom = (row + 1) * ch - inset,
                             studPx = studPx,
-                            alpha = if (did) 1f else 0.16f,
+                            alpha = if (did) 1f else Alpha.unlit,
                         )
                     }
                 }
@@ -553,12 +560,12 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
     Row(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(Radius.control)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
             ) { sounds.play(Sfx.TAP); feel.play(Feel.TAP); onClick() }
-            .padding(vertical = 14.dp),
+            .padding(vertical = Space.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
@@ -568,20 +575,20 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.xs))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SectionLabel(
                     "${entry.date.format(ShortDate)}  ·  ${entry.question.category}",
                 )
                 if (marks.isNotEmpty()) {
-                    Spacer(Modifier.size(8.dp))
-                    ReactionMarks(marks, size = 14.dp)
+                    Spacer(Modifier.size(Space.s))
+                    ReactionMarks(marks, size = IconSize.mark)
                 }
             }
         }
-        Spacer(Modifier.size(12.dp))
+        Spacer(Modifier.size(Space.m))
         if (score != null) {
-            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
                 repeat(2) { i ->
                     BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < score)
                 }

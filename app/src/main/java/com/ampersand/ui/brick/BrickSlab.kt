@@ -52,7 +52,7 @@ fun structureSlug(): String? =
 
 /** A scrim behind text on the brick wall background, so seams do not cut through the text. */
 @Composable
-fun Modifier.onWall(corner: Dp = 14.dp, strength: Float = 1f): Modifier {
+fun Modifier.onWall(corner: Dp = com.ampersand.ui.theme.Corner.medium, strength: Float = 1f): Modifier {
     // Use background luminance; the themed ink is not a fixed constant to compare against.
     val light = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val pane = if (light) Color.White else Color.Black
@@ -70,7 +70,7 @@ fun Modifier.onWall(corner: Dp = 14.dp, strength: Float = 1f): Modifier {
 @Composable
 fun Modifier.glass(
     ink: Color,
-    corner: Dp = 16.dp,
+    corner: Dp = com.ampersand.ui.theme.Corner.medium,
     strength: Float = 1f,
 ): Modifier {
     val dark = ink == DarkInk
@@ -84,7 +84,7 @@ fun Modifier.glass(
 
 /** As [glass], using the ink for [slug]. */
 @Composable
-fun Modifier.glassOn(slug: String?, corner: Dp = 16.dp): Modifier =
+fun Modifier.glassOn(slug: String?, corner: Dp = com.ampersand.ui.theme.Corner.medium): Modifier =
     glass(inkOnBrick(slug), corner)
 
 /**
@@ -101,6 +101,12 @@ fun BrickSlab(
     studs: Int = 12,
     height: BrickHeight = BrickHeight.MEDIUM,
     alpha: Float = 1f,
+    /**
+     * Stay one size on any phone. Bricks scale with the screen but text does not, so a
+     * button's content is taller against a brick on a narrow phone. Snug lets empty
+     * padding overhang rather than adding a course. For content that is mostly padding.
+     */
+    snug: Boolean = false,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     val run = remember(studs) { BrickArt.runOf(studs) }
@@ -159,12 +165,13 @@ fun BrickSlab(
 
         // Round up to whole courses plus the top nub, so nothing draws above the slab.
         val needed = max(placeable.height.toFloat(), coursePx + nubPx)
-        val courses = ceil((needed - nubPx) / coursePx).toInt().coerceAtLeast(1)
+        val courses = ceil((needed - nubPx) / coursePx - if (snug) 0.5f else 0f).toInt().coerceAtLeast(1)
         val slabHeight = (courses * coursePx + nubPx).roundToInt()
 
         layout(width, slabHeight) {
             // Center content vertically in the rounded height.
-            placeable.place(0, ((slabHeight - placeable.height) / 2).coerceAtLeast(0))
+            val top = (slabHeight - placeable.height) / 2
+            placeable.place(0, if (snug) top else top.coerceAtLeast(0))
         }
     }
 }

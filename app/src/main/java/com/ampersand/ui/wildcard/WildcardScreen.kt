@@ -1,5 +1,7 @@
 package com.ampersand.ui.wildcard
 
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import androidx.compose.foundation.layout.width
 import com.ampersand.ui.components.IconBrick
 import com.ampersand.ui.components.UiIcon
@@ -73,33 +75,28 @@ fun WildcardScreen(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Inset.screen),
     ) {
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(
-                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
-            }
+            com.ampersand.ui.components.BackAction(onBack)
             SectionLabel("For ${state.them.name}")
         }
 
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(Space.l))
         Text(
             text = "Write your own question.",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
         SectionLabel("Question")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         AmpField(
             value = text,
             onValueChange = { text = it },
@@ -107,9 +104,9 @@ fun WildcardScreen(
             color = you,
         )
 
-        Spacer(Modifier.height(26.dp))
+        Spacer(Modifier.height(Space.xl))
         SectionLabel("Type")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         AmpRadioGroup(
             options = Wildcard.WRITABLE.map { it.label },
             selected = type.label,
@@ -118,20 +115,20 @@ fun WildcardScreen(
                 type = Wildcard.WRITABLE.first { it.label == picked }
             },
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.s))
         QuietNote(explain(type, state.them.name))
 
         if (needsOptions) {
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(Space.xl))
             SectionLabel("Options")
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
             AmpField(
                 value = optionA,
                 onValueChange = { optionA = it },
                 placeholder = "Option 1",
                 color = you,
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
             AmpField(
                 value = optionB,
                 onValueChange = { optionB = it },
@@ -140,7 +137,7 @@ fun WildcardScreen(
             )
         }
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         AmpButton(
             label = "Add question",
             slug = you.slug,
@@ -156,9 +153,9 @@ fun WildcardScreen(
             onBack()
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         QuietNote("It will be the question on the next unanswered day.")
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(Space.page))
     }
 }
 

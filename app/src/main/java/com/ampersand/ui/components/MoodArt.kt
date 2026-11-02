@@ -28,7 +28,7 @@ fun MoodArt(
     mood: Mood,
     color: BrickColor,
     modifier: Modifier = Modifier,
-    size: Dp = 44.dp,
+    size: Dp = com.ampersand.ui.theme.IconSize.tile,
     faceColor: BrickColor? = null,
 ) {
     Box(modifier.size(size), contentAlignment = Alignment.Center) {

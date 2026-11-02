@@ -110,6 +110,9 @@ who says "you two should talk about that" and then leaves.
 
 ## Materials
 
+Which token and component to use is in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). This
+section is why they are what they are.
+
 One rule decides most component arguments:
 
 > **Things you press are bricks.** Studs on top, a lip underneath that shortens

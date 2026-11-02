@@ -1,5 +1,7 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Space
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Spring
@@ -219,15 +221,15 @@ private fun RankRow(
             Modifier
                 .fillMaxSize()
                 // Clear the nubs along the top edge.
-                .padding(start = 16.dp, end = 16.dp, top = rowHeight * BrickArt.NUB_RATIO),
+                .padding(start = Space.l, end = Space.l, top = rowHeight * BrickArt.NUB_RATIO),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = position.toString(),
                 style = MaterialTheme.typography.titleMedium,
-                color = ink.copy(alpha = 0.65f),
+                color = ink.copy(alpha = Alpha.quiet),
             )
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(Space.m))
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyLarge,

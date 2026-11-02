@@ -11,7 +11,8 @@ Firestore. The in-memory repository survives only as fixture data for the
 `@Preview` composables.
 
 See [DESIGN.md](DESIGN.md) for what the app is *for* — the name, the voice, the
-rules that settle arguments. This file is how it is built.
+rules that settle arguments. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) is the rulebook for
+spacing, type and controls. This file is how it is built.
 
 > **The code still says Ampersand.** That was the name until the rename, and the
 > package is `com.ampersand`, the theme composable is `AmpersandTheme` and every

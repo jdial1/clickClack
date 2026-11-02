@@ -1,5 +1,7 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.Space
+import com.ampersand.ui.theme.Alpha
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
@@ -114,7 +116,7 @@ fun AmpReactionRow(
                             bottom = size.height,
                             studPx = size.width / Tile.w,
                             // Higher floor than the nav bar so adjacent same-color bricks stay distinct.
-                            alpha = 0.55f + 0.45f * lift,
+                            alpha = Alpha.rise(Alpha.quiet, lift),
                         )
                     }
                     Image(
@@ -147,7 +149,7 @@ fun PartnerReaction(
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         BrickBadge(color, reaction)
-        Spacer(Modifier.size(10.dp))
+        Spacer(Modifier.size(Space.m))
         Text(
             text = "$name: ${reaction.label}",
             style = MaterialTheme.typography.bodyMedium,

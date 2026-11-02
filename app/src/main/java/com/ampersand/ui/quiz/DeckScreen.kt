@@ -1,5 +1,8 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.components.AnswerValues
 import com.ampersand.ui.components.IconAction
 import com.ampersand.model.Kept
@@ -120,9 +123,9 @@ private fun DeckPlayer(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 10.dp, bottom = 12.dp),
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = Alpha.strong))
+                    .padding(horizontal = Inset.screen)
+                    .padding(top = Space.m, bottom = Space.m),
             ) {
                 DeckHeader(quiz, index, you, onBack)
             }
@@ -133,14 +136,14 @@ private fun DeckPlayer(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = Inset.screen),
         ) {
         if (!sticky) {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
             DeckHeader(quiz, index, you, onBack)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Space.xl))
         BrickSlab(
             slugs = listOf(quiz.theme.brick.slug),
             studs = 12,
@@ -151,17 +154,17 @@ private fun DeckPlayer(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 26.dp, bottom = 18.dp)
+                    .padding(start = Space.l, end = Space.l, top = Space.xl, bottom = Space.l)
                     .glassOn(quiz.theme.brick.slug)
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(horizontal = Space.l, vertical = Space.m),
             ) {
                 // Question type and category.
                 Text(
                     text = "${question.type.label.uppercase()}  ·  ${question.category.uppercase()}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = inkOnBrick(quiz.theme.brick.slug).copy(alpha = 0.8f),
+                    color = inkOnBrick(quiz.theme.brick.slug).copy(alpha = Alpha.secondary),
                 )
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(Space.m))
                 Text(
                     text = question.text,
                     style = MaterialTheme.typography.headlineSmall,
@@ -170,17 +173,17 @@ private fun DeckPlayer(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
         SectionLabel("Your answer")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Box(Modifier.arrive(index, index = 1, slide = 16.dp)) {
             QuestionInput(question, mine, you, forPartner = false, state = state)
         }
 
         if (question.isScored) {
-            Spacer(Modifier.height(26.dp))
+            Spacer(Modifier.height(Space.xl))
             SectionLabel("Guess ${state.them.name}'s answer")
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
             Box(Modifier.arrive(index, index = 2, slide = 16.dp)) {
                 QuestionInput(question, guess, them, forPartner = true, state = state)
             }
@@ -193,14 +196,14 @@ private fun DeckPlayer(
         val theirRun = state.theirRun(quiz.id)
         if (!quiz.sealed && ready) {
             theirRun?.answers?.get(question.id)?.let { theirs ->
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(Space.xl))
                 SectionLabel("${state.them.name} said")
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Space.s))
                 AnswerValues(theirs, question.type)
             }
         }
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         val last = index == quiz.size - 1
 
         AmpButton(
@@ -217,7 +220,7 @@ private fun DeckPlayer(
             if (last) onSubmit(answers.toMap(), guesses.toMap()) else index++
         }
 
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(Space.page))
         }
     }
 }
@@ -232,15 +235,10 @@ private fun DeckHeader(quiz: Quiz, index: Int, you: BrickColor, onBack: () -> Un
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TextButton(
-            onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-        ) {
-            Text("Leave")
-        }
+        com.ampersand.ui.components.QuietAction("Leave", onClick = onBack)
         SectionLabel("${index + 1} of ${quiz.size}", panel = false)
     }
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(Space.m))
     Progress(done = index, total = quiz.size, color = you)
 }
 
@@ -248,30 +246,30 @@ private fun DeckHeader(quiz: Quiz, index: Int, you: BrickColor, onBack: () -> Un
 @Composable
 private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modifier: Modifier) {
     Column(
-        modifier.fillMaxWidth().padding(horizontal = 28.dp),
+        modifier.fillMaxWidth().padding(horizontal = Inset.screen),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.height(60.dp))
+        Spacer(Modifier.height(Space.page))
         BrickSlab(
             slugs = listOf(quiz.theme.brick.slug),
             studs = 4,
             height = BrickHeight.MEDIUM,
             modifier = Modifier.width(120.dp),
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Space.xl))
         Text(
             text = "Done",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Text(
             text = "You finished ${quiz.title}. $theirName has not finished yet. Opens when you both finish.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(Space.xxl))
         AmpButton(label = "Back", slug = BrickColor.BLUE.slug, icon = UiIcon.BACK, onClick = onBack)
     }
 }
@@ -291,13 +289,11 @@ private fun DeckResult(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Inset.screen),
     ) {
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
-            }
+            com.ampersand.ui.components.BackAction(onBack)
             val key = Kept.deck(result.quiz.id)
             val isKept = key in state.kept
             IconAction(UiIcon.KEEP, if (isKept) "Kept" else "Keep", onClick = {
@@ -305,14 +301,14 @@ private fun DeckResult(
             })
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.s))
         Text(
             text = result.quiz.title,
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
         CrossAnswerChart(
             result = result,
             you = you,
@@ -321,13 +317,13 @@ private fun DeckResult(
             theirName = state.them.name,
         )
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         SectionLabel("Question by question")
         result.rows.forEachIndexed { i, row ->
             CrossAnswerRow(row, you, them, state.you.name, state.them.name, number = i + 1)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Space.xl))
         Text(
             text = "Now go and ask them about it.",
             style = MaterialTheme.typography.titleSmall,
@@ -335,7 +331,7 @@ private fun DeckResult(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(Modifier.height(48.dp))
+        Spacer(Modifier.height(Space.page))
     }
 }
 
@@ -345,7 +341,7 @@ private fun DeckResult(
  */
 @Composable
 private fun Progress(done: Int, total: Int, color: BrickColor) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
         repeat(total) { i ->
             val lit = i <= done
             // No spring on alpha: overshooting 1.0 breaks drawImage.

@@ -1,5 +1,11 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.components.panel
+import com.ampersand.ui.components.Emphasis
+import com.ampersand.ui.theme.IconSize
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Corner
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.glass
 import androidx.compose.ui.draw.alpha
@@ -69,7 +75,7 @@ fun DeckList(
             val inGroup = grouped[group].orEmpty()
             if (inGroup.isEmpty()) return@forEach
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
             SectionLabel(
                 when (group) {
                     // Your turn, never "Maya is waiting for you": that is a lever.
@@ -78,11 +84,11 @@ fun DeckList(
                     else -> group.heading
                 },
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
 
             inGroup.forEach { deck ->
                 DeckRow(deck, group, state, onOpen)
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(Space.m))
             }
         }
     }
@@ -107,7 +113,7 @@ internal fun BrickChip(
         slug = color?.slug,
         studSize = Stud.chip,
         height = BrickHeight.MEDIUM,
-        alpha = 0.45f + 0.55f * lift,
+        alpha = Alpha.rise(Alpha.quiet, lift),
         modifier = Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
@@ -117,10 +123,10 @@ internal fun BrickChip(
             onClick()
         },
     ) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = Space.m, vertical = Space.s), verticalAlignment = Alignment.CenterVertically) {
             icon?.let {
-                IconBrick(it, size = 20.dp)
-                Spacer(Modifier.width(6.dp))
+                IconBrick(it, size = IconSize.small)
+                Spacer(Modifier.width(Space.s))
             }
             Text(text = label, style = MaterialTheme.typography.labelLarge, color = inkOnBrick(color?.slug))
         }
@@ -168,14 +174,14 @@ private fun DeckRow(
     Row(
         Modifier
             .fillMaxWidth()
-            .alpha(if (group == DeckState.WAITING_ON_THEM) 0.6f else 1f)
-            .glass(inkOnBrick(structureSlug()), corner = 14.dp, strength = 1.4f)
+            .alpha(if (group == DeckState.WAITING_ON_THEM) Alpha.quiet else 1f)
+            .panel(Emphasis.RAISED)
             .clickable { onOpen(deck.id) }
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = Space.m, vertical = Space.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ThemeIcon(deck.theme, size = 44.dp)
-        Spacer(Modifier.width(12.dp))
+        ThemeIcon(deck.theme, size = IconSize.tile)
+        Spacer(Modifier.width(Space.m))
         run {
             Column(Modifier.weight(1f)) {
                 Text(
@@ -186,7 +192,7 @@ private fun DeckRow(
                 Text(
                     text = "${deck.theme.label.uppercase()}  ·  $detail",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ink.copy(alpha = 0.85f),
+                    color = ink.copy(alpha = Alpha.secondary),
                 )
             }
         }
@@ -229,6 +235,6 @@ private fun PreviewDeckList() = AmpersandTheme {
         ),
     )
     Surface(color = MaterialTheme.colorScheme.background) {
-        DeckList(decks, state, {}, Modifier.padding(horizontal = 24.dp))
+        DeckList(decks, state, {}, Modifier.padding(horizontal = Space.xl))
     }
 }

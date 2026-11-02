@@ -140,7 +140,7 @@ fun BrickDot(
     studSize: Dp = 14.dp,
     filled: Boolean = true,
     /** Alpha for an unfilled marker. Raise it for unselected options that must stay visible. */
-    dimAlpha: Float = 0.28f,
+    dimAlpha: Float = com.ampersand.ui.theme.Alpha.unlit,
 ) {
     val asset = BrickArt.assetFor(slug, DotShape)
     val atlas = rememberBricks(listOf(asset))

@@ -1,5 +1,7 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.IconSize
+import com.ampersand.ui.theme.Space
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -42,7 +44,7 @@ enum class UiIcon(@DrawableRes val res: Int) {
 }
 
 @Composable
-fun IconBrick(icon: UiIcon, modifier: Modifier = Modifier, size: Dp = 22.dp, turned: Boolean = false) {
+fun IconBrick(icon: UiIcon, modifier: Modifier = Modifier, size: Dp = com.ampersand.ui.theme.IconSize.medium, turned: Boolean = false) {
     Image(
         painterResource(icon.res),
         contentDescription = null,
@@ -66,18 +68,18 @@ fun IconAction(
                 if (onClick == null) Modifier
                 else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
             )
-            .padding(vertical = 4.dp),
+            .padding(vertical = Space.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconBrick(icon, turned = turned)
-        Spacer(Modifier.width(6.dp))
+        Spacer(Modifier.width(Space.s))
         Text(label, style = MaterialTheme.typography.labelLarge, color = color)
     }
 }
 
 /** The theme's icon brick, in the theme's colour. Drawn by tools/ui/themes.py. */
 @Composable
-fun ThemeIcon(theme: com.ampersand.model.QuizTheme, modifier: Modifier = Modifier, size: Dp = 40.dp) {
+fun ThemeIcon(theme: com.ampersand.model.QuizTheme, modifier: Modifier = Modifier, size: Dp = com.ampersand.ui.theme.IconSize.tile) {
     val res = when (theme) {
         com.ampersand.model.QuizTheme.KNOW_ME -> R.drawable.theme_know_me
         com.ampersand.model.QuizTheme.EVERYDAY -> R.drawable.theme_everyday
