@@ -45,6 +45,21 @@ class VoiceTest {
         assertTrue("\"your partner\": $bad", bad.isEmpty())
     }
 
+    /** DESIGN.md's worked examples: say what is true, and never announce the tap. */
+    @Test
+    fun `no waiting for and no tap to`() {
+        val banned = Regex("""Waiting (for|on)\b|Tap to""")
+        val bad = File(root, "java/com/ampersand").walk()
+            .filter { it.extension == "kt" }
+            .flatMap { file ->
+                Regex(""""((?:[^"\\\n]|\\.)*)"""").findAll(file.readText())
+                    .map { file.name to it.groupValues[1] }
+                    .filter { (_, s) -> banned.containsMatchIn(s) }
+            }
+            .toList()
+        assertTrue("banned phrasing: $bad", bad.isEmpty())
+    }
+
     @Test
     fun `no exclamation marks or emoji in the questions`() {
         val bad = File(root, "assets").walk().filter { it.extension == "json" }

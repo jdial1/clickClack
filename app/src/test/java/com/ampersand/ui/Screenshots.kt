@@ -123,4 +123,37 @@ class Screenshots {
     @Test fun sign_in() = shoot("00-sign-in") { com.ampersand.ui.auth.SignInScreen(busy = false, error = null, onSignIn = {}) }
 
     @Test fun settings() = shoot("07-settings") { SettingsScreen(special, onPickColor = {}, onBack = {}, onSignOut = {}) }
+
+    /** Today once you have both answered: the first thing a new couple ever opens. */
+    private val bothIn: CoupleState = base.copy(
+        today = base.today.copy(
+            question = com.ampersand.model.Question(
+                "fw5",
+                "What is something small I do that you would miss by Wednesday?",
+                QuestionType.REFLECT,
+                "Playful",
+                com.ampersand.model.Depth(1),
+            ),
+            answers = mapOf(
+                you.uid to com.ampersand.model.Answer(you.uid, listOf("The coffee you leave on the step")),
+                them.uid to com.ampersand.model.Answer(them.uid, listOf("You humming when you think I am asleep")),
+            ),
+            opened = true,
+        ),
+        history = emptyList(),
+        shelf = emptyList(),
+        capsule = null,
+    )
+
+    @Test fun today_open_it() = shoot("09-today-open-it") { TodayScreen(bothIn, { _, _ -> }, {}) }
+
+    @Test fun first_reveal() = shoot("10-first-reveal") {
+        RevealScreen(bothIn, bothIn.today, onBack = {}, animateIn = false)
+    }
+
+    @Test fun shelf_first_week() = shoot("11-shelf-first-week-building") { HistoryScreen(bothIn, onOpenDay = {}) }
+
+    @Test fun shelf_nothing_placed() = shoot("12-shelf-nothing-placed") {
+        HistoryScreen(bothIn.copy(plate = bothIn.plate.copy(placed = emptyList())), onOpenDay = {})
+    }
 }

@@ -74,7 +74,7 @@ fun DeckList(
                 when (group) {
                     // Your turn, never "Maya is waiting for you": that is a lever.
                     DeckState.WAITING_ON_YOU -> "Your turn"
-                    DeckState.WAITING_ON_THEM -> "Waiting for ${state.them.name}"
+                    DeckState.WAITING_ON_THEM -> "${state.them.name} has not finished"
                     else -> group.heading
                 },
             )

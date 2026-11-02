@@ -20,6 +20,11 @@ import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import com.ampersand.model.BrickShape
 import com.ampersand.ui.brick.BrickArt
@@ -164,8 +169,12 @@ fun TodayScreen(
                     "Your turn",
                     "${state.them.name} sees your answer once they answer too.",
                 )
-                !day.isRevealed -> HeroStatus("Waiting for ${state.them.name}", answerLine(yourAnswer))
-                else -> HeroStatus("You both answered", "Tap to see answers. " + answerLine(yourAnswer), onOpenReveal)
+                !day.isRevealed -> HeroStatus(
+                    title = "Click.",
+                    detail = "${state.them.name} has not answered yet. " + answerLine(yourAnswer),
+                    waiting = true,
+                )
+                else -> HeroStatus("Click. Clack.", "Open it. " + answerLine(yourAnswer), onOpenReveal)
             },
         )
         // Your answer lives on the card once it's in, so the form is the only thing below it.
@@ -181,19 +190,26 @@ fun TodayScreen(
             }
         }
 
-        Spacer(Modifier.height(20.dp))
-        Moods(state, onSetMood, onReplyToMood)
-
-        val events = remember(state) { specialToday(state) }
-        if (events.isNotEmpty()) {
-            Spacer(Modifier.height(12.dp))
-            SpecialDayCard(state, events, onAddPhoto)
-        }
-
-        val moments = remember(state.history, state.kept, state.today.date) { Moments.of(state) }
-        if (moments.isNotEmpty()) {
+        // Until you have answered, the question has the screen. The rest is one tap away.
+        var moreOpen by rememberSaveable { mutableStateOf(false) }
+        if (yourAnswer != null || moreOpen) {
             Spacer(Modifier.height(20.dp))
-            MomentsList(state, moments, onOpenDay, onAnswerDay)
+            Moods(state, onSetMood, onReplyToMood)
+
+            val events = remember(state) { specialToday(state) }
+            if (events.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                SpecialDayCard(state, events, onAddPhoto)
+            }
+
+            val moments = remember(state.history, state.kept, state.today.date) { Moments.of(state) }
+            if (moments.isNotEmpty()) {
+                Spacer(Modifier.height(20.dp))
+                MomentsList(state, moments, onOpenDay, onAnswerDay)
+            }
+        } else {
+            Spacer(Modifier.height(12.dp))
+            androidx.compose.material3.TextButton(onClick = { moreOpen = true }) { Text("More today") }
         }
 
 
@@ -305,7 +321,11 @@ private fun QuestionHero(
                     )
                     .padding(horizontal = 14.dp, vertical = 12.dp),
             ) {
-                Text(st.title, style = MaterialTheme.typography.titleMedium, color = ink)
+                if (st.waiting) {
+                    ClickThenClack(ink)
+                } else {
+                    Text(st.title, style = MaterialTheme.typography.titleMedium, color = ink)
+                }
                 Text(st.detail, style = MaterialTheme.typography.bodySmall, color = ink)
             }
         }
@@ -1003,7 +1023,28 @@ fun PastAnswerScreen(
 }
 
 /** What the question card says about the day, and where tapping it goes. */
-private data class HeroStatus(val title: String, val detail: String, val onClick: (() -> Unit)? = null)
+private data class HeroStatus(
+    val title: String,
+    val detail: String,
+    val onClick: (() -> Unit)? = null,
+    /** You are in and they are not: the title becomes the name, half made. */
+    val waiting: Boolean = false,
+)
+
+/** The name doing its job: yours is made, theirs is still breathing. */
+@Composable
+private fun ClickThenClack(ink: Color) {
+    val breath by rememberInfiniteTransition(label = "clack").animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(tween(1400), RepeatMode.Reverse),
+        label = "clack",
+    )
+    Row {
+        Text("Click. ", style = MaterialTheme.typography.titleMedium, color = ink)
+        Text("Clack.", style = MaterialTheme.typography.titleMedium, color = ink.copy(alpha = breath))
+    }
+}
 
 
 @Composable

@@ -266,7 +266,7 @@ private fun DeckWaiting(quiz: Quiz, theirName: String, onBack: () -> Unit, modif
         )
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "You finished ${quiz.title}. Waiting for $theirName. Opens when you both finish.",
+            text = "You finished ${quiz.title}. $theirName has not finished yet. Opens when you both finish.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

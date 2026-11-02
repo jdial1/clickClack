@@ -295,8 +295,19 @@ private fun Shelf(
     onNameWeek: (String, NameWords) -> Unit,
 ) {
     if (shelf.isEmpty()) {
+        // Nothing sealed yet, so show the week being built rather than an empty promise.
+        val live = state.plate
+        val seals = live.endsOn().format(LongDate)
+        if (live.placed.isNotEmpty()) {
+            Sculpture(live, Modifier.fillMaxWidth())
+            Spacer(Modifier.height(10.dp))
+        }
         Text(
-            text = "No sculptures yet. Your first one arrives at the end of the week.",
+            text = if (live.placed.isEmpty()) {
+                "Nothing sealed yet. Your first sculpture lands on $seals."
+            } else {
+                "This week, so far. It seals on $seals."
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -374,7 +385,7 @@ private fun NameWeek(plate: BuildPlate, state: CoupleState, onName: (String, Nam
     Spacer(Modifier.height(8.dp))
     if (mine != null) {
         Text(
-            "You picked ${mine.describing} and ${mine.thing}. Waiting for ${state.them.name}.",
+            "You picked ${mine.describing} and ${mine.thing}. ${state.them.name} has not picked yet.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -442,7 +453,7 @@ private fun WeekNotes(plate: BuildPlate, state: CoupleState, onNote: (String, St
     if (theirs == null) {
         Spacer(Modifier.height(6.dp))
         Text(
-            "Waiting for ${state.them.name}.",
+            "${state.them.name} has not written one yet.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

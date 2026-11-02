@@ -84,10 +84,10 @@ object BadgeWall {
     /** (progress line, action label) for a test, from both people's progress. */
     fun caption(yours: Standing, theirs: Standing, them: String): Pair<String, String> = when {
         yours.finished && theirs.inProgress ->
-            (them + " is " + at(theirs)) to ("Waiting on " + them)
+            (them + " is " + at(theirs)) to (them + " has not finished")
 
         yours.finished ->
-            "You are done" to ("Waiting on " + them)
+            "You are done" to (them + " has not finished")
 
         // Same place: say it once instead of repeating it for each person.
         yours.inProgress && theirs.inProgress && at(yours) == at(theirs) ->
