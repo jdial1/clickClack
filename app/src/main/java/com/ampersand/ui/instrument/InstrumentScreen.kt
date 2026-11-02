@@ -1,5 +1,9 @@
 package com.ampersand.ui.instrument
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.components.IconAction
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.brick.structureSlug
@@ -134,11 +138,11 @@ fun InstrumentScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(scroll)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = Inset.screen),
         ) {
             // Intro and scale note at the start of each pass.
             if (here.items.first == 0) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(Space.l))
                 Text(
                     text = if (instrument.passCount > 1) {
                         "Round ${here.pass + 1} of ${instrument.passCount}. ${instrument.blurb}"
@@ -148,11 +152,11 @@ fun InstrumentScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(Space.m))
                 QuietNote(scaleNote(instrument))
             }
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
 
             here.items.forEachIndexed { i, item ->
                 val slot = here.slots.first + i
@@ -166,10 +170,10 @@ fun InstrumentScreen(
                         responses[slot] = v
                     },
                 )
-                if (i < here.size - 1) Spacer(Modifier.height(4.dp))
+                if (i < here.size - 1) Spacer(Modifier.height(Space.xs))
             }
 
-            Spacer(Modifier.height(26.dp))
+            Spacer(Modifier.height(Space.xl))
             AmpButton(
                 label = when {
                     last -> "Finish"
@@ -190,7 +194,7 @@ fun InstrumentScreen(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
             QuietNote(
                 when {
                     !ready -> "Answer every item to continue."
@@ -202,18 +206,18 @@ fun InstrumentScreen(
             // Source credit, last page only.
             if (last) {
                 Sources[instrument.sourceId]?.let { source ->
-                    Spacer(Modifier.height(18.dp))
+                    Spacer(Modifier.height(Space.l))
                     Text(
                         text = "${source.credit}. ${source.venue}. ${source.licence}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.secondary),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(Space.page))
         }
     }
 }
@@ -233,12 +237,12 @@ private fun ItemRow(
     Column(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(Radius.medium)
             // Answered rows are more transparent.
             .background(
-                MaterialTheme.colorScheme.surface.copy(alpha = if (answered) 0.55f else 0.88f),
+                MaterialTheme.colorScheme.surface.copy(alpha = if (answered) Alpha.quiet else Alpha.strong),
             )
-            .padding(horizontal = 14.dp, vertical = 13.dp),
+            .padding(horizontal = Space.m, vertical = Space.m),
     ) {
         item.text?.let {
             Text(
@@ -246,19 +250,19 @@ private fun ItemRow(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
         }
 
         Row(
             Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Space.m),
             verticalAlignment = Alignment.Top,
         ) {
             Pole(item.low, Modifier.weight(1f), TextAlign.Start, item.isPolePair)
             Pole(item.high, Modifier.weight(1f), TextAlign.End, item.isPolePair)
         }
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         // Spread edge to edge so the end stops sit under the pole labels.
         Row(
             Modifier.fillMaxWidth(),
@@ -269,12 +273,12 @@ private fun ItemRow(
                 val interaction = remember { MutableInteractionSource() }
                 Box(
                     Modifier
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(Radius.small)
                         .clickable(
                             interactionSource = interaction,
                             indication = null,
                         ) { onPick(stop) }
-                        .padding(horizontal = 6.dp, vertical = 7.dp),
+                        .padding(horizontal = Space.s, vertical = Space.s),
                 ) {
                     BrickDot(
                         slug = stopSlug(item, stop, value, accent),
@@ -289,7 +293,7 @@ private fun ItemRow(
 
         // The chosen stop in words.
         if (answered) {
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = stopLabel(item, value),
                 style = MaterialTheme.typography.labelSmall,
@@ -318,9 +322,9 @@ private fun StickyHeader(
     Column(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.94f))
-            .padding(horizontal = 24.dp)
-            .padding(top = 10.dp, bottom = 12.dp),
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = Alpha.strong))
+            .padding(horizontal = Inset.screen)
+            .padding(top = Space.m, bottom = Space.m),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -328,14 +332,7 @@ private fun StickyHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Same Back pill as Settings.
-            BrickPill(slug = structureSlug(), studSize = Stud.chip, height = BrickHeight.MEDIUM) {
-                IconAction(
-                    UiIcon.BACK, "Back",
-                    Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
-                    color = inkOnBrick(structureSlug()),
-                    onClick = onBack,
-                )
-            }
+            com.ampersand.ui.components.BackAction(onBack)
 
             if (instrument.needsProgress) {
                 SectionLabel("$answered of ${instrument.length}", panel = false)
@@ -349,13 +346,13 @@ private fun StickyHeader(
         )
 
         if (instrument.needsProgress) {
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.xs))
             Text(
                 text = "Page ${page.index + 1} of $pages",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             PageStuds(done = pageDone, of = page.size, you = you)
         }
     }
@@ -364,7 +361,7 @@ private fun StickyHeader(
 /** One stud per item on the page, lit as you answer. */
 @Composable
 private fun PageStuds(done: Int, of: Int, you: BrickColor) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
         repeat(of) { i ->
             val lit = i < done
             // No spring on alpha: overshooting 1.0 breaks drawImage.

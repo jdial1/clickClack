@@ -1,5 +1,7 @@
 package com.ampersand.ui
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Space
 import com.ampersand.model.Topic
 import com.ampersand.model.Kept
 import com.ampersand.ui.today.PastAnswerScreen
@@ -681,8 +683,8 @@ private fun SignedInApp(
                         screen.tab == Tab.SHELF -> Column(Modifier.fillMaxSize()) {
                             var past by rememberSaveable { mutableStateOf(false) }
                             Row(
-                                Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                Modifier.padding(start = Space.xl, end = Space.xl, top = Space.m),
+                                horizontalArrangement = Arrangement.spacedBy(Space.s),
                             ) {
                                 BrickChip(label = "This week", on = !past, color = BrickColor.of(state.you.colorArgb), onClick = { past = false })
                                 BrickChip(label = "Past weeks", on = past, color = BrickColor.of(state.you.colorArgb), onClick = { past = true })
@@ -751,7 +753,7 @@ private fun BottomBar(
         Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 18.dp, vertical = 8.dp),
+            .padding(horizontal = Space.l, vertical = Space.s),
     ) {
         // Two studs a tab and one between each: 14 for five tabs.
         val stud = maxWidth / (Tab.entries.size * 3 - 1).toFloat()
@@ -807,15 +809,12 @@ private fun BottomBar(
                             bottom = size.height,
                             studPx = size.width / tabShape.w,
                             // Unselected tabs are faded.
-                            alpha = 0.34f + 0.66f * lift,
+                            alpha = Alpha.rise(Alpha.dim, lift),
                         )
                     }
                     Text(
                         text = entry.label,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp,
-                            letterSpacing = 0.2.sp,
-                        ),
+                        style = com.ampersand.ui.theme.NavLabel,
                         color = fg,
                         maxLines = 1,
                         modifier = Modifier

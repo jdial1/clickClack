@@ -1,5 +1,8 @@
 package com.ampersand.ui.auth
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,19 +37,19 @@ fun SignInScreen(
     onPreview: () -> Unit = {},
 ) {
     Box(modifier.fillMaxSize()) {
-      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
+      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = Alpha.faint)
 
       Column(
         Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = Inset.screen),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Wordmark()
 
-        Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(Space.xl))
         Text(
             text = "Answers open when you both finish.",
             style = MaterialTheme.typography.bodyLarge,
@@ -54,7 +57,7 @@ fun SignInScreen(
             textAlign = TextAlign.Center,
         )
 
-        Spacer(Modifier.height(36.dp))
+        Spacer(Modifier.height(Space.xxl))
         AmpButton(
             label = if (busy) "Signing in" else "Continue with Google",
             slug = BrickColor.RED.slug,
@@ -63,7 +66,7 @@ fun SignInScreen(
         )
 
         if (error != null) {
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
             // Selectable, so a failure report can be copied out whole.
             androidx.compose.foundation.text.selection.SelectionContainer {
                 Text(
@@ -75,10 +78,10 @@ fun SignInScreen(
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Space.xl))
         SectionLabel("One question a day, for two people")
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         com.ampersand.ui.components.IconAction(
             com.ampersand.ui.components.UiIcon.NEXT,
             "Skip for now and look around",

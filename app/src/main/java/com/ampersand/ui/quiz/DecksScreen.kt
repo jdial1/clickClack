@@ -1,5 +1,12 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.components.panel
+import com.ampersand.ui.components.Emphasis
+import com.ampersand.ui.theme.IconSize
+import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Corner
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
@@ -67,27 +74,27 @@ fun DecksScreen(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Inset.screen),
     ) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.l))
         Text("Decks", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(Space.xs))
         Text(
             "Longer sets of questions to play together.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
         ShapeTomorrow(state, themes, onPickTomorrow, onWrite)
 
         LongerTests(state, onTakeInstrument)
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         SectionLabel("Themes")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         // One scrolling row. Grey cards; only the icon brick carries the theme colour.
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(Space.m)) {
             items(deckThemes, key = { it.name }) { t ->
                 val on = theme == t
                 val inTheme = decks.filter { it.theme == t }
@@ -95,8 +102,8 @@ fun DecksScreen(
                 Column(
                     Modifier
                         .width(108.dp)
-                        .glass(inkOnBrick(structureSlug()), corner = 12.dp, strength = if (on) 2.2f else 1.4f)
-                        .then(if (on) Modifier.border(2.dp, MaterialTheme.colorScheme.onBackground, RoundedCornerShape(12.dp)) else Modifier)
+                        .panel(if (on) Emphasis.SELECTED else Emphasis.RAISED)
+                        .then(if (on) Modifier.border(2.dp, MaterialTheme.colorScheme.onBackground, Radius.medium) else Modifier)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -105,11 +112,11 @@ fun DecksScreen(
                             feel.play(if (on) Feel.DESELECT else Feel.SELECT)
                             theme = if (on) null else t
                         }
-                        .padding(horizontal = 6.dp, vertical = 10.dp),
+                        .padding(horizontal = Space.s, vertical = Space.m),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    ThemeIcon(t, size = 40.dp)
-                    Spacer(Modifier.height(6.dp))
+                    ThemeIcon(t, size = IconSize.tile)
+                    Spacer(Modifier.height(Space.s))
                     Text(t.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
                     Text(
                         if (waiting > 0) "${inTheme.size} · $waiting your turn" else if (inTheme.size == 1) "1 deck" else "${inTheme.size} decks",
@@ -121,10 +128,10 @@ fun DecksScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         DeckList(decks = shown, state = state, onOpen = onOpenDeck)
 
-        Spacer(Modifier.height(48.dp))
+        Spacer(Modifier.height(Space.page))
     }
 }
 
@@ -136,17 +143,17 @@ private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
         BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.isEarned }
     }
     if (groups.isEmpty()) return
-    Spacer(Modifier.height(28.dp))
+    Spacer(Modifier.height(Space.xxl))
     val sounds = LocalSounds.current
     val feel = LocalFeel.current
     SectionLabel("Longer tests")
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(Space.m))
     groups.forEach { g ->
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp)
-                .glass(inkOnBrick(structureSlug()), corner = 12.dp)
+                .padding(bottom = Space.s)
+                .panel()
                 .then(
                     if (!g.yourTurn) Modifier
                     else Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
@@ -155,7 +162,7 @@ private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
                         onTake(g.instrumentId)
                     },
                 )
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = Space.m, vertical = Space.m),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {

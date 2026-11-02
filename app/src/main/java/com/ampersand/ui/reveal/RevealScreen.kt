@@ -1,5 +1,7 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import com.ampersand.model.Kept
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
@@ -111,41 +113,39 @@ fun RevealScreen(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = Inset.screen),
     ) {
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(
-                onClick = { sounds.play(Sfx.NAV); feel.play(Feel.NAV); onBack() },
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) { IconBrick(UiIcon.BACK, size = 20.dp); Spacer(Modifier.width(6.dp)); Text("Back") }
-            }
+            com.ampersand.ui.components.BackAction(onBack)
             val key = Kept.day(day.date)
             val isKept = key in state.kept
             IconAction(UiIcon.KEEP, if (isKept) "Kept" else "Keep", onClick = {
                 onKeep(key, if (isKept) null else day.question.text)
             })
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SectionLabel(day.date.format(DayFormat))
-                DepthDots(day.question.depth)
-            }
+        }
+
+        // On its own line: a brick Back, Keep and a date do not fit across a phone.
+        Spacer(Modifier.height(Space.m))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Space.s),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SectionLabel(day.date.format(DayFormat))
+            DepthDots(day.question.depth)
         }
 
         // The first day you both answered gets the name, in your two colours, and nothing louder.
         if (day.isRevealed && (state.history + state.today).count { it.isRevealed } == 1) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Space.xl))
             FirstOpen(state, Modifier.arrive(day.date, index = 0, enabled = animateIn))
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(Space.xl))
         Text(
             text = day.question.text,
             style = MaterialTheme.typography.headlineSmall,
@@ -154,13 +154,13 @@ fun RevealScreen(
         )
 
         if (score != null) {
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
             Box(Modifier.arrive(day.date, index = 1, enabled = animateIn)) {
                 ScoreBanner(score)
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
 
         Box(Modifier.arrive(day.date, index = 2, enabled = animateIn)) {
             AnswerPanelPair(
@@ -187,11 +187,11 @@ fun RevealScreen(
 
         // Capsule days only, after reveal: the earlier answers to the same question.
         state.capsule?.takeIf { it.question.id == day.question.id && day.isRevealed }?.let { then ->
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(Space.xxl))
             Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
                 Column(Modifier.fillMaxWidth()) {
                     SectionLabel("And ${agoIn(then.date, day.date)}")
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(Space.m))
                     AnswerPanelPair(
                         type = then.question.type,
                         scored = then.question.isScored,
@@ -216,9 +216,9 @@ fun RevealScreen(
             }
         }
 
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(Space.xxl))
         SectionLabel("React")
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
             AmpReactionRow(
                 selected = day.reactionFor(state.you.uid),
@@ -227,7 +227,7 @@ fun RevealScreen(
             )
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.l))
         val theirs = day.reactionFor(state.them.uid)
         if (theirs != null) {
             PartnerReaction(
@@ -241,12 +241,12 @@ fun RevealScreen(
 
         if (day.isRevealed) {
             // One line each, not a thread: the conversation belongs in the other room.
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.xl))
             SectionLabel("A line back")
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             day.notes[state.them.uid]?.let {
                 Text("${state.them.name}: $it", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Space.s))
             }
             val mine = day.notes[state.you.uid]
             var editing by remember(day.date) { mutableStateOf(mine == null) }
@@ -255,7 +255,7 @@ fun RevealScreen(
                 IconAction(UiIcon.WRITE, "You: $mine", onClick = { editing = true })
             } else {
                 AmpField(value = draft, onValueChange = { draft = it.take(140) }, color = BrickColor.of(state.you.colorArgb), placeholder = "Say one thing back")
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Space.s))
                 AmpButton(label = "Send", slug = null, enabled = draft.isNotBlank(), icon = UiIcon.DONE) {
                     onNote(draft.trim())
                     editing = false
@@ -263,14 +263,14 @@ fun RevealScreen(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.xl))
         DidYouTalk(state, day, onTalkedAbout)
 
         if (day.isRevealed) {
             // A gesture, not a countdown: nothing announces the date before it comes.
             val mine = state.you.uid in day.askAgain
             val theirs = state.them.uid in day.askAgain
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
             IconAction(
                 UiIcon.DATES,
                 when {
@@ -283,13 +283,13 @@ fun RevealScreen(
         }
 
         if (day.date == state.today.date) {
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(Space.xxl))
             ShapeTomorrow(state, themes, onPickTomorrow, onWrite)
         }
 
         if (day.isRevealed) {
             // The last word on the screen, and the only instruction the app ever gives.
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(Space.xxl))
             Text(
                 text = "Now go and ask them about it.",
                 style = MaterialTheme.typography.titleSmall,
@@ -298,7 +298,7 @@ fun RevealScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(Space.page))
     }
 }
 
@@ -308,9 +308,9 @@ private fun ScoreBanner(score: Int) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         repeat(2) { i ->
             BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < score)
-            Spacer(Modifier.size(6.dp))
+            Spacer(Modifier.size(Space.s))
         }
-        Spacer(Modifier.size(4.dp))
+        Spacer(Modifier.size(Space.xs))
         Text(
             text = when (score) {
                 2 -> "You both guessed right."
@@ -376,20 +376,20 @@ private fun PreviewRevealDark() = AmpersandTheme(darkTheme = true) {
 @Composable
 private fun FirstOpen(state: CoupleState, modifier: Modifier = Modifier) {
     Column(modifier) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Space.s)) {
             listOf("Click." to state.you, "Clack." to state.them).forEach { (word, member) ->
                 val slug = BrickColor.of(member.colorArgb).slug
                 BrickPill(slug = slug, studSize = Stud.chip, height = BrickHeight.MEDIUM) {
                     Text(
                         word,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = Space.m, vertical = Space.s),
                         style = MaterialTheme.typography.titleMedium,
                         color = inkOnBrick(slug),
                     )
                 }
             }
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Text(
             "This is your first one.",
             style = MaterialTheme.typography.bodyMedium,

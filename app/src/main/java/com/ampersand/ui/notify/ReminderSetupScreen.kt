@@ -1,5 +1,8 @@
 package com.ampersand.ui.notify
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,13 +59,13 @@ fun ReminderSetupScreen(
     // Own background: the themes.xml window background is always dark, which hid text in light mode.
     Surface(color = MaterialTheme.colorScheme.background) {
     Box(modifier.fillMaxSize()) {
-        BrickWall(you = color, them = BrickColor.BLUE, alpha = 0.12f)
+        BrickWall(you = color, them = BrickColor.BLUE, alpha = Alpha.faint)
 
         Column(
             Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
-                .padding(horizontal = 28.dp),
+                .padding(horizontal = Inset.screen),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -71,7 +74,7 @@ fun ReminderSetupScreen(
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = "We'll remind you once a day to answer the question.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -79,9 +82,9 @@ fun ReminderSetupScreen(
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(Space.xxl))
             SectionLabel("Time")
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
             AmpDropdown(
                 options = Hours,
                 selected = hour,
@@ -90,7 +93,7 @@ fun ReminderSetupScreen(
                 onSelect = { hour = it },
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.xl))
             AmpButton(
                 label = "Remind me",
                 slug = color.slug,
@@ -104,10 +107,8 @@ fun ReminderSetupScreen(
                 }
             }
 
-            Spacer(Modifier.height(6.dp))
-            TextButton(onClick = { Reminder.markAsked(context); onDone() }) {
-                Text("Not now")
-            }
+            Spacer(Modifier.height(Space.s))
+            com.ampersand.ui.components.QuietAction("Not now", onClick = { Reminder.markAsked(context); onDone() })
         }
     }
     }

@@ -1,5 +1,7 @@
 package com.ampersand.ui.theme
 
+import androidx.compose.ui.unit.Dp
+
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
@@ -165,9 +167,103 @@ object Stud {
     val hero = 46.dp
 }
 
+/**
+ * The only gaps in the app. Anything between two of these is a decision nobody
+ * meant to make. See DESIGN_SYSTEM.md for which to reach for.
+ */
+object Space {
+    /** Between a label and the line it belongs to, inside a pill. */
+    val hair = 2.dp
+
+    /** Between lines of one thing. */
+    val xs = 4.dp
+
+    /** Between an icon and its label; tight rows. */
+    val s = 8.dp
+
+    /** Between items in a group. */
+    val m = 12.dp
+
+    /** A panel's own padding; a label above what it heads. */
+    val l = 16.dp
+
+    /** Between sections. */
+    val xl = 24.dp
+
+    /** Between unrelated sections. */
+    val xxl = 32.dp
+
+    /** Top and bottom of a page. */
+    val page = 48.dp
+}
+
+/** Named margins, so a screen cannot pick its own. */
+object Inset {
+    /** Every screen's side margin. The page is 12 studs inside this. */
+    val screen = Space.xl
+}
+
+/** Corner sizes for things that take a [Dp]. Prefer [Radius] for a shape. */
+object Corner {
+    /** Thin bars only, where a larger corner would swallow the bar. */
+    val hair = 3.dp
+    val small = 8.dp
+    val medium = 12.dp
+    val control = 20.dp
+    val card = 28.dp
+}
+
+/**
+ * How see-through something is. Six steps, each with a job; art that animates between
+ * them uses [rise].
+ */
+object Alpha {
+    /** A wash behind everything: the sign-in wall, an owner's tint. */
+    const val faint = 0.12f
+
+    /** Bricks not earned yet: an empty pip, an unlit stud. */
+    const val unlit = 0.25f
+
+    /** Off: disabled, not selected. */
+    const val dim = 0.4f
+
+    /** Resting, or waiting on someone else. Still readable. */
+    const val quiet = 0.6f
+
+    /** Secondary text on brick, where the theme's muted colour cannot be used. */
+    const val secondary = 0.8f
+
+    /** Nearly solid: a card or a sticky header over the wall; a pressed brick. */
+    const val strong = 0.9f
+
+    /** From [from] up to fully solid as [t] goes from 0 to 1. */
+    fun rise(from: Float, t: Float): Float = from + (1f - from) * t
+}
+
+/** Icon and art sizes. A brick icon is pixel art, so fewer sizes also means less blur. */
+object IconSize {
+    /** Inside a line of small text. */
+    val mark = 14.dp
+
+    /** A marker next to a label. */
+    val small = 20.dp
+
+    /** The default: actions and buttons. */
+    val medium = 22.dp
+
+    /** The icon that leads a row: weather, a mood, a special day. */
+    val large = 32.dp
+
+    /** The icon that is the point of a tile: a deck, a theme. */
+    val tile = 44.dp
+}
+
 object Radius {
-    val control = RoundedCornerShape(20.dp)
-    val card = RoundedCornerShape(28.dp)
+    val hair = RoundedCornerShape(Corner.hair)
+    val small = RoundedCornerShape(Corner.small)
+    val medium = RoundedCornerShape(Corner.medium)
+    val control = RoundedCornerShape(Corner.control)
+    val card = RoundedCornerShape(Corner.card)
 }
 
 /**
@@ -255,10 +351,19 @@ internal val DayCard = Color(0xFFE8EBF7)
 internal val DayInk = Color(0xFF11152B)
 internal val DayMuted = Color(0xFF6A7299)
 
+/** The border on a special day's card. The app's only gold, so it stays special. */
+internal val SpecialGold = Color(0xFFFFC94D)
+
 /** The four pickable colors, from [com.ampersand.model.BrickColor] (brick art exists only in these). */
 val ColorChoices: List<Color> = com.ampersand.model.BrickColor.entries.map { Color(it.argb) }
 
 // --- Type --------------------------------------------------------------------
+
+/** The tab bar: a 2-stud tile has to fit "Shelf" without shrinking the brick. */
+val NavLabel = TextStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 0.2.sp)
+
+/** A partner code, read aloud from one phone to another. */
+val InviteCodeText = TextStyle(fontSize = 26.sp)
 
 val AmpersandTypography = Typography().run {
     copy(

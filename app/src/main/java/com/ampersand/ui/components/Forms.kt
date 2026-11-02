@@ -1,5 +1,8 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.IconSize
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Space
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -147,7 +150,7 @@ fun AmpField(
                 .graphicsLayer {
                     translationY = -lift * FieldLift.toPx()
                     // Alpha on one offscreen layer, or lower nubs show through translucent bricks.
-                    alpha = if (enabled) 1f else 0.5f
+                    alpha = if (enabled) 1f else Alpha.dim
                     compositingStrategy = CompositingStrategy.Offscreen
                 },
         ) {
@@ -187,7 +190,7 @@ fun AmpField(
             if (value.isEmpty()) {
                 Text(
                     text = placeholder,
-                    style = style.copy(color = ink.copy(alpha = 0.75f)),
+                    style = style.copy(color = ink.copy(alpha = Alpha.secondary)),
                     onTextLayout = { layout ->
                         lines = layout.lineCount
                         lastRight = layout.getLineRight(layout.lineCount - 1)
@@ -231,11 +234,11 @@ fun AmpRadioGroup(
     }
     val atlas = rememberBricks(colors.map { it.asset(shape) })
 
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(Space.m)) {
         options.forEachIndexed { index, option ->
             val on = option == selected
             val brick = colors[index]
-            val alpha by animateFloatAsState(if (on) 1f else 0.3f, label = "radioBrick")
+            val alpha by animateFloatAsState(if (on) 1f else Alpha.unlit, label = "radioBrick")
 
             BrickSlab(
                 slugs = listOf(if (on) brick.slug else structureSlug()),
@@ -259,7 +262,7 @@ fun AmpRadioGroup(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 14.dp, end = Pad, top = 24.dp, bottom = 14.dp),
+                    .padding(start = Space.m, end = Pad, top = Space.xl, bottom = Space.m),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BrickTile(
@@ -269,7 +272,7 @@ fun AmpRadioGroup(
                     atlas = atlas,
                     alpha = alpha,
                 )
-                Spacer(Modifier.width(14.dp))
+                Spacer(Modifier.width(Space.m))
                 Text(
                     text = option,
                     style = MaterialTheme.typography.bodyLarge,
@@ -297,7 +300,7 @@ fun AmpCheckboxGroup(
     // Incremented on each blocked tap to retrigger the shake.
     var refused by remember { mutableIntStateOf(0) }
 
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(Space.m)) {
         options.forEach { option ->
             val on = option in selected
             val blocked = max != null && !on && selected.size >= max
@@ -316,7 +319,7 @@ fun AmpCheckboxGroup(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
-                    .padding(start = 4.dp, top = 2.dp)
+                    .padding(start = Space.xs, top = Space.hair)
                     .shake(refused),
             )
         }
@@ -333,7 +336,7 @@ private fun CheckBox(on: Boolean, ink: Color) {
     val resting = MaterialTheme.colorScheme.onSurfaceVariant
     // Resolved here: the Canvas draw scope is not a composable context.
     val tickOnFill = Duo.inkOn(ink)
-    Canvas(Modifier.size(22.dp)) {
+    Canvas(Modifier.size(IconSize.medium)) {
         val stroke = 2.dp.toPx()
         val radius = CornerRadius(7.dp.toPx())
         drawRoundRect(
@@ -391,7 +394,7 @@ private fun ChoiceRow(
         slugs = listOf(slug),
         studs = 12,
         height = BrickHeight.MEDIUM,
-        alpha = if (enabled) 1f else 0.45f,
+        alpha = if (enabled) 1f else Alpha.dim,
         modifier = Modifier
             .fillMaxWidth()
             // Blocked rows stay clickable so they can give reject feedback.
@@ -413,11 +416,11 @@ private fun ChoiceRow(
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(start = Pad, end = Pad, top = 22.dp, bottom = 12.dp),
+            .padding(start = Pad, end = Pad, top = Space.xl, bottom = Space.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         indicator(selected, ink)
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(Space.m))
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
@@ -462,7 +465,7 @@ fun AmpDropdown(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(start = Pad, end = Pad, top = 22.dp, bottom = 12.dp),
+                .padding(start = Pad, end = Pad, top = Space.xl, bottom = Space.m),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -507,7 +510,7 @@ fun AmpDropdown(
 
 @Composable
 private fun Caret(color: Color, modifier: Modifier = Modifier) {
-    Canvas(modifier.size(14.dp)) {
+    Canvas(modifier.size(IconSize.mark)) {
         val s = 2.dp.toPx()
         drawLine(
             color, Offset(size.width * 0.2f, size.height * 0.38f),
@@ -547,7 +550,7 @@ fun AmpScale(
     val assets = remember(brick) { BrickArt.WIDTHS.map { brick.asset(BrickShape(it, BrickHeight.MEDIUM)) } }
     val atlas = rememberBricks(assets)
     val socket = MaterialTheme.colorScheme.surfaceVariant
-    val socketInk = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
+    val socketInk = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.dim)
 
     val current = (value ?: 1).coerceIn(1, steps)
 
@@ -633,7 +636,7 @@ fun AmpScale(
             }
         }
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 lowLabel,
@@ -693,7 +696,8 @@ fun AmpButton(
         slugs = listOf(if (enabled) lit else offSlug),
         studs = 12,
         height = BrickHeight.HIGH,
-        alpha = if (pressed) 0.90f else 1f,
+        snug = true,
+        alpha = if (pressed) Alpha.strong else 1f,
         modifier = modifier
             .fillMaxWidth()
             .pressDepth(pressed)
@@ -706,12 +710,12 @@ fun AmpButton(
         Row(
             Modifier
                 .align(Alignment.Center)
-                .padding(top = 14.dp, bottom = 22.dp),
+                .padding(top = 14.dp, bottom = 22.dp), // course-fit: one course of HIGH brick, nub included
             verticalAlignment = Alignment.CenterVertically,
         ) {
             icon?.let {
-                IconBrick(it, size = 26.dp)
-                Spacer(Modifier.width(8.dp))
+                IconBrick(it, size = IconSize.medium)
+                Spacer(Modifier.width(Space.s))
             }
             Text(
                 label,

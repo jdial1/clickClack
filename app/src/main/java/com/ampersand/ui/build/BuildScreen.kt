@@ -1,5 +1,8 @@
 package com.ampersand.ui.build
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -196,8 +199,8 @@ fun BuildScreen(
             .fillMaxWidth()
             .onGloballyPositioned { rootOrigin = it.positionInRoot() },
     ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-            Spacer(Modifier.height(12.dp))
+        Column(Modifier.fillMaxWidth().padding(horizontal = Inset.screen)) {
+            Spacer(Modifier.height(Space.m))
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -212,7 +215,7 @@ fun BuildScreen(
                 )
             }
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(Space.m))
 
             Plate(
                 plate = plate,
@@ -228,7 +231,7 @@ fun BuildScreen(
                     },
             )
 
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -239,7 +242,7 @@ fun BuildScreen(
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(Space.m))
 
             // Same height as the brick row, so placing your last brick never moves the page.
             if (tray.isEmpty()) {
@@ -264,7 +267,7 @@ fun BuildScreen(
                         .height(TrayHeight)
                         // Frozen while a brick is in the air, so the tray never slides under your finger.
                         .horizontalScroll(rememberScrollState(), enabled = dragging == null),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Space.m),
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     // key() is required: without it a slot is reused for the next block, its gesture
@@ -292,7 +295,7 @@ fun BuildScreen(
                     }
                 }
             }
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.xl))
         }
 
         // Dragged brick, drawn last so it sits on top.
@@ -318,7 +321,7 @@ fun BuildScreen(
                         left = 0f,
                         bottom = size.height,
                         studPx = studPx,
-                        alpha = 0.92f,
+                        alpha = Alpha.strong,
                     )
                 }
             }
@@ -336,7 +339,7 @@ private fun Plate(
     modifier: Modifier = Modifier,
 ) {
     val duo = Duo
-    val studHint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.16f)
+    val studHint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.unlit)
     val plateBg = MaterialTheme.colorScheme.surfaceVariant
 
     // Control radius, not card: a 28dp corner visibly clips the baseplate row.
@@ -359,7 +362,7 @@ private fun Plate(
         if (target != null && dragging != null) {
             val (tx, ty) = target
             drawRoundRect(
-                color = duo.blend.copy(alpha = 0.35f),
+                color = duo.blend.copy(alpha = Alpha.dim),
                 topLeft = Offset(tx * stud, (plate.gridH - ty - dragging.shape.h) * row),
                 size = Size(dragging.shape.w * stud, dragging.shape.h * row),
                 cornerRadius = CornerRadius(stud * 0.1f),
@@ -417,7 +420,7 @@ private fun TrayBrick(
             left = 0f,
             bottom = size.height,
             studPx = studPx,
-            alpha = if (faded) 0.25f else 1f,
+            alpha = if (faded) Alpha.unlit else 1f,
         )
     }
 }

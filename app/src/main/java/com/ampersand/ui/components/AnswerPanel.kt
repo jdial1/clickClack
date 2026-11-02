@@ -1,5 +1,8 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,8 +52,8 @@ fun AnswerPanel(
     Column(
         modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(if (compact) 20.dp else 28.dp))
-            .background(ownerColor.copy(alpha = 0.12f))
+            .clip(if (compact) com.ampersand.ui.theme.Radius.control else com.ampersand.ui.theme.Radius.card)
+            .background(ownerColor.copy(alpha = Alpha.faint))
             .padding(if (compact) 14.dp else 20.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -58,7 +61,7 @@ fun AnswerPanel(
             Spacer(Modifier.size(if (compact) 7.dp else 10.dp))
             SectionLabel("$ownerName said", panel = false)
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
 
         if (answer.isEmpty()) {
             // No answer: show a note instead of an empty panel with a badge.
@@ -75,7 +78,7 @@ fun AnswerPanel(
 
         if (type == QuestionType.RANK && scored) {
             // Rankings are scored on the top pick only.
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = "Only the top pick counts.",
                 style = MaterialTheme.typography.labelSmall,
@@ -84,19 +87,19 @@ fun AnswerPanel(
         }
 
         if (scored && guess != null) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(Space.l))
             if (compact) {
                 SectionLabel("$guesserName guessed", panel = false)
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(Space.s))
                 HitBadge(hit)
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     SectionLabel("$guesserName guessed", panel = false)
-                    Spacer(Modifier.size(8.dp))
+                    Spacer(Modifier.size(Space.s))
                     HitBadge(hit)
                 }
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
             // AnswerValues keeps rank order visible.
             AnswerValues(guess, type, quiet = true)
         }
@@ -127,7 +130,7 @@ fun AnswerPanelPair(
 ) {
     Row(
         modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(Space.m),
     ) {
         AnswerPanel(
             ownerName = yourName,
@@ -168,9 +171,9 @@ fun HitBadge(hit: Boolean) {
     }
     Box(
         Modifier
-            .clip(RoundedCornerShape(6.dp))
+            .clip(Radius.small)
             .background(bg)
-            .padding(horizontal = 7.dp, vertical = 2.dp),
+            .padding(horizontal = Space.s, vertical = Space.hair),
     ) {
         Text(
             // A wrong guess is the best reveal of the day, not a failure.
@@ -203,7 +206,7 @@ fun AnswerValues(
     }
 
     if (type == QuestionType.RANK) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Space.xs)) {
             values.forEachIndexed { i, value ->
                 Text("${i + 1}.  $value", style = style, color = color)
             }

@@ -1,5 +1,8 @@
 package com.ampersand.ui.auth
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.ampersand.ui.components.IconAction
 import androidx.compose.foundation.layout.Row
@@ -70,7 +73,7 @@ fun PairingScreen(
     }
 
     Box(modifier.fillMaxSize()) {
-      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = 0.12f)
+      BrickWall(you = BrickColor.RED, them = BrickColor.BLUE, alpha = Alpha.faint)
 
       Column(
         Modifier
@@ -78,17 +81,17 @@ fun PairingScreen(
             .fillMaxSize()
             .systemBarsPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = Inset.screen),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(Space.xxl))
         Text(
             text = "Hello $name.",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(Space.s))
         Text(
             text = "Connect with your partner to start.",
             style = MaterialTheme.typography.bodyMedium,
@@ -97,14 +100,14 @@ fun PairingScreen(
         )
 
         // Choose first: nothing is created until you pick "Create a code".
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(Space.xxl))
         when (mode) {
             PairMode.CHOOSE -> {
                 AmpButton(label = "Create a partner code", slug = BrickColor.RED.slug, icon = UiIcon.ADD) {
                     mode = PairMode.CREATE
                     if (code == null) onCreateInvite()
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.m))
                 AmpButton(label = "Enter a partner code", slug = BrickColor.BLUE.slug, icon = UiIcon.WRITE) {
                     mode = PairMode.JOIN
                 }
@@ -112,7 +115,7 @@ fun PairingScreen(
 
             PairMode.CREATE -> {
                 SectionLabel("Your partner code")
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.m))
                 if (code == null) {
                     AmpButton(
                         label = if (busy) "Creating code" else "Create code",
@@ -122,8 +125,8 @@ fun PairingScreen(
                     )
                 } else {
                     CodePlate(code)
-                    Spacer(Modifier.height(12.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Spacer(Modifier.height(Space.m))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Space.m)) {
                         AmpButton(label = "Share", slug = null, icon = UiIcon.NEXT, modifier = Modifier.weight(1f)) {
                             val text = "Join me on Click Clack. Our code is ${InviteCode.display(code)}.\n${InviteCode.link(code)}"
                             val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
@@ -134,7 +137,7 @@ fun PairingScreen(
                             clipboard.setPrimaryClip(ClipData.newPlainText("Click Clack code", InviteCode.display(code)))
                         }
                     }
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(Space.m))
                     Text(
                         text = "Send it to your partner. Single use, expires in 1 hour.",
                         style = MaterialTheme.typography.bodySmall,
@@ -142,13 +145,13 @@ fun PairingScreen(
                         textAlign = TextAlign.Center,
                     )
                 }
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(Space.xl))
                 IconAction(UiIcon.BACK, "I have a code instead", onClick = { mode = PairMode.JOIN })
             }
 
             PairMode.JOIN -> {
                 SectionLabel("Enter your partner's code")
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.m))
                 AmpField(
                     value = entered,
                     onValueChange = { entered = it },
@@ -156,20 +159,20 @@ fun PairingScreen(
                     color = BrickColor.BLUE,
                     placeholder = "Like Wobbly Castle 427",
                 )
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(Space.m))
                 AmpButton(
                     label = if (busy) "Joining" else "Join",
                     slug = BrickColor.BLUE.slug,
                     enabled = !busy && entered.isNotBlank(),
                     onClick = { onRedeem(entered) },
                 )
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(Space.xl))
                 IconAction(UiIcon.BACK, "Create a code instead", onClick = { mode = PairMode.CREATE })
             }
         }
 
         if (error != null) {
-            Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(Space.l))
             Text(
                 text = error,
                 style = MaterialTheme.typography.bodySmall,
@@ -178,9 +181,9 @@ fun PairingScreen(
             )
         }
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(Space.xxl))
         IconAction(UiIcon.NEXT, "Skip for now and look around", onClick = onPreview)
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(Space.xxl))
       }
     }
 }
@@ -197,12 +200,12 @@ private fun CodePlate(code: String) {
         SelectionContainer {
             Text(
                 text = InviteCode.display(code),
-                fontSize = 26.sp,
+                style = com.ampersand.ui.theme.InviteCodeText,
                 color = inkOnBrick(BrickColor.YELLOW.slug),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 26.dp, bottom = 22.dp),
+                    .padding(top = Space.xl, bottom = Space.xl),
             )
         }
     }

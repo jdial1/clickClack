@@ -1,5 +1,7 @@
 package com.ampersand.ui.quiz
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -103,7 +105,7 @@ fun CrossAnswerChart(
             modifier = Modifier.fillMaxWidth(0.6f),
         )
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.m))
         Text(
             text = "${result.landed} of ${result.guesses} guesses landed",
             style = MaterialTheme.typography.titleMedium,
@@ -113,7 +115,7 @@ fun CrossAnswerChart(
         )
 
         if (result.agreements > 0) {
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = "You answered the same ${result.agreements} " +
                     if (result.agreements == 1) "time." else "times.",
@@ -167,7 +169,7 @@ private fun PairTower(
                     left = side * half.w * studPx,
                     bottom = size.height - row * coursePx,
                     studPx = studPx,
-                    alpha = if (i < laid) 1f else 0.16f,
+                    alpha = if (i < laid) 1f else Alpha.unlit,
                 )
             }
         }
@@ -186,10 +188,10 @@ fun CrossAnswerRow(
     /** 1-based position in the deck; shows a "Question N" label when set. */
     number: Int? = null,
 ) {
-    Column(modifier.fillMaxWidth().padding(vertical = 14.dp)) {
+    Column(modifier.fillMaxWidth().padding(vertical = Space.m)) {
         if (number != null) {
             SectionLabel("Question $number")
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
         }
         Text(
             text = row.question.text,
@@ -199,7 +201,7 @@ fun CrossAnswerRow(
 
         // Mark rows where both gave the same answer.
         if (row.question.isScored && row.agreed) {
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 text = "Same answer",
                 style = MaterialTheme.typography.labelSmall,
@@ -207,7 +209,7 @@ fun CrossAnswerRow(
             )
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
         AnswerPanelPair(
             type = row.question.type,
             scored = row.question.isScored,
@@ -274,7 +276,7 @@ internal fun sampleCrossResult(): QuizResult {
 @Composable
 private fun PreviewChart() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
-        Box(Modifier.padding(24.dp)) {
+        Box(Modifier.padding(Space.xl)) {
             CrossAnswerChart(
                 result = sampleCrossResult(),
                 you = BrickColor.RED,
@@ -290,7 +292,7 @@ private fun PreviewChart() = AmpersandTheme {
 @Composable
 private fun PreviewRows() = AmpersandTheme {
     Surface(color = MaterialTheme.colorScheme.background) {
-        Column(Modifier.padding(24.dp)) {
+        Column(Modifier.padding(Space.xl)) {
             sampleCrossResult().rows.take(3).forEach {
                 CrossAnswerRow(it, BrickColor.RED, BrickColor.BLUE, "Justin", "Maya")
             }

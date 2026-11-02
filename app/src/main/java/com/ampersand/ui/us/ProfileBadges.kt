@@ -1,5 +1,10 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.components.panel
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Radius
+import com.ampersand.ui.theme.Corner
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.glass
 import com.ampersand.ui.components.IconAction
@@ -79,12 +84,12 @@ fun ProfileBadges(
 
     Column(modifier.fillMaxWidth()) {
         SectionLabel("Profiles")
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
 
         val earned = groups.filter { it.isEarned }
         if (earned.isEmpty()) QuietNote("Take the longer tests on Decks to see results here.")
         earned.forEachIndexed { i, group ->
-            if (i > 0) Spacer(Modifier.height(30.dp))
+            if (i > 0) Spacer(Modifier.height(Space.xxl))
             WallGroup(
                 group = group,
                 you = you,
@@ -116,7 +121,7 @@ private fun WallGroup(
 
     Column(Modifier.fillMaxWidth()) {
         Row(
-            Modifier.fillMaxWidth().onWall(corner = 12.dp),
+            Modifier.fillMaxWidth().onWall(corner = Corner.medium),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -130,12 +135,12 @@ private fun WallGroup(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.m))
 
         // One button per test, not per slot (per-slot showed six "Take it" bricks for one test).
         if (group.isEarned) {
             group.rows.forEachIndexed { i, row ->
-                if (i > 0) Spacer(Modifier.height(12.dp))
+                if (i > 0) Spacer(Modifier.height(Space.m))
                 WallRow(
                     row = row,
                     you = you,
@@ -149,15 +154,15 @@ private fun WallGroup(
         }
 
         group.together?.let { reading ->
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.m))
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .glass(inkOnBrick(structureSlug()), corner = 12.dp)
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .panel()
+                    .padding(horizontal = Space.m, vertical = Space.m),
             ) {
                 Text("You two", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Space.xs))
                 Text(reading, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground)
             }
         }
@@ -191,11 +196,11 @@ private fun TakeIt(
         modifier = Modifier.fillMaxWidth().then(tap),
         studs = HalfRow * 2,
         height = BrickHeight.MEDIUM,
-        alpha = if (yourTurn) GhostAlpha else GhostAlpha * 0.7f,
+        alpha = if (yourTurn) GhostAlpha else Alpha.faint,
     ) {
         Box(Modifier.fillMaxWidth(), Alignment.Center) {
             Column(
-                Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                Modifier.padding(horizontal = Space.m, vertical = Space.xs),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Progress for both partners; falls back to duration before anyone starts.
@@ -203,7 +208,7 @@ private fun TakeIt(
                     text = group.standing.ifBlank { "${group.minutes} min each" },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(
-                        alpha = if (yourTurn) 0.72f else 0.5f,
+                        alpha = if (yourTurn) Alpha.secondary else Alpha.dim,
                     ),
                     textAlign = TextAlign.Center,
                 )
@@ -211,7 +216,7 @@ private fun TakeIt(
                     text = group.action,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(
-                        alpha = if (yourTurn) 1f else 0.55f,
+                        alpha = if (yourTurn) 1f else Alpha.quiet,
                     ),
                     textAlign = TextAlign.Center,
                 )
@@ -232,12 +237,12 @@ private fun WallRow(
         // Blank for single-row tests, so no redundant sub-heading.
         if (row.label.isNotBlank()) {
             SectionLabel(row.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(Space.s))
         }
 
         Row(
             Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
+            horizontalArrangement = Arrangement.spacedBy(Space.s),
         ) {
             row.badges.forEach { badge ->
                 BadgeBrick(
@@ -260,14 +265,14 @@ private fun WallRow(
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.88f))
-                    .padding(horizontal = 12.dp, vertical = 12.dp),
+                    .padding(top = Space.m)
+                    .clip(Radius.medium)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = Alpha.strong))
+                    .padding(horizontal = Space.m, vertical = Space.m),
             ) {
                 Row(
                     Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Space.m),
                 ) {
                     earned.forEach { badge ->
                         Detail(
@@ -297,13 +302,13 @@ private fun BadgeBrick(
 
     val label: @Composable () -> Unit = {
         Column(
-            Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            Modifier.padding(horizontal = Space.m, vertical = Space.xs),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = if (badge.isEarned) badge.who else "${badge.minutes} min",
                 style = MaterialTheme.typography.labelSmall,
-                color = ink(badge, color, other).copy(alpha = 0.72f),
+                color = ink(badge, color, other).copy(alpha = Alpha.secondary),
                 textAlign = TextAlign.Center,
             )
             Text(
@@ -361,7 +366,7 @@ private fun BadgeBrick(
 private const val HalfRow = 6
 
 /** Alpha for unclaimed slots; higher values looked like a solid, taken brick in light mode. */
-private const val GhostAlpha = 0.3f
+private const val GhostAlpha = com.ampersand.ui.theme.Alpha.unlit
 
 @Composable
 private fun ink(badge: Badge, color: BrickColor, other: BrickColor): Color = when {
@@ -384,16 +389,16 @@ private fun Detail(badge: Badge, color: BrickColor, modifier: Modifier = Modifie
             color = MaterialTheme.colorScheme.onSurface,
         )
         badge.detail.forEach { bar ->
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.s))
             Text(
                 bar.label,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Spacer(Modifier.height(3.dp))
+            Spacer(Modifier.height(Space.xs))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Meter(fraction = bar.fraction, color = color, modifier = Modifier.weight(1f))
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(Space.s))
                 Text(
                     bar.value,
                     style = MaterialTheme.typography.labelSmall,
@@ -411,14 +416,14 @@ private fun Meter(fraction: Float, color: BrickColor, modifier: Modifier = Modif
     Box(
         modifier
             .height(9.dp)
-            .clip(RoundedCornerShape(3.dp))
-            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
+            .clip(Radius.hair)
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = Alpha.faint)),
     ) {
         Box(
             Modifier
                 .fillMaxWidth(grown.coerceIn(0f, 1f))
                 .height(9.dp)
-                .clip(RoundedCornerShape(3.dp))
+                .clip(Radius.hair)
                 .background(Color(color.argb)),
         )
     }

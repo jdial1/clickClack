@@ -1,5 +1,8 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.Inset
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,28 +60,28 @@ fun InterestsSetupScreen(
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Box(modifier.fillMaxSize()) {
-            BrickWall(you = color, them = BrickColor.BLUE, alpha = 0.12f)
+            BrickWall(you = color, them = BrickColor.BLUE, alpha = Alpha.faint)
             Column(
                 Modifier
                     .fillMaxSize()
                     .systemBarsPadding()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 28.dp, vertical = 40.dp),
+                    .padding(horizontal = Inset.screen, vertical = Space.page),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 when (step) {
                     0 -> {
                         Heading("Do you follow sports?", "Only the ones you pick show up in questions.")
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpButton(label = "Yes", slug = color.slug) { step = 1 }
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(Space.m))
                         AmpButton(label = "Not really", slug = "black") { leagues = emptySet(); step = 2 }
                     }
 
                     1 -> {
                         Heading("Which ones?", "Local teams are based on your home ZIP.")
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpCheckboxGroup(
                             options = League.entries.map { it.label },
                             selected = leagues,
@@ -86,15 +89,15 @@ fun InterestsSetupScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onToggle = { leagues = if (it in leagues) leagues - it else leagues + it },
                         )
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpButton(label = "Next", slug = color.slug, icon = UiIcon.NEXT) { step = 2 }
                     }
 
                     2 -> {
                         Heading("Into horoscopes?", "We'll use both your birthdays to find your signs and ask about them now and then.")
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpButton(label = "Yes", slug = color.slug) { horoscopes = true; step = 3 }
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(Space.m))
                         AmpButton(label = "Not really", slug = "black") { horoscopes = false; step = 3 }
                     }
 
@@ -103,7 +106,7 @@ fun InterestsSetupScreen(
                             "Any topics to skip?",
                             "If either of you skips a topic, it's skipped for both.",
                         )
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpCheckboxGroup(
                             options = Topic.entries.filter { it != Topic.SPORTS && it != Topic.HOROSCOPES }.map { it.label },
                             selected = leaveOut,
@@ -111,7 +114,7 @@ fun InterestsSetupScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onToggle = { leaveOut = if (it in leaveOut) leaveOut - it else leaveOut + it },
                         )
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(Space.xl))
                         AmpButton(label = "Done", slug = color.slug, icon = UiIcon.DONE) { finish() }
                     }
                 }
@@ -123,6 +126,6 @@ fun InterestsSetupScreen(
 @Composable
 private fun Heading(title: String, detail: String) {
     Text(title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center)
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Space.s))
     Text(detail, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
 }

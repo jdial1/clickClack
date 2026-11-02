@@ -1,5 +1,6 @@
 package com.ampersand.ui.components
 
+import com.ampersand.ui.theme.Corner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,19 @@ import com.ampersand.model.BrickColor
 import com.ampersand.model.BrickHeight
 import com.ampersand.ui.brick.BrickDot
 import com.ampersand.ui.brick.BrickPill
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.remember
 import com.ampersand.ui.brick.inkOnBrick
+import com.ampersand.ui.brick.structureSlug
+import com.ampersand.ui.feel.Feel
+import com.ampersand.ui.feel.LocalFeel
+import com.ampersand.ui.feel.play
+import com.ampersand.ui.sound.LocalSounds
+import com.ampersand.ui.sound.Sfx
+import com.ampersand.ui.sound.play
+import com.ampersand.ui.theme.Space
 import com.ampersand.ui.brick.quietSlug
 import com.ampersand.ui.theme.Stud
 import com.ampersand.ui.theme.toArgbLong
@@ -36,7 +49,7 @@ fun SectionLabel(
         text = text.uppercase(),
         style = MaterialTheme.typography.labelSmall,
         color = color,
-        modifier = if (panel) modifier.onWall(corner = 10.dp) else modifier,
+        modifier = if (panel) modifier.onWall(corner = Corner.medium) else modifier,
     )
 }
 
@@ -44,7 +57,7 @@ fun SectionLabel(
 @Composable
 fun DepthDots(depth: Depth, modifier: Modifier = Modifier, tint: Color? = null) {
     // Neutral brick so it stays visible on the gradient hero.
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(Space.xs)) {
         repeat(3) { i ->
             BrickDot(slug = quietSlug(), studSize = Stud.pip, filled = i < depth.level)
         }
@@ -73,6 +86,55 @@ fun PersonDot(
             color = inkOnBrick(slug),
         )
     }
+}
+
+/** The one way back: a brick, because things you press are bricks. Top left of a screen. */
+@Composable
+fun BackAction(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    BrickPill(
+        slug = structureSlug(),
+        studSize = Stud.chip,
+        height = BrickHeight.MEDIUM,
+        modifier = modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+        ) {
+            sounds.play(Sfx.NAV)
+            feel.play(Feel.NAV)
+            onBack()
+        },
+    ) {
+        IconAction(
+            UiIcon.BACK,
+            "Back",
+            Modifier.padding(horizontal = Space.m, vertical = Space.hair),
+            color = inkOnBrick(structureSlug()),
+        )
+    }
+}
+
+/** A way out that should not compete with the brick beside it: "Not now", "Leave". */
+@Composable
+fun QuietAction(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val sounds = LocalSounds.current
+    val feel = LocalFeel.current
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                sounds.play(Sfx.NAV)
+                feel.play(Feel.NAV)
+                onClick()
+            }
+            .padding(vertical = Space.s),
+    )
 }
 
 /** Centered muted text for empty and waiting states. */
