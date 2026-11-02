@@ -17,6 +17,7 @@ class FirstWeekTest {
     private val today = LocalDate.of(2026, 11, 3)
     private fun q(id: String, category: String = "Everyday") = Question(id, "?", QuestionType.REFLECT, category, Depth(1))
     private val pool = QuestionPool(
+        decks = emptyList(),
         dailyOnly = listOf(Quiz("d", "D", "", QuizTheme.PLAYFUL, listOf(q("pool"), q("themed", "Food")))),
         firstWeek = listOf(q("fw1"), q("fw2"), q("fw3")),
     )
