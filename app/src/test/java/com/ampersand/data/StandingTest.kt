@@ -116,13 +116,13 @@ class StandingTest {
     @Test
     fun `you are done and they are mid-way`() {
         val (note, action) = caption(40, 25)
-        assertEquals("Waiting on Maya", action)
+        assertEquals("Maya has not finished", action)
         assertEquals("Maya is on round 2 of 2", note)
     }
 
     @Test
     fun `you are done and they never started`() {
-        assertEquals("You are done" to "Waiting on Maya", caption(40, 0))
+        assertEquals("You are done" to "Maya has not finished", caption(40, 0))
     }
 
     @Test

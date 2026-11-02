@@ -68,7 +68,7 @@ enum class DeckState(val heading: String) {
     WAITING_ON_YOU("Your turn"),
 
     /** You played it; results open when they do. */
-    WAITING_ON_THEM("Waiting for them"),
+    WAITING_ON_THEM("Their turn"),
 
     /** Both played; results are ready. */
     FINISHED("Finished"),

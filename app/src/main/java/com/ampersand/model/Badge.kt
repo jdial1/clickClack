@@ -54,11 +54,11 @@ data class BadgeGroup(
     val title: String,
     val about: String,
     val minutes: Int,
-    /** Partner's name, for "Waiting for Maya". */
+    /** Partner's name, for "Maya has not finished". */
     val partnerName: String,
     /** Progress line shown above the action. */
     val standing: String,
-    /** Action label: "Start", "Continue", "Waiting for Maya". */
+    /** Action label: "Start", "Continue", "Maya has not finished". */
     val action: String,
     /** False once you have sealed your half. */
     val yourTurn: Boolean,

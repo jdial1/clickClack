@@ -162,7 +162,7 @@ private fun LongerTests(state: CoupleState, onTake: (String) -> Unit) {
                 Text(g.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                 Text(
                     when {
-                        !g.yourTurn -> "Waiting for ${state.them.name}"
+                        !g.yourTurn -> "${state.them.name} has not finished"
                         else -> g.standing.ifBlank { "${g.minutes} min each" }
                     },
                     style = MaterialTheme.typography.bodySmall,
