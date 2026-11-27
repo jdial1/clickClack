@@ -77,3 +77,21 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   call `close()`, so `ui/` knew the implementation class.
 - **Chosen:** `CoupleRepository.close()` with a no-op default.
 - **Validated (rounds 5–6):** full suite 281 tests, 27 skipped, 0 failures.
+
+## Round 7: one listener policy, named defaults, dead code (T6, T15, T16, T19)
+
+- **Listeners:** all 19 Firestore listeners go through `Query.watch` or
+  `DocumentReference.watch`. A failed snapshot is logged and skipped, so the
+  last good data stays. Before this, nine query listeners each had their own
+  copy of the check, and the ten document listeners ignored the error and
+  wrote `null` into state.
+- **Defaults:** quiet hours are `CoupleState.QUIET_FROM`/`QUIET_TO`, used by the
+  model's defaults and the Firestore fallback (two copies of 20/8 before).
+- **Deleted (no callers):** `Theme.ColorChoices`, `BadgeWall.fitPercent` with
+  its private `readings`, `ALIGNED` and `SPAN`, `BuildPlate.earnedBy`, and unused
+  `MockCouple`/`MockQuestions` imports in seven screens.
+- **Config:** Settings reads `AppConfig.versionName`. `BuildConfig` is now read
+  only in `AppConfig`.
+- **Scan findings** from a read-only pass over `ui/` and `model/` were added to
+  TASKS.md as T11–T19, and the decisions that need a product call as P1–P2.
+- **Validated:** full suite 281 tests, 27 skipped, 0 failures.

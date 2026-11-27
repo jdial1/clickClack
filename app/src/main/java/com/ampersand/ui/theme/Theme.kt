@@ -354,9 +354,6 @@ internal val DayMuted = Color(0xFF6A7299)
 /** The border on a special day's card. The app's only gold, so it stays special. */
 internal val SpecialGold = Color(0xFFFFC94D)
 
-/** The four pickable colors, from [com.ampersand.model.BrickColor] (brick art exists only in these). */
-val ColorChoices: List<Color> = com.ampersand.model.BrickColor.entries.map { Color(it.argb) }
-
 // --- Type --------------------------------------------------------------------
 
 /** The tab bar: a 2-stud tile has to fit "Shelf" without shrinking the brick. */

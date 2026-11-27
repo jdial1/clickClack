@@ -150,9 +150,6 @@ data class BuildPlate(
         p.y + (byId[p.blockId]?.shape?.h ?: 0)
     } ?: 0
 
-    /** How many bricks [uid] earned into this plate, placed or not. */
-    fun earnedBy(uid: String): Int = blocks.count { it.ownerUid == uid }
-
     /** Bricks earned but not yet on the plate, for [uid]. */
     fun tray(uid: String): List<Block> {
         val used = placed.mapTo(mutableSetOf()) { it.blockId }

@@ -18,6 +18,9 @@ object AppConfig {
      */
     val hasFirebase: Boolean get() = webClientId.isNotBlank()
 
-    /** "0.1.123 (release)", for diagnostics and Settings. */
-    val version: String get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.BUILD_TYPE})"
+    /** "0.1.123", as shown in Settings. */
+    val versionName: String get() = BuildConfig.VERSION_NAME
+
+    /** "0.1.123 (release)", for diagnostics. */
+    val version: String get() = "$versionName (${BuildConfig.BUILD_TYPE})"
 }

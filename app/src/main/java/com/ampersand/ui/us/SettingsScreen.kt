@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.AppConfig
 import com.ampersand.ui.theme.Alpha
 import com.ampersand.ui.components.ActionRow
 import com.ampersand.ui.components.panel
@@ -60,7 +61,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ampersand.data.MockCouple
 import com.ampersand.model.Occasion
 import com.ampersand.model.timeTogether
 import com.ampersand.ui.components.AmpDropdown
@@ -278,7 +278,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(Space.m))
             }
             Text(
-                "Version ${com.ampersand.BuildConfig.VERSION_NAME}",
+                "Version ${AppConfig.versionName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

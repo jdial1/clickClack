@@ -62,6 +62,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -154,35 +155,27 @@ class FirestoreCoupleRepository(
 
     init {
         regs += db.collection(USERS).document(myUid)
-            .addSnapshotListener { d, _ -> me = d; recompose() }
+            .watch("your user") { d -> me = d; recompose() }
         regs += db.collection(USERS).document(partnerUid)
-            .addSnapshotListener { d, _ -> them = d; recompose() }
+            .watch("partner user") { d -> them = d; recompose() }
 
-        regs += couple.addSnapshotListener { d, _ ->
+        regs += couple.watch("couple") { d ->
             coupleDoc = d
             anniversary = d?.getString("anniversary")
                 .toDateOrNull()
             recompose()
         }
 
-        regs += couple.collection(PHOTOS).addSnapshotListener { snap, error ->
-            if (error != null) {
-                Log.w(TAG, "photos listener failed", error)
-                return@addSnapshotListener
-            }
-            photos = snap?.documents.orEmpty().mapNotNull { doc ->
+        regs += couple.collection(PHOTOS).watch("photos") { docs ->
+            photos = docs.mapNotNull { doc ->
                 val date = doc.getString("date").toDateOrNull() ?: return@mapNotNull null
                 DayPhoto(doc.id, date, doc.getString("label").orEmpty(), doc.getString("byUid").orEmpty(), doc.getString("data") ?: return@mapNotNull null)
             }.sortedByDescending { it.date }
             recompose()
         }
 
-        regs += couple.collection(DATES).addSnapshotListener { snap, error ->
-            if (error != null) {
-                Log.w(TAG, "dates listener failed", error)
-                return@addSnapshotListener
-            }
-            specialDates = snap?.documents.orEmpty().mapNotNull { doc ->
+        regs += couple.collection(DATES).watch("dates") { docs ->
+            specialDates = docs.mapNotNull { doc ->
                 val label = doc.getString("label")?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
                 val date = doc.getString("date").toDateOrNull()
                     ?: return@mapNotNull null
@@ -191,7 +184,7 @@ class FirestoreCoupleRepository(
             recompose()
         }
 
-        regs += dayRef.addSnapshotListener { d, _ ->
+        regs += dayRef.watch("today") { d ->
             todayDoc = d
             todayLoaded = true
             // The partner's answer is only readable after reveal.
@@ -203,31 +196,23 @@ class FirestoreCoupleRepository(
         // Listen to your own answer doc by id, not the collection: rules deny a
         // collection query while sealed, and the listener dies silently.
         regs += dayRef.collection(ANSWERS).document(myUid)
-            .addSnapshotListener { d, _ -> putAnswer(myUid, d) }
+            .watch("your answer") { d -> putAnswer(myUid, d) }
 
         regs += couple.collection(DAYS)
             .whereGreaterThanOrEqualTo(
                 com.google.firebase.firestore.FieldPath.documentId(),
                 today.minusDays(HistoryDays).toString(),
             )
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "history listener failed", error)
-                    return@addSnapshotListener
-                }
-                historyDocs = snap?.documents.orEmpty()
+            .watch("history") { docs ->
+                historyDocs = docs
                 historyLoaded = true
                 recompose()
             }
 
         // Deck docs. Your run is watched per deck; the partner's only after reveal (rules).
         regs += couple.collection(QUIZZES)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "quiz listener failed", error)
-                    return@addSnapshotListener
-                }
-                snap?.documents.orEmpty().forEach { quiz ->
+            .watch("quiz") { docs ->
+                docs.forEach { quiz ->
                     quizDocs = quizDocs + (quiz.id to quiz)
                     watchRuns(quiz.id)
                     // Open decks (sealed = false) let you read theirs straight away.
@@ -238,12 +223,8 @@ class FirestoreCoupleRepository(
 
         // Instruments, sealed like decks: one run doc per person, partner's readable after reveal.
         regs += couple.collection(INSTRUMENTS)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "instrument listener failed", error)
-                    return@addSnapshotListener
-                }
-                snap?.documents.orEmpty().forEach { doc ->
+            .watch("instrument") { docs ->
+                docs.forEach { doc ->
                     instrumentDocs = instrumentDocs + (doc.id to doc)
                     @Suppress("UNCHECKED_CAST")
                     val counts = doc.get("progress") as? Map<String, Long>
@@ -259,34 +240,22 @@ class FirestoreCoupleRepository(
             }
 
         regs += couple.collection(WILDCARDS)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "wildcard listener failed", error)
-                    return@addSnapshotListener
-                }
-                allWildcards = snap?.documents.orEmpty().mapNotNull { it.toWildcard() }
+            .watch("wildcard") { docs ->
+                allWildcards = docs.mapNotNull { it.toWildcard() }
                 recompose()
             }
 
         regs += couple.collection(BUCKET)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "bucket listener failed", error)
-                    return@addSnapshotListener
-                }
-                bucket = snap?.documents.orEmpty().mapNotNull { it.toBucketItem() }
+            .watch("bucket") { docs ->
+                bucket = docs.mapNotNull { it.toBucketItem() }
                 recompose()
             }
 
         // One doc per month, keyed by day, so repeated writes cannot double-count.
         regs += couple.collection(KNOWING)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "knowing listener failed", error)
-                    return@addSnapshotListener
-                }
+            .watch("knowing") { docs ->
                 knowing = Knowing(
-                    snap?.documents.orEmpty().mapNotNull { it.toKnowingMonth(myUid, partnerUid) },
+                    docs.mapNotNull { it.toKnowingMonth(myUid, partnerUid) },
                 )
                 recompose()
             }
@@ -295,17 +264,31 @@ class FirestoreCoupleRepository(
         loadMemories()
 
         regs += couple.collection(PLATES)
-            .addSnapshotListener { snap, error ->
-                if (error != null) {
-                    Log.w(TAG, "plates listener failed", error)
-                    return@addSnapshotListener
-                }
-                plates = snap?.documents.orEmpty().mapNotNull { it.toPlate() }
+            .watch("plates") { docs ->
+                plates = docs.mapNotNull { it.toPlate() }
                 platesLoaded = true
                 loadMyWords()
                 recompose()
             }
     }
+
+    /**
+     * Listens to a query. A failed snapshot (rules refused, offline cache miss) is
+     * logged and skipped, so the last good data stays on screen. Every listener
+     * goes through this or the document version below.
+     */
+    private fun Query.watch(what: String, onDocs: (List<DocumentSnapshot>) -> Unit): ListenerRegistration =
+        addSnapshotListener { snap, error ->
+            if (error != null) Log.w(TAG, "$what listener failed", error)
+            else onDocs(snap?.documents.orEmpty())
+        }
+
+    /** Listens to one document, with the same failure handling as [Query.watch]. */
+    private fun DocumentReference.watch(what: String, onDoc: (DocumentSnapshot?) -> Unit): ListenerRegistration =
+        addSnapshotListener { doc, error ->
+            if (error != null) Log.w(TAG, "$what listener failed", error)
+            else onDoc(doc)
+        }
 
     /** Rebuilds state from whatever has arrived. Safe to call from any listener; missing pieces use defaults. */
     private fun recompose() {
@@ -463,8 +446,8 @@ class FirestoreCoupleRepository(
                 .map { day -> pastAnswers[day.date]?.let { day.copy(answers = it) } ?: day },
             why = pool.why(question, today, anniversary, place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, dateKinds, interests, together),
             sourcesOff = off,
-            quietFrom = coupleDoc?.getLong("quietFrom")?.toInt() ?: 20,
-            quietTo = coupleDoc?.getLong("quietTo")?.toInt() ?: 8,
+            quietFrom = coupleDoc?.getLong("quietFrom")?.toInt() ?: CoupleState.QUIET_FROM,
+            quietTo = coupleDoc?.getLong("quietTo")?.toInt() ?: CoupleState.QUIET_TO,
             localTeams = place?.let { "${Teams.nearest(it, League.MLB).nickname} and ${Teams.nearest(it, League.NFL).nickname}" },
             weather = weather,
             specialDates = specialDates,
@@ -536,7 +519,7 @@ class FirestoreCoupleRepository(
         if (key in instrumentRegs) return
         instrumentRegs[key] = couple.collection(INSTRUMENTS).document(id)
             .collection(DRAFTS).document(myUid)
-            .addSnapshotListener { d, _ ->
+            .watch("instrument draft") { d ->
                 @Suppress("UNCHECKED_CAST")
                 val raw = d?.get("responses") as? List<Long>
                 instrumentDrafts = if (raw == null) {
@@ -554,7 +537,7 @@ class FirestoreCoupleRepository(
         if (key in instrumentRegs) return
         instrumentRegs[key] = couple.collection(INSTRUMENTS).document(id)
             .collection(RUNS).document(uid)
-            .addSnapshotListener { d, _ -> putInstrumentRun(id, uid, d) }
+            .watch("instrument run") { d -> putInstrumentRun(id, uid, d) }
     }
 
     private fun putInstrumentRun(id: String, uid: String, doc: DocumentSnapshot?) {
@@ -581,14 +564,14 @@ class FirestoreCoupleRepository(
     private fun watchRuns(quizId: String) {
         if (quizId in runRegs) return
         runRegs[quizId] = runRef(quizId, myUid)
-            .addSnapshotListener { d, _ -> putRun(quizId, myUid, d) }
+            .watch("your deck run") { d -> putRun(quizId, myUid, d) }
     }
 
     /** Watches the partner's run, after reveal. */
     private fun watchPartnerRun(quizId: String) {
         if (quizId in partnerRunRegs) return
         partnerRunRegs[quizId] = runRef(quizId, partnerUid)
-            .addSnapshotListener { d, _ -> putRun(quizId, partnerUid, d) }
+            .watch("partner deck run") { d -> putRun(quizId, partnerUid, d) }
     }
 
     private fun runRef(quizId: String, uid: String) =
@@ -617,7 +600,7 @@ class FirestoreCoupleRepository(
     private fun watchPartnerAnswer() {
         if (partnerAnswerReg != null) return
         partnerAnswerReg = dayRef.collection(ANSWERS).document(partnerUid)
-            .addSnapshotListener { d, _ -> putAnswer(partnerUid, d) }
+            .watch("partner answer") { d -> putAnswer(partnerUid, d) }
             .also { regs += it }
     }
 
