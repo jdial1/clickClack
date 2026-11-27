@@ -261,21 +261,6 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      // Dates worth a countdown. Either of you adds or removes one; nobody
-      // edits one in place, which keeps "who changed the date" out of it.
-      // Conversations, retired: the app is not a chat app (DESIGN.md). What was
-      // written before stays readable to the two of you; nothing new is taken.
-      // Account deletion removes your messages through the admin SDK.
-      match /chats/{chatId} {
-        allow read: if isMember(cid);
-        allow create, update, delete: if false;
-
-        match /messages/{mid} {
-          allow read: if isMember(cid);
-          allow create, update, delete: if false;
-        }
-      }
-
       // Photos from special days, stored inline as compressed JPEG. The author may remove theirs.
       match /photos/{pid} {
         allow read: if isMember(cid);
@@ -287,6 +272,8 @@ service cloud.firestore {
         allow delete: if isMember(cid) && resource.data.byUid == me();
       }
 
+      // Dates worth a countdown. Either of you adds or removes one; nobody
+      // edits one in place, which keeps "who changed the date" out of it.
       match /dates/{id} {
         allow read: if isMember(cid);
         allow create: if isLive(cid)

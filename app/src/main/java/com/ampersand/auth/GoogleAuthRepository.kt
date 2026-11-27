@@ -1,5 +1,7 @@
 package com.ampersand.auth
 
+import com.ampersand.AppConfig
+import com.ampersand.await
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -16,8 +18,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 private const val TAG = "GoogleAuth"
 
@@ -108,16 +108,17 @@ class GoogleAuthRepository(
      */
     private suspend fun signInInBrowser(activity: Activity, earlier: Throwable): Result<Unit> {
         Log.w(TAG, "Credential Manager failed, signing in through the browser", earlier)
-        return suspendCancellableCoroutine { cont ->
-            val provider = com.google.firebase.auth.OAuthProvider.newBuilder("google.com").build()
-            val pending = auth.pendingAuthResult
-            val task = pending ?: auth.startActivityForSignInWithProvider(activity, provider)
-            task.addOnSuccessListener { cont.resume(Result.success(Unit)) }
-                .addOnFailureListener {
-                    val cancelled = it is com.google.firebase.auth.FirebaseAuthException &&
-                        it.errorCode == "ERROR_WEB_CONTEXT_CANCELED"
-                    cont.resume(if (cancelled) Result.success(Unit) else Result.failure(diagnose("Browser sign-in", it.also { f -> f.addSuppressed(earlier) })))
-                }
+        val provider = com.google.firebase.auth.OAuthProvider.newBuilder("google.com").build()
+        val task = auth.pendingAuthResult ?: auth.startActivityForSignInWithProvider(activity, provider)
+        return try {
+            task.await()
+            Result.success(Unit)
+        } catch (e: com.google.firebase.auth.FirebaseAuthException) {
+            if (e.errorCode == "ERROR_WEB_CONTEXT_CANCELED") Result.success(Unit)
+            else Result.failure(diagnose("Browser sign-in", e.also { it.addSuppressed(earlier) }))
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Result.failure(diagnose("Browser sign-in", e.also { it.addSuppressed(earlier) }))
         }
     }
 
@@ -128,11 +129,7 @@ class GoogleAuthRepository(
 
     /** Exchange the Google ID token for a Firebase session. */
     private suspend fun signInToFirebase(idToken: String): Result<Unit> =
-        suspendCancellableCoroutine { cont ->
-            auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null))
-                .addOnSuccessListener { cont.resume(Result.success(Unit)) }
-                .addOnFailureListener { cont.resume(Result.failure(it)) }
-        }
+        runCatching { auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await() }.map { }
 
     override fun signOut() {
         auth.signOut()
@@ -145,14 +142,10 @@ class GoogleAuthRepository(
      */
     override suspend fun deleteAccount(): Result<Unit> = runCatching {
         val user = auth.currentUser ?: error("Not signed in.")
-        val token = suspendCancellableCoroutine { cont ->
-            user.getIdToken(true)
-                .addOnSuccessListener { cont.resume(Result.success(it.token.orEmpty())) }
-                .addOnFailureListener { cont.resume(Result.failure(it)) }
-        }.getOrThrow()
+        val token = user.getIdToken(true).await().token.orEmpty()
         val project = com.google.firebase.FirebaseApp.getInstance().options.projectId
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            val connection = java.net.URL("https://us-central1-$project.cloudfunctions.net/deleteAccount")
+            val connection = java.net.URL("https://${AppConfig.FUNCTIONS_REGION}-$project.cloudfunctions.net/deleteAccount")
                 .openConnection() as java.net.HttpURLConnection
             try {
                 connection.requestMethod = "POST"
@@ -189,10 +182,10 @@ class GoogleAuthRepository(
         val text = buildString {
             appendLine("Google sign-in didn't finish ($stage).")
             appendLine(causes)
-            appendLine("App: ${appContext.packageName} ${com.ampersand.BuildConfig.VERSION_NAME} (${com.ampersand.BuildConfig.BUILD_TYPE})")
+            appendLine("App: ${appContext.packageName} ${AppConfig.version}")
             appendLine("Installed by: $installer")
             appendLine("App key SHA-1: ${signingSha1()}")
-            appendLine("Web client: ${com.ampersand.BuildConfig.WEB_CLIENT_ID}")
+            appendLine("Web client: ${AppConfig.webClientId}")
             append("Play services: $playServices, Android ${android.os.Build.VERSION.RELEASE}")
         }
         Log.e(TAG, text, e)
@@ -225,6 +218,6 @@ class GoogleAuthRepository(
          * Not a `getIdentifier` lookup: the resource shrinker removed that string in release.
          */
         fun webClientId(context: Context): String? =
-            com.ampersand.BuildConfig.WEB_CLIENT_ID.takeIf { it.isNotBlank() }
+            AppConfig.webClientId.takeIf { it.isNotBlank() }
     }
 }

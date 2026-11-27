@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.components.Emphasis
 import com.ampersand.ui.theme.IconSize
@@ -72,7 +73,6 @@ import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
-import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable
@@ -113,7 +113,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-internal val DayFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 @Composable
 fun TodayScreen(
@@ -146,7 +145,7 @@ fun TodayScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(day.date.format(DayFormat))
+            SectionLabel(day.date.format(DateFormats.Weekday))
             // Days you both answered this week, not a run: a gap never breaks anything.
             StreakStuds(
                 days = remember(state.history, state.today, state.plate.startedOn) {
@@ -168,7 +167,8 @@ fun TodayScreen(
             why = when {
                 state.capsule?.question?.id == question.id -> "Again"
                 author != null -> if (author.uid == state.you.uid) "You wrote this" else "From ${author.name}"
-                else -> pickedBy(state)?.let { if (it == "You") "Your pick" else "$it's pick" } ?: state.why
+                else -> Turns.pickedBy(state.today, state.history, state.you.uid, state.them.uid)
+                    ?.let { if (it == state.you.uid) "Your pick" else "${state.them.name}'s pick" } ?: state.why
             },
             author = author?.let { if (it.uid == state.you.uid) "You wrote this for ${state.them.name}" else "${it.name} wrote you this" },
             authorColor = author?.let { BrickColor.of(it.colorArgb) },
@@ -344,18 +344,6 @@ internal fun QuestionHero(
     }
 }
 
-/** Rough "how long ago" in months or years, never days. */
-internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
-    val months = ChronoUnit.MONTHS.between(then, now)
-    return when {
-        months >= 24 -> "${months / 12} years ago"
-        months >= 12 -> "a year ago"
-        months == 1L -> "a month ago"
-        months >= 2 -> "$months months ago"
-        else -> "a few weeks ago"
-    }
-}
-
 /**
  * Seven one-stud bricks, one lit for each day this week you both answered.
  * No number and no milestone: a count that gets praised becomes one people perform for.
@@ -426,7 +414,7 @@ fun PastAnswerScreen(
         Spacer(Modifier.height(Space.m))
         BackAction(onBack)
         Spacer(Modifier.height(Space.s))
-        SectionLabel(day.date.format(DayFormat))
+        SectionLabel(day.date.format(DateFormats.Weekday))
         Spacer(Modifier.height(Space.m))
         Text(day.question.text, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(Space.xl))

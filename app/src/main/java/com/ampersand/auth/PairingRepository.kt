@@ -1,9 +1,9 @@
 package com.ampersand.auth
 
+import com.ampersand.AppConfig
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import com.ampersand.model.SculptureNames
-import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,11 +57,10 @@ interface PairingRepository {
 
 /** Firestore pairing when there is a Firebase config, in-memory otherwise. Same check as [createAuthRepository]. */
 fun createPairingRepository(
-    context: Context,
     uid: String,
     displayName: String,
 ): PairingRepository =
-    if (hasFirebaseConfigFor(context)) {
+    if (AppConfig.hasFirebase) {
         FirestorePairingRepository(uid, displayName)
     } else {
         FakePairingRepository(uid)

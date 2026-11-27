@@ -1,13 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.BuildPlate
-import com.ampersand.model.CoupleState
-import com.ampersand.model.DayEntry
-import com.ampersand.model.Depth
-import com.ampersand.model.Member
-import com.ampersand.model.Question
-import com.ampersand.model.QuestionType
-import com.ampersand.model.Reaction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

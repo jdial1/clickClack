@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Row
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.glass
-import com.ampersand.data.BadgeWall
+import com.ampersand.model.BadgeWall
 import com.ampersand.ui.today.ShapeTomorrow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ampersand.R
-import com.ampersand.data.Instruments
+import com.ampersand.model.Instruments
 import com.ampersand.data.MockCouple
 import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer

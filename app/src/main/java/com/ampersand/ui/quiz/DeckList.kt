@@ -4,18 +4,11 @@ import com.ampersand.ui.components.panel
 import com.ampersand.ui.components.Emphasis
 import com.ampersand.ui.theme.IconSize
 import com.ampersand.ui.theme.Alpha
-import com.ampersand.ui.theme.Corner
 import com.ampersand.ui.theme.Space
-import com.ampersand.ui.brick.structureSlug
-import com.ampersand.ui.brick.glass
 import androidx.compose.ui.draw.alpha
 import com.ampersand.ui.components.ThemeIcon
 import androidx.compose.foundation.layout.width
-import com.ampersand.ui.components.IconBrick
-import com.ampersand.ui.components.UiIcon
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,34 +19,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ampersand.data.MockCouple
 import com.ampersand.data.QuizJson
-import com.ampersand.model.BrickColor
-import com.ampersand.model.BrickHeight
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DeckState
 import com.ampersand.model.Quiz
 import com.ampersand.model.QuizResult
 import com.ampersand.model.label
-import com.ampersand.ui.brick.BrickPill
-import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.SectionLabel
-import com.ampersand.ui.feel.Feel
-import com.ampersand.ui.feel.LocalFeel
-import com.ampersand.ui.feel.play
-import com.ampersand.ui.sound.LocalSounds
-import com.ampersand.ui.sound.Sfx
-import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
-import com.ampersand.ui.theme.Motion
-import com.ampersand.ui.theme.Stud
 
 /** All decks, grouped by [DeckState]. Finished decks stay listed so their results are one tap away. */
 @Composable
@@ -90,45 +68,6 @@ fun DeckList(
                 DeckRow(deck, group, state, onOpen)
                 Spacer(Modifier.height(Space.m))
             }
-        }
-    }
-}
-
-/** Toggle chip drawn as a brick pill; selected is full brightness, unselected is faded. */
-@Composable
-internal fun BrickChip(
-    label: String,
-    on: Boolean,
-    color: BrickColor?,
-    icon: UiIcon? = null,
-    onClick: () -> Unit,
-) {
-    val sounds = LocalSounds.current
-    val feel = LocalFeel.current
-
-    // Color stays constant; on/off is shown by alpha only.
-    val lift by animateFloatAsState(if (on) 1f else 0f, Motion.glide, label = "chipLift")
-
-    BrickPill(
-        slug = color?.slug,
-        studSize = Stud.chip,
-        height = BrickHeight.MEDIUM,
-        alpha = Alpha.rise(Alpha.quiet, lift),
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-        ) {
-            sounds.play(if (on) Sfx.DESELECT else Sfx.SELECT)
-            feel.play(if (on) Feel.DESELECT else Feel.SELECT)
-            onClick()
-        },
-    ) {
-        Row(Modifier.padding(horizontal = Space.m, vertical = Space.s), verticalAlignment = Alignment.CenterVertically) {
-            icon?.let {
-                IconBrick(it, size = IconSize.small)
-                Spacer(Modifier.width(Space.s))
-            }
-            Text(text = label, style = MaterialTheme.typography.labelLarge, color = inkOnBrick(color?.slug))
         }
     }
 }

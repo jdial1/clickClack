@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.theme.IconSize
 import com.ampersand.ui.theme.Alpha
@@ -11,10 +12,11 @@ import com.ampersand.ui.components.rememberPhoto
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.IconBrick
+import com.ampersand.model.ago
 import com.ampersand.model.Kept
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.FlowRow
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import com.ampersand.model.name
 import com.ampersand.model.SculptureNames
 import com.ampersand.model.NameWords
@@ -95,8 +97,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private val ShortDate = DateTimeFormatter.ofPattern("MMM d")
-private val LongDate = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 private const val WeeksShown = 10
 private const val DaysPerWeek = 7
 
@@ -133,7 +133,7 @@ fun HistoryScreen(
                             }
                             Spacer(Modifier.height(Space.xs))
                             Text(p.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
-                            Text(p.date.format(LongDate), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
+                            Text(p.date.format(DateFormats.Full), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
                         }
                     }
                 }
@@ -162,7 +162,7 @@ fun HistoryScreen(
                     Spacer(Modifier.width(Space.m))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            date?.format(LongDate) ?: "Deck",
+                            date?.format(DateFormats.Full) ?: "Deck",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -233,7 +233,7 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
                 .padding(horizontal = Space.l, vertical = Space.m),
         ) {
             Text(
-                text = ago(entry.date, state.today.date),
+                text = "${ago(entry.date, state.today.date).replaceFirstChar { it.uppercase() }} today",
                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
                 color = ink.copy(alpha = Alpha.secondary),
             )
@@ -281,18 +281,6 @@ private fun Said(name: String, what: String?, ink: Color) {
     )
 }
 
-/** "N months/years ago today". No day units: [CoupleState.onThisDay] only returns entries a month or older. */
-private fun ago(then: LocalDate, now: LocalDate): String {
-    val months = ChronoUnit.MONTHS.between(then, now).toInt()
-    val years = months / 12
-    return when {
-        years >= 2 -> "$years years ago today"
-        years == 1 -> "A year ago today"
-        months <= 1 -> "A month ago today"
-        else -> "$months months ago today"
-    }
-}
-
 /** Finished sculptures, newest first: the selected one large, the rest in a strip below. */
 @Composable
 private fun Shelf(
@@ -304,7 +292,7 @@ private fun Shelf(
     if (shelf.isEmpty()) {
         // Nothing sealed yet, so show the week being built rather than an empty promise.
         val live = state.plate
-        val seals = live.endsOn().format(LongDate)
+        val seals = live.endsOn().format(DateFormats.Full)
         if (live.placed.isNotEmpty()) {
             Sculpture(live, Modifier.fillMaxWidth())
             Spacer(Modifier.height(Space.m))
@@ -343,7 +331,7 @@ private fun Shelf(
             Text(it, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
         }
         Text(
-            text = "Finished ${selected.completedOn?.format(LongDate).orEmpty()}",
+            text = "Finished ${selected.completedOn?.format(DateFormats.Full).orEmpty()}",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -374,7 +362,7 @@ private fun Shelf(
                 ) {
                     Sculpture(plate, Modifier.fillMaxWidth(), alpha = if (on) 1f else Alpha.dim)
                     Spacer(Modifier.height(Space.s))
-                    SectionLabel(plate.completedOn?.format(ShortDate).orEmpty())
+                    SectionLabel(plate.completedOn?.format(DateFormats.Short).orEmpty())
                 }
             }
         }
@@ -578,7 +566,7 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
             Spacer(Modifier.height(Space.xs))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SectionLabel(
-                    "${entry.date.format(ShortDate)}  ·  ${entry.question.category}",
+                    "${entry.date.format(DateFormats.Short)}  ·  ${entry.question.category}",
                 )
                 if (marks.isNotEmpty()) {
                     Spacer(Modifier.size(Space.s))

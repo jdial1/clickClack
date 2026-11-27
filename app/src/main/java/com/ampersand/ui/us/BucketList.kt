@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.theme.Alpha
 import com.ampersand.ui.components.ActionRow
 import com.ampersand.ui.components.panel
@@ -24,14 +25,14 @@ import com.ampersand.model.Dates
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
 import com.ampersand.ui.components.AmpField
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
-import com.ampersand.data.Sources
+import com.ampersand.model.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
@@ -60,7 +61,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ampersand.data.MockCouple
 import com.ampersand.model.Occasion
 import com.ampersand.model.timeTogether
 import com.ampersand.ui.components.AmpDropdown
@@ -185,7 +185,7 @@ internal fun BucketRow(
             Text(item.group.label.uppercase(), style = MaterialTheme.typography.labelSmall, color = ink)
             Text(item.text, style = MaterialTheme.typography.titleMedium, color = ink)
             Text(
-                item.doneOn?.let { "Done ${it.format(DoneDate)}" } ?: "Added by $byName",
+                item.doneOn?.let { "Done ${it.format(DateFormats.Full)}" } ?: "Added by $byName",
                 style = MaterialTheme.typography.bodySmall,
                 color = ink,
             )
@@ -215,4 +215,3 @@ internal fun BucketRow(
     }
 }
 
-internal val DoneDate: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")

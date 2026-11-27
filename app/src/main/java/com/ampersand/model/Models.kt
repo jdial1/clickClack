@@ -95,7 +95,18 @@ data class Member(
     val birthday: LocalDate? = null,
     /** How they said they are, and when. See [MoodEntry.current]. */
     val mood: MoodEntry? = null,
-)
+) {
+    companion object {
+        /** The partner's name until their profile arrives. */
+        const val PARTNER_NAME = "Partner"
+
+        /** You, before your profile arrives: the pack red. */
+        fun placeholderYou(uid: String) = Member(uid, "You", BrickColor.RED.argb)
+
+        /** Your partner, before their profile arrives: the pack blue. */
+        fun placeholderPartner(uid: String) = Member(uid, PARTNER_NAME, BrickColor.BLUE.argb)
+    }
+}
 
 /** One person's submission. [values] is a list for every type, so RANK and MULTI_SELECT fit. */
 data class Answer(
@@ -232,8 +243,8 @@ data class CoupleState(
     /** Question sources either of you can turn off in Advanced settings. Shared, so both phones agree. */
     val sourcesOff: Set<QuestionSource> = emptySet(),
     /** No pushes from this hour until [quietTo], in your home ZIP's time zone. Shared by both of you. */
-    val quietFrom: Int = 20,
-    val quietTo: Int = 8,
+    val quietFrom: Int = QUIET_FROM,
+    val quietTo: Int = QUIET_TO,
     /** Why today's question was chosen, for the tag on its card: "Weather", "First date", "Family". */
     val why: String? = null,
     /** Days and decks either of you kept, keyed by [Kept.day] or [Kept.deck], with a label to show. */
@@ -268,6 +279,17 @@ data class CoupleState(
                 compareByDescending<DayEntry> { java.time.temporal.ChronoUnit.MONTHS.between(it.date, on) % 12 == 0L }
                     .thenBy { it.date },
             )
+
+    companion object {
+        /** Default quiet hours, 8pm to 8am, until either of you changes them. */
+        const val QUIET_FROM = 20
+        const val QUIET_TO = 8
+    }
+
+    /** The day for [date] wherever it is loaded: today, the history window, or recalled on demand. */
+    fun dayOn(date: LocalDate): DayEntry? =
+        if (today.date == date) today
+        else history.firstOrNull { it.date == date } ?: recalled.firstOrNull { it.date == date }
 
     /** Your run through [quizId], if you have played it. */
     fun myRun(quizId: String): QuizRun? = quizRuns.firstOrNull {

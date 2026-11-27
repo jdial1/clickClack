@@ -1,5 +1,7 @@
 package com.ampersand.data
 
+import com.ampersand.model.firstWeekDay
+import com.ampersand.model.gentleReturn
 import com.ampersand.model.Together
 import com.ampersand.model.ChineseZodiac
 import com.ampersand.model.DateKind
@@ -290,27 +292,3 @@ class QuestionPool(
         const val RecentDays = 42L
     }
 }
-
-/**
- * The Bad-Month Test as a rule: after [QuietDays] days that neither of you
- * answered, the next question is a light one. Only for couples who have
- * answered before, and computed from shared history so both phones agree.
- */
-/**
- * Which of the first week's questions is next: the count of days you have both opened,
- * or null after seven, or once a sculpture has sealed (history is a window, so a couple
- * back from a long gap must not start over). Shared state only, so both phones agree.
- */
-fun firstWeekDay(history: List<com.ampersand.model.DayEntry>, sealedSculpture: Boolean): Int? {
-    if (sealedSculpture) return null
-    return history.count { it.isRevealed }.takeIf { it < 7 }
-}
-
-fun gentleReturn(today: java.time.LocalDate, history: List<com.ampersand.model.DayEntry>): Boolean {
-    if (history.none { it.submitted.isNotEmpty() || it.isRevealed }) return false
-    return (1L..QuietDays).all { back ->
-        history.none { it.date == today.minusDays(back) && (it.submitted.isNotEmpty() || it.isRevealed) }
-    }
-}
-
-const val QuietDays = 3L

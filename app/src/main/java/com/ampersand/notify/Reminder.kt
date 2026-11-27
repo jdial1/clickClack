@@ -1,18 +1,12 @@
 package com.ampersand.notify
 
 import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationCompat
-import com.ampersand.MainActivity
-import com.ampersand.R
 import java.util.Calendar
 
-private const val CHANNEL = "daily"
 private const val REQUEST = 4711
 private const val PREFS = "reminder"
 private const val KEY_HOUR = "hour"
@@ -114,18 +108,6 @@ object Reminder {
         time(context)?.let { (h, m) -> schedule(context, h, m) }
     }
 
-    internal fun ensureChannel(context: Context) {
-        val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL,
-                "Daily question",
-                // Default importance: no heads-up popup.
-                NotificationManager.IMPORTANCE_DEFAULT,
-            ).apply { description = "A daily reminder when a question is waiting." },
-        )
-    }
-
     private fun pending(context: Context): PendingIntent = PendingIntent.getBroadcast(
         context,
         REQUEST,
@@ -150,15 +132,6 @@ class ReminderReceiver : BroadcastReceiver() {
         // Nothing outstanding: no notification.
         if (!questionPending && decksWaiting == 0) return
 
-        Reminder.ensureChannel(context)
-
-        val open = PendingIntent.getActivity(
-            context,
-            0,
-            Intent(context, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
         // One short message about what is waiting.
         val decks = if (decksWaiting == 1) "a deck" else "$decksWaiting decks"
         val title = when {
@@ -172,17 +145,6 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> "Opens when you both answer."
         }
 
-        val note = NotificationCompat.Builder(context, CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher_monochrome)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setContentIntent(open)
-            .setAutoCancel(true)
-            .build()
-
-        runCatching {
-            // Throws if notifications are denied.
-            androidx.core.app.NotificationManagerCompat.from(context).notify(1, note)
-        }
+        Notifier.show(context, Notifier.REMINDER, title, body)
     }
 }

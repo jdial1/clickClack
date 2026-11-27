@@ -1,10 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.Fidelity
-import com.ampersand.model.Instrument
-import com.ampersand.model.InstrumentItem
-import com.ampersand.model.Source
-import com.ampersand.model.Subscale
 
 /**
  * Content sources and their licenses, spelled out.

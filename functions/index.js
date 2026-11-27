@@ -251,7 +251,7 @@ function isQuiet(hour, from, to) {
   return from > to ? hour >= from || hour < to : hour >= from && hour < to;
 }
 
-/** Wait this long after the newest item, so a burst (a chat, say) goes out as one push. */
+/** Wait this long after the newest item, so a burst of activity goes out as one push. */
 const SETTLE_MS = 10 * 60 * 1000;
 /** Never hold a burst longer than this outside quiet hours. */
 const MAX_HOLD_MS = 60 * 60 * 1000;
@@ -413,6 +413,8 @@ async function eraseFromCouple(cid, uid) {
   for (const p of (await couple.collection("plates").get()).docs) {
     await p.ref.collection("words").doc(uid).delete();
   }
+  // Conversations were removed from the app, but couples who used them still
+  // have lines stored; erasing an account must still erase those.
   for (const chat of (await couple.collection("chats").get()).docs) {
     await deleteWhere(chat.ref.collection("messages"), "byUid", uid);
     if (chat.get("lastBy") === uid) await chat.ref.update({ lastText: FieldValue.delete() });

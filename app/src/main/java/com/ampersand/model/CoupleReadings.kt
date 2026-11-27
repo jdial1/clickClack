@@ -1,8 +1,5 @@
-﻿package com.ampersand.data
+﻿package com.ampersand.model
 
-import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Member
-import com.ampersand.model.Reading
 
 /**
  * Two finished results side by side, then one question about them. Null until

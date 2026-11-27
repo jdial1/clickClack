@@ -1,6 +1,8 @@
 package com.ampersand.ui.us
 
+import com.ampersand.AppConfig
 import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.ActionRow
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.theme.Corner
@@ -24,14 +26,13 @@ import com.ampersand.model.Dates
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
 import com.ampersand.ui.components.AmpField
-import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
-import com.ampersand.data.Sources
+import com.ampersand.model.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
@@ -60,7 +61,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ampersand.data.MockCouple
 import com.ampersand.model.Occasion
 import com.ampersand.model.timeTogether
 import com.ampersand.ui.components.AmpDropdown
@@ -189,7 +189,7 @@ fun SettingsScreen(
                     Column(Modifier.weight(1f)) {
                         Text(d.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                         Text(
-                            "${d.kind.label}  ·  ${d.date.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))}",
+                            "${d.kind.label}  ·  ${d.date.format(DateFormats.Full)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -278,7 +278,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(Space.m))
             }
             Text(
-                "Version ${com.ampersand.BuildConfig.VERSION_NAME}",
+                "Version ${AppConfig.versionName}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -305,7 +305,7 @@ fun SettingsScreen(
                 onSetFollowing(emptySet())
             }
 
-            val done = com.ampersand.data.BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.yourTurn }
+            val done = com.ampersand.model.BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.yourTurn }
             if (done.isNotEmpty()) {
                 Spacer(Modifier.height(Space.l))
                 SectionLabel("Retake a test")

@@ -1,7 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.CoupleState
-import com.ampersand.model.Taste
 
 /**
  * Weights for the daily draw: topics the couple asked for, plus categories they

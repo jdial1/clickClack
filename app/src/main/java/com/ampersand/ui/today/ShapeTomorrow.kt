@@ -67,12 +67,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ampersand.data.MockCouple
-import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable
@@ -214,18 +212,6 @@ internal fun DidYouTalk(state: CoupleState, day: DayEntry, onTalkedAbout: (Local
             color = MaterialTheme.colorScheme.onSurface,
         )
     }
-}
-
-/**
- * Who picked today's theme, or null. Checked against the question's category,
- * since a wildcard, capsule or occasion can override the pick.
- */
-internal fun pickedBy(state: CoupleState): String? {
-    val theme = Turns.themeFor(state.today.date, state.history, state.you.uid, state.them.uid)
-        ?: return null
-    if (state.today.question.category != theme) return null
-    val yesterday = state.history.first { it.date == state.today.date.minusDays(1) }
-    return if (yesterday.nextThemeBy == state.you.uid) "You" else state.them.name
 }
 
 /**

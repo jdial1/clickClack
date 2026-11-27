@@ -10,7 +10,6 @@ import com.ampersand.model.League
 import com.ampersand.model.SpecialDate
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
-import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.BrickColor
@@ -19,8 +18,9 @@ import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Placement
 import com.ampersand.model.QuizRun
+import com.ampersand.model.Quiz
+import com.ampersand.model.ZipTable
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
 import com.ampersand.model.Wildcard
@@ -100,9 +100,6 @@ interface CoupleRepository {
     /** Answer a past day you missed. Opens it if your partner already answered. */
     fun answerPast(date: LocalDate, questionId: String, values: List<String>, guess: List<String>?)
 
-    /** Seals the current plate and starts the next. Firestore calls this itself when the period ends. */
-    fun sealPlate()
-
     /**
      * Submits your deck run. Cannot be changed.
      * [answers] and [guesses] are keyed by question id, since a deck can change between partners' runs.
@@ -154,6 +151,9 @@ interface CoupleRepository {
 
     /** Picks tomorrow's theme. Only on your turn, after today is revealed, once. See [com.ampersand.model.Turns]. */
     fun pickTomorrow(theme: String)
+
+    /** Stops listening. The repository is unusable afterwards. Nothing to release in memory. */
+    fun close() {}
 }
 
 /** Firestore when configured and the couple is real, the fake otherwise. Same test as the auth and pairing factories. */
@@ -169,12 +169,19 @@ fun createCoupleRepository(
     if (hasFirebase && !coupleId.startsWith("c_fake")) {
         FirestoreCoupleRepository(coupleId, myUid, partnerUid, pool, zone)
     } else {
-        FakeCoupleRepository()
+        FakeCoupleRepository(decks = pool.playable, places = pool.places)
     }
 
-/** In-memory repository seeded from [MockCouple]. */
+/**
+ * In-memory repository seeded from [MockCouple]. Bricks are laid by the same
+ * [Rewards.due] rule as Firestore, after every change.
+ */
 class FakeCoupleRepository(
     initial: CoupleState = MockCouple.state(),
+    /** Playable decks, so finished decks earn their bricks here too. */
+    private val decks: List<Quiz> = emptyList(),
+    /** The bundled ZIP table, so a home ZIP is accepted or refused exactly as on Firestore. */
+    private val places: ZipTable = ZipTable.empty,
 ) : CoupleRepository {
 
     private val _state = MutableStateFlow(initial)
@@ -233,25 +240,7 @@ class FakeCoupleRepository(
         val you = current.you
         val today = current.today
         if (today.answerFor(you.uid) != null) return@mutate current
-        awardIfComplete(
-            current.copy(
-                today = today.copy(
-                    answers = today.answers + (you.uid to Answer(you.uid, values, guess)),
-                ),
-            ),
-        )
-    }
-
-    /** Awards both partners' bricks once today is revealed. Idempotent via `date_uid` block ids. */
-    private fun awardIfComplete(s: CoupleState): CoupleState {
-        if (!s.today.isRevealed) return s
-        val existing = s.plate.blocks.mapTo(mutableSetOf()) { it.id }
-        val fresh = (
-            Rewards.forDay(s.today, s.you, s.them, s.streak) +
-                Rewards.forDay(s.today, s.them, s.you, s.streak)
-            ).filter { it.id !in existing }
-        if (fresh.isEmpty()) return s
-        return s.copy(plate = s.plate.copy(blocks = s.plate.blocks + fresh))
+        current.copy(today = today.copy(answers = today.answers + (you.uid to Answer(you.uid, values, guess))))
     }
 
     override fun react(date: LocalDate, reaction: Reaction?) = mutate { current ->
@@ -277,35 +266,9 @@ class FakeCoupleRepository(
             copy(history = history.map { if (it.date == date) f(it) else it })
         }
 
-    override fun sealPlate() = mutate { current ->
-        val plate = current.plate
-        if (plate.isSealed || plate.placed.isEmpty()) return@mutate current
-
-        current.copy(
-            shelf = listOf(plate.copy(completedOn = current.today.date)) + current.shelf,
-            plate = BuildPlate(
-                id = "plate_${current.shelf.size + 2}",
-                startedOn = current.today.date,
-                periodDays = plate.periodDays,
-                gridW = plate.gridW,
-                gridH = plate.gridH,
-                // Unplaced bricks carry over to the new plate.
-                blocks = plate.tray(current.you.uid) + plate.tray(current.them.uid),
-            ),
-        )
-    }
-
     override fun placeBlock(blockId: String, x: Int, y: Int) = mutate { current ->
-        val plate = current.plate
-        if (plate.isSealed) return@mutate current
-        val block = plate.block(blockId) ?: return@mutate current
-        // Validated here (not in UI) so Firestore can run the same check in a transaction.
-        if (plate.placed.any { it.blockId == blockId }) return@mutate current
-        if (!plate.canPlace(block.shape, x, y)) return@mutate current
-
-        current.copy(
-            plate = plate.copy(placed = plate.placed + Placement(blockId, x, y)),
-        )
+        val placement = current.plate.placement(blockId, x, y, current.today.date) ?: return@mutate current
+        current.copy(plate = current.plate.copy(placed = current.plate.placed + placement))
     }
 
     override fun submitQuizRun(
@@ -376,9 +339,8 @@ class FakeCoupleRepository(
     }
 
     override fun setHomeZip(zip: String): Boolean {
-        val clean = zip.trim()
-        if (clean.length != 5 || !clean.all(Char::isDigit)) return false
-        mutate { it.copy(homeZip = clean) }
+        val place = places.lookup(zip) ?: return false
+        mutate { it.copy(homeZip = zip.trim(), region = place.region, homeState = place.state) }
         return true
     }
 
@@ -441,14 +403,7 @@ class FakeCoupleRepository(
 
     override fun tickBucket(id: String) = mutate { current ->
         val item = current.bucket.firstOrNull { it.id == id && !it.isDone } ?: return@mutate current
-        val ticked = item.copy(doneOn = current.today.date)
-        val laid = (current.shelf.flatMap { it.blocks } + current.plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = listOfNotNull(BucketList.reward(ticked, current.you), BucketList.reward(ticked, current.them))
-            .filter { it.id !in laid }
-        current.copy(
-            bucket = current.bucket.map { if (it.id == id) ticked else it },
-            plate = if (current.plate.isSealed) current.plate else current.plate.copy(blocks = current.plate.blocks + fresh),
-        )
+        current.copy(bucket = current.bucket.map { if (it.id == id) item.copy(doneOn = current.today.date) else it })
     }
 
     override fun removeFromBucket(id: String) = mutate { current ->
@@ -467,20 +422,7 @@ class FakeCoupleRepository(
             if (this.date != date || !isRevealed) this
             else copy(talkedAbout = talkedAbout + current.you.uid)
 
-        val marked = current.copy(
-            today = current.today.mark(),
-            history = current.history.map { it.mark() },
-        )
-        val day = (listOf(marked.today) + marked.history).firstOrNull { it.date == date }
-            ?: return@mutate marked
-        if (marked.plate.isSealed) return@mutate marked
-
-        val laid = (marked.shelf.flatMap { it.blocks } + marked.plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = (
-            Rewards.forTalk(day, marked.you, marked.them, marked.today.date) +
-                Rewards.forTalk(day, marked.them, marked.you, marked.today.date)
-            ).filter { it.id !in laid }
-        marked.copy(plate = marked.plate.copy(blocks = marked.plate.blocks + fresh))
+        current.copy(today = current.today.mark(), history = current.history.map { it.mark() })
     }
 
     override fun pickTomorrow(theme: String) = mutate { current ->
@@ -518,6 +460,8 @@ class FakeCoupleRepository(
         }
 
     private inline fun mutate(block: (CoupleState) -> CoupleState) {
-        _state.value = block(_state.value)
+        val next = block(_state.value)
+        val fresh = Rewards.due(next, next.today.date, decks, next.shelf)
+        _state.value = if (fresh.isEmpty()) next else next.copy(plate = next.plate.copy(blocks = next.plate.blocks + fresh))
     }
 }

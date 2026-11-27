@@ -1,7 +1,9 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.theme.Inset
 import com.ampersand.ui.theme.Space
+import com.ampersand.model.ago
 import com.ampersand.model.Kept
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
@@ -65,12 +67,10 @@ import com.ampersand.ui.sound.Sfx
 import com.ampersand.ui.sound.play
 import com.ampersand.ui.theme.AmpersandTheme
 import com.ampersand.ui.theme.Motion
-import com.ampersand.ui.today.agoIn
 import com.ampersand.ui.theme.Stud
 import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
-private val DayFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 /** A revealed day: both answers side by side, plus one reaction each. */
 @Composable
@@ -135,7 +135,7 @@ fun RevealScreen(
             horizontalArrangement = Arrangement.spacedBy(Space.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(day.date.format(DayFormat))
+            SectionLabel(day.date.format(DateFormats.Weekday))
             DepthDots(day.question.depth)
         }
 
@@ -190,7 +190,7 @@ fun RevealScreen(
             Spacer(Modifier.height(Space.xxl))
             Box(Modifier.arrive(day.date, index = 3, enabled = animateIn)) {
                 Column(Modifier.fillMaxWidth()) {
-                    SectionLabel("And ${agoIn(then.date, day.date)}")
+                    SectionLabel("And ${ago(then.date, day.date)}")
                     Spacer(Modifier.height(Space.m))
                     AnswerPanelPair(
                         type = then.question.type,

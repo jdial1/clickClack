@@ -3,19 +3,14 @@ package com.ampersand.auth
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import com.ampersand.AppConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Google auth when the build has a Firebase config, otherwise the fake.
- * Checks a BuildConfig constant, not a resource by name, which the release shrinker could remove.
- */
+/** Google auth when the build has a Firebase config ([AppConfig.hasFirebase]), otherwise the fake. */
 fun createAuthRepository(context: Context): AuthRepository =
-    if (hasFirebaseConfigFor(context)) GoogleAuthRepository(context) else FakeAuthRepository()
-
-fun hasFirebaseConfigFor(@Suppress("UNUSED_PARAMETER") context: Context): Boolean =
-    com.ampersand.BuildConfig.WEB_CLIENT_ID.isNotBlank()
+    if (AppConfig.hasFirebase) GoogleAuthRepository(context) else FakeAuthRepository()
 
 /** Unwraps to the hosting Activity (Credential Manager needs one; LocalContext may be a wrapper). */
 fun Context.findActivity(): Activity? {

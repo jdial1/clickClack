@@ -40,7 +40,7 @@ data class DuoColors(
 
     /** Readable ink for text sitting on [color]. */
     fun inkOn(color: Color): Color =
-        if (color.luminance() > 0.5f) Color(0xFF0E1226) else Color.White
+        if (color.luminance() > 0.5f) DarkInk else Color.White
 }
 
 val LocalDuoColors = staticCompositionLocalOf {
@@ -337,10 +337,13 @@ fun Color.toArgbLong(): Long = toArgb().toLong() and 0xFFFFFFFFL
 // --- Base palette ------------------------------------------------------------
 
 /** Default colors before a couple's colors load. */
-internal val DefaultYou = Color(0xFFF54E4F)   // pack red
-internal val DefaultThem = Color(0xFF108BE2)  // pack blue
+internal val DefaultYou = Color(com.ampersand.model.BrickColor.RED.argb)
+internal val DefaultThem = Color(com.ampersand.model.BrickColor.BLUE.argb)
 
 internal val NightBase = Color(0xFF0E1226)
+
+/** The one dark ink: text on any colour too pale for white, bricks and blends alike. */
+val DarkInk = Color(0xFF15121F)
 internal val NightCard = Color(0xFF1A2043)
 internal val NightCardHigh = Color(0xFF252C56)
 internal val NightInk = Color(0xFFEDEFFA)
@@ -353,9 +356,6 @@ internal val DayMuted = Color(0xFF6A7299)
 
 /** The border on a special day's card. The app's only gold, so it stays special. */
 internal val SpecialGold = Color(0xFFFFC94D)
-
-/** The four pickable colors, from [com.ampersand.model.BrickColor] (brick art exists only in these). */
-val ColorChoices: List<Color> = com.ampersand.model.BrickColor.entries.map { Color(it.argb) }
 
 // --- Type --------------------------------------------------------------------
 

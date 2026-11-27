@@ -1,17 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.Badge
-import com.ampersand.model.BadgeBar
-import com.ampersand.model.BadgeGroup
-import com.ampersand.model.BadgeRow
-import com.ampersand.model.Instrument
-import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Member
-import com.ampersand.model.Owner
-import com.ampersand.model.Reading
-import com.ampersand.model.Standing
-import kotlin.math.abs
-import kotlin.math.roundToInt
 
 /** Builds the Us page's test results, one group per test. Results appear only once both have finished. */
 object BadgeWall {
@@ -330,36 +318,5 @@ object BadgeWall {
             minutes = kit.minutes,
             waitingOnThem = run != null && !open && run.has(of.uid),
         )
-    }
-
-    // ---- the gap ---------------------------------------------------------
-
-        private fun readings(run: InstrumentRun?, uid: String, pass: Int): List<Reading> =
-        if (run?.isOpen != true) emptyList()
-        else run.responsesFor(uid)?.let { Instruments.LOVE_LANGUAGES.readings(it, pass) }.orEmpty()
-
-    /** A gap this size or smaller counts as lined up. A quarter of 4..20. */
-    private const val ALIGNED = 4
-
-    /** The widest a gap can be on a 4..20 subscale. */
-    private const val SPAN = 16
-
-    /** Overall fit as a percent. */
-    fun fitPercent(run: InstrumentRun?, you: Member, them: Member): Int? {
-        val kit = Instruments.LOVE_LANGUAGES
-        val yourFelt = readings(run, you.uid, Instruments.FELT)
-        if (yourFelt.isEmpty()) return null
-        val yourGiven = readings(run, you.uid, Instruments.GIVEN)
-        val theirFelt = readings(run, them.uid, Instruments.FELT)
-        val theirGiven = readings(run, them.uid, Instruments.GIVEN)
-
-        val gaps = kit.subscales.indices.flatMap { i ->
-            listOf(
-                abs(yourFelt[i].value - theirGiven[i].value),
-                abs(theirFelt[i].value - yourGiven[i].value),
-            )
-        }
-        val mean = gaps.average()
-        return ((1.0 - (mean / SPAN)) * 100).roundToInt().coerceIn(0, 100)
     }
 }

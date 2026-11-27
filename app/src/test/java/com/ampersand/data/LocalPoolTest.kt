@@ -1,5 +1,6 @@
 package com.ampersand.data
 
+import com.ampersand.model.Profiles
 import com.ampersand.model.Depth
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType

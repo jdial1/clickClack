@@ -1,5 +1,6 @@
 package com.ampersand.ui.build
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.theme.Alpha
 import com.ampersand.ui.theme.Inset
 import com.ampersand.ui.theme.Space
@@ -72,7 +73,6 @@ import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
-private val Month = DateTimeFormatter.ofPattern("MMM d")
 
 /** Stud width in the tray. */
 private val TrayStud = Stud.small
@@ -157,6 +157,7 @@ fun BuildScreen(
                         block.shape.h * rowPx / 2f,
                 )
             } else {
+                sounds.play(Sfx.DESELECT)
                 feel.play(Feel.REJECT)
                 grabbedAt
             }
@@ -207,7 +208,7 @@ fun BuildScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SectionLabel(
-                    "${plate.startedOn.format(Month)} — ${plate.endsOn().format(Month)}",
+                    "${plate.startedOn.format(DateFormats.Short)} — ${plate.endsOn().format(DateFormats.Short)}",
                 )
                 SectionLabel(
                     "${plate.daysLeft(state.today.date)} days left",

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
+import com.ampersand.ui.theme.DarkInk
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.draw.drawBehind
@@ -30,7 +31,6 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-private val DarkInk = Color(0xFF15121F)
 
 /** Readable text color for a brick of [slug]. Pale bricks need dark ink. */
 fun inkOnBrick(slug: String?): Color =
@@ -79,7 +79,7 @@ fun Modifier.glass(
     return this
         .clip(shape)
         .background(pane.copy(alpha = (if (dark) 0.34f else 0.26f) * strength))
-        .border(1.dp, (if (dark) Color.White else Color.White).copy(alpha = 0.18f * strength), shape)
+        .border(1.dp, Color.White.copy(alpha = 0.18f * strength), shape)
 }
 
 /** As [glass], using the ink for [slug]. */

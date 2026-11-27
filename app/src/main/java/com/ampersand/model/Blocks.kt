@@ -101,6 +101,41 @@ data class BuildPlate(
 
         /** Height in rows. Intentionally far more than two weeks of bricks can fill, so towers are possible. */
         const val GRID_H = 28
+
+        /** A plate is one week. */
+        const val PERIOD_DAYS = 7
+
+        /**
+         * The plate for the week starting [from], holding [carried] bricks. The id is the
+         * start date, so two phones rolling over at once write the same next plate.
+         */
+        fun startingOn(from: LocalDate, carried: List<Block> = emptyList()) = BuildPlate(
+            id = "plate_$from",
+            startedOn = from,
+            periodDays = PERIOD_DAYS,
+            gridW = GRID_W,
+            gridH = GRID_H,
+            blocks = carried,
+        )
+    }
+
+    /** Bricks earned onto this plate and not placed yet, whoever's. They carry over when the week seals. */
+    fun unplaced(): List<Block> {
+        val used = placed.mapTo(mutableSetOf()) { it.blockId }
+        return blocks.filter { it.id !in used }
+    }
+
+    /**
+     * The placement of [blockId] at ([x], [y]), or null when that is not a legal move
+     * on [today]: the week is sealed or over, the brick is not this plate's or is
+     * already placed, or the spot is taken.
+     */
+    fun placement(blockId: String, x: Int, y: Int, today: LocalDate): Placement? {
+        if (isSealed || endsOn() < today) return null
+        val block = block(blockId) ?: return null
+        if (placed.any { it.blockId == blockId }) return null
+        if (!canPlace(block.shape, x, y)) return null
+        return Placement(blockId, x, y)
     }
 
     private val byId: Map<String, Block> get() = blocks.associateBy { it.id }
@@ -114,9 +149,6 @@ data class BuildPlate(
     fun builtHeight(): Int = placed.maxOfOrNull { p ->
         p.y + (byId[p.blockId]?.shape?.h ?: 0)
     } ?: 0
-
-    /** How many bricks [uid] earned into this plate, placed or not. */
-    fun earnedBy(uid: String): Int = blocks.count { it.ownerUid == uid }
 
     /** Bricks earned but not yet on the plate, for [uid]. */
     fun tray(uid: String): List<Block> {
@@ -184,8 +216,39 @@ data class BuildPlate(
     ): Int? = (0 until gridH).firstOrNull { canPlace(shape, x, it, occupied) }
 }
 
-/** Brick rewards for days, talks and decks. */
+/** Brick rewards for days, talks, decks, bucket items and moods. */
 object Rewards {
+
+    /**
+     * Every brick [state] has earned that is not on any plate yet: the one rule for
+     * what is owed. Repositories only decide when to ask and how to write the result.
+     *
+     * Idempotent, because block ids are per-person keys and anything already on
+     * [plates] or the live plate is left out, so asking on every change is safe.
+     * Nothing is owed onto a sealed plate. [decks] are the playable decks, for
+     * finished-deck bricks; [today] is the couple's home date.
+     */
+    fun due(state: CoupleState, today: LocalDate, decks: List<Quiz>, plates: List<BuildPlate>): List<Block> {
+        if (state.plate.isSealed) return emptyList()
+        val laid = (plates + state.plate).flatMapTo(mutableSetOf()) { p -> p.blocks.map { it.id } }
+        val pairs = listOf(state.you to state.them, state.them to state.you)
+        val earned = pairs.flatMap { (member, partner) ->
+            forDay(state.today, member, partner, state.streak) +
+                // Talks are laid the morning after, so only past days count.
+                state.history.flatMap { forTalk(it, member, partner, today) } +
+                decks.flatMap { quiz ->
+                    val mine = state.quizRuns.firstOrNull { it.quizId == quiz.id && it.uid == member.uid }
+                    val theirs = state.quizRuns.firstOrNull { it.quizId == quiz.id && it.uid == partner.uid }
+                    if (mine == null || theirs == null) return@flatMap emptyList()
+                    val result = QuizResult.of(quiz, mine, theirs)
+                    forQuiz(result, member, today, effort = deckEffort(result.rows, yours = true))
+                } +
+                state.bucket.mapNotNull { BucketList.reward(it, member) } +
+                // A mood earns its brick once its day is over.
+                listOfNotNull(member.mood?.takeIf { it.on < today }?.block(member))
+        }
+        return earned.filter { it.id !in laid }.distinctBy { it.id }
+    }
 
     /**
      * One brick for [member] for a revealed day they answered.
