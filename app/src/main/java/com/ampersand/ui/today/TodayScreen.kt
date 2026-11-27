@@ -1,5 +1,6 @@
 package com.ampersand.ui.today
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.components.Emphasis
 import com.ampersand.ui.theme.IconSize
@@ -113,7 +114,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-internal val DayFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 @Composable
 fun TodayScreen(
@@ -146,7 +146,7 @@ fun TodayScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(day.date.format(DayFormat))
+            SectionLabel(day.date.format(DateFormats.Weekday))
             // Days you both answered this week, not a run: a gap never breaks anything.
             StreakStuds(
                 days = remember(state.history, state.today, state.plate.startedOn) {
@@ -426,7 +426,7 @@ fun PastAnswerScreen(
         Spacer(Modifier.height(Space.m))
         BackAction(onBack)
         Spacer(Modifier.height(Space.s))
-        SectionLabel(day.date.format(DayFormat))
+        SectionLabel(day.date.format(DateFormats.Weekday))
         Spacer(Modifier.height(Space.m))
         Text(day.question.text, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(Space.xl))

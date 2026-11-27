@@ -95,3 +95,28 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
 - **Scan findings** from a read-only pass over `ui/` and `model/` were added to
   TASKS.md as T11–T19, and the decisions that need a product call as P1–P2.
 - **Validated:** full suite 281 tests, 27 skipped, 0 failures.
+
+## Round 8: pure rules move to `model/` (T11)
+
+- **Moved:** `BadgeWall`, `CoupleReadings`, `Profiles`, `Instruments`/`Sources`
+  from `data/` to `model/`. `firstWeekDay`, `gentleReturn` and `QuietDays` moved
+  out of `QuestionPool.kt` into `model/DrawRules.kt`, with the misattached KDoc
+  fixed. Seven tests moved to `test/.../model/` unchanged apart from the
+  package. See [ADR 0003](adr/0003-model-holds-rules-data-holds-io.md).
+- **Validated:** full suite 281 tests, 27 skipped, 0 failures.
+
+## Round 9: named date formats (T12)
+
+- **Found:** ten `DateTimeFormatter` patterns across seven UI files, five of
+  them duplicates (`"EEEE, MMMM d"` twice, `"MMMM d, yyyy"` four times,
+  `"MMM d"` twice), one built inline on every recomposition in Settings.
+- **Chosen:** `ui/theme/DateFormats.kt` with `Weekday`, `Full`, `MonthDay`, `Short`
+  and `MonthShort`, named by what the date is for. Every screen uses them, and
+  no UI file builds its own pattern. `model/Moments` and `model/Sun` keep
+  theirs, because they produce text in the model, not on screen.
+- **Not merged:** the two "N months ago" helpers. `HistoryScreen.ago` is a
+  heading on the same calendar day ("A year ago today", capitalised, never
+  under a month); `TodayScreen.agoIn` is mid-sentence relative time with a
+  "a few weeks ago" case. Merging would add flags to one function for two
+  callers, which fails the deletion test.
+- **Validated:** full suite 281 tests, 27 skipped, 0 failures. DESIGN_SYSTEM.md gains a Dates section.

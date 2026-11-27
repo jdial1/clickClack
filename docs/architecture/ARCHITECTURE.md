@@ -42,11 +42,13 @@ Allowed edges, all one way:
 
 | Module | Owns | Public interface |
 |---|---|---|
-| `model/` | Every business rule: question types and scoring, rewards (bricks), plates and placement, streaks, turns, moods, dates, teams, zodiac | Data classes + pure functions/objects |
+| `model/` | Every business rule: question types and scoring, rewards (`Rewards.due`), plates and placement, streaks, turns, moods, dates, teams, zodiac, instruments and their badges, taste profiles, draw rules (`DrawRules.kt`) | Data classes + pure functions/objects |
 | `data/CoupleRepository` | The couple's shared state and every write to it | `state: StateFlow<CoupleState>` + one command per user intent |
 | `data/FirestoreCoupleRepository` | Listening to Firestore and mapping documents to `CoupleState` | Implements `CoupleRepository` |
 | `data/FakeCoupleRepository` | The same contract in memory, for previews and the no-Firebase build | Implements `CoupleRepository` |
-| `data/QuestionPool` | The bundled question/deck/instrument assets and the daily draw | `daily(...)`, `deck(id)`, `question(id)`, `places` |
+| `data/QuestionPool` | Loading the bundled question/deck/instrument assets, and the daily draw over them | `daily(...)`, `deck(id)`, `question(id)`, `places` |
+| `data/FirestoreMapping` | Firestore documents ↔ model types | `toX()` readers, `toMap()` writers, `toDateOrNull()` |
+| `com.ampersand` root | Build config and Firestore names, shared by every package | `AppConfig`, `FirestoreSchema` |
 | `auth/` | Sign-in and pairing two accounts into a couple | `AuthRepository`, `PairingRepository` |
 | `notify/` | Push token registration and the local daily reminder | `Push`, `Reminder` |
 | `ui/theme`, `ui/components` | Design tokens and shared controls (DESIGN_SYSTEM.md) | Composables + token objects |

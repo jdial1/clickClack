@@ -1,4 +1,4 @@
-package com.ampersand.data
+package com.ampersand.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

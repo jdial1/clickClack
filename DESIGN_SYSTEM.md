@@ -155,9 +155,22 @@ scrims in `brick/` and the splash keep their own values, tuned to the art.
 | `IconSize.large` | 32 | The icon leading a row: weather, a mood, a special day |
 | `IconSize.tile` | 44 | The icon that is the point of a tile: a deck, a theme |
 
+## Dates
+
+A date on screen uses one of the formats in `ui/theme/DateFormats.kt`, chosen by what
+the date is for. No screen builds its own pattern.
+
+| Format | Shows | Use it for |
+|---|---|---|
+| `Weekday` | Friday, November 27 | The day a question belongs to |
+| `Full` | November 27, 2026 | A date that may be in another year |
+| `MonthDay` | November 27 | A date this year |
+| `Short` | Nov 27 | A date in a tight row |
+| `MonthShort` | Nov | A month in a picker |
+
 ## Where things live
 
-- `ui/theme/Theme.kt`: every token.
+- `ui/theme/Theme.kt`: every token. `ui/theme/DateFormats.kt`: every date format.
 - `ui/components/`: anything used by more than one screen. `Panel.kt`, `Common.kt`, `Forms.kt`, `UiIcon.kt`.
 - `ui/<feature>/`: a screen, and pieces only that feature uses, in files named for what they are.
   Today is `TodayScreen`, `AnswerInput`, `Moods`, `ShapeTomorrow` and `TodayCards`. Us is

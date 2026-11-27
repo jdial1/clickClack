@@ -1,5 +1,6 @@
 package com.ampersand.ui.reveal
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.theme.Inset
 import com.ampersand.ui.theme.Space
 import com.ampersand.model.Kept
@@ -70,7 +71,6 @@ import com.ampersand.ui.theme.Stud
 import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
-private val DayFormat = DateTimeFormatter.ofPattern("EEEE, MMMM d")
 
 /** A revealed day: both answers side by side, plus one reaction each. */
 @Composable
@@ -135,7 +135,7 @@ fun RevealScreen(
             horizontalArrangement = Arrangement.spacedBy(Space.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(day.date.format(DayFormat))
+            SectionLabel(day.date.format(DateFormats.Weekday))
             DepthDots(day.question.depth)
         }
 

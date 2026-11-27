@@ -2,6 +2,7 @@ package com.ampersand.ui.us
 
 import com.ampersand.AppConfig
 import com.ampersand.ui.theme.Alpha
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.ActionRow
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.theme.Corner
@@ -32,7 +33,7 @@ import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
-import com.ampersand.data.Sources
+import com.ampersand.model.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
@@ -189,7 +190,7 @@ fun SettingsScreen(
                     Column(Modifier.weight(1f)) {
                         Text(d.label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                         Text(
-                            "${d.kind.label}  ·  ${d.date.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))}",
+                            "${d.kind.label}  ·  ${d.date.format(DateFormats.Full)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -305,7 +306,7 @@ fun SettingsScreen(
                 onSetFollowing(emptySet())
             }
 
-            val done = com.ampersand.data.BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.yourTurn }
+            val done = com.ampersand.model.BadgeWall.groups(state.instrumentRuns, state.you, state.them).filter { !it.yourTurn }
             if (done.isNotEmpty()) {
                 Spacer(Modifier.height(Space.l))
                 SectionLabel("Retake a test")

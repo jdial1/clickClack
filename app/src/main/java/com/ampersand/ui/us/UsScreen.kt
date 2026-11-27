@@ -31,7 +31,7 @@ import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
-import com.ampersand.data.Sources
+import com.ampersand.model.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background

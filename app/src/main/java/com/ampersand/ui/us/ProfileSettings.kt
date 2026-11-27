@@ -1,5 +1,6 @@
 package com.ampersand.ui.us
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.theme.Alpha
 import com.ampersand.ui.components.ActionRow
 import com.ampersand.ui.components.panel
@@ -31,7 +32,7 @@ import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.until
 import com.ampersand.model.SideBySide
-import com.ampersand.data.Sources
+import com.ampersand.model.Sources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
@@ -116,7 +117,7 @@ internal fun RelationshipProfile(
 
     ProfileRow(
         title = "About you",
-        status = listOfNotNull(state.you.gender, state.you.birthday?.format(LongDay)).joinToString("  ·  ")
+        status = listOfNotNull(state.you.gender, state.you.birthday?.format(DateFormats.Full)).joinToString("  ·  ")
             .ifEmpty { "Not added" },
         done = state.you.gender != null || state.you.birthday != null,
         open = open == "you",
@@ -148,7 +149,7 @@ internal fun RelationshipProfile(
         title = "Your relationship",
         status = listOfNotNull(
             state.relationship?.label,
-            state.anniversary?.let { "since ${it.format(LongDay)}" },
+            state.anniversary?.let { "since ${it.format(DateFormats.Full)}" },
             state.homeZip?.let { zip ->
                 "home $zip" + listOfNotNull(state.region?.label, state.localTeams).joinToString(", ").let { if (it.isEmpty()) "" else " ($it)" }
             },
@@ -324,7 +325,7 @@ internal fun DatesSection(
         DateCard(
             day = d.next,
             title = d.label,
-            detail = "Since ${d.since.format(LongDay)}",
+            detail = "Since ${d.since.format(DateFormats.Full)}",
             countdown = until(state.today.date, d.next),
             brick = if (d.label.startsWith(state.them.name)) BrickColor.of(state.them.colorArgb) else you,
         )
@@ -333,7 +334,7 @@ internal fun DatesSection(
 
     Occasion.next(state.today.date.plusDays(1), state.anniversary, state.homeState)?.let { (occasion, day) ->
         Text(
-            "Next special question: ${occasion.label}, ${day.format(ShortDay)}.",
+            "Next special question: ${occasion.label}, ${day.format(DateFormats.MonthDay)}.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -413,8 +414,6 @@ internal fun DateFields(
     }
 }
 
-internal val LongDay: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-internal val ShortDay: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d")
 
 /** A date row: day on a low brick, title, detail, and countdown. */
 @Composable
@@ -435,7 +434,7 @@ internal fun DateCard(
     ) {
         BrickPill(slug = brick.slug, studSize = Stud.chip, height = BrickHeight.LOW) {
             Text(
-                "${day.dayOfMonth} ${day.format(ShortMonth)}",
+                "${day.dayOfMonth} ${day.format(DateFormats.MonthShort)}",
                 style = MaterialTheme.typography.labelLarge,
                 color = inkOnBrick(brick.slug),
                 modifier = Modifier.padding(horizontal = Space.m, vertical = Space.hair),
@@ -451,4 +450,3 @@ internal fun DateCard(
     }
 }
 
-internal val ShortMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM")

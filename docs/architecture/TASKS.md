@@ -7,8 +7,6 @@ Ordered by value for the risk. Each task becomes one round in
 
 | # | Area | Entropy | Plan |
 |---|---|---|---|
-| T11 | Package roles | Pure rule files sit in `data/` (`BadgeWall`, `CoupleReadings`, `Profiles`, `Instruments`), and `QuestionPool` holds `firstWeekDay`/`gentleReturn` rules beside asset loading | Move the pure files to `model/`; `data/` keeps loading and storage |
-| T12 | Dates in UI | `"EEEE, MMMM d"` twice, `"MMMM d, yyyy"` four times, `"MMMM d"`/`"MMM d"` twice each; two "N months ago" helpers with different wording (`HistoryScreen.ago`, `TodayScreen.agoIn`) | One `ui/theme/Dates.kt` with named formats |
 | T13 | Plurals | Seven hand-rolled pluralisations (`Occasion.plural` private, `Together`, `Reminder`, `TodayCards`, `DecksScreen`, `ResultChart`, `ShapeTomorrow.count`) | One public `plural` in `model/` |
 | T14 | Notifications | `Push.MessagingService` and `ReminderReceiver` each build the same PendingIntent + builder + guarded `notify` | One `Notifier.show(context, id, title, body)` in `notify/` |
 | T17 | Rules in UI | `pickedBy` (ShapeTomorrow), day lookup across today/history/recalled (AmpersandApp), deck ordering (DeckList) computed in composables | Move each to the model type it describes (`Turns`, `CoupleState.dayOn`, deck rules) |
@@ -25,4 +23,4 @@ Ordered by value for the risk. Each task becomes one round in
 
 ## Done
 
-T1–T8, T15, T16, T19 (rounds 1–7). Details in PROGRESS.md.
+T1–T8, T11, T12, T15, T16, T19 (rounds 1–9). Details in PROGRESS.md.

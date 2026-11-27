@@ -37,8 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ampersand.data.BadgeWall
-import com.ampersand.data.Profiles
+import com.ampersand.model.BadgeWall
+import com.ampersand.model.Profiles
 import com.ampersand.model.Badge
 import com.ampersand.model.BadgeGroup
 import com.ampersand.model.BadgeRow

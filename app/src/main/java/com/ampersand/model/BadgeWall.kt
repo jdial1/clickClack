@@ -1,15 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.Badge
-import com.ampersand.model.BadgeBar
-import com.ampersand.model.BadgeGroup
-import com.ampersand.model.BadgeRow
-import com.ampersand.model.Instrument
-import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Member
-import com.ampersand.model.Owner
-import com.ampersand.model.Reading
-import com.ampersand.model.Standing
 
 /** Builds the Us page's test results, one group per test. Results appear only once both have finished. */
 object BadgeWall {

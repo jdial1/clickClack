@@ -1,9 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.DayEntry
-import com.ampersand.model.Depth
-import com.ampersand.model.Question
-import com.ampersand.model.QuestionType
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

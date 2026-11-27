@@ -1,8 +1,5 @@
-package com.ampersand.data
+package com.ampersand.model
 
-import com.ampersand.model.InstrumentRun
-import com.ampersand.model.Member
-import com.ampersand.model.Standing
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

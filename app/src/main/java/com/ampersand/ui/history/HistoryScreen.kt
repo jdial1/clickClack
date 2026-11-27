@@ -1,5 +1,6 @@
 package com.ampersand.ui.history
 
+import com.ampersand.ui.theme.DateFormats
 import com.ampersand.ui.components.panel
 import com.ampersand.ui.theme.IconSize
 import com.ampersand.ui.theme.Alpha
@@ -95,8 +96,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-private val ShortDate = DateTimeFormatter.ofPattern("MMM d")
-private val LongDate = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 private const val WeeksShown = 10
 private const val DaysPerWeek = 7
 
@@ -133,7 +132,7 @@ fun HistoryScreen(
                             }
                             Spacer(Modifier.height(Space.xs))
                             Text(p.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground, maxLines = 1)
-                            Text(p.date.format(LongDate), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
+                            Text(p.date.format(DateFormats.Full), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground)
                         }
                     }
                 }
@@ -162,7 +161,7 @@ fun HistoryScreen(
                     Spacer(Modifier.width(Space.m))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            date?.format(LongDate) ?: "Deck",
+                            date?.format(DateFormats.Full) ?: "Deck",
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -304,7 +303,7 @@ private fun Shelf(
     if (shelf.isEmpty()) {
         // Nothing sealed yet, so show the week being built rather than an empty promise.
         val live = state.plate
-        val seals = live.endsOn().format(LongDate)
+        val seals = live.endsOn().format(DateFormats.Full)
         if (live.placed.isNotEmpty()) {
             Sculpture(live, Modifier.fillMaxWidth())
             Spacer(Modifier.height(Space.m))
@@ -343,7 +342,7 @@ private fun Shelf(
             Text(it, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
         }
         Text(
-            text = "Finished ${selected.completedOn?.format(LongDate).orEmpty()}",
+            text = "Finished ${selected.completedOn?.format(DateFormats.Full).orEmpty()}",
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -374,7 +373,7 @@ private fun Shelf(
                 ) {
                     Sculpture(plate, Modifier.fillMaxWidth(), alpha = if (on) 1f else Alpha.dim)
                     Spacer(Modifier.height(Space.s))
-                    SectionLabel(plate.completedOn?.format(ShortDate).orEmpty())
+                    SectionLabel(plate.completedOn?.format(DateFormats.Short).orEmpty())
                 }
             }
         }
@@ -578,7 +577,7 @@ private fun HistoryRow(state: CoupleState, entry: DayEntry, onClick: () -> Unit)
             Spacer(Modifier.height(Space.xs))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SectionLabel(
-                    "${entry.date.format(ShortDate)}  ·  ${entry.question.category}",
+                    "${entry.date.format(DateFormats.Short)}  ·  ${entry.question.category}",
                 )
                 if (marks.isNotEmpty()) {
                     Spacer(Modifier.size(Space.s))

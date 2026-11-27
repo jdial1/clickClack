@@ -59,7 +59,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
 import com.ampersand.data.createCoupleRepository
 import com.ampersand.data.HomeZone
-import com.ampersand.data.Instruments
+import com.ampersand.model.Instruments
 import com.ampersand.data.QuestionPool
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
