@@ -174,3 +174,16 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   memory, as noted in the project memory). The keep rule for `model.**` now
   also covers the files moved there in round 8.
 - **Validated:** full suite 282 tests, 27 skipped, 0 failures.
+
+## Round 14: last scan
+
+- Re-scanned the scan agent's UI findings not yet handled. `glass` had a
+  border colour branch that chose white either way; it is now one value
+  (identical rendering). The two ink rules are recorded as P4: merging them
+  changes a rendered colour, so it waits for a design decision.
+- Kept on purpose: `createAuthRepository`/`createPairingRepository`/
+  `createCoupleRepository` look shallow, but each is the single place that
+  chooses fake vs Firebase; deleting them would spread that choice to every
+  caller. `Push` writing the token field directly is the notify module's own
+  job (the token is per device), now through `FirestoreSchema`.
+- **Validated:** full suite 282 tests, 27 skipped, 0 failures.

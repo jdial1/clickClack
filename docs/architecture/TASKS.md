@@ -14,6 +14,7 @@ Ordered by value for the risk. Each task becomes one round in
 |---|---|---|
 | P1 | Should the in-app ViewModels stay as thin holders (`AmpersandViewModel` only holds a repo; screens call `vm.repo::method`)? | A real ViewModel layer would move navigation state out of `SignedInApp`, but that is a UX/architecture investment, not entropy removal. Left as is. |
 | P3 | `model/Inbox.kt` and `model/Milestones.kt` are tested but nothing in the app uses them | They look like features that were built ahead of their screens. Deleting them is right if they are dropped; keeping them is right if they are planned. |
+| P4 | Two "dark ink" colours: `Duo.inkOn` uses `#0E1226`, `inkOnBrick` uses `#15121F`. `DragRank` and `AnswerPanel` pick ink for a brick by luminance instead of `inkOnBrick(slug)`, which DESIGN_SYSTEM.md names for text on a brick | The two rules take different inputs (any colour vs a brick slug) and agree on which colours get dark ink, but choosing one dark ink changes the rendered text colour, which is a design call. |
 | P2 | `deleteAccount` calls `us-central1-<project>.cloudfunctions.net` with the region hard-coded | Correct today; moving functions to another region is a deployment decision. Noted, not changed. |
 
 ## Done
