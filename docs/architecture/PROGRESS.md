@@ -158,3 +158,19 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   The other "pluralisations" the scan listed are not the same rule ("a deck",
   "One", "time."/"times." ending a sentence), so they stay as they are.
 - **Validated:** full suite 282 tests, 27 skipped, 0 failures.
+
+## Round 13: shared control in `components/`; release build (T17 rest)
+
+- **`BrickChip`** was defined in `ui/quiz/DeckList.kt` but used by eight
+  features (Today, Moods, Shape tomorrow, Shelf, Bucket list, Profile, Us, the
+  tab bar). DESIGN_SYSTEM.md says a piece a second feature needs moves to
+  `components/`; it is now `ui/components/BrickChip.kt`.
+- **Kept in the UI on purpose (deletion test):** `DeckList.order` is display
+  order with one caller and reads only model results; `finishedDetail` and
+  `TodayCards.specialToday` are text built from model values. Moving them would
+  relocate code without removing any.
+- **Release:** `assembleRelease` with R8 and lint passes (needs
+  `-Dorg.gradle.jvmargs=-Xmx6g`; with the default heap lint and R8 run out of
+  memory, as noted in the project memory). The keep rule for `model.**` now
+  also covers the files moved there in round 8.
+- **Validated:** full suite 282 tests, 27 skipped, 0 failures.

@@ -73,7 +73,6 @@ import com.ampersand.data.MockQuestions
 import com.ampersand.model.Answer
 import com.ampersand.model.QuizTheme
 import com.ampersand.model.Turns
-import com.ampersand.ui.quiz.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.label
 import androidx.compose.foundation.clickable

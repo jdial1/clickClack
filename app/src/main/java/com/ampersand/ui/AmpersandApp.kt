@@ -7,7 +7,7 @@ import com.ampersand.model.Kept
 import com.ampersand.ui.today.PastAnswerScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import com.ampersand.ui.us.InterestsSetupScreen
 import com.ampersand.ui.quiz.DecksScreen
 import com.ampersand.ui.us.SettingsScreen

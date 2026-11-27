@@ -77,3 +77,38 @@ One per concern; anything else is a deviation and goes in TASKS.md.
 | Background | Firebase Messaging (pushes), AlarmManager (reminder) |
 | Config | `AppConfig`, which reads `BuildConfig` (filled from `google-services.json` at build time) |
 | Tests | JUnit on the JVM; Robolectric + Roborazzi for screenshots; node tests for rules |
+
+## Canonical homes
+
+The one place each core concept lives. If you are changing one of these, this is
+the file; a second copy anywhere else is a bug.
+
+| Concept | Authority |
+|---|---|
+| Which bricks are owed | `Rewards.due` (`model/Blocks.kt`) |
+| What one day/talk/deck/bucket/mood earns | `Rewards.forDay/forTalk/forQuiz`, `BucketList.reward`, `MoodEntry.block` |
+| A week's plate: length, id, rollover, legal placement | `BuildPlate.PERIOD_DAYS`, `startingOn`, `unplaced`, `placement` |
+| Today's question | `QuestionPool.daily`, fed once from `FirestoreCoupleRepository.recompose` |
+| Draw rules from history | `model/DrawRules.kt` (`firstWeekDay`, `gentleReturn`), `Turns`, `Profiles` |
+| Whose turn, who picked | `Turns.chooser`, `Turns.canPick`, `Turns.pickedBy` |
+| A day by date | `CoupleState.dayOn` |
+| Reveal (the seal) | `firestore.rules` + `FirestoreCoupleRepository.openSeal` (the one retry) |
+| Document ↔ model | `data/FirestoreMapping.kt`; stored dates via `toDateOrNull` |
+| Collection names | `FirestoreSchema` (mirrored by `firestore.rules`, `functions/index.js`) |
+| Build configuration | `AppConfig` |
+| Firestore listener failure policy | `Query.watch` / `DocumentReference.watch` |
+| Play `Task` → coroutine | `com.ampersand.await()` |
+| Showing a notification | `notify/Notifier` |
+| Design tokens, controls, date formats | `ui/theme/Theme.kt`, `ui/components/`, `ui/theme/DateFormats.kt` (DESIGN_SYSTEM.md) |
+| Quiet-hour defaults | `CoupleState.QUIET_FROM` / `QUIET_TO` |
+
+## Acceptance check (after round 12)
+
+| Criterion | State |
+|---|---|
+| Each core concept has one authoritative implementation | Yes, per the table above. The one deliberate pair is `FakeCoupleRepository` vs Firestore, which share every rule through `model/` and differ only in storage. |
+| Each core module has a clear responsibility and public interface | Yes: see "Modules and their public interfaces". |
+| No unexplained multiple implementations | Remaining look-alikes are documented as different semantics in PROGRESS.md (the two "ago" phrasings, the non-`counted` count phrases). |
+| No circular dependencies between core modules | Yes: `model` depends on nothing, `data`/`auth`/`notify` only on `model` and the root kernel, `ui` on all. |
+| Business logic decoupled from UI, storage, frameworks | Rules are in `model/` (pure Kotlin, JVM-tested). Known UI-side leftovers: deck display order and the special-day card text, kept on purpose (see TASKS.md). |
+| Functionality, data compatibility, external contracts preserved | No Firestore field, collection, rule or function changed. Unit suite 270 → 282 tests, 0 failures; release build checked with R8. |

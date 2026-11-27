@@ -7,7 +7,6 @@ Ordered by value for the risk. Each task becomes one round in
 
 | # | Area | Entropy | Plan |
 |---|---|---|---|
-| T17 | Rules in UI | `pickedBy` (ShapeTomorrow), day lookup across today/history/recalled (AmpersandApp), deck ordering (DeckList) computed in composables | Move each to the model type it describes (`Turns`, `CoupleState.dayOn`, deck rules) |
 
 ## Pending confirmation (product)
 
@@ -19,4 +18,4 @@ Ordered by value for the risk. Each task becomes one round in
 
 ## Done
 
-T1–T9, T11–T16, T18, T19 (rounds 1–12); T17 partly (round 10). Details in PROGRESS.md.
+T1–T19 (rounds 1–13). T10 was folded into T5. Details in PROGRESS.md.

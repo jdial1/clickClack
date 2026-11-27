@@ -15,7 +15,7 @@ import com.ampersand.ui.components.IconBrick
 import com.ampersand.model.Kept
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.FlowRow
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import com.ampersand.model.name
 import com.ampersand.model.SculptureNames
 import com.ampersand.model.NameWords

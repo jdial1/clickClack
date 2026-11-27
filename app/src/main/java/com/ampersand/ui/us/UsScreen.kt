@@ -24,7 +24,7 @@ import com.ampersand.model.Dates
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
 import com.ampersand.ui.components.AmpField
-import com.ampersand.ui.quiz.BrickChip
+import com.ampersand.ui.components.BrickChip
 import androidx.compose.foundation.layout.FlowRow
 import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
