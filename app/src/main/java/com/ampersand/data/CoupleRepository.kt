@@ -150,6 +150,9 @@ interface CoupleRepository {
 
     /** Picks tomorrow's theme. Only on your turn, after today is revealed, once. See [com.ampersand.model.Turns]. */
     fun pickTomorrow(theme: String)
+
+    /** Stops listening. The repository is unusable afterwards. Nothing to release in memory. */
+    fun close() {}
 }
 
 /** Firestore when configured and the couple is real, the fake otherwise. Same test as the auth and pairing factories. */

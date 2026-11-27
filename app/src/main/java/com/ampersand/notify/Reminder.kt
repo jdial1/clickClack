@@ -12,7 +12,6 @@ import com.ampersand.MainActivity
 import com.ampersand.R
 import java.util.Calendar
 
-private const val CHANNEL = "daily"
 private const val REQUEST = 4711
 private const val PREFS = "reminder"
 private const val KEY_HOUR = "hour"
@@ -35,6 +34,9 @@ private const val KEY_PARTNER = "partnerName"
  * ```
  */
 object Reminder {
+
+    /** The one notification channel: the daily reminder and partner pushes share it. */
+    const val CHANNEL = "daily"
 
     /** Whether we have already asked, so the setup screen is shown once. */
     fun hasBeenAsked(context: Context): Boolean =
@@ -172,7 +174,7 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> "Opens when you both answer."
         }
 
-        val note = NotificationCompat.Builder(context, CHANNEL)
+        val note = NotificationCompat.Builder(context, Reminder.CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
             .setContentTitle(title)
             .setContentText(body)

@@ -1,5 +1,6 @@
 package com.ampersand.auth
 
+import com.ampersand.AppConfig
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -189,10 +190,10 @@ class GoogleAuthRepository(
         val text = buildString {
             appendLine("Google sign-in didn't finish ($stage).")
             appendLine(causes)
-            appendLine("App: ${appContext.packageName} ${com.ampersand.BuildConfig.VERSION_NAME} (${com.ampersand.BuildConfig.BUILD_TYPE})")
+            appendLine("App: ${appContext.packageName} ${AppConfig.version}")
             appendLine("Installed by: $installer")
             appendLine("App key SHA-1: ${signingSha1()}")
-            appendLine("Web client: ${com.ampersand.BuildConfig.WEB_CLIENT_ID}")
+            appendLine("Web client: ${AppConfig.webClientId}")
             append("Play services: $playServices, Android ${android.os.Build.VERSION.RELEASE}")
         }
         Log.e(TAG, text, e)
@@ -225,6 +226,6 @@ class GoogleAuthRepository(
          * Not a `getIdentifier` lookup: the resource shrinker removed that string in release.
          */
         fun webClientId(context: Context): String? =
-            com.ampersand.BuildConfig.WEB_CLIENT_ID.takeIf { it.isNotBlank() }
+            AppConfig.webClientId.takeIf { it.isNotBlank() }
     }
 }

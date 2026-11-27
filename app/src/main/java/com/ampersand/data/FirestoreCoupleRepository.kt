@@ -27,8 +27,21 @@ import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.BrickColor
 import android.util.Log
-import com.ampersand.auth.COUPLES
-import com.ampersand.auth.USERS
+import com.ampersand.FirestoreSchema.ANSWERS
+import com.ampersand.FirestoreSchema.BUCKET
+import com.ampersand.FirestoreSchema.COUPLES
+import com.ampersand.FirestoreSchema.DATES
+import com.ampersand.FirestoreSchema.DAYS
+import com.ampersand.FirestoreSchema.DRAFTS
+import com.ampersand.FirestoreSchema.INSTRUMENTS
+import com.ampersand.FirestoreSchema.KNOWING
+import com.ampersand.FirestoreSchema.PHOTOS
+import com.ampersand.FirestoreSchema.PLATES
+import com.ampersand.FirestoreSchema.QUIZZES
+import com.ampersand.FirestoreSchema.RUNS
+import com.ampersand.FirestoreSchema.USERS
+import com.ampersand.FirestoreSchema.WILDCARDS
+import com.ampersand.FirestoreSchema.WORDS
 import com.ampersand.model.Answer
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
@@ -58,24 +71,9 @@ import java.time.DayOfWeek
 import java.time.YearMonth
 
 private const val TAG = "Couple"
-private const val DAYS = "days"
-private const val ANSWERS = "answers"
-private const val PLATES = "plates"
-private const val QUIZZES = "quizzes"
-private const val RUNS = "runs"
-private const val WILDCARDS = "wildcards"
-private const val BUCKET = "bucket"
-private const val DATES = "dates"
-private const val PHOTOS = "photos"
-private const val KNOWING = "knowing"
-private const val INSTRUMENTS = "instruments"
-private const val DRAFTS = "drafts"
 
 /** Days of history to load (ten weeks, what the Shelf shows). */
 private const val HistoryDays = 70L
-
-/** Each person's words toward a sealed week's name, under the plate. */
-private const val WORDS = "words"
 
 /**
  * Firestore-backed repository. Document layout: README.md, "Firestore model".
@@ -1263,7 +1261,7 @@ class FirestoreCoupleRepository(
         )
     }
 
-    fun close() {
+    override fun close() {
         regs.forEach { it.remove() }
         regs.clear()
         runRegs.values.forEach { it.remove() }

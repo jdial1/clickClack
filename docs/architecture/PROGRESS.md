@@ -56,3 +56,24 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
 - **Chosen:** `data/FirestoreMapping.kt` holds every `DocumentSnapshot`→model
   reader and model→map writer, plus `String?.toDateOrNull()`, the one way a
   stored date is read. The repository keeps listening, recomposing and writing.
+- **Validated (rounds 3–4):** full suite 281 tests, 27 skipped, 0 failures.
+
+## Round 5: a shared kernel for config and Firestore names (T5, T8)
+
+- **Found:** `data → auth` (collection names), `notify → auth` and `ui → auth`
+  (Firebase check), a Firebase check that ignored its `context`, `BuildConfig`
+  read in four places, `"users"`/`"fcmToken"`/`"daily"` as literals in `notify/`.
+- **Chosen:** `com.ampersand.AppConfig` and `com.ampersand.FirestoreSchema`, see
+  [ADR 0002](adr/0002-shared-kernel-for-config-and-schema.md). `Reminder.CHANNEL`
+  is the one channel id.
+- **Deleted:** `hasFirebaseConfigFor`, the `internal` constants in
+  `FirestorePairingRepository`, the twelve private names in the couple
+  repository, the unused `context` of `createPairingRepository` and
+  `PairingViewModel.factory`.
+
+## Round 6: the repository contract includes closing (T7)
+
+- **Found:** `AmpersandViewModel` downcast to `FirestoreCoupleRepository` to
+  call `close()`, so `ui/` knew the implementation class.
+- **Chosen:** `CoupleRepository.close()` with a no-op default.
+- **Validated (rounds 5–6):** full suite 281 tests, 27 skipped, 0 failures.

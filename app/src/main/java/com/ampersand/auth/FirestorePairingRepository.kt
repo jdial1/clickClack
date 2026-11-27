@@ -1,6 +1,9 @@
 package com.ampersand.auth
 
 import android.util.Log
+import com.ampersand.FirestoreSchema.COUPLES
+import com.ampersand.FirestoreSchema.INVITES
+import com.ampersand.FirestoreSchema.USERS
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -17,9 +20,6 @@ import kotlin.coroutines.resumeWithException
 
 private const val TAG = "Pairing"
 
-internal const val USERS = "users"
-internal const val INVITES = "invites"
-internal const val COUPLES = "couples"
 
 /**
  * Pairing in Firestore.

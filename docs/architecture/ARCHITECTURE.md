@@ -20,11 +20,10 @@ the whole app runs on in-memory fakes.
 ## Packages and dependency direction
 
 ```
-ui  ─────►  data  ─────►  model
- │            │             ▲
- ├──► auth ───┼─────────────┤
- └──► notify ─┘ (config)    │
-          auth ─────────────┘
+            ┌──────────► auth ───┐
+ui ─────────┼──────────► data ───┼──► model
+            └──────────► notify ─┘
+     all of them ──► com.ampersand (AppConfig, FirestoreSchema)
 ```
 
 Allowed edges, all one way:
@@ -32,9 +31,9 @@ Allowed edges, all one way:
 | From | May use | Must not use |
 |---|---|---|
 | `model/` | Kotlin + `java.time` only | Android, Firebase, any other app package |
-| `data/` | `model`, `config` | `ui`, `auth` (collection names live in `data/`) |
-| `auth/` | `model`, `config`, the shared Firestore schema | `ui`, `data` repositories |
-| `notify/` | `config`, `model` | `ui` |
+| `data/` | `model`, root (`AppConfig`, `FirestoreSchema`) | `ui`, `auth`, `notify` |
+| `auth/` | `model`, root | `ui`, `data`, `notify` |
+| `notify/` | `model`, root | `ui`, `data`, `auth` |
 | `ui/` | everything above | Firebase directly |
 
 `model/` is pure on purpose: everything in it runs on the JVM in unit tests.
@@ -74,5 +73,5 @@ One per concern; anything else is a deviation and goes in TASKS.md.
 | State | `StateFlow<CoupleState>` from a repository held in a ViewModel |
 | Persistence | Firestore with snapshot listeners; fakes in memory |
 | Background | Firebase Messaging (pushes), AlarmManager (reminder) |
-| Config | `BuildConfig` (from `google-services.json` at build time) |
+| Config | `AppConfig`, which reads `BuildConfig` (filled from `google-services.json` at build time) |
 | Tests | JUnit on the JVM; Robolectric + Roborazzi for screenshots; node tests for rules |

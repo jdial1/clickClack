@@ -57,7 +57,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ampersand.data.CoupleRepository
-import com.ampersand.data.FirestoreCoupleRepository
 import com.ampersand.data.createCoupleRepository
 import com.ampersand.data.HomeZone
 import com.ampersand.data.Instruments
@@ -74,7 +73,7 @@ import com.ampersand.auth.PairState
 import com.ampersand.auth.PairingRepository
 import com.ampersand.auth.createAuthRepository
 import com.ampersand.auth.createPairingRepository
-import com.ampersand.auth.hasFirebaseConfigFor
+import com.ampersand.AppConfig
 import com.ampersand.auth.findActivity
 import com.ampersand.model.CoupleState
 import com.ampersand.model.QuizTheme
@@ -122,7 +121,7 @@ import java.time.LocalDate
  */
 class AmpersandViewModel(val repo: CoupleRepository) : ViewModel() {
     override fun onCleared() {
-        (repo as? FirestoreCoupleRepository)?.close()
+        repo.close()
     }
 
     companion object {
@@ -156,8 +155,8 @@ class AuthViewModel(val auth: AuthRepository) : ViewModel() {
 /** Pairing for the signed-in account. Built after sign-in because it watches `users/{uid}`. */
 class PairingViewModel(val pairing: PairingRepository) : ViewModel() {
     companion object {
-        fun factory(context: Context, uid: String, name: String) = viewModelFactory {
-            initializer { PairingViewModel(createPairingRepository(context, uid, name)) }
+        fun factory(uid: String, name: String) = viewModelFactory {
+            initializer { PairingViewModel(createPairingRepository(uid, name)) }
         }
     }
 }
@@ -322,12 +321,12 @@ private fun PairedGate(
     onDeleteAccount: suspend () -> Result<Unit>,
 ) {
     val context = LocalContext.current
-    val hasFirebase = remember(context) { hasFirebaseConfigFor(context) }
+    val hasFirebase = AppConfig.hasFirebase
     // Loaded once; shared by decks and the daily question.
     val pool = remember(context) { QuestionPool.load(context) }
     val pairVm: PairingViewModel = viewModel(
         key = "pairing_${account.uid}",
-        factory = PairingViewModel.factory(context, account.uid, account.displayName),
+        factory = PairingViewModel.factory(account.uid, account.displayName),
     )
     val pair by pairVm.pairing.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
