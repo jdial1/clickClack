@@ -255,3 +255,4 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   Firestore emulator, plus `delete.test.mjs` against the Firestore, Auth and
   Functions emulators: 107 checks, 0 failures, including "her message gone, his
   kept" (legacy chat erasure still works with the chat rules removed).
+- **Release:** `assembleRelease` (R8 + lint, 6 GB heap) passes on the final tree, 9198ff3.
