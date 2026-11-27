@@ -147,3 +147,14 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   sign-in keeps its rule that a closed browser tab is not an error, now as a
   `catch`.
 - **Validated:** full suite 282 tests, 27 skipped, 0 failures.
+
+## Round 12: the fake accepts ZIPs like Firestore; one count phrase (T9, T13)
+
+- **ZIP:** `FakeCoupleRepository` takes the pool's `ZipTable` and accepts a home
+  ZIP only if `lookup` finds it, setting `region` and `homeState` as Firestore
+  does. Before, it accepted any five digits.
+- **Counts:** `model/Words.kt` `counted(n, noun)` replaces `Occasion`'s private
+  `plural` and the inline copies in `Together`, `TodayCards` and `DecksScreen`.
+  The other "pluralisations" the scan listed are not the same rule ("a deck",
+  "One", "time."/"times." ending a sentence), so they stay as they are.
+- **Validated:** full suite 282 tests, 27 skipped, 0 failures.

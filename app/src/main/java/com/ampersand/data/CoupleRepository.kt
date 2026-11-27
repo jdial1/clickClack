@@ -20,6 +20,7 @@ import com.ampersand.model.DayEntry
 import com.ampersand.model.InstrumentRun
 import com.ampersand.model.QuizRun
 import com.ampersand.model.Quiz
+import com.ampersand.model.ZipTable
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Reaction
 import com.ampersand.model.Wildcard
@@ -168,7 +169,7 @@ fun createCoupleRepository(
     if (hasFirebase && !coupleId.startsWith("c_fake")) {
         FirestoreCoupleRepository(coupleId, myUid, partnerUid, pool, zone)
     } else {
-        FakeCoupleRepository(decks = pool.playable)
+        FakeCoupleRepository(decks = pool.playable, places = pool.places)
     }
 
 /**
@@ -179,6 +180,8 @@ class FakeCoupleRepository(
     initial: CoupleState = MockCouple.state(),
     /** Playable decks, so finished decks earn their bricks here too. */
     private val decks: List<Quiz> = emptyList(),
+    /** The bundled ZIP table, so a home ZIP is accepted or refused exactly as on Firestore. */
+    private val places: ZipTable = ZipTable.empty,
 ) : CoupleRepository {
 
     private val _state = MutableStateFlow(initial)
@@ -336,9 +339,8 @@ class FakeCoupleRepository(
     }
 
     override fun setHomeZip(zip: String): Boolean {
-        val clean = zip.trim()
-        if (clean.length != 5 || !clean.all(Char::isDigit)) return false
-        mutate { it.copy(homeZip = clean) }
+        val place = places.lookup(zip) ?: return false
+        mutate { it.copy(homeZip = zip.trim(), region = place.region, homeState = place.state) }
         return true
     }
 
