@@ -8,9 +8,7 @@ Ordered by value for the risk. Each task becomes one round in
 | # | Area | Entropy | Plan |
 |---|---|---|---|
 | T13 | Plurals | Seven hand-rolled pluralisations (`Occasion.plural` private, `Together`, `Reminder`, `TodayCards`, `DecksScreen`, `ResultChart`, `ShapeTomorrow.count`) | One public `plural` in `model/` |
-| T14 | Notifications | `Push.MessagingService` and `ReminderReceiver` each build the same PendingIntent + builder + guarded `notify` | One `Notifier.show(context, id, title, body)` in `notify/` |
 | T17 | Rules in UI | `pickedBy` (ShapeTomorrow), day lookup across today/history/recalled (AmpersandApp), deck ordering (DeckList) computed in composables | Move each to the model type it describes (`Turns`, `CoupleState.dayOn`, deck rules) |
-| T18 | Task bridges | Four hand-written `suspendCancellableCoroutine` bridges over Play `Task` (pairing ×1, auth ×3) | One `Task.await()` in the root kernel |
 | T9 | Fake fidelity | The fake validates a ZIP as "any five digits"; the real repository checks the bundled table | Use the pool's place table in both |
 
 ## Pending confirmation (product)
@@ -23,4 +21,4 @@ Ordered by value for the risk. Each task becomes one round in
 
 ## Done
 
-T1–T8, T11, T12, T15, T16, T19 (rounds 1–9). Details in PROGRESS.md.
+T1–T8, T11, T12, T14–T16, T18, T19 (rounds 1–11); T17 partly (round 10). Details in PROGRESS.md.

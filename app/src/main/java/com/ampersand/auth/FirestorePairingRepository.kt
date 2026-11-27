@@ -1,6 +1,7 @@
 package com.ampersand.auth
 
 import android.util.Log
+import com.ampersand.await
 import com.ampersand.FirestoreSchema.COUPLES
 import com.ampersand.FirestoreSchema.INVITES
 import com.ampersand.FirestoreSchema.USERS
@@ -13,10 +14,7 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Date
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 private const val TAG = "Pairing"
 
@@ -136,26 +134,22 @@ class FirestorePairingRepository(
 
         return runCatching {
             // Write the invite first: an orphan invite is harmless, an unwritten code is not.
-            await(
-                db.collection(INVITES).document(code).set(
-                    mapOf(
-                        "fromUid" to uid,
-                        "fromName" to displayName,
-                        "createdAt" to FieldValue.serverTimestamp(),
-                        "expiresAt" to expiresAt,
-                    ),
+            db.collection(INVITES).document(code).set(
+                mapOf(
+                    "fromUid" to uid,
+                    "fromName" to displayName,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "expiresAt" to expiresAt,
                 ),
-            )
-            await(
-                db.collection(USERS).document(uid).set(
-                    mapOf(
-                        "displayName" to displayName,
-                        "inviteCode" to code,
-                        "inviteExpiresAt" to expiresAt,
-                    ),
-                    SetOptions.merge(),
+            ).await()
+            db.collection(USERS).document(uid).set(
+                mapOf(
+                    "displayName" to displayName,
+                    "inviteCode" to code,
+                    "inviteExpiresAt" to expiresAt,
                 ),
-            )
+                SetOptions.merge(),
+            ).await()
             code
         }
     }
@@ -172,59 +166,57 @@ class FirestorePairingRepository(
         val coupleRef = db.collection(COUPLES).document()
 
         return runCatching {
-            await(
-                db.runTransaction { txn ->
-                    val invite = txn.get(inviteRef)
-                    if (!invite.exists()) throw RedeemException(RedeemError.UNKNOWN_CODE)
+            db.runTransaction { txn ->
+                val invite = txn.get(inviteRef)
+                if (!invite.exists()) throw RedeemException(RedeemError.UNKNOWN_CODE)
 
-                    val expiresAt = invite.getTimestamp("expiresAt")
-                    if (expiresAt == null || expiresAt.toDate().time <= System.currentTimeMillis()) {
-                        // Delete expired codes. Returned, not thrown: throwing aborts the transaction and the delete.
-                        txn.delete(inviteRef)
-                        return@runTransaction RedeemError.EXPIRED
-                    }
-
-                    val fromUid = invite.getString("fromUid")
-                        ?: throw RedeemException(RedeemError.UNKNOWN_CODE)
-                    if (fromUid == uid) throw RedeemException(RedeemError.OWN_CODE)
-
-                    // The code's owner may have paired with someone else since.
-                    if (txn.get(db.collection(USERS).document(fromUid)).getString("coupleId") != null) {
-                        throw RedeemException(RedeemError.THEY_ARE_PAIRED)
-                    }
-
-                    txn.set(
-                        coupleRef,
-                        mapOf(
-                            "members" to listOf(fromUid, uid),
-                            "createdAt" to FieldValue.serverTimestamp(),
-                            "endedAt" to null,
-                        ),
-                    )
-                    txn.set(
-                        db.collection(USERS).document(uid),
-                        mapOf(
-                            "displayName" to displayName,
-                            "coupleId" to coupleRef.id,
-                            "inviteCode" to null,
-                            "inviteExpiresAt" to null,
-                        ),
-                        SetOptions.merge(),
-                    )
-                    txn.set(
-                        db.collection(USERS).document(fromUid),
-                        mapOf(
-                            "coupleId" to coupleRef.id,
-                            "inviteCode" to null,
-                            "inviteExpiresAt" to null,
-                        ),
-                        SetOptions.merge(),
-                    )
-                    // One use per invite.
+                val expiresAt = invite.getTimestamp("expiresAt")
+                if (expiresAt == null || expiresAt.toDate().time <= System.currentTimeMillis()) {
+                    // Delete expired codes. Returned, not thrown: throwing aborts the transaction and the delete.
                     txn.delete(inviteRef)
-                    null
-                },
-            )?.let { throw RedeemException(it) }
+                    return@runTransaction RedeemError.EXPIRED
+                }
+
+                val fromUid = invite.getString("fromUid")
+                    ?: throw RedeemException(RedeemError.UNKNOWN_CODE)
+                if (fromUid == uid) throw RedeemException(RedeemError.OWN_CODE)
+
+                // The code's owner may have paired with someone else since.
+                if (txn.get(db.collection(USERS).document(fromUid)).getString("coupleId") != null) {
+                    throw RedeemException(RedeemError.THEY_ARE_PAIRED)
+                }
+
+                txn.set(
+                    coupleRef,
+                    mapOf(
+                        "members" to listOf(fromUid, uid),
+                        "createdAt" to FieldValue.serverTimestamp(),
+                        "endedAt" to null,
+                    ),
+                )
+                txn.set(
+                    db.collection(USERS).document(uid),
+                    mapOf(
+                        "displayName" to displayName,
+                        "coupleId" to coupleRef.id,
+                        "inviteCode" to null,
+                        "inviteExpiresAt" to null,
+                    ),
+                    SetOptions.merge(),
+                )
+                txn.set(
+                    db.collection(USERS).document(fromUid),
+                    mapOf(
+                        "coupleId" to coupleRef.id,
+                        "inviteCode" to null,
+                        "inviteExpiresAt" to null,
+                    ),
+                    SetOptions.merge(),
+                )
+                // One use per invite.
+                txn.delete(inviteRef)
+                null
+            }.await()?.let { throw RedeemException(it) }
         }.map { }.recoverCatching { e ->
             val reason = e as? RedeemException ?: e.cause as? RedeemException
             Log.w(TAG, "redeem failed", e)
@@ -244,18 +236,14 @@ class FirestorePairingRepository(
             ?: return Result.success(Unit)
 
         return runCatching {
-            await(
-                db.collection(COUPLES).document(coupleId).set(
-                    mapOf("endedAt" to FieldValue.serverTimestamp()),
-                    SetOptions.merge(),
-                ),
-            )
-            await(
-                db.collection(USERS).document(uid).set(
-                    mapOf("coupleId" to null),
-                    SetOptions.merge(),
-                ),
-            )
+            db.collection(COUPLES).document(coupleId).set(
+                mapOf("endedAt" to FieldValue.serverTimestamp()),
+                SetOptions.merge(),
+            ).await()
+            db.collection(USERS).document(uid).set(
+                mapOf("coupleId" to null),
+                SetOptions.merge(),
+            ).await()
         }.map { }
     }
 
@@ -264,14 +252,4 @@ class FirestorePairingRepository(
         userReg = null
         stopWatchingCouple()
     }
-
-    /**
-     * Awaits a Play Services Task.
-     * Uses [resumeWithException], not `cancel`, so the original [RedeemException] reaches the caller.
-     */
-    private suspend fun <T> await(task: com.google.android.gms.tasks.Task<T>): T =
-        suspendCancellableCoroutine { cont ->
-            task.addOnSuccessListener { cont.resume(it) }
-                .addOnFailureListener { cont.resumeWithException(it) }
-        }
 }

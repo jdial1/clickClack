@@ -32,7 +32,7 @@ Status: accepted (rounds 5–6)
 Option 3. `AppConfig.hasFirebase`, `AppConfig.webClientId` and
 `AppConfig.version` are the only reads of `BuildConfig` outside Settings' version
 line. `FirestoreSchema` holds every collection name and the push-token field.
-`Reminder.CHANNEL` is the channel id. `CoupleRepository.close()` is part of the
+`Reminder.CHANNEL` is the channel id (moved to `Notifier.CHANNEL` in round 11). `com.ampersand.await()` joined the kernel in round 11 as the one Play `Task` bridge. `CoupleRepository.close()` is part of the
 contract, with a no-op default for the fake.
 
 The deletion test also removed `createPairingRepository`'s unused `context` and

@@ -133,3 +133,17 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   reads like presentation order; moving it needs a look at what "order" means
   to the product), and `TodayCards.specialToday` (UI copy as much as rule).
 - **Validated:** new `TurnsTest` case. Full suite: 282 tests, 27 skipped, 0 failures.
+
+## Round 11: one notification path, one Task bridge (T14, T18)
+
+- **Notifications:** `notify/Notifier` owns the channel, the tap intent, the
+  builder and the guarded `notify`, plus the two ids (`REMINDER`, `PUSH`).
+  `ReminderReceiver` and `MessagingService` each had a full copy; both are now
+  one `Notifier.show(...)` call. `Reminder.CHANNEL` (round 5) moved to
+  `Notifier.CHANNEL`, where the channel is created.
+- **Task bridge:** `com.ampersand.await()` is the one `Task` → coroutine bridge.
+  It replaces pairing's private `await(task)` (five calls) and three hand-written
+  `suspendCancellableCoroutine` blocks in `GoogleAuthRepository`. The browser
+  sign-in keeps its rule that a closed browser tab is not an error, now as a
+  `catch`.
+- **Validated:** full suite 282 tests, 27 skipped, 0 failures.

@@ -1,14 +1,8 @@
 package com.ampersand.notify
 
 import com.google.firebase.firestore.FieldValue
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.ampersand.MainActivity
-import com.ampersand.R
 import com.ampersand.AppConfig
 import com.ampersand.FirestoreSchema
 import com.google.firebase.auth.FirebaseAuth
@@ -70,26 +64,6 @@ class MessagingService : FirebaseMessagingService() {
         val title = message.data["title"] ?: return
         val body = message.data["body"].orEmpty()
 
-        Reminder.ensureChannel(this)
-
-        val open = PendingIntent.getActivity(
-            this,
-            0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
-        val note = NotificationCompat.Builder(this, Reminder.CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher_monochrome)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setContentIntent(open)
-            .setAutoCancel(true)
-            .build()
-
-        runCatching {
-            // Throws if notifications are denied.
-            NotificationManagerCompat.from(this).notify(2, note)
-        }
+        Notifier.show(this, Notifier.PUSH, title, body)
     }
 }
