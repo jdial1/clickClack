@@ -12,6 +12,7 @@ import com.ampersand.ui.components.rememberPhoto
 import com.ampersand.ui.brick.structureSlug
 import com.ampersand.ui.brick.inkOnBrick
 import com.ampersand.ui.components.IconBrick
+import com.ampersand.model.ago
 import com.ampersand.model.Kept
 import com.ampersand.ui.components.UiIcon
 import androidx.compose.foundation.layout.FlowRow
@@ -232,7 +233,7 @@ private fun OnThisDay(state: CoupleState, entry: DayEntry, onClick: () -> Unit) 
                 .padding(horizontal = Space.l, vertical = Space.m),
         ) {
             Text(
-                text = ago(entry.date, state.today.date),
+                text = "${ago(entry.date, state.today.date).replaceFirstChar { it.uppercase() }} today",
                 style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
                 color = ink.copy(alpha = Alpha.secondary),
             )
@@ -278,18 +279,6 @@ private fun Said(name: String, what: String?, ink: Color) {
         style = MaterialTheme.typography.bodyMedium,
         color = ink.copy(alpha = Alpha.strong),
     )
-}
-
-/** "N months/years ago today". No day units: [CoupleState.onThisDay] only returns entries a month or older. */
-private fun ago(then: LocalDate, now: LocalDate): String {
-    val months = ChronoUnit.MONTHS.between(then, now).toInt()
-    val years = months / 12
-    return when {
-        years >= 2 -> "$years years ago today"
-        years == 1 -> "A year ago today"
-        months <= 1 -> "A month ago today"
-        else -> "$months months ago today"
-    }
 }
 
 /** Finished sculptures, newest first: the selected one large, the rest in a strip below. */

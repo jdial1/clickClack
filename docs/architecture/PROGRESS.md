@@ -114,11 +114,7 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   and `MonthShort`, named by what the date is for. Every screen uses them, and
   no UI file builds its own pattern. `model/Moments` and `model/Sun` keep
   theirs, because they produce text in the model, not on screen.
-- **Not merged:** the two "N months ago" helpers. `HistoryScreen.ago` is a
-  heading on the same calendar day ("A year ago today", capitalised, never
-  under a month); `TodayScreen.agoIn` is mid-sentence relative time with a
-  "a few weeks ago" case. Merging would add flags to one function for two
-  callers, which fails the deletion test.
+- **The two "N months ago" helpers** were merged later, in round 17.
 - **Validated:** full suite 281 tests, 27 skipped, 0 failures. DESIGN_SYSTEM.md gains a Dates section.
 
 ## Round 10: rules computed in composables move to their model types (T17, part)
@@ -256,3 +252,12 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   Functions emulators: 107 checks, 0 failures, including "her message gone, his
   kept" (legacy chat erasure still works with the chat rules removed).
 - **Release:** `assembleRelease` (R8 + lint, 6 GB heap) passes on the final tree, 9198ff3.
+
+## Round 17: one "ago"
+
+- Round 9 kept `HistoryScreen.ago` and `TodayScreen.agoIn` apart. A closer look:
+  History only shows days at least 90 days old (`Memories.MinDays`), so its
+  "under a month" branch never ran, and the rest is `agoIn`'s phrase
+  capitalised with " today" added. Both now use `model/Words.kt` `ago(then, now)`;
+  History adds the capital and " today" itself. The rendered text is unchanged.
+- **Validated:** `WordsTest` (2 cases). Full suite: 279 tests, 27 skipped, 0 failures.

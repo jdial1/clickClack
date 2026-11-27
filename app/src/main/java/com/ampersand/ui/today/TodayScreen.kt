@@ -344,18 +344,6 @@ internal fun QuestionHero(
     }
 }
 
-/** Rough "how long ago" in months or years, never days. */
-internal fun agoIn(then: LocalDate, now: LocalDate = LocalDate.now()): String {
-    val months = ChronoUnit.MONTHS.between(then, now)
-    return when {
-        months >= 24 -> "${months / 12} years ago"
-        months >= 12 -> "a year ago"
-        months == 1L -> "a month ago"
-        months >= 2 -> "$months months ago"
-        else -> "a few weeks ago"
-    }
-}
-
 /**
  * Seven one-stud bricks, one lit for each day this week you both answered.
  * No number and no milestone: a count that gets praised becomes one people perform for.
