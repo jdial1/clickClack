@@ -238,7 +238,7 @@ internal fun Map<String, Any?>.toBlock(): Block? {
     return Block(
         id = id,
         shape = shape,
-        colorArgb = (this["colorArgb"] as? Number)?.toLong() ?: 0xFFF54E4F,
+        colorArgb = (this["colorArgb"] as? Number)?.toLong() ?: BrickColor.RED.argb,
         ownerUid = owner,
         earnedOn = (this["earnedOn"] as? String).toDateOrNull()
             ?: LocalDate.now(),

@@ -337,8 +337,8 @@ fun Color.toArgbLong(): Long = toArgb().toLong() and 0xFFFFFFFFL
 // --- Base palette ------------------------------------------------------------
 
 /** Default colors before a couple's colors load. */
-internal val DefaultYou = Color(0xFFF54E4F)   // pack red
-internal val DefaultThem = Color(0xFF108BE2)  // pack blue
+internal val DefaultYou = Color(com.ampersand.model.BrickColor.RED.argb)
+internal val DefaultThem = Color(com.ampersand.model.BrickColor.BLUE.argb)
 
 internal val NightBase = Color(0xFF0E1226)
 internal val NightCard = Color(0xFF1A2043)

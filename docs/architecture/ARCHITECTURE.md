@@ -102,13 +102,13 @@ the file; a second copy anywhere else is a bug.
 | Design tokens, controls, date formats | `ui/theme/Theme.kt`, `ui/components/`, `ui/theme/DateFormats.kt` (DESIGN_SYSTEM.md) |
 | Quiet-hour defaults | `CoupleState.QUIET_FROM` / `QUIET_TO` |
 
-## Acceptance check (after round 12)
+## Acceptance check (after round 15)
 
 | Criterion | State |
 |---|---|
-| Each core concept has one authoritative implementation | Yes, per the table above. The one deliberate pair is `FakeCoupleRepository` vs Firestore, which share every rule through `model/` and differ only in storage. |
-| Each core module has a clear responsibility and public interface | Yes: see "Modules and their public interfaces". |
-| No unexplained multiple implementations | Remaining look-alikes are documented as different semantics in PROGRESS.md (the two "ago" phrasings, the non-`counted` count phrases). |
-| No circular dependencies between core modules | Yes: `model` depends on nothing, `data`/`auth`/`notify` only on `model` and the root kernel, `ui` on all. |
-| Business logic decoupled from UI, storage, frameworks | Rules are in `model/` (pure Kotlin, JVM-tested). Known UI-side leftovers: deck display order and the special-day card text, kept on purpose (see TASKS.md). |
-| Functionality, data compatibility, external contracts preserved | No Firestore field, collection, rule or function changed. Unit suite 270 → 282 tests, 0 failures; release build checked with R8. |
+| Each core concept has one authoritative implementation | Met for every concept in "Canonical homes". Rules the server must restate in JavaScript are pinned to the app's copy by `ServerContractTest`. |
+| Each core module has a clear responsibility and public interface | Met: the repository interfaces are the contracts; the ViewModels only own lifetime (ADR 0004). |
+| No unexplained multiple implementations | Met with two open, recorded exceptions awaiting a design call: two dark-ink colours (P4) and two refusal sounds (P5). Every other look-alike is explained in PROGRESS.md round 15. |
+| No circular dependencies between core modules | Met: `model` → nothing; `data`, `auth`, `notify` → `model` + root kernel; `ui` → all. |
+| Business logic decoupled from UI, storage, frameworks | Met for rules (all in `model/`, JVM-tested). Display order and card wording stay in the UI by decision (round 13). |
+| Functionality, data compatibility, external contracts preserved | Verified by unit tests (270 → 286, 0 failures) and the release build. **Not yet run on a device or against live Firebase**; no Firestore field, collection, rule or function was changed. |

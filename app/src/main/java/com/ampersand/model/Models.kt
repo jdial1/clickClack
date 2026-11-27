@@ -95,7 +95,18 @@ data class Member(
     val birthday: LocalDate? = null,
     /** How they said they are, and when. See [MoodEntry.current]. */
     val mood: MoodEntry? = null,
-)
+) {
+    companion object {
+        /** The partner's name until their profile arrives. */
+        const val PARTNER_NAME = "Partner"
+
+        /** You, before your profile arrives: the pack red. */
+        fun placeholderYou(uid: String) = Member(uid, "You", BrickColor.RED.argb)
+
+        /** Your partner, before their profile arrives: the pack blue. */
+        fun placeholderPartner(uid: String) = Member(uid, PARTNER_NAME, BrickColor.BLUE.argb)
+    }
+}
 
 /** One person's submission. [values] is a list for every type, so RANK and MULTI_SELECT fit. */
 data class Answer(

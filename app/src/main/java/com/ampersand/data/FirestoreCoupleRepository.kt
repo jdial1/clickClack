@@ -99,8 +99,8 @@ class FirestoreCoupleRepository(
     private val _state = MutableStateFlow(
         // Placeholder state until the first snapshots arrive.
         CoupleState(
-            you = Member(myUid, "You", 0xFFF54E4F),
-            them = Member(partnerUid, "Them", 0xFF108BE2),
+            you = Member.placeholderYou(myUid),
+            them = Member.placeholderPartner(partnerUid),
             today = DayEntry(today, pool.daily(today)),
             plate = BuildPlate.startingOn(today),
         ),

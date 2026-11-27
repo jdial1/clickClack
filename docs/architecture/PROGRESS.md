@@ -187,3 +187,43 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   caller. `Push` writing the token field directly is the notify module's own
   job (the token is per device), now through `FirestoreSchema`.
 - **Validated:** full suite 282 tests, 27 skipped, 0 failures.
+
+## Round 15: the server side, and the findings still open after round 14
+
+- **Scanned `functions/index.js` and `firestore.rules`.** Three app rules are
+  necessarily restated in JavaScript: the mood labels (`MOOD_LABELS`), the
+  anniversary names (`NAMED`) and the quiet-hours test (`isQuiet`). A single
+  source would need code generation across two runtimes, so the app's copy is
+  made the authority instead: `ServerContractTest` fails if the server's mood
+  labels or anniversary names differ from `Mood` and `Together.Named`, or if
+  the functions or rules touch a collection that is not in `FirestoreSchema`
+  (apart from the server-only `outbox`, `chats`, `messages`). `isQuiet` is
+  already unit-tested on the server (`exports._isQuiet`).
+- **Placeholders:** the partner's placeholder name was "Partner" in pairing and
+  "Them" in the couple repository's first frame; the placeholder colours were
+  raw hex in four places. Now `Member.PARTNER_NAME`, `Member.placeholderYou`,
+  `Member.placeholderPartner`, and `BrickColor.RED/BLUE` everywhere, including
+  the theme defaults and the mapper's fallback.
+- **P1 resolved by [ADR 0004](adr/0004-viewmodels-are-lifecycle-holders.md):**
+  the ViewModels hold a repository across configuration changes and close it;
+  the repository interface is the screens' contract. No forwarding methods added.
+- **Considered and kept (deletion test fails), with the reason:**
+  - *Sound + haptic pairs (47 sites).* They vary independently on purpose: a
+    tap sound with a tick haptic, click/clack sounds with a place haptic, a
+    badge that switches haptic by state, haptics that follow the sound
+    setting. One `Cue` type would add a pair table without removing a
+    decision. The one real inconsistency, the refusal sound, is P5.
+  - *Two HTTP calls.* `NationalWeatherService.get` (anonymous GET, User-Agent
+    required, 8 s, GeoJSON) and `deleteAccount` (authenticated callable POST,
+    60 s read, user-facing error) share only `openConnection`/`disconnect`; a
+    helper would take as many parameters as lines it saves.
+  - *Push token write in `notify/Push`.* The token belongs to this device and
+    rotates in `MessagingService.onNewToken`, where no repository exists. It is
+    the notify module's own data, written through `FirestoreSchema`.
+  - *Hand-pressed pills* (`ThemeBricks`, the bucket list's action pill, the
+    Us settings pill). Each looks different from `BrickChip` (colour swap vs
+    fade, one-shot action, icon content); folding them in changes the design.
+  - *The `.clickable` sites outside `components/`* are the sanctioned
+    `.panel().clickable { }` chain (DESIGN_SYSTEM.md) or gestures on brick
+    art and canvases, not rows `ActionRow` would replace.
+- **Validated:** full suite 286 tests, 27 skipped, 0 failures.

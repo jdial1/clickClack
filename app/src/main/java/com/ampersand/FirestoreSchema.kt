@@ -4,7 +4,9 @@ package com.ampersand
  * Firestore collection names: the one copy of the layout in README.md, "Firestore
  * model", shared by `auth/` (users, invites, couples), `data/` (everything under a
  * couple) and `notify/` (the push token on the user document). `firestore.rules`
- * and `functions/index.js` use the same names and must change with these.
+ * and `functions/index.js` use the same names and must change with these;
+ * `ServerContractTest` fails if they mention one that is missing here. The server
+ * also keeps `outbox` and `chats/{id}/messages`, which no client code touches.
  */
 object FirestoreSchema {
     const val USERS = "users"

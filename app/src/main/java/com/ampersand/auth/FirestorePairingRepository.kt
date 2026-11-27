@@ -3,6 +3,7 @@ package com.ampersand.auth
 import android.util.Log
 import com.ampersand.await
 import com.ampersand.FirestoreSchema.COUPLES
+import com.ampersand.model.Member
 import com.ampersand.FirestoreSchema.INVITES
 import com.ampersand.FirestoreSchema.USERS
 import com.google.firebase.Timestamp
@@ -105,11 +106,11 @@ class FirestorePairingRepository(
                         _state.value = PairState.Paired(
                             coupleId = coupleId,
                             partnerUid = partnerUid,
-                            partnerName = partner.getString("displayName") ?: "Partner",
+                            partnerName = partner.getString("displayName") ?: Member.PARTNER_NAME,
                         )
                     }
                     .addOnFailureListener {
-                        _state.value = PairState.Paired(coupleId, partnerUid, "Partner")
+                        _state.value = PairState.Paired(coupleId, partnerUid, Member.PARTNER_NAME)
                     }
             }
     }
