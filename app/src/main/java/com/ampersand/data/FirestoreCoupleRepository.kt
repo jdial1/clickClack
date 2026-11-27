@@ -13,7 +13,6 @@ import com.ampersand.model.DateKind
 import com.google.firebase.firestore.DocumentReference
 import android.os.Looper
 import android.os.Handler
-import com.ampersand.model.MoodEntry
 import com.ampersand.model.Mood
 import com.ampersand.model.Following
 import com.ampersand.model.League
@@ -24,7 +23,6 @@ import com.ampersand.model.DayWeather
 import com.ampersand.model.SpecialDate
 import com.ampersand.model.Topic
 import com.ampersand.model.RelationshipStatus
-import com.ampersand.model.BucketList
 import com.ampersand.model.BucketItem
 import com.ampersand.model.BucketGroup
 import com.ampersand.model.BrickColor
@@ -32,27 +30,19 @@ import android.util.Log
 import com.ampersand.auth.COUPLES
 import com.ampersand.auth.USERS
 import com.ampersand.model.Answer
-import com.ampersand.model.Block
-import com.ampersand.model.BlockFace
-import com.ampersand.model.BrickHeight
-import com.ampersand.model.BrickShape
 import com.ampersand.model.BuildPlate
 import com.ampersand.model.CoupleState
 import com.ampersand.model.DayEntry
 import com.ampersand.model.InstrumentRun
 import com.ampersand.model.Knowing
 import com.ampersand.model.Memories
-import com.ampersand.model.KnowingMonth
 import com.ampersand.model.Question
 import com.ampersand.model.QuestionType
 import com.ampersand.model.Member
-import com.ampersand.model.Placement
-import com.ampersand.model.QuizResult
 import com.ampersand.model.QuizRun
 import com.ampersand.model.Wildcard
 import com.ampersand.model.Reaction
 import com.ampersand.model.Rewards
-import com.ampersand.model.Slope
 import com.ampersand.model.Streaks
 import com.ampersand.model.Turns
 import com.google.firebase.firestore.DocumentSnapshot
@@ -87,9 +77,6 @@ private const val HistoryDays = 70L
 /** Each person's words toward a sealed week's name, under the plate. */
 private const val WORDS = "words"
 
-/** Plate length in days. */
-private const val PeriodDays = 7
-
 /**
  * Firestore-backed repository. Document layout: README.md, "Firestore model".
  * Today's question is computed from the bundled [QuestionPool] so both phones agree before any write.
@@ -112,7 +99,7 @@ class FirestoreCoupleRepository(
             you = Member(myUid, "You", 0xFFF54E4F),
             them = Member(partnerUid, "Them", 0xFF108BE2),
             today = DayEntry(today, pool.daily(today)),
-            plate = emptyPlate(today),
+            plate = BuildPlate.startingOn(today),
         ),
     )
     override val state: StateFlow<CoupleState> = _state.asStateFlow()
@@ -176,7 +163,7 @@ class FirestoreCoupleRepository(
         regs += couple.addSnapshotListener { d, _ ->
             coupleDoc = d
             anniversary = d?.getString("anniversary")
-                ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                .toDateOrNull()
             recompose()
         }
 
@@ -186,7 +173,7 @@ class FirestoreCoupleRepository(
                 return@addSnapshotListener
             }
             photos = snap?.documents.orEmpty().mapNotNull { doc ->
-                val date = doc.getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@mapNotNull null
+                val date = doc.getString("date").toDateOrNull() ?: return@mapNotNull null
                 DayPhoto(doc.id, date, doc.getString("label").orEmpty(), doc.getString("byUid").orEmpty(), doc.getString("data") ?: return@mapNotNull null)
             }.sortedByDescending { it.date }
             recompose()
@@ -199,7 +186,7 @@ class FirestoreCoupleRepository(
             }
             specialDates = snap?.documents.orEmpty().mapNotNull { doc ->
                 val label = doc.getString("label")?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
-                val date = doc.getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                val date = doc.getString("date").toDateOrNull()
                     ?: return@mapNotNull null
                 SpecialDate(doc.id, label, date, DateKind.entries.firstOrNull { it.name == doc.getString("kind") } ?: DateKind.OTHER)
             }
@@ -387,15 +374,15 @@ class FirestoreCoupleRepository(
         val hidden = hiddenByUid.values.flatten().toSet() +
             (if (Following.hideSports(following, interests)) setOf(Topic.SPORTS) else emptySet())
         val weather = todayDoc.toWeather()
-        val dateKinds = Dates.kindsOn(today, specialDates, listOf(you.birthday, partner.birthday), coupleDoc?.getString("marriedOn")
-            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() })
+        val marriedOn = coupleDoc?.getString("marriedOn").toDateOrNull()
+        val dateKinds = Dates.kindsOn(today, specialDates, listOf(you.birthday, partner.birthday), marriedOn)
         val leagues = Following.leagues(place?.let { Teams.activeLeagues(it, today) }.orEmpty(), following)
         maybeFetchWeather(place, weather)
 
         val off = QuestionSource.entries.filter { coupleDoc?.getBoolean(it.field) == false }.toSet()
         val signs = Topic.HOROSCOPES in interests && you.birthday != null && partner.birthday != null
         val birthdays = listOfNotNull(you.birthday, partner.birthday)
-        val together = Together.on(today, anniversary, coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() })
+        val together = Together.on(today, anniversary, marriedOn)
         val decades = birthdays.map(::decadeOf).toSet()
         val animals = if (Topic.HOROSCOPES in interests) birthdays.map { ChineseZodiac.of(it) }.toSet() else emptySet()
         // Only once both are in: an older couple's empty first read must not look like day one.
@@ -404,13 +391,14 @@ class FirestoreCoupleRepository(
         } else {
             null
         }
+        fun draw() = pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history), firstWeekDay = firstWeek)
         val pinned = todayDoc?.getString("questionId")
         val question = when {
-            pinned != null -> resolveQuestion(pinned) ?: pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history), firstWeekDay = firstWeek)
+            pinned != null -> resolveQuestion(pinned) ?: draw()
             // A ready wildcard beats the capsule and the pool.
             ready.isNotEmpty() -> ready.first().asQuestion()
             capsuleSource != null -> capsuleSource!!.question
-            else -> pool.daily(today, anniversary, taste, recent, picked, hidden = hidden, weatherKind = weather?.kind.takeIf { QuestionSource.WEATHER !in off }, region = place?.region.takeIf { QuestionSource.LOCAL !in off }, state = place?.state.takeIf { QuestionSource.HOLIDAYS !in off }, leagues = leagues.takeIf { QuestionSource.LOCAL !in off }.orEmpty(), signs = signs, decades = decades, animals = animals, together = together, dateKinds = dateKinds, gentle = gentleReturn(today, history), firstWeekDay = firstWeek)
+            else -> draw()
         }.forPlace(place, today).forSigns(you.birthday, partner.birthday)
 
         val todayEntry = DayEntry(
@@ -429,7 +417,7 @@ class FirestoreCoupleRepository(
         )
 
         val live = plates.filter { !it.isSealed }.maxByOrNull { it.startedOn }
-            ?: emptyPlate(today)
+            ?: BuildPlate.startingOn(today)
 
         // A week that has ended rolls over, placed-on or not: an unsealed past week used to
         // keep collecting bricks, and the first brick placed on it sealed it from a stale copy
@@ -457,7 +445,7 @@ class FirestoreCoupleRepository(
             bucket = bucket,
             relationship = coupleDoc?.getString("relationship")
                 ?.let { s -> RelationshipStatus.entries.firstOrNull { it.name == s } },
-            marriedOn = coupleDoc?.getString("marriedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            marriedOn = marriedOn,
             yourHiddenTopics = hiddenByUid[myUid].orEmpty(),
             hiddenTopics = hidden,
             yourInterests = interestsByUid[myUid].orEmpty(),
@@ -486,17 +474,9 @@ class FirestoreCoupleRepository(
 
         _state.value = next
 
+        if (todayDoc?.getBoolean("revealed") == true) recordKnowing(todayEntry)
         // Awards run here because a reveal is often triggered by the partner, seen via a listener.
-        if (todayDoc?.getBoolean("revealed") == true) {
-            if (platesLoaded) awardForToday()
-            recordKnowing(todayEntry)
-        }
-        if (platesLoaded) {
-            awardForQuizzes(next)
-            awardForTalks(next)
-            awardForBucket(next)
-            awardForMoods(next)
-        }
+        if (platesLoaded) award(next)
     }
 
     /**
@@ -516,51 +496,17 @@ class FirestoreCoupleRepository(
         return (fromDays + fromDecks).toSet()
     }
 
-    /** Awards bricks for talked-about days. Checks all plates, since the day is often in a sealed week. */
-    // Every award appends with arrayUnion. Five awards run in one recompose, each
-    // from the same snapshot; writing `plate.blocks + fresh` made the last one
-    // erase the others, the tray flickered while they fought it out, and a brick
-    // dropped mid-fight was refused because it had briefly vanished from the plate.
-    private fun awardForTalks(s: CoupleState) {
-        val plate = s.plate
-        if (plate.isSealed) return
-        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = s.history.filter { it.wasTalkedAbout }.flatMap { day ->
-            Rewards.forTalk(day, s.you, s.them, today) + Rewards.forTalk(day, s.them, s.you, today)
-        }.filter { it.id !in laid }
+    /**
+     * Lays every brick [Rewards.due] says is owed. Appended with arrayUnion: several
+     * awards can land from one snapshot, and writing `plate.blocks + fresh` made the
+     * last write erase the others, so a brick dropped mid-fight was refused because it
+     * had briefly vanished from the plate. Both phones call this; block ids dedupe.
+     */
+    private fun award(s: CoupleState) {
+        val fresh = Rewards.due(s, today, pool.playable, plates)
         if (fresh.isEmpty()) return
-
-        plateRef(plate).set(
-            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
-            SetOptions.merge(),
-        )
-    }
-
-    /** A one-stud mood brick each for the last day either of you set a mood, once that day is over. */
-    private fun awardForMoods(s: CoupleState) {
-        val plate = s.plate
-        if (plate.isSealed) return
-        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = listOf(s.you, s.them).mapNotNull { m -> m.mood?.takeIf { it.on < today }?.block(m) }
-            .filter { it.id !in laid }
-        if (fresh.isEmpty()) return
-        plateRef(plate).set(
-            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
-            SetOptions.merge(),
-        )
-    }
-
-    /** Awards a brick each for done bucket items, deduped by id across all plates. */
-    private fun awardForBucket(s: CoupleState) {
-        val plate = s.plate
-        if (plate.isSealed) return
-        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = s.bucket.flatMap { item ->
-            listOfNotNull(BucketList.reward(item, s.you), BucketList.reward(item, s.them))
-        }.filter { it.id !in laid }
-        if (fresh.isEmpty()) return
-        plateRef(plate).set(
-            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
+        plateRef(s.plate).set(
+            s.plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
             SetOptions.merge(),
         )
     }
@@ -772,49 +718,6 @@ class FirestoreCoupleRepository(
         }
     }
 
-    /** Awards today's bricks to both. Idempotent via `date_uid` block ids, since both phones call it. */
-    private fun awardForToday() {
-        val s = _state.value
-        val plate = s.plate
-        val fresh = (
-            Rewards.forDay(s.today, s.you, s.them, s.streak) +
-                Rewards.forDay(s.today, s.them, s.you, s.streak)
-            ).filter { b -> plate.blocks.none { it.id == b.id } }
-        if (fresh.isEmpty()) return
-
-        plateRef(plate).set(
-            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
-            SetOptions.merge(),
-        )
-    }
-
-    /** Awards bricks to both for finished decks. Flat: accuracy never changes the brick. */
-    private fun awardForQuizzes(s: CoupleState) {
-        val plate = s.plate
-        if (plate.isSealed) return
-
-        // Check all plates, or decks get re-awarded on every new plate.
-        val laid = (plates.flatMap { it.blocks } + plate.blocks).mapTo(mutableSetOf()) { it.id }
-        val fresh = pool.playable.flatMap { quiz ->
-            val mine = s.myRun(quiz.id) ?: return@flatMap emptyList()
-            val theirs = s.theirRun(quiz.id) ?: return@flatMap emptyList()
-            val result = QuizResult.of(quiz, mine, theirs)
-            Rewards.forQuiz(
-                result, s.you, today,
-                effort = Rewards.deckEffort(result.rows, yours = true),
-            ) + Rewards.forQuiz(
-                result, s.them, today,
-                effort = Rewards.deckEffort(result.rows, yours = false),
-            )
-        }.filter { it.id !in laid }
-
-        if (fresh.isEmpty()) return
-        plateRef(plate).set(
-            plate.toMap() + ("blocks" to FieldValue.arrayUnion(*fresh.map { it.toMap() }.toTypedArray())),
-            SetOptions.merge(),
-        )
-    }
-
     override fun noteWeek(plateId: String, text: String) {
         // Merge keeps the partner's note.
         couple.collection(PLATES).document(plateId)
@@ -923,8 +826,8 @@ class FirestoreCoupleRepository(
             .orderBy(FieldPath.documentId()).limit(1).get()
             .addOnSuccessListener { snap ->
                 val first = snap.documents.firstOrNull()
-                val date = first?.id?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
-                val question = date?.let { resolveQuestion(first.getString("questionId"), it) }
+                val date = first?.id.toDateOrNull()
+                val question = date?.let { resolveQuestion(first?.getString("questionId"), it) }
                 if (first != null && date != null && question != null &&
                     date.year < today.year && date.monthValue == today.monthValue && date.dayOfMonth == today.dayOfMonth
                 ) {
@@ -1162,15 +1065,12 @@ class FirestoreCoupleRepository(
     override fun placeBlock(blockId: String, x: Int, y: Int) {
         val plate = _state.value.plate
         // Never onto a week that has ended; it is rolling over.
-        if (plate.isSealed || plate.endsOn() < today) return
-        val block = plate.block(blockId) ?: return
-        if (plate.placed.any { it.blockId == blockId }) return
-        if (!plate.canPlace(block.shape, x, y)) return
+        val placement = plate.placement(blockId, x, y, today) ?: return
 
         // Appended, never rewritten: a whole-list write from a slightly stale plate
         // would erase a brick the other phone placed a moment ago.
         plateRef(plate).set(
-            plate.toMap() + ("placed" to FieldValue.arrayUnion(Placement(blockId, x, y).toMap())),
+            plate.toMap() + ("placed" to FieldValue.arrayUnion(placement.toMap())),
             SetOptions.merge(),
         )
     }
@@ -1266,8 +1166,6 @@ class FirestoreCoupleRepository(
         )
     }
 
-    override fun sealPlate() = sealPlate(_state.value.plate)
-
     /** Plates already sealed by this phone, so a recompose before the snapshot doesn't seal twice. */
     private val sealing = mutableSetOf<String>()
 
@@ -1283,8 +1181,8 @@ class FirestoreCoupleRepository(
             SetOptions.merge(),
         )
         // Unplaced bricks carry over.
-        val carried = plate.tray(myUid) + plate.tray(partnerUid)
-        val next = emptyPlate(today).copy(blocks = carried)
+        val carried = plate.unplaced()
+        val next = BuildPlate.startingOn(today, carried)
         // Date-based id, so two phones sealing at once write the same next plate,
         // and appended, so neither phone's carried bricks erase the other's.
         plateRef(next).set(
@@ -1377,257 +1275,4 @@ class FirestoreCoupleRepository(
     }
 
     private fun plateRef(plate: BuildPlate) = couple.collection(PLATES).document(plate.id)
-
-    private fun emptyPlate(from: LocalDate) = BuildPlate(
-        id = "plate_${from}",
-        startedOn = from,
-        periodDays = PeriodDays,
-        gridW = BuildPlate.GRID_W,
-        gridH = BuildPlate.GRID_H,
-    )
 }
-
-// --- Mapping -----------------------------------------------------------------
-
-private fun DocumentSnapshot?.toMember(uid: String, fallback: Member): Member = Member(
-    uid = uid,
-    name = this?.getString("displayName")?.takeIf { it.isNotBlank() } ?: fallback.name,
-    colorArgb = this?.getLong("colorArgb") ?: fallback.colorArgb,
-    gender = this?.getString("gender"),
-    birthday = this?.getString("birthday")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
-    mood = (this?.get("mood") as? Map<*, *>)?.let { m ->
-        val mood = Mood.entries.firstOrNull { it.name == m["id"] } ?: return@let null
-        val on = (m["on"] as? String)?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return@let null
-        MoodEntry(
-            mood, on, BrickColor.entries.firstOrNull { it.slug == m["color"] },
-            atMillis = (m["at"] as? Number)?.toLong() ?: 0,
-            spans = (m["spans"] as? Map<*, *>).orEmpty().entries.mapNotNull { (k, v) ->
-                val key = Mood.entries.firstOrNull { it.name == k } ?: return@mapNotNull null
-                (v as? Number)?.let { key to it.toLong() }
-            }.toMap(),
-        )
-    },
-)
-
-private fun DayWeather.toMap(): Map<String, Any?> =
-    mapOf("tempF" to tempF, "summary" to summary, "city" to city, "precipChance" to precipChance, "daytime" to daytime)
-
-private fun DocumentSnapshot?.toWeather(): DayWeather? {
-    val w = this?.get("weather") as? Map<*, *> ?: return null
-    val temp = (w["tempF"] as? Number)?.toInt() ?: return null
-    return DayWeather(
-        tempF = temp,
-        summary = w["summary"] as? String ?: "",
-        city = w["city"] as? String,
-        precipChance = (w["precipChance"] as? Number)?.toInt(),
-        daytime = w["daytime"] as? Boolean,
-    )
-}
-
-private fun DocumentSnapshot?.leaguesByUid(): Map<String, Set<League>> =
-    (this?.get("following") as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
-        val key = uid as? String ?: return@mapNotNull null
-        key to (names as? List<*>).orEmpty().mapNotNull { n -> League.entries.firstOrNull { it.name == n } }.toSet()
-    }.toMap()
-
-private fun DocumentSnapshot?.topicsByUid(field: String): Map<String, Set<Topic>> =
-    (this?.get(field) as? Map<*, *>).orEmpty().entries.mapNotNull { (uid, names) ->
-        val key = uid as? String ?: return@mapNotNull null
-        key to (names as? List<*>).orEmpty().mapNotNull { n -> Topic.entries.firstOrNull { it.name == n } }.toSet()
-    }.toMap()
-
-private fun DocumentSnapshot?.toSubmitted(): Set<String> =
-    (this?.get("submitted") as? List<*>).orEmpty().filterIsInstance<String>().toSet()
-
-private fun DocumentSnapshot?.toReactions(): Map<String, Reaction> {
-    val raw = this?.get("reactions") as? Map<*, *> ?: return emptyMap()
-    return raw.entries.mapNotNull { (k, v) ->
-        val uid = k as? String ?: return@mapNotNull null
-        val name = v as? String ?: return@mapNotNull null
-        Reaction.entries.firstOrNull { it.name == name }?.let { uid to it }
-    }.toMap()
-}
-
-private fun DocumentSnapshot?.stringMap(field: String): Map<String, String> =
-    (this?.get(field) as? Map<*, *>).orEmpty().entries
-        .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
-        .toMap()
-
-private fun DocumentSnapshot?.toUidSet(field: String): Set<String> =
-    (this?.get(field) as? List<*>).orEmpty().filterIsInstance<String>().toSet()
-
-private fun DocumentSnapshot?.toTalkedAbout(): Set<String> {
-    @Suppress("UNCHECKED_CAST")
-    val raw = this?.get("talkedAbout") as? List<String> ?: return emptySet()
-    return raw.toSet()
-}
-
-private fun DocumentSnapshot.toWildcard(): Wildcard? {
-    val text = getString("text")?.takeIf { it.isNotBlank() } ?: return null
-    val type = QuestionType.entries.firstOrNull { it.name == getString("type") } ?: return null
-    @Suppress("UNCHECKED_CAST")
-    val options = (get("options") as? List<String>).orEmpty()
-    return Wildcard(
-        id = id,
-        text = text,
-        type = type,
-        options = options,
-        byUid = getString("byUid").orEmpty(),
-        byName = getString("byName").orEmpty(),
-        createdAtMillis = getTimestamp("createdAt")?.toDate()?.time ?: 0L,
-        usedOn = getString("usedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
-    )
-}
-
-private fun DocumentSnapshot.toBucketItem(): BucketItem? {
-    val text = getString("text")?.takeIf { it.isNotBlank() } ?: return null
-    return BucketItem(
-        id = id,
-        text = text,
-        group = BucketGroup.entries.firstOrNull { it.name == getString("group") } ?: BucketGroup.GOALS,
-        byUid = getString("byUid").orEmpty(),
-        createdAtMillis = getTimestamp("createdAt")?.toDate()?.time ?: 0L,
-        doneOn = getString("doneOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
-    )
-}
-
-private fun DocumentSnapshot.toKnowingMonth(myUid: String, partnerUid: String): KnowingMonth? {
-    val month = runCatching { YearMonth.parse(id) }.getOrNull() ?: return null
-    var mine = 0
-    var theirs = 0
-    var scored = 0
-    data.orEmpty().forEach { (_, value) ->
-        val day = value as? Map<*, *> ?: return@forEach
-        scored++
-        if (day[myUid] == true) mine++
-        if (day[partnerUid] == true) theirs++
-    }
-    return KnowingMonth(month, youHits = mine, theyHits = theirs, scored = scored)
-}
-
-private fun DocumentSnapshot.toAnswer(): Answer? {
-    if (!exists()) return null
-    @Suppress("UNCHECKED_CAST")
-    val values = get("values") as? List<String> ?: return null
-    @Suppress("UNCHECKED_CAST")
-    val guess = get("guess") as? List<String>
-    return Answer(uid = id, values = values, guess = guess)
-}
-
-private fun DocumentSnapshot.toDayEntry(pool: QuestionPool, resolve: (String?, LocalDate) -> Question?): DayEntry? {
-    val date = runCatching { LocalDate.parse(id) }.getOrNull() ?: return null
-    // Skip day docs that only hold weather.
-    if (getString("questionId") == null && getBoolean("revealed") != true && toSubmitted().isEmpty()) return null
-    val question = resolve(getString("questionId"), date) ?: pool.daily(date)
-    // No answers here (subcollection read per day); the Reveal screen loads them.
-    return DayEntry(
-        date = date,
-        question = question,
-        reactions = toReactions(),
-        notes = stringMap("notes"),
-        moodReplies = stringMap("moodReplies"),
-        talkedAbout = toTalkedAbout(),
-        askAgain = toUidSet("askAgain"),
-        opened = getBoolean("revealed") == true,
-        submitted = toSubmitted(),
-        nextTheme = getString("nextTheme"),
-        nextThemeBy = getString("nextThemeBy"),
-        recordedRun = getLong("run")?.toInt() ?: 0,
-    )
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun DocumentSnapshot.toQuizRun(quizId: String): QuizRun? {
-    if (!exists()) return null
-    val answers = (get("answers") as? Map<String, List<String>>).orEmpty()
-    if (answers.isEmpty()) return null
-    return QuizRun(
-        quizId = quizId,
-        uid = id,
-        answers = answers,
-        guesses = (get("guesses") as? Map<String, List<String>>).orEmpty(),
-        completedAtMillis = getTimestamp("completedAt")?.toDate()?.time,
-    )
-}
-
-private fun DocumentSnapshot.toPlate(): BuildPlate? {
-    val started = runCatching { LocalDate.parse(getString("startedOn")) }.getOrNull() ?: return null
-    @Suppress("UNCHECKED_CAST")
-    val blocks = (get("blocks") as? List<Map<String, Any?>>).orEmpty().mapNotNull { it.toBlock() }
-    @Suppress("UNCHECKED_CAST")
-    // Placements are appended, so two phones placing the same brick at once leave two; the first stands.
-    val placed = (get("placed") as? List<Map<String, Any?>>).orEmpty().mapNotNull { it.toPlacement() }.distinctBy { it.blockId }
-    return BuildPlate(
-        id = id,
-        startedOn = started,
-        periodDays = (getLong("periodDays") ?: 7L).toInt(),
-        gridW = (getLong("gridW") ?: BuildPlate.GRID_W.toLong()).toInt(),
-        gridH = (getLong("gridH") ?: BuildPlate.GRID_H.toLong()).toInt(),
-        blocks = blocks,
-        placed = placed,
-        completedOn = getString("completedOn")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
-        notes = (get("notes") as? Map<*, *>).orEmpty().entries
-            .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? String)?.let { key to it } } }
-            .toMap(),
-        words = (get("words") as? Map<*, *>).orEmpty().entries.mapNotNull { (k, v) ->
-            val m = v as? Map<*, *> ?: return@mapNotNull null
-            val describing = m["describing"] as? String ?: return@mapNotNull null
-            val thing = m["thing"] as? String ?: return@mapNotNull null
-            (k as? String)?.let { it to NameWords(describing, thing) }
-        }.toMap(),
-    )
-}
-
-private fun Map<String, Any?>.toBlock(): Block? {
-    val id = this["id"] as? String ?: return null
-    val owner = this["ownerUid"] as? String ?: return null
-    val shape = BrickShape(
-        studs = (this["studs"] as? Number)?.toInt() ?: return null,
-        height = BrickHeight.entries.firstOrNull { it.name == this["height"] } ?: BrickHeight.LOW,
-        slope = Slope.entries.firstOrNull { it.name == this["slope"] } ?: Slope.NONE,
-    )
-    return Block(
-        id = id,
-        shape = shape,
-        colorArgb = (this["colorArgb"] as? Number)?.toLong() ?: 0xFFF54E4F,
-        ownerUid = owner,
-        earnedOn = runCatching { LocalDate.parse(this["earnedOn"] as? String) }.getOrNull()
-            ?: LocalDate.now(),
-        face = BlockFace.entries.firstOrNull { it.name == this["face"] },
-        moodGlyph = this["moodGlyph"] as? String,
-    )
-}
-
-private fun Map<String, Any?>.toPlacement(): Placement? {
-    val id = this["blockId"] as? String ?: return null
-    return Placement(
-        blockId = id,
-        x = (this["x"] as? Number)?.toInt() ?: return null,
-        y = (this["y"] as? Number)?.toInt() ?: return null,
-    )
-}
-
-private fun Block.toMap(): Map<String, Any?> = mapOf(
-    "id" to id,
-    "studs" to shape.studs,
-    "height" to shape.height.name,
-    "slope" to shape.slope.name,
-    "colorArgb" to colorArgb,
-    "ownerUid" to ownerUid,
-    "earnedOn" to earnedOn.toString(),
-    "face" to face?.name,
-    "moodGlyph" to moodGlyph,
-)
-
-private fun Placement.toMap(): Map<String, Any?> = mapOf("blockId" to blockId, "x" to x, "y" to y)
-
-private fun BuildPlate.toMap(): Map<String, Any?> = mapOf(
-    "startedOn" to startedOn.toString(),
-    "periodDays" to periodDays,
-    "gridW" to gridW,
-    "gridH" to gridH,
-) + (
-    // Only when set: merging completedOn = null from a stale plate would un-seal it.
-    completedOn?.let { mapOf("completedOn" to it.toString()) } ?: emptyMap()
-)
-

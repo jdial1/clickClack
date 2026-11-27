@@ -242,8 +242,7 @@ object MockCouple {
     val you = Member(uid = "u_justin", name = "Justin", colorArgb = 0xFFF54E4F)
     val them = Member(uid = "u_maya", name = "Maya", colorArgb = 0xFF108BE2)
 
-    /** Plate length in days. */
-    const val PeriodDays = 7
+    private const val PeriodDays = BuildPlate.PERIOD_DAYS
     private const val GridW = BuildPlate.GRID_W
     private const val GridH = BuildPlate.GRID_H
 
