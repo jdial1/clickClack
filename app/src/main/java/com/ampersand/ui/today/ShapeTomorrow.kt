@@ -215,18 +215,6 @@ internal fun DidYouTalk(state: CoupleState, day: DayEntry, onTalkedAbout: (Local
 }
 
 /**
- * Who picked today's theme, or null. Checked against the question's category,
- * since a wildcard, capsule or occasion can override the pick.
- */
-internal fun pickedBy(state: CoupleState): String? {
-    val theme = Turns.themeFor(state.today.date, state.history, state.you.uid, state.them.uid)
-        ?: return null
-    if (state.today.question.category != theme) return null
-    val yesterday = state.history.first { it.date == state.today.date.minusDays(1) }
-    return if (yesterday.nextThemeBy == state.you.uid) "You" else state.them.name
-}
-
-/**
  * Tomorrow's theme picker. The chooser sees the themes; the other partner only
  * sees whether a pick was made, not which one.
  */

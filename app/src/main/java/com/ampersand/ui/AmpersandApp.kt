@@ -563,13 +563,7 @@ private fun SignedInApp(
                         label = "screen",
                     ) { screen ->
                     // Resolve from `screen`, not the live vars, so the outgoing screen keeps its content.
-                    val day = (screen as? Screen.Reveal)?.date?.let { date ->
-                        if (state.today.date == date) {
-                            state.today
-                        } else {
-                            state.history.firstOrNull { it.date == date } ?: state.recalled.firstOrNull { it.date == date }
-                        }
-                    }
+                    val day = (screen as? Screen.Reveal)?.date?.let(state::dayOn)
 
                     val deck = (screen as? Screen.Deck)?.id?.let { pool.deck(it) }
                     val past = (screen as? Screen.Past)?.date?.let { date -> state.history.firstOrNull { it.date == date } }

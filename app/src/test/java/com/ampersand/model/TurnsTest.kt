@@ -110,4 +110,14 @@ class TurnsTest {
     fun `themes lists every category once`() {
         assertEquals(listOf("Everyday", "Deep"), pool.themes)
     }
+
+    @Test
+    fun `the pick is credited to yesterday's chooser, and only when today's question is from it`() {
+        val yesterday = day.minusDays(1)
+        val by = Turns.chooser(yesterday, "alice", "bob")
+        val history = listOf(opened(yesterday, theme = "Money", by = by))
+        assertEquals(by, Turns.pickedBy(DayEntry(day, q("m", "Money")), history, "alice", "bob"))
+        assertNull(Turns.pickedBy(DayEntry(day, q("w", "Weather")), history, "alice", "bob"))
+        assertNull("no yesterday, no pick", Turns.pickedBy(DayEntry(day, q("m", "Money")), emptyList(), "alice", "bob"))
+    }
 }

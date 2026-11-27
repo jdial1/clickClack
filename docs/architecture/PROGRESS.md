@@ -120,3 +120,16 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
   "a few weeks ago" case. Merging would add flags to one function for two
   callers, which fails the deletion test.
 - **Validated:** full suite 281 tests, 27 skipped, 0 failures. DESIGN_SYSTEM.md gains a Dates section.
+
+## Round 10: rules computed in composables move to their model types (T17, part)
+
+- **`Turns.pickedBy(today, history, a, b)`** replaces `ShapeTomorrow.pickedBy`,
+  which re-derived the chooser from the screen and called `history.first {}`
+  (it would throw if yesterday was missing, a case `themeFor` happened to rule
+  out). The screen now only turns the uid into "Your pick"/"Maya's pick".
+- **`CoupleState.dayOn(date)`** is the one lookup across today, the history
+  window and recalled days; `AmpersandApp` used an inline copy.
+- **Left for later:** deck ordering in `DeckList` (it is only used there and
+  reads like presentation order; moving it needs a look at what "order" means
+  to the product), and `TodayCards.specialToday` (UI copy as much as rule).
+- **Validated:** new `TurnsTest` case. Full suite: 282 tests, 27 skipped, 0 failures.

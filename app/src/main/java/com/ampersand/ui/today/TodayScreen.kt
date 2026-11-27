@@ -168,7 +168,8 @@ fun TodayScreen(
             why = when {
                 state.capsule?.question?.id == question.id -> "Again"
                 author != null -> if (author.uid == state.you.uid) "You wrote this" else "From ${author.name}"
-                else -> pickedBy(state)?.let { if (it == "You") "Your pick" else "$it's pick" } ?: state.why
+                else -> Turns.pickedBy(state.today, state.history, state.you.uid, state.them.uid)
+                    ?.let { if (it == state.you.uid) "Your pick" else "${state.them.name}'s pick" } ?: state.why
             },
             author = author?.let { if (it.uid == state.you.uid) "You wrote this for ${state.them.name}" else "${it.name} wrote you this" },
             authorColor = author?.let { BrickColor.of(it.colorArgb) },

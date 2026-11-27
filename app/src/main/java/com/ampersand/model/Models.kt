@@ -275,6 +275,11 @@ data class CoupleState(
         const val QUIET_TO = 8
     }
 
+    /** The day for [date] wherever it is loaded: today, the history window, or recalled on demand. */
+    fun dayOn(date: LocalDate): DayEntry? =
+        if (today.date == date) today
+        else history.firstOrNull { it.date == date } ?: recalled.firstOrNull { it.date == date }
+
     /** Your run through [quizId], if you have played it. */
     fun myRun(quizId: String): QuizRun? = quizRuns.firstOrNull {
         it.quizId == quizId && it.uid == you.uid

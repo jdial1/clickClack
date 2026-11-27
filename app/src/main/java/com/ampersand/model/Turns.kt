@@ -25,6 +25,16 @@ object Turns {
         return theme.takeIf { day.nextThemeBy == chooser(yesterday, a, b) }
     }
 
+    /**
+     * The uid who picked [today]'s theme, when today's question came from it; null when
+     * nobody picked or the draw went elsewhere (a pin, a wildcard, an occasion).
+     */
+    fun pickedBy(today: DayEntry, history: List<DayEntry>, a: String, b: String): String? {
+        val theme = themeFor(today.date, history, a, b) ?: return null
+        if (today.question.category != theme) return null
+        return chooser(today.date.minusDays(1), a, b)
+    }
+
     /** Whether [uid] can pick tomorrow right now: their turn, today open, nothing picked yet. */
     fun canPick(today: DayEntry, uid: String, partner: String): Boolean =
         today.isRevealed && today.nextTheme == null && chooser(today.date, uid, partner) == uid
