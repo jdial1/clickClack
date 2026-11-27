@@ -40,7 +40,7 @@ data class DuoColors(
 
     /** Readable ink for text sitting on [color]. */
     fun inkOn(color: Color): Color =
-        if (color.luminance() > 0.5f) Color(0xFF0E1226) else Color.White
+        if (color.luminance() > 0.5f) DarkInk else Color.White
 }
 
 val LocalDuoColors = staticCompositionLocalOf {
@@ -341,6 +341,9 @@ internal val DefaultYou = Color(com.ampersand.model.BrickColor.RED.argb)
 internal val DefaultThem = Color(com.ampersand.model.BrickColor.BLUE.argb)
 
 internal val NightBase = Color(0xFF0E1226)
+
+/** The one dark ink: text on any colour too pale for white, bricks and blends alike. */
+val DarkInk = Color(0xFF15121F)
 internal val NightCard = Color(0xFF1A2043)
 internal val NightCardHigh = Color(0xFF252C56)
 internal val NightInk = Color(0xFFEDEFFA)

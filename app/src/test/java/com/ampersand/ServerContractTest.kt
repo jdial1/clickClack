@@ -46,6 +46,14 @@ class ServerContractTest {
     }
 
     @Test
+    fun `the functions run where the app calls them`() {
+        assertTrue(
+            "functions/index.js sets a region; update AppConfig.FUNCTIONS_REGION to match",
+            "region" !in functions || "region: \"${AppConfig.FUNCTIONS_REGION}\"" in functions,
+        )
+    }
+
+    @Test
     fun `every collection the server touches is in FirestoreSchema or known server-only`() {
         val named = Regex("""collection\("(\w+)"\)""").findAll(functions).map { it.groupValues[1] } +
             Regex("""/(\w+)/\{\w+\}""").findAll(functions).map { it.groupValues[1] } +

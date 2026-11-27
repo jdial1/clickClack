@@ -157,6 +157,7 @@ fun BuildScreen(
                         block.shape.h * rowPx / 2f,
                 )
             } else {
+                sounds.play(Sfx.DESELECT)
                 feel.play(Feel.REJECT)
                 grabbedAt
             }

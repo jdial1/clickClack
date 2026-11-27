@@ -143,7 +143,7 @@ fun AmpDragRank(
                                     offsetY = 0f
                                 },
                                 onDragCancel = {
-                                    sounds.play(Sfx.PLACE)
+                                    sounds.play(Sfx.DESELECT)
                                     feel.play(Feel.REJECT)
                                     dragging = null
                                     offsetY = 0f

@@ -18,6 +18,12 @@ object AppConfig {
      */
     val hasFirebase: Boolean get() = webClientId.isNotBlank()
 
+    /**
+     * Where the Cloud Functions run: Firebase's default region, because
+     * `functions/index.js` sets none. `ServerContractTest` fails if it starts to.
+     */
+    const val FUNCTIONS_REGION = "us-central1"
+
     /** "0.1.123", as shown in Settings. */
     val versionName: String get() = BuildConfig.VERSION_NAME
 

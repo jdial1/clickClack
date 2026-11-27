@@ -1,13 +1,13 @@
-// Conversations and special-day photos, against the real firestore.rules.
+// Special-day photos, and the retired conversations, against the real firestore.rules.
 //
-//   npx firebase emulators:exec --only firestore --project clickclack-rules "node chat.test.mjs"
+//   npx firebase emulators:exec --only firestore --project clickclack-rules "node photos.test.mjs"
 import { readFileSync } from 'node:fs'
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing'
 import { doc, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
 
 const RULES = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8')
 const env = await initializeTestEnvironment({
-  projectId: 'clickclack-chat',
+  projectId: 'clickclack-photos',
   firestore: { rules: RULES, host: '127.0.0.1', port: 8080 },
 })
 
@@ -35,20 +35,12 @@ async function check(name, fn) {
 const hi = { byUid: 'alice', text: 'That was sweet', emote: null, at: new Date() }
 const pic = { byUid: 'alice', date: '2026-09-14', label: 'Anniversary', data: 'abc' }
 
-await check('conversations are retired: nobody sends a new line', async () => {
-  await seed()
-  await assertFails(setDoc(msg(as('alice')), hi))
-  await assertFails(setDoc(msg(as('bob')), { byUid: 'bob', text: null, emote: 'HEART', at: new Date() }))
-})
-
-await check('old lines stay readable to the two of you, and only to you', async () => {
+// Conversations were removed: no rule covers them, so old lines are closed to
+// everyone. Account deletion still erases them through the admin SDK.
+await check('old conversations are closed: nobody reads, writes, edits or deletes a line', async () => {
   await seed({ existing: hi })
-  await assertSucceeds(getDoc(msg(as('bob'))))
-  await assertFails(getDoc(msg(as('mallory'))))
-})
-
-await check('an old line is never edited or deleted', async () => {
-  await seed({ existing: hi })
+  await assertFails(getDoc(msg(as('alice'))))
+  await assertFails(setDoc(msg(as('bob'), 'm2'), { byUid: 'bob', text: 'hi', emote: null, at: new Date() }))
   await assertFails(updateDoc(msg(as('alice')), { text: 'edited' }))
   await assertFails(deleteDoc(msg(as('alice'))))
 })

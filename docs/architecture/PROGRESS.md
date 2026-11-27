@@ -227,3 +227,31 @@ Baseline on 63e07c2: 270 tests, 27 skipped, 0 failures.
     `.panel().clickable { }` chain (DESIGN_SYSTEM.md) or gestures on brick
     art and canvases, not rows `ActionRow` would replace.
 - **Validated:** full suite 286 tests, 27 skipped, 0 failures.
+
+## Round 16: the owner's decisions on P3–P6
+
+- **P4, one dark ink.** `ui/theme/Theme.kt` `DarkInk` (#15121F) is the only
+  dark text colour; `Duo.inkOn` (blends) and `inkOnBrick` (bricks) both use it.
+  `#0E1226` remains only as `NightBase`, the dark background, which it always
+  also was. Text on pale blends shifts very slightly warmer.
+- **P5, one refusal sound.** A refused move is `Sfx.DESELECT` + `Feel.REJECT`
+  everywhere: `DragRank`'s cancelled drag changed from the place sound, and a
+  brick dropped where it cannot go on the plate now makes the sound as well as
+  the buzz (it was haptic only).
+- **P3, deleted:** `model/Inbox.kt`, `model/Milestones.kt` and their tests.
+- **P6, chat removed.** The `chats` rules are gone, so the old conversations
+  are closed to everyone (Firestore denies what no rule allows; there is no
+  catch-all). `rules-test/chat.test.mjs` became `photos.test.mjs`: its photo
+  checks are unchanged, and its three chat checks became one "closed to
+  everyone" check. **Kept on purpose:** `deleteAccount` still erases a
+  person's old chat lines, because couples who used chat have them stored, and
+  deleting an account must keep deleting that data. Both changes only reach
+  production with the next `firebase deploy` of rules and functions.
+- **P2, functions region:** `AppConfig.FUNCTIONS_REGION` is the one copy of
+  `us-central1` (Firebase's default, since `functions/index.js` sets none);
+  `ServerContractTest` fails if the functions start setting a region.
+- **Validated:** unit suite 277 tests (286 − 10 deleted with `Inbox`/`Milestones`
+  + 1 region check), 27 skipped, 0 failures. Every `rules-test` suite against the
+  Firestore emulator, plus `delete.test.mjs` against the Firestore, Auth and
+  Functions emulators: 107 checks, 0 failures, including "her message gone, his
+  kept" (legacy chat erasure still works with the chat rules removed).

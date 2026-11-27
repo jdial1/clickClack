@@ -145,7 +145,7 @@ class GoogleAuthRepository(
         val token = user.getIdToken(true).await().token.orEmpty()
         val project = com.google.firebase.FirebaseApp.getInstance().options.projectId
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            val connection = java.net.URL("https://us-central1-$project.cloudfunctions.net/deleteAccount")
+            val connection = java.net.URL("https://${AppConfig.FUNCTIONS_REGION}-$project.cloudfunctions.net/deleteAccount")
                 .openConnection() as java.net.HttpURLConnection
             try {
                 connection.requestMethod = "POST"

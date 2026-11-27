@@ -101,14 +101,17 @@ the file; a second copy anywhere else is a bug.
 | Showing a notification | `notify/Notifier` |
 | Design tokens, controls, date formats | `ui/theme/Theme.kt`, `ui/components/`, `ui/theme/DateFormats.kt` (DESIGN_SYSTEM.md) |
 | Quiet-hour defaults | `CoupleState.QUIET_FROM` / `QUIET_TO` |
+| Dark text colour | `ui/theme` `DarkInk` |
+| Refusal feedback | `Sfx.DESELECT` + `Feel.REJECT` |
+| Placeholder member before a profile loads | `Member.placeholderYou` / `placeholderPartner` |
 
-## Acceptance check (after round 15)
+## Acceptance check (after round 16)
 
 | Criterion | State |
 |---|---|
 | Each core concept has one authoritative implementation | Met for every concept in "Canonical homes". Rules the server must restate in JavaScript are pinned to the app's copy by `ServerContractTest`. |
 | Each core module has a clear responsibility and public interface | Met: the repository interfaces are the contracts; the ViewModels only own lifetime (ADR 0004). |
-| No unexplained multiple implementations | Met with two open, recorded exceptions awaiting a design call: two dark-ink colours (P4) and two refusal sounds (P5). Every other look-alike is explained in PROGRESS.md round 15. |
+| No unexplained multiple implementations | Met. The last two (dark ink, refusal sound) were unified in round 16; every remaining look-alike is explained in PROGRESS.md round 15. |
 | No circular dependencies between core modules | Met: `model` → nothing; `data`, `auth`, `notify` → `model` + root kernel; `ui` → all. |
 | Business logic decoupled from UI, storage, frameworks | Met for rules (all in `model/`, JVM-tested). Display order and card wording stay in the UI by decision (round 13). |
-| Functionality, data compatibility, external contracts preserved | Verified by unit tests (270 → 286, 0 failures) and the release build. **Not yet run on a device or against live Firebase**; no Firestore field, collection, rule or function was changed. |
+| Functionality, data compatibility, external contracts preserved | Verified by unit tests (277, 0 failures), the release build, and every rules test plus the account-deletion test on the Firebase emulators (107 checks, 0 failures). No Firestore field or collection changed; the only rule change is the owner-approved removal of chat (P6). **Not yet run on a phone or against live Firebase**, and the rules/functions changes reach production only with the next deploy. |
